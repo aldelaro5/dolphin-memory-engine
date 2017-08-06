@@ -10,6 +10,8 @@ Any x64 based system should theoritically work, however, please note that macos 
 
 You absolutely need to have Dolphin running AND have an emulation started for this program to be of any use.  Because of this, your system needs to match Dolphin's own requirements which you can find [here](https://github.com/dolphin-emu/dolphin#system-requirements).  Additionally, have at least 250MB of free RAM especially when scanning with MEM2 enabled, it should only take this much when doing that.
 
+On Linux, you need to install the Qt5 package of your respective distribution.
+
 # How to build
 ## Windows
 You need Microsoft Visual Studio 2017 since it has native support for CMake (I had a lot of problem to put a solution file so I might add it in the future for previous versions of Visual Studio).  You also need to install the Qt open source package which you can download the installer [here](http://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-windows-x86-5.9.1.exe). Then, simply open the folder "Source" in Visual Studio which should automatically configure the build.  Only use the x64 build configuration as x86 is not supported.
