@@ -1,0 +1,16 @@
+﻿---
+AlignAfterOpenBracket: 'true'
+AllowAllParametersOfDeclarationOnNextLine: 'true'
+AllowShortFunctionsOnASingleLine: None
+AlwaysBreakBeforeMultilineStrings: 'true'
+AlwaysBreakTemplateDeclarations: 'true'
+BreakBeforeBraces: Allman
+BreakStringLiterals: 'true'
+ColumnLimit: '100'
+Cpp11BracedListStyle: 'true'
+Language: Cpp
+PointerAlignment: Left
+Standard: Cpp11
+UseTab: Never
+
+...

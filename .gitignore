@@ -1,0 +1,14 @@
+Source/[Bb]uild*/
+Source/[Bb]inary/
+Source/obj/
+Source/*.ipch
+Source/*.opensdf
+Source/*.sdf
+Source/*.suo
+Source/*.vcxproj.user
+Source/*.obj
+Source/*.tlog
+Source/*.VC.opendb
+Source/*.VC.db
+Source/.vs/
+Source/.vscode/
