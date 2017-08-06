@@ -31,3 +31,6 @@ First, open Dolphin and start a game, then run this program.  Make sure that the
 Once hooked, you can do scans just like Cheat Engine as well as manage your watch list.  You can save and load your watch list to disk by using the file menu.  Note, the watch list files uses JSON internally so you can edit them manually with a text editor.
 
 In case the program unhook itself from Dolphin, it means a read or write failed which should normally mean that Dolphin would ahve crashed or the emualtion was stopped.  Start Dolphin and boot a game again to solve this, your watch list and scan aren't lost if this happens.
+
+# License
+This program is licensed under the MIT license which grants you the permission "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software" as long as you keep the copright notice in the license file.
