@@ -48,7 +48,7 @@ bool WindowsDolphinProcess::findEmuRAMStartAddress()
   for (unsigned char* p = nullptr;
        VirtualQueryEx(m_hDolphin, p, &info, sizeof(info)) == sizeof(info); p += info.RegionSize)
   {
-    if (info.RegionSize == 0x2000000)
+    if (info.RegionSize == 0x2000000 && info.Type == MEM_MAPPED)
     {
       std::memcpy(&m_emuRAMAddressStart, &(info.BaseAddress), sizeof(info.BaseAddress));
       break;
