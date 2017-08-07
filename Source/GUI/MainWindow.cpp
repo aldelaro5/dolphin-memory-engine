@@ -227,7 +227,7 @@ void MainWindow::onSaveAsWatchFile()
 void MainWindow::onAbout()
 {
   QMessageBox::about(this, "About Dolphin memory engine",
-                     "Beta version 0.1.1\n\nA RAM search made to facilitate research and "
+                     "Beta version 0.1.2\n\nA RAM search made to facilitate research and "
                      "reverse engineering of GameCube and Wii games using the Dolphin "
                      "emulator.\n\nThis program is licensed under the MIT license. You "
                      "should have received a copy of the MIT license along with this program");
