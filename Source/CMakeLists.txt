@@ -32,6 +32,10 @@ find_package(Qt5Widgets REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 
-add_executable(Dolphin-memory-engine ${SRCS})
+IF(WIN32)
+SET(GUI_TYPE WIN32)
+ENDIF(WIN32)
+
+add_executable(Dolphin-memory-engine ${GUI_TYPE} ${SRCS})
 
 target_link_libraries(Dolphin-memory-engine Qt5::Widgets)
