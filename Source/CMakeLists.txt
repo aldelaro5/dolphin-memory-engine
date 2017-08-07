@@ -29,6 +29,8 @@ set(SRCS ${DolphinProcessSrc}
 set(CMAKE_INCLUE_CURRENT_DIR ON)
 
 find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Gui REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -39,3 +41,31 @@ ENDIF(WIN32)
 add_executable(Dolphin-memory-engine ${GUI_TYPE} ${SRCS})
 
 target_link_libraries(Dolphin-memory-engine Qt5::Widgets)
+target_link_libraries(Dolphin-memory-engine Qt5::Gui)
+target_link_libraries(Dolphin-memory-engine Qt5::Core)
+
+if(WIN32)
+    if($<CONFIG:Debug>)
+        get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_DEBUG)
+		get_target_property(COREDLL Qt5::Widgets IMPORTED_LOCATION_DEBUG)
+		get_target_property(GUIDLL Qt5::Widgets IMPORTED_LOCATION_DEBUG)
+    else($<CONFIG:Debug>)
+        get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_RELEASE)
+		get_target_property(COREDLL Qt5::Widgets IMPORTED_LOCATION_RELEASE)
+		get_target_property(GUIDLL Qt5::Widgets IMPORTED_LOCATION_RELEASE)
+    endif($<CONFIG:Debug>)
+    add_custom_command(
+		TARGET Dolphin-memory-engine POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			$<TARGET_FILE:Qt5::Widgets>
+			$<TARGET_FILE_DIR:Dolphin-memory-engine>
+		TARGET Dolphin-memory-engine POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			$<TARGET_FILE:Qt5::Core>
+			$<TARGET_FILE_DIR:Dolphin-memory-engine>
+		TARGET Dolphin-memory-engine POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			$<TARGET_FILE:Qt5::Gui>
+			$<TARGET_FILE_DIR:Dolphin-memory-engine>
+	)
+endif(WIN32)
