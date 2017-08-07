@@ -141,7 +141,7 @@ void MainWindow::updateDolphinHookingStatus()
   case DolphinComm::DolphinAccessor::DolphinStatus::hooked:
   {
     m_lblDolphinStatus->setText(
-        "Hooked sucessfully to Dolphin, current start address: " +
+        "Hooked successfully to Dolphin, current start address: " +
         QString::number(DolphinComm::DolphinAccessor::getEmuRAMAddressStart(), 16).toUpper());
     m_scanner->setEnabled(true);
     m_watcher->setEnabled(true);
@@ -227,8 +227,8 @@ void MainWindow::onSaveAsWatchFile()
 void MainWindow::onAbout()
 {
   QMessageBox::about(this, "About Dolphin memory engine",
-                     "Preview version 0.1.0\n\nA RAM search made to facilitate research and "
-                     "reverse engineering of Gamecube and Wii games using the Dolphin "
+                     "Beta version 0.1.1\n\nA RAM search made to facilitate research and "
+                     "reverse engineering of GameCube and Wii games using the Dolphin "
                      "emulator.\n\nThis program is licensed under the MIT license. You "
                      "should have received a copy of the MIT license along with this program");
 }
