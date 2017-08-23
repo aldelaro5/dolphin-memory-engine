@@ -51,6 +51,6 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
                            const std::string inputString, const MemBase base, const MemType type,
                            const size_t length);
 std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
-                                 const MemBase base, const bool isUsigned,
+                                 const MemBase base, const bool isUnsigned,
                                  const bool withBSwap = false);
 }
