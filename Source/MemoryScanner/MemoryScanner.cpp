@@ -16,7 +16,6 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
                                                      const std::string& searchTerm2)
 {
   m_scanRAMCache = nullptr;
-  m_updatedRAMCache = nullptr;
   u32 ramSize = 0;
   if (DolphinComm::DolphinAccessor::isMem2Enabled())
   {
@@ -49,7 +48,6 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     m_wasUnknownInitialValue = true;
     m_memSize = 1;
     m_scanStarted = true;
-    m_updatedRAMCache = new char[ramSize - 1];
     return Common::MemOperationReturnCode::OK;
   }
 
@@ -81,8 +79,6 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     if (scanReturn != Common::MemOperationReturnCode::OK)
       return scanReturn;
   }
-
-  m_updatedRAMCache = new char[ramSize - 1];
 
   bool withBSwap = Common::shouldBeBSwappedForType(m_memType);
 
@@ -272,8 +268,6 @@ void MemScanner::reset()
   m_wasUnknownInitialValue = false;
   if (m_scanRAMCache != nullptr)
     delete[] m_scanRAMCache;
-  if (m_updatedRAMCache != nullptr)
-    delete[] m_updatedRAMCache;
   m_resultCount = 0;
   m_scanStarted = false;
 }
@@ -468,29 +462,13 @@ std::string MemScanner::getFormattedScannedValueAt(const int index) const
 
 Common::MemOperationReturnCode MemScanner::updateCurrentRAMCache()
 {
-  if (DolphinComm::DolphinAccessor::isMem2Enabled())
-  {
-    if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM2_START),
-                                                   m_updatedRAMCache + Common::MEM1_SIZE,
-                                                   Common::MEM2_SIZE - 1, false))
-      return Common::MemOperationReturnCode::operationFailed;
-  }
-  if (!DolphinComm::DolphinAccessor::readFromRAM(0, m_updatedRAMCache, Common::MEM1_SIZE - 1,
-                                                 false))
-    return Common::MemOperationReturnCode::operationFailed;
-  return Common::MemOperationReturnCode::OK;
+  return DolphinComm::DolphinAccessor::updateRAMCache();
 }
 
 std::string MemScanner::getFormattedCurrentValueAt(const int index) const
 {
-  u32 offset = Common::dolphinAddrToOffset(m_resultsConsoleAddr.at(index));
-  u32 ramIndex = 0;
-  if (offset >= Common::MEM1_SIZE)
-    ramIndex = offset - (Common::MEM2_START - Common::MEM1_END);
-  else
-    ramIndex = offset;
-  return Common::formatMemoryToString(&m_updatedRAMCache[ramIndex], m_memType, m_memSize, m_memBase,
-                                      !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
+  return DolphinComm::DolphinAccessor::getFormattedCurrentValue(
+      m_resultsConsoleAddr.at(index), m_memType, m_memSize, m_memBase, !m_memIsSigned);
 }
 
 size_t MemScanner::getResultCount() const

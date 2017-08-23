@@ -1,6 +1,8 @@
 // Wrapper around IDolphinProcess
 #pragma once
 
+#include "../Common/CommonTypes.h"
+#include "../Common/MemoryCommon.h"
 #include "IDolphinProcess.h"
 
 namespace DolphinComm
@@ -16,6 +18,7 @@ public:
     unHooked
   };
 
+  static void init();
   static void hook();
   static void unHook();
   static bool readFromRAM(const u32 offset, char* buffer, const size_t size, const bool withBSwap);
@@ -27,11 +30,17 @@ public:
   static void enableMem2(const bool doEnable);
   static bool isMem2Enabled();
   static void autoDetectMem2();
+  static Common::MemOperationReturnCode updateRAMCache();
+  static std::string getFormattedValueFromCache(const u32 ramIndex, Common::MemType memType,
+                                                size_t memSize, Common::MemBase memBase,
+                                                bool memIsUnsigned);
+  static void copyRawMemoryFromCache(char* dest, const u32 consoleAddress, const size_t byteCount);
   static bool isValidConsoleAddress(const u32 address);
 
 private:
   static IDolphinProcess* m_instance;
   static DolphinStatus m_status;
   static bool m_mem2Enabled;
+  static char* m_updatedRAMCache;
 };
 }
