@@ -1,38 +1,53 @@
-# Dolphin memory engine
-A RAM search specifically made to search, track and edit at runtime the emulated memory of the Dolphin emulator (a Nintendo Wii and Nintendo GameCube emulator).  Its primary goal is to make research, TASing and reverse engineering of games more convenient and easier than the alternative solution, Cheat Engine.  Its name is derived from Cheat Engine to symbolize that.
+# Dolphin Memory Engine
+A RAM search specifically made to search, track, and edit the emulated memory of [the Dolphin emulator](https://github.com/dolphin-emu/dolphin) at runtime. The primary goal is to make research, tool-assisted speedruns, and reverse engineering of GCN & Wii games more convenient and easier than with the alternative solution, Cheat Engine. Its name is derived from Cheat Engine to symbolize that.
 
-It uses Qt5 as its GUI and was made with convenience in mind without disrupting the performance of the emulator.
+It uses Qt 5 for the GUI and was made with convenience in mind, without disrupting the performance of the emulation.
 
-For binary releases of this program, refer to the "release" tab on the Github repository page.
+For binary releases of this program, refer to [the "releases" page](https://github.com/aldelaro5/Dolphin-memory-engine/releases) on [the Github repository](https://github.com/aldelaro5/Dolphin-memory-engine).
 
-# System requirements
-Any x64 based system should theoretically work, however, please note that Mac OS is NOT supported at the moment. x86 based systems are unsupported simply because Dolphin no longer supports it since a while ago.
 
-You absolutely need to have Dolphin running AND have an emulation started for this program to be of any use.  Because of this, your system needs to match Dolphin's own requirements which you can find [here](https://github.com/dolphin-emu/dolphin#system-requirements).  Additionally, have at least 250MB of free RAM especially when scanning with MEM2 enabled, it should only take this much when doing that.
+## System requirements
+Any x86_64 based system should theoretically work, however, please note that Mac OS is currently _not_ supported. Additionally, 32-bit x86 based systems are unsupported as Dolphin does not support them either. (Support for them was dropped a while ago.)
 
-On Linux, you need to install the Qt5 package of your respective distribution.
+You absolutely need to have Dolphin running ***and*** _have the emulation started_ for this program to be of any use. As such, your system needs to meet Dolphin's [system requirements](https://github.com/dolphin-emu/dolphin#system-requirements). Additionally, have at least 250 MB of memory free; especially when scanning with MEM2 enabled, as it should only take this much when doing that.
 
-# How to build
-## Windows
-You need Microsoft Visual Studio 2017 since it has native support for CMake (I had a lot of problem to put a solution file so I might add it in the future for previous versions of Visual Studio).  You also need to install the Qt open source package which you can download the installer [here](http://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-windows-x86-5.9.1.exe). During the installation, you only need to check the component corresponding to your version of msvc (for example, check msvc2017 x64 if you use Visual Studio 2017).  After the installation is done, add an environment variable (sytem info page->advanced settings->environment variables) named CMAKE_PREFIX_PATH whose value is the path of Qt (use the browse directory button). By default, it installs to C:\Qt\[your version of Qt]\[your version of msvc]. Then, simply open the folder "Source" in Visual Studio which should automatically configure the build.  Only use the x64 build configurations as x86 is not supported.
+On Linux, you need to install the Qt 5 package of your respective distribution.
 
-## Linux
-You need to install CMake and Qt5, refer to your distribution for specific instructions on how to do that.  Then, run the following commands from the "Source" directory:
 
-`mkdir build && cd build`
+## How to Build
+### Microsoft Windows
+> *You will need Microsoft Visual Studio 2017 since it has native support for CMake (I had a lot of trouble trying put a solution file. It might be added in the future for previous versions of Visual Studio). You also need to install [the Qt open source](http://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-windows-x86-5.9.1.exe) package if you have not already done so.*
 
-`cmake ..`
+During the installation, you only need to check the component corresponding to your version of MSVC (for example, check msvc2017 x64 if you use Visual Studio 2017).  After the installation is done, make sure the environment variable ``CMAKE_PREFIX_PATH`` contains the path to Qt. (Which is installed to ``C:\Qt\<Qt version>\<MSVC version>`` by default.)
 
-`make`
+Then, simply open the ``Source`` folder in Visual Studio which should automatically configure the build.
 
-The binaries should be built in a directory named "build".
+>_Remember, only use the x64 build configurations as 32-bit x86 platforms are not supported by Dolphin._
 
-# General usage
-First, open Dolphin and start a game, then run this program.  Make sure that the program reports that MEM2 is enabled for Wii games and disabled for GameCube games, MEM2 is an extra memory region exclusive to the Wii and this option affects valid watch addresses as well as where the scanner will look.  Auto detect will detect the right choice most of the time, but some rare cases won't work so simply use the toggle button if you think it got it wrong.  If the hooking process is successful, the UI should be enabled, otherwise, you have to manually press the hook button before you can use this program.
 
-Once hooked, you can do scans just like Cheat Engine as well as manage your watch list.  You can save and load your watch list to disk by using the file menu.  Note, the watch list files uses JSON internally so you can edit them manually with a text editor.
+### Linux
+> _You will need CMake and Qt 5. Please refer to your distribution's documentation for specific instructions on how to install them if necessary._
 
-In case the program unhook itself from Dolphin, it means a read or write failed which should normally mean that Dolphin would have crashed or the emulation was stopped.  Start Dolphin and boot a game again to solve this, your watch list and scan aren't lost if this happens.
+To build for your system, simply run the following commands from the "Source" directory:
 
-# License
-This program is licensed under the MIT license which grants you the permission "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software" as long as you keep the copyright notice in the license file.
+	mkdir build && cd build
+	cmake ..
+	make
+
+The compiled binaries should be appear in the directory named “build”.
+
+
+## General usage
+First, open Dolphin and start a game, then run this program. Make sure that it reports that MEM2 is enabled for Wii games and disabled for GameCube games. The auto detection will usually make the right choice, but there are some rare cases that it will fail. In this case just simply use the toggle button to correct the setting.
+
+>_MEM2 is an extra memory region exclusive to the Wii. This setting affects what are considered valid watch addresses as well as where the scanner will look._
+
+If the hooking process is successful, the UI should be enabled, otherwise, you will need to click the hook button before the program can be of any use.
+
+Once hooked, you can do scans just like Cheat Engine as well as manage your watch list. You can save and load your watch list to disk by using the file menu. Note, the watch list files uses JSON internally so you can edit them manually with a text editor.
+
+If the program unhooks itself from Dolphin, it means a read/write failed which normally means that the emulation has stopped in some way. Just boot a game again to solve this; your watch list and scan will be retained if this happens.
+
+
+## License
+This program is licensed under the MIT license which grants you the permission to anything with the software as long as you preserve all copyright notices. (See the file LICENSE for the legal text.)
