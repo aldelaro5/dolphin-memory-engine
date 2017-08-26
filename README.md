@@ -1,5 +1,5 @@
 # Dolphin Memory Engine
-A RAM search specifically made to search, track, and edit the emulated memory of [the Dolphin emulator](https://github.com/dolphin-emu/dolphin) at runtime. The primary goal is to make research, tool-assisted speedruns, and reverse engineering of GCN & Wii games more convenient and easier than with the alternative solution, Cheat Engine. Its name is derived from Cheat Engine to symbolize that.
+A RAM search specifically made to search, track, and edit the emulated memory of [the Dolphin emulator](https://github.com/dolphin-emu/dolphin) at runtime. The primary goal is to make research, tool-assisted speedruns, and reverse engineering of GameCube & Wii games more convenient and easier than with the alternative solution, Cheat Engine. Its name is derived from Cheat Engine to symbolize that.
 
 It uses Qt 5 for the GUI and was made with convenience in mind, without disrupting the performance of the emulation.
 
