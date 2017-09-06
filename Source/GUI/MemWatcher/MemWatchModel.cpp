@@ -497,3 +497,8 @@ bool MemWatchModel::hasAnyNodes() const
 {
   return m_rootNode->hasChildren();
 }
+
+MemWatchTreeNode* MemWatchModel::getTreeNodeFromIndex(const QModelIndex& index) const
+{
+  return static_cast<MemWatchTreeNode*>(index.internalPointer());
+}

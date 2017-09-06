@@ -198,7 +198,7 @@ void MemWatchWidget::onValueWriteError(const QModelIndex& index,
   {
   case Common::MemOperationReturnCode::invalidInput:
   {
-    MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
+    MemWatchTreeNode* node = m_watchModel->getTreeNodeFromIndex(index);
     MemWatchEntry* entry = node->getEntry();
     int typeIndex = static_cast<int>(entry->getType());
     int baseIndex = static_cast<int>(entry->getBase());

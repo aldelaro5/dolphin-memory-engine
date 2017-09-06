@@ -51,6 +51,7 @@ public:
   void loadRootFromJsonRecursive(const QJsonObject& json);
   void writeRootToJsonRecursive(QJsonObject& json) const;
   bool hasAnyNodes() const;
+  MemWatchTreeNode* getTreeNodeFromIndex(const QModelIndex& index) const;
 signals:
   void writeFailed(const QModelIndex& index, Common::MemOperationReturnCode writeReturn);
   void readFailed();
