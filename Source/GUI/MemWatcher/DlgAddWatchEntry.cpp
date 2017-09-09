@@ -251,7 +251,8 @@ void DlgAddWatchEntry::accept()
       m_entry->setLabel("No label");
     else
       m_entry->setLabel(m_txbLabel->text().toStdString());
-
+    m_entry->setBase(Common::MemBase::base_decimal);
+    m_entry->setSignedUnsigned(false);
     setResult(QDialog::Accepted);
     hide();
   }
