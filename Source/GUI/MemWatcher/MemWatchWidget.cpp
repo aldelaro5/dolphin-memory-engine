@@ -39,7 +39,7 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
   connect(m_watchView,
           static_cast<void (QWidget::*)(const QPoint&)>(&QWidget::customContextMenuRequested), this,
           static_cast<void (MemWatchWidget::*)(const QPoint&)>(
-              &MemWatchWidget::customContextMenuRequested));
+              &MemWatchWidget::onMemWatchContextMenuRequested));
   connect(m_watchModel,
           static_cast<void (MemWatchModel::*)(const QModelIndex&, Common::MemOperationReturnCode)>(
               &MemWatchModel::writeFailed),
@@ -85,12 +85,12 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
   connect(m_freezeTimer, &QTimer::timeout, m_watchModel, &MemWatchModel::onFreezeTimer);
 }
 
-void MemWatchWidget::onMemWatchContextMenuRequested(QPoint pos)
+void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
 {
   QModelIndex index = m_watchView->indexAt(pos);
   if (index != QModelIndex())
   {
-    MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
+    MemWatchTreeNode* node = m_watchModel->getTreeNodeFromIndex(index);
     if (!node->isGroup())
     {
       MemWatchEntry* entry = m_watchModel->getEntryFromIndex(index);

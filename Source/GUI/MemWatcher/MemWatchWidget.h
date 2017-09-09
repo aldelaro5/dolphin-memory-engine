@@ -14,7 +14,7 @@ class MemWatchWidget : public QWidget
 public:
   MemWatchWidget(QWidget* parent);
 
-  void onMemWatchContextMenuRequested(QPoint pos);
+  void onMemWatchContextMenuRequested(const QPoint& pos);
   void onValueWriteError(const QModelIndex& index, Common::MemOperationReturnCode writeReturn);
   void onWatchDoubleClicked(const QModelIndex& index);
   void onAddGroup();
