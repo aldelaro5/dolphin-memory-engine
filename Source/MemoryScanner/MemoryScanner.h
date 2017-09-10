@@ -153,6 +153,5 @@ private:
   bool m_wasUnknownInitialValue = false;
   size_t m_resultCount = 0;
   char* m_scanRAMCache = nullptr;
-  char* m_updatedRAMCache = nullptr;
   bool m_scanStarted = false;
 };

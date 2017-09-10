@@ -5,7 +5,7 @@ This file explains the features that are planned so far in the future of the pro
 
 ## Features to be implemented before 1.0:
 
-* Memory viewer with real time updates
+* DONE - Memory viewer with real time updates
 	* If possible, with a little animation showing what bytes updated
 	* Must also provide in place editing.
 * Greatly improve the UI.

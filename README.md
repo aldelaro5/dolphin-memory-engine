@@ -9,7 +9,7 @@ For binary releases of this program, refer to [the "releases" page](https://gith
 ## System requirements
 Any x86_64 based system should theoretically work, however, please note that Mac OS is currently _not_ supported. Additionally, 32-bit x86 based systems are unsupported as Dolphin does not support them either. (Support for them was dropped a while ago.)
 
-You absolutely need to have Dolphin running ***and*** _have the emulation started_ for this program to be of any use. As such, your system needs to meet Dolphin's [system requirements](https://github.com/dolphin-emu/dolphin#system-requirements). Additionally, have at least 250 MB of memory free; especially when scanning with MEM2 enabled, as it should only take this much when doing that.
+You absolutely need to have Dolphin running ***and*** _have the emulation started_ for this program to be of any use. As such, your system needs to meet Dolphin's [system requirements](https://github.com/dolphin-emu/dolphin#system-requirements). Additionally, have at least 250 MB of memory free.
 
 On Linux, you need to install the Qt 5 package of your respective distribution.
 

@@ -55,11 +55,16 @@ MainWindow::MainWindow()
   m_mem2StatusWidget = new QWidget();
   m_mem2StatusWidget->setLayout(mem2Status_layout);
 
+  m_btnOpenMemViewer = new QPushButton("Open memory viewer");
+  connect(m_btnOpenMemViewer, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
+          &MainWindow::onOpenMenViewer);
+
   QVBoxLayout* main_layout = new QVBoxLayout;
   main_layout->addWidget(m_lblDolphinStatus);
   main_layout->addLayout(dolphinHookButtons_layout);
   main_layout->addWidget(m_mem2StatusWidget);
   main_layout->addWidget(m_scanner);
+  main_layout->addWidget(m_btnOpenMemViewer);
   main_layout->addWidget(m_watcher);
 
   QWidget* main_widget = new QWidget(this);
@@ -88,6 +93,18 @@ MainWindow::MainWindow()
 
   connect(m_scanner, &MemScanWidget::mustUnhook, this, &MainWindow::onUnhook);
   connect(m_watcher, &MemWatchWidget::mustUnhook, this, &MainWindow::onUnhook);
+
+  DolphinComm::DolphinAccessor::init();
+
+  m_viewer = new MemViewerWidget(this, Common::MEM1_START);
+  connect(m_viewer, &MemViewerWidget::mustUnhook, this, &MainWindow::onUnhook);
+  connect(m_watcher,
+          static_cast<void (MemWatchWidget::*)(u32)>(&MemWatchWidget::goToAddressInViewer), this,
+          static_cast<void (MainWindow::*)(u32)>(&MainWindow::onOpenMemViewerWithAddress));
+  m_dlgViewer = new QDialog(this);
+  QVBoxLayout* layout = new QVBoxLayout;
+  layout->addWidget(m_viewer);
+  m_dlgViewer->setLayout(layout);
 
   // First attempt to hook
   onHookAttempt();
@@ -126,6 +143,17 @@ void MainWindow::onToggleMem2()
   updateMem2Status();
 }
 
+void MainWindow::onOpenMenViewer()
+{
+  m_dlgViewer->show();
+}
+
+void MainWindow::onOpenMemViewerWithAddress(u32 address)
+{
+  m_viewer->goToAddress(address);
+  m_dlgViewer->show();
+}
+
 void MainWindow::updateMem2Status()
 {
   if (DolphinComm::DolphinAccessor::isMem2Enabled())
@@ -145,6 +173,7 @@ void MainWindow::updateDolphinHookingStatus()
         QString::number(DolphinComm::DolphinAccessor::getEmuRAMAddressStart(), 16).toUpper());
     m_scanner->setEnabled(true);
     m_watcher->setEnabled(true);
+    m_btnOpenMemViewer->setEnabled(true);
     m_btnAttempHook->hide();
     m_btnUnhook->show();
     break;
@@ -154,6 +183,7 @@ void MainWindow::updateDolphinHookingStatus()
     m_lblDolphinStatus->setText("Cannot hook to Dolphin, the process is not running");
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
+    m_btnOpenMemViewer->setDisabled(true);
     m_btnAttempHook->show();
     m_btnUnhook->hide();
     break;
@@ -164,6 +194,7 @@ void MainWindow::updateDolphinHookingStatus()
         "Cannot hook to Dolphin, the process is running, but no emulation has been started");
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
+    m_btnOpenMemViewer->setDisabled(true);
     m_btnAttempHook->show();
     m_btnUnhook->hide();
     break;
@@ -173,6 +204,7 @@ void MainWindow::updateDolphinHookingStatus()
     m_lblDolphinStatus->setText("Unhooked, press \"Hook\" to hook to Dolphin again");
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
+    m_btnOpenMemViewer->setDisabled(true);
     m_btnAttempHook->show();
     m_btnUnhook->hide();
     break;
@@ -190,6 +222,8 @@ void MainWindow::onHookAttempt()
     m_scanner->getUpdateTimer()->start(100);
     m_watcher->getUpdateTimer()->start(10);
     m_watcher->getFreezeTimer()->start(10);
+    m_viewer->getUpdateTimer()->start(100);
+    m_viewer->hookStatusChanged(true);
     m_mem2StatusWidget->setEnabled(true);
   }
   else
@@ -203,6 +237,8 @@ void MainWindow::onUnhook()
   m_scanner->getUpdateTimer()->stop();
   m_watcher->getUpdateTimer()->stop();
   m_watcher->getFreezeTimer()->stop();
+  m_viewer->getUpdateTimer()->stop();
+  m_viewer->hookStatusChanged(false);
   m_mem2StatusWidget->setDisabled(true);
   DolphinComm::DolphinAccessor::unHook();
   updateDolphinHookingStatus();
@@ -227,7 +263,7 @@ void MainWindow::onSaveAsWatchFile()
 void MainWindow::onAbout()
 {
   QMessageBox::about(this, "About Dolphin memory engine",
-                     "Beta version 0.1.2\n\nA RAM search made to facilitate research and "
+                     "Beta version 0.2\n\nA RAM search made to facilitate research and "
                      "reverse engineering of GameCube and Wii games using the Dolphin "
                      "emulator.\n\nThis program is licensed under the MIT license. You "
                      "should have received a copy of the MIT license along with this program");

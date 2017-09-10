@@ -8,6 +8,7 @@
 #include "../Common/CommonTypes.h"
 #include "../Common/MemoryCommon.h"
 #include "MemScanner/MemScanWidget.h"
+#include "MemViewer/MemViewerWidget.h"
 #include "MemWatcher/MemWatchWidget.h"
 
 class MainWindow : public QMainWindow
@@ -24,6 +25,8 @@ public:
   void onUnhook();
   void onAutoDetectMem2();
   void onToggleMem2();
+  void onOpenMenViewer();
+  void onOpenMemViewerWithAddress(u32 address);
   void updateMem2Status();
 
   void onOpenWatchFile();
@@ -35,13 +38,16 @@ public:
 private:
   MemWatchWidget* m_watcher;
   MemScanWidget* m_scanner;
+  MemViewerWidget* m_viewer;
 
+  QDialog* m_dlgViewer;
   QLabel* m_lblDolphinStatus;
   QPushButton* m_btnAttempHook;
   QPushButton* m_btnUnhook;
   QLabel* m_lblMem2Status;
   QPushButton* m_btnToggleMem2;
   QPushButton* m_btnMem2AutoDetect;
+  QPushButton* m_btnOpenMemViewer;
   QWidget* m_mem2StatusWidget;
 
   QMenu* m_menuFile;
