@@ -463,8 +463,10 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
       std::memcpy(&aByte, memory + i, sizeof(u8));
       ss << std::setfill('0') << std::setw(2) << static_cast<int>(aByte) << " ";
     }
-    std::string test = ss.str();
-    return ss.str();
+    std::string str = ss.str();
+    // Remove the space at the end
+    str.pop_back();
+    return str;
   }
   default:
     return "";
