@@ -23,6 +23,8 @@ set(SRCS ${DolphinProcessSrc}
          GUI/MemWatcher/MemWatchWidget.cpp  
          GUI/MemScanner/ResultsListModel.cpp 
          GUI/MemScanner/MemScanWidget.cpp
+         GUI/MemViewer/MemViewer.cpp
+         GUI/MemViewer/MemViewerWidget.cpp
          GUI/MainWindow.cpp
          main.cpp)
 
