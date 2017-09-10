@@ -467,8 +467,18 @@ Common::MemOperationReturnCode MemScanner::updateCurrentRAMCache()
 
 std::string MemScanner::getFormattedCurrentValueAt(const int index) const
 {
-  return DolphinComm::DolphinAccessor::getFormattedCurrentValue(
-      m_resultsConsoleAddr.at(index), m_memType, m_memSize, m_memBase, !m_memIsSigned);
+  if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_resultsConsoleAddr.at(index)))
+  {
+    u32 offset = Common::dolphinAddrToOffset(m_resultsConsoleAddr.at(index));
+    u32 ramIndex = 0;
+    if (offset >= Common::MEM1_SIZE)
+      ramIndex = offset - (Common::MEM2_START - Common::MEM1_END);
+    else
+      ramIndex = offset;
+    return DolphinComm::DolphinAccessor::getFormattedValueFromCache(ramIndex, m_memType, m_memSize,
+                                                                    m_memBase, !m_memIsSigned);
+  }
+  return "";
 }
 
 size_t MemScanner::getResultCount() const
