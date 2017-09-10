@@ -100,6 +100,13 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       {
         QMenu* contextMenu = new QMenu(this);
 
+        QAction* showInViewer = new QAction("Browse memory at this address...", this);
+        connect(showInViewer, &QAction::triggered, this,
+                [=] { emit goToAddressInViewer(entry->getConsoleAddress()); });
+
+        contextMenu->addAction(showInViewer);
+        contextMenu->addSeparator();
+
         QAction* viewDec = new QAction("View as Decimal", this);
         QAction* viewHex = new QAction("View as Hexadecimal", this);
         QAction* viewOct = new QAction("View as Octal", this);
@@ -126,10 +133,11 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
         contextMenu->addAction(viewHex);
         contextMenu->addAction(viewOct);
         contextMenu->addAction(viewBin);
+        contextMenu->addSeparator();
 
         int baseIndex = static_cast<int>(entry->getBase());
         Common::MemBase theBase = static_cast<Common::MemBase>(baseIndex);
-        contextMenu->actions().at(baseIndex)->setEnabled(false);
+        contextMenu->actions().at(baseIndex + 2)->setEnabled(false);
 
         if (theBase == Common::MemBase::base_decimal)
         {
@@ -145,16 +153,22 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
             m_hasUnsavedChanges = true;
           });
 
-          contextMenu->addSeparator();
           contextMenu->addAction(viewSigned);
           contextMenu->addAction(viewUnsigned);
 
           if (entry->isUnsigned())
-            contextMenu->actions().at(6)->setEnabled(false);
+          {
+            contextMenu->actions()
+                .at(static_cast<int>(Common::MemBase::base_none) + 4)
+                ->setEnabled(false);
+          }
           else
-            contextMenu->actions().at(5)->setEnabled(false);
+          {
+            contextMenu->actions()
+                .at(static_cast<int>(Common::MemBase::base_none) + 3)
+                ->setEnabled(false);
+          }
         }
-
         contextMenu->popup(m_watchView->viewport()->mapToGlobal(pos));
       }
     }

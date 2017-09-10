@@ -31,6 +31,7 @@ public:
 
 signals:
   void mustUnhook();
+  void goToAddressInViewer(u32 address);
 
 private:
   QTreeView* m_watchView;
