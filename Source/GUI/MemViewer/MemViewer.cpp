@@ -319,14 +319,23 @@ void MemViewer::renderColumnsHeaderText(QPainter& painter)
 {
   painter.drawText(m_charWidthEm / 2, m_charHeight, " Address");
   int posXHeaderText = m_rowHeaderWidth;
-  for (int i = 0; i < 16; ++i)
+  int i = m_currentFirstAddress & 0xF;
+  do
   {
-    std::stringstream ss;
-    ss << std::hex << std::uppercase << i;
-    std::string headerText = "." + ss.str();
-    painter.drawText(posXHeaderText, m_charHeight, QString::fromStdString(headerText));
-    posXHeaderText += m_charWidthEm * 2 + m_charWidthEm / 2;
-  }
+    if (i >= 16)
+    {
+      i = 0;
+    }
+    else
+    {
+      std::stringstream ss;
+      ss << std::hex << std::uppercase << i;
+      std::string headerText = "." + ss.str();
+      painter.drawText(posXHeaderText, m_charHeight, QString::fromStdString(headerText));
+      posXHeaderText += m_charWidthEm * 2 + m_charWidthEm / 2;
+      i++;
+    }
+  } while (i != (m_currentFirstAddress & 0xF));
 
   painter.drawText(m_hexAsciiSeparatorPosX + m_charWidthEm / 2, m_charHeight, "  Text (ASCII)  ");
 }
