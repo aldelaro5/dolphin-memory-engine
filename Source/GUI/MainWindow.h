@@ -36,6 +36,8 @@ public:
   void onQuit();
 
 private:
+  QString* m_strMem2Info;
+
   MemWatchWidget* m_watcher;
   MemScanWidget* m_scanner;
   MemViewerWidget* m_viewer;

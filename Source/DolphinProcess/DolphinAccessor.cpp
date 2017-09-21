@@ -86,7 +86,7 @@ void DolphinAccessor::enableMem2(const bool doEnable)
 {
   bool old = m_mem2Enabled;
   m_mem2Enabled = doEnable;
-  if (old != m_mem2Enabled)
+  if (old != m_mem2Enabled && m_status == DolphinStatus::hooked)
     updateRAMCache();
 }
 

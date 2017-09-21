@@ -18,9 +18,10 @@ MainWindow::MainWindow()
           static_cast<void (MemScanWidget::*)(u32 address, Common::MemType type, size_t length,
                                               bool isUnsigned, Common::MemBase base)>(
               &MemScanWidget::requestAddWatchEntry),
-          this, static_cast<void (MainWindow::*)(u32 address, Common::MemType type, size_t length,
-                                                 bool isUnsigned, Common::MemBase base)>(
-                    &MainWindow::addWatchRequested));
+          this,
+          static_cast<void (MainWindow::*)(u32 address, Common::MemType type, size_t length,
+                                           bool isUnsigned, Common::MemBase base)>(
+              &MainWindow::addWatchRequested));
   m_watcher = new MemWatchWidget(this);
 
   m_btnAttempHook = new QPushButton("Hook");
@@ -36,7 +37,9 @@ MainWindow::MainWindow()
 
   m_lblDolphinStatus = new QLabel("");
 
-  m_lblMem2Status = new QLabel("MEM2 is disabled");
+  m_strMem2Info =
+      new QString(" (This should be disabled for GameCube games and enabled for Wii games)");
+  m_lblMem2Status = new QLabel("MEM2 is disabled" + *m_strMem2Info);
   m_btnMem2AutoDetect = new QPushButton("Auto detect");
   m_btnToggleMem2 = new QPushButton("Toggle MEM2");
   connect(m_btnMem2AutoDetect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -157,9 +160,9 @@ void MainWindow::onOpenMemViewerWithAddress(u32 address)
 void MainWindow::updateMem2Status()
 {
   if (DolphinComm::DolphinAccessor::isMem2Enabled())
-    m_lblMem2Status->setText("MEM2 is enabled");
+    m_lblMem2Status->setText("MEM2 is enabled" + *m_strMem2Info);
   else
-    m_lblMem2Status->setText("MEM2 is disabled");
+    m_lblMem2Status->setText("MEM2 is disabled" + *m_strMem2Info);
 }
 
 void MainWindow::updateDolphinHookingStatus()
@@ -224,11 +227,11 @@ void MainWindow::onHookAttempt()
     m_watcher->getFreezeTimer()->start(10);
     m_viewer->getUpdateTimer()->start(100);
     m_viewer->hookStatusChanged(true);
-    m_mem2StatusWidget->setEnabled(true);
+    m_btnMem2AutoDetect->setEnabled(true);
   }
   else
   {
-    m_mem2StatusWidget->setDisabled(true);
+    m_btnMem2AutoDetect->setDisabled(true);
   }
 }
 
@@ -239,7 +242,7 @@ void MainWindow::onUnhook()
   m_watcher->getFreezeTimer()->stop();
   m_viewer->getUpdateTimer()->stop();
   m_viewer->hookStatusChanged(false);
-  m_mem2StatusWidget->setDisabled(true);
+  m_btnMem2AutoDetect->setDisabled(true);
   DolphinComm::DolphinAccessor::unHook();
   updateDolphinHookingStatus();
 }
