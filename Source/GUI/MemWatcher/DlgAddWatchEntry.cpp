@@ -143,6 +143,8 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
         ssOffset << std::hex << std::uppercase << m_entry->getPointerOffset(i);
         QLineEdit* lineEdit = new QLineEdit();
         lineEdit->setText(QString::fromStdString(ssOffset.str()));
+        connect(lineEdit, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited),
+                this, &DlgAddWatchEntry::onOffsetChanged);
         m_offsetsWidgets.append(lineEdit);
         QLabel* label = new QLabel(QString::fromStdString("Level " + std::to_string(i + 1) + ":"));
         m_offsetsLayout->addRow(label, lineEdit);
