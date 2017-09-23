@@ -3,7 +3,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialog>
-#include <QFormLayout>
+#include <QGridLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -25,7 +25,7 @@ public:
   MemWatchEntry* getEntry() const;
 
 private:
-  void updateValuePreview();
+  void updatePreview();
   bool validateAndSetAddress();
   bool validateAndSetOffset(int index);
   void addPointerOffset();
@@ -33,8 +33,9 @@ private:
 
   MemWatchEntry* m_entry;
   QLineEdit* m_txbAddress;
-  QVector<QLineEdit*> m_offsetsWidgets;
-  QFormLayout* m_offsetsLayout;
+  QVector<QLineEdit*> m_offsets;
+  QVector<QLabel*> m_addressPath;
+  QGridLayout* m_offsetsLayout;
   QCheckBox* m_chkBoundToPointer;
   QLabel* m_lblValuePreview;
   QLineEdit* m_txbLabel;

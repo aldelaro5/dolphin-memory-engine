@@ -33,8 +33,8 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   connect(m_txbAddress, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited),
           this, &DlgAddWatchEntry::onAddressChanged);
 
-  m_offsetsLayout = new QFormLayout;
-  m_offsetsWidgets = QVector<QLineEdit*>();
+  m_offsetsLayout = new QGridLayout;
+  m_offsets = QVector<QLineEdit*>();
   QWidget* offsetsWidget = new QWidget();
   offsetsWidget->setLayout(m_offsetsLayout);
 
@@ -133,21 +133,27 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
     std::stringstream ssAddress;
     ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
     m_txbAddress->setText(QString::fromStdString(ssAddress.str()));
-    m_chkBoundToPointer->setChecked(m_entry->isBoundToPointer());
     if (entry->isBoundToPointer())
     {
       m_pointerWidget->show();
       for (int i = 0; i < m_entry->getPointerLevel(); ++i)
       {
-        std::stringstream ssOffset;
-        ssOffset << std::hex << std::uppercase << m_entry->getPointerOffset(i);
-        QLineEdit* lineEdit = new QLineEdit();
-        lineEdit->setText(QString::fromStdString(ssOffset.str()));
-        connect(lineEdit, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited),
+        std::stringstream ss;
+        ss << std::hex << std::uppercase << m_entry->getPointerOffset(i);
+        QLabel* lblLevel =
+            new QLabel(QString::fromStdString("Level " + std::to_string(i + 1) + ":"));
+        QLineEdit* txbOffset = new QLineEdit();
+        txbOffset->setText(QString::fromStdString(ss.str()));
+        connect(txbOffset, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited),
                 this, &DlgAddWatchEntry::onOffsetChanged);
-        m_offsetsWidgets.append(lineEdit);
-        QLabel* label = new QLabel(QString::fromStdString("Level " + std::to_string(i + 1) + ":"));
-        m_offsetsLayout->addRow(label, lineEdit);
+        m_offsets.append(txbOffset);
+        QLabel* lblAddressOfPath = new QLabel();
+        lblAddressOfPath->setText(
+            QString::fromStdString(" -> " + m_entry->getAddressStringForPointerLevel(i + 1)));
+        m_addressPath.append(lblAddressOfPath);
+        m_offsetsLayout->addWidget(lblLevel, i, 0);
+        m_offsetsLayout->addWidget(txbOffset, i, 1);
+        m_offsetsLayout->addWidget(lblAddressOfPath, i, 2);
       }
     }
     else
@@ -155,22 +161,27 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
       m_pointerWidget->hide();
       addPointerOffset();
     }
-    updateValuePreview();
+    // Implicitly calls updateValuePreview via an event
+    m_chkBoundToPointer->setChecked(m_entry->isBoundToPointer());
   }
 }
 
 void DlgAddWatchEntry::addPointerOffset()
 {
-  QLineEdit* lineEdit = new QLineEdit();
-  lineEdit->setText(0);
-  m_offsetsWidgets.append(lineEdit);
-  int level = m_offsetsLayout->rowCount();
-  QLabel* label = new QLabel(QString::fromStdString("Level " + std::to_string(level + 1) + ":"));
-  m_offsetsLayout->addRow(label, lineEdit);
+  int level = m_entry->getPointerLevel();
+  QLabel* lblLevel = new QLabel(QString::fromStdString("Level " + std::to_string(level + 1) + ":"));
+  QLineEdit* txbOffset = new QLineEdit();
+  txbOffset->setText(0);
+  m_offsets.append(txbOffset);
+  QLabel* lblAddressOfPath = new QLabel(" -> ");
+  m_addressPath.append(lblAddressOfPath);
+  m_offsetsLayout->addWidget(lblLevel, level, 0);
+  m_offsetsLayout->addWidget(txbOffset, level, 1);
+  m_offsetsLayout->addWidget(lblAddressOfPath, level, 2);
   m_entry->addOffset(0);
-  connect(lineEdit, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited), this,
+  connect(txbOffset, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited), this,
           &DlgAddWatchEntry::onOffsetChanged);
-  if (m_offsetsLayout->rowCount() > 1)
+  if (m_entry->getPointerLevel() > 1)
     m_btnRemoveOffset->setEnabled(true);
   else
     m_btnRemoveOffset->setDisabled(true);
@@ -178,23 +189,44 @@ void DlgAddWatchEntry::addPointerOffset()
 
 void DlgAddWatchEntry::removePointerOffset()
 {
-  m_offsetsLayout->removeRow(m_offsetsLayout->rowCount() - 1);
-  m_offsetsWidgets.removeLast();
+  int level = m_entry->getPointerLevel();
+
+  QLayoutItem* lblLevelItem = m_offsetsLayout->takeAt(
+      m_offsetsLayout->indexOf(m_offsetsLayout->itemAtPosition(level - 1, 0)->widget()));
+  QLayoutItem* txbOffsetItem = m_offsetsLayout->takeAt(
+      m_offsetsLayout->indexOf(m_offsetsLayout->itemAtPosition(level - 1, 1)->widget()));
+  QLayoutItem* lblAddressOfPathItem = m_offsetsLayout->takeAt(
+      m_offsetsLayout->indexOf(m_offsetsLayout->itemAtPosition(level - 1, 2)->widget()));
+
+  delete lblLevelItem->widget();
+  delete txbOffsetItem->widget();
+  delete lblAddressOfPathItem->widget();
+
+  m_offsetsLayout->setRowMinimumHeight(level - 1, 0);
+  m_offsetsLayout->setRowStretch(level - 1, 0);
+
+  m_offsets.removeLast();
+  m_addressPath.removeLast();
   m_entry->removeOffset();
-  updateValuePreview();
-  if (m_offsetsLayout->rowCount() == 1)
+  updatePreview();
+  if (m_entry->getPointerLevel() == 1)
+  {
     m_btnRemoveOffset->setDisabled(true);
+    m_btnAddOffset->setFocus();
+  }
 }
 
 void DlgAddWatchEntry::onOffsetChanged()
 {
   QLineEdit* theLineEdit = static_cast<QLineEdit*>(sender());
   int index = 0;
-  QFormLayout::ItemRole itemRole;
-  m_offsetsLayout->getWidgetPosition(theLineEdit, &index, &itemRole);
+  // Dummy variable for getItemPosition
+  int column, rowSpan, columnSpan;
+  m_offsetsLayout->getItemPosition(m_offsetsLayout->indexOf(theLineEdit), &index, &column, &rowSpan,
+                                   &columnSpan);
   if (validateAndSetOffset(index))
   {
-    updateValuePreview();
+    updatePreview();
   }
 }
 
@@ -207,7 +239,7 @@ void DlgAddWatchEntry::onTypeChange(int index)
     m_lengtWidget->hide();
   m_entry->setType(theType);
   if (validateAndSetAddress())
-    updateValuePreview();
+    updatePreview();
 }
 
 void DlgAddWatchEntry::accept()
@@ -231,7 +263,7 @@ void DlgAddWatchEntry::accept()
     {
       bool allOffsetsValid = true;
       int i = 0;
-      for (i; i < m_offsetsWidgets.count(); ++i)
+      for (i; i < m_offsets.count(); ++i)
       {
         allOffsetsValid = validateAndSetOffset(i);
         if (!allOffsetsValid)
@@ -280,7 +312,7 @@ bool DlgAddWatchEntry::validateAndSetAddress()
 
 bool DlgAddWatchEntry::validateAndSetOffset(int index)
 {
-  std::string offsetStr = m_offsetsWidgets[index]->text().toStdString();
+  std::string offsetStr = m_offsets[index]->text().toStdString();
   std::stringstream ss(offsetStr);
   ss >> std::hex;
   int offset = 0;
@@ -297,7 +329,7 @@ void DlgAddWatchEntry::onAddressChanged()
 {
   if (validateAndSetAddress())
   {
-    updateValuePreview();
+    updatePreview();
   }
   else
   {
@@ -305,17 +337,29 @@ void DlgAddWatchEntry::onAddressChanged()
   }
 }
 
-void DlgAddWatchEntry::updateValuePreview()
+void DlgAddWatchEntry::updatePreview()
 {
   m_entry->readMemoryFromRAM();
   m_lblValuePreview->setText(QString::fromStdString(m_entry->getStringFromMemory()));
+  if (m_entry->isBoundToPointer())
+  {
+    int level = m_entry->getPointerLevel();
+    for (int i = 0; i < level; ++i)
+    {
+      QWidget* test = m_offsetsLayout->itemAtPosition(i, 2)->widget();
+      QLabel* lblAddressOfPath =
+          static_cast<QLabel*>(m_offsetsLayout->itemAtPosition(i, 2)->widget());
+      lblAddressOfPath->setText(
+          QString::fromStdString(" -> " + m_entry->getAddressStringForPointerLevel(i + 1)));
+    }
+  }
 }
 
 void DlgAddWatchEntry::onLengthChanged()
 {
   m_entry->setLength(m_spnLength->value());
   if (validateAndSetAddress())
-    updateValuePreview();
+    updatePreview();
 }
 
 void DlgAddWatchEntry::onIsPointerChanged()
@@ -325,7 +369,7 @@ void DlgAddWatchEntry::onIsPointerChanged()
   else
     m_pointerWidget->hide();
   m_entry->setBoundToPointer(m_chkBoundToPointer->isChecked());
-  updateValuePreview();
+  updatePreview();
 }
 
 MemWatchEntry* DlgAddWatchEntry::getEntry() const
