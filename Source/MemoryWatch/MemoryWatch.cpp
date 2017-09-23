@@ -185,6 +185,46 @@ Common::MemOperationReturnCode MemWatchEntry::freeze()
   return writeCode;
 }
 
+u32 MemWatchEntry::getAddressForPointerLevel(const int level)
+{
+  if (!m_boundToPointer && level > m_pointerOffsets.size() && level > 0)
+    return 0;
+  u32 address = m_consoleAddress;
+  char addressBuffer[sizeof(u32)] = {0};
+  for (int i = 0; i < level; ++i)
+  {
+    if (DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(address),
+                                                  addressBuffer, sizeof(u32), true))
+    {
+      std::memcpy(&address, addressBuffer, sizeof(u32));
+      if (DolphinComm::DolphinAccessor::isValidConsoleAddress(address))
+        address += m_pointerOffsets.at(i);
+      else
+        return 0;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+  return address;
+}
+
+std::string MemWatchEntry::getAddressStringForPointerLevel(const int level)
+{
+  u32 address = getAddressForPointerLevel(level);
+  if (address == 0)
+  {
+    return "???";
+  }
+  else
+  {
+    std::stringstream ss;
+    ss << std::hex << std::uppercase << address;
+    return ss.str();
+  }
+}
+
 Common::MemOperationReturnCode MemWatchEntry::readMemoryFromRAM()
 {
   u32 realConsoleAddress = m_consoleAddress;

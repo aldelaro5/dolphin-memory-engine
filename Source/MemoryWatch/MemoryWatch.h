@@ -43,6 +43,8 @@ public:
 
   Common::MemOperationReturnCode freeze();
 
+  u32 getAddressForPointerLevel(const int level);
+  std::string getAddressStringForPointerLevel(const int level);
   Common::MemOperationReturnCode readMemoryFromRAM();
 
   std::string getStringFromMemory() const;
