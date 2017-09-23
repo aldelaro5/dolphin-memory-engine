@@ -42,7 +42,6 @@ private:
   MemScanWidget* m_scanner;
   MemViewerWidget* m_viewer;
 
-  QDialog* m_dlgViewer;
   QLabel* m_lblDolphinStatus;
   QPushButton* m_btnAttempHook;
   QPushButton* m_btnUnhook;

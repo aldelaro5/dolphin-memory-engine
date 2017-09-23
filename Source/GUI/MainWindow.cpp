@@ -99,15 +99,11 @@ MainWindow::MainWindow()
 
   DolphinComm::DolphinAccessor::init();
 
-  m_viewer = new MemViewerWidget(this, Common::MEM1_START);
+  m_viewer = new MemViewerWidget(nullptr, Common::MEM1_START);
   connect(m_viewer, &MemViewerWidget::mustUnhook, this, &MainWindow::onUnhook);
   connect(m_watcher,
           static_cast<void (MemWatchWidget::*)(u32)>(&MemWatchWidget::goToAddressInViewer), this,
           static_cast<void (MainWindow::*)(u32)>(&MainWindow::onOpenMemViewerWithAddress));
-  m_dlgViewer = new QDialog(this);
-  QVBoxLayout* layout = new QVBoxLayout;
-  layout->addWidget(m_viewer);
-  m_dlgViewer->setLayout(layout);
 
   // First attempt to hook
   onHookAttempt();
@@ -148,13 +144,13 @@ void MainWindow::onToggleMem2()
 
 void MainWindow::onOpenMenViewer()
 {
-  m_dlgViewer->show();
+  m_viewer->show();
 }
 
 void MainWindow::onOpenMemViewerWithAddress(u32 address)
 {
   m_viewer->goToAddress(address);
-  m_dlgViewer->show();
+  m_viewer->show();
 }
 
 void MainWindow::updateMem2Status()
