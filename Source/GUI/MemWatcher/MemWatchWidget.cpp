@@ -47,10 +47,12 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
           static_cast<void (MemWatchWidget::*)(const QModelIndex&, Common::MemOperationReturnCode)>(
               &MemWatchWidget::onValueWriteError));
   connect(m_watchModel, &MemWatchModel::dropSucceeded, this, &MemWatchWidget::onDropSucceeded);
-  connect(m_watchView, static_cast<void (QAbstractItemView::*)(const QModelIndex&)>(
-                           &QAbstractItemView::doubleClicked),
-          this, static_cast<void (MemWatchWidget::*)(const QModelIndex&)>(
-                    &MemWatchWidget::onWatchDoubleClicked));
+  connect(m_watchView,
+          static_cast<void (QAbstractItemView::*)(const QModelIndex&)>(
+              &QAbstractItemView::doubleClicked),
+          this,
+          static_cast<void (MemWatchWidget::*)(const QModelIndex&)>(
+              &MemWatchWidget::onWatchDoubleClicked));
   m_watchView->setItemDelegate(m_watchDelegate);
   m_watchView->setModel(m_watchModel);
   QShortcut* shortcut = new QShortcut(QKeySequence::Delete, m_watchView);
@@ -100,11 +102,37 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       {
         QMenu* contextMenu = new QMenu(this);
 
-        QAction* showInViewer = new QAction("Browse memory at this address...", this);
-        connect(showInViewer, &QAction::triggered, this,
-                [=] { emit goToAddressInViewer(entry->getConsoleAddress()); });
+        if (entry->isBoundToPointer())
+        {
+          QMenu* memViewerSubMenu = contextMenu->addMenu("Browse memory at");
+          QAction* showPointerInViewer = new QAction("The pointer address...", this);
+          connect(showPointerInViewer, &QAction::triggered, this,
+                  [=] { emit goToAddressInViewer(entry->getConsoleAddress()); });
+          memViewerSubMenu->addAction(showPointerInViewer);
+          for (int i = 0; i < entry->getPointerLevel(); ++i)
+          {
+            std::string strAddressOfPath = entry->getAddressStringForPointerLevel(i + 1);
+            if (strAddressOfPath == "???")
+              break;
+            QAction* showAddressOfPathInViewer =
+                new QAction("The pointed address at level " + QString::number(i + 1) + "...", this);
+            connect(showAddressOfPathInViewer, &QAction::triggered, this,
+                    [=] { emit goToAddressInViewer(entry->getAddressForPointerLevel(i + 1)); });
+            memViewerSubMenu->addAction(showAddressOfPathInViewer);
+          }
 
-        contextMenu->addAction(showInViewer);
+          QAction* showInViewer = new QAction("Browse memory at this address...", this);
+          connect(showInViewer, &QAction::triggered, this,
+                  [=] { emit goToAddressInViewer(entry->getConsoleAddress()); });
+        }
+        else
+        {
+          QAction* showInViewer = new QAction("Browse memory at this address...", this);
+          connect(showInViewer, &QAction::triggered, this,
+                  [=] { emit goToAddressInViewer(entry->getConsoleAddress()); });
+
+          contextMenu->addAction(showInViewer);
+        }
         contextMenu->addSeparator();
 
         QAction* viewDec = new QAction("View as Decimal", this);
