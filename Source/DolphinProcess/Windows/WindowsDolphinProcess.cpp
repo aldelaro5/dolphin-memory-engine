@@ -3,6 +3,7 @@
 #include "WindowsDolphinProcess.h"
 #include "../../Common/CommonUtils.h"
 
+#include <Psapi.h>
 #include <string>
 #include <tlhelp32.h>
 
@@ -50,8 +51,20 @@ bool WindowsDolphinProcess::findEmuRAMStartAddress()
   {
     if (info.RegionSize == 0x2000000 && info.Type == MEM_MAPPED)
     {
-      std::memcpy(&m_emuRAMAddressStart, &(info.BaseAddress), sizeof(info.BaseAddress));
-      break;
+      // Here, it's likely the right page, but it can happen that multiple pages with these criteria
+      // exists and have nothing to do with the emulated memory. Only the right page has valid
+      // working set information so an additional check is required that it is backed by phisical
+      // memory.
+      PSAPI_WORKING_SET_EX_INFORMATION wsInfo;
+      wsInfo.VirtualAddress = info.BaseAddress;
+      if (QueryWorkingSetEx(m_hDolphin, &wsInfo, sizeof(PSAPI_WORKING_SET_EX_INFORMATION)))
+      {
+        if (wsInfo.VirtualAttributes.Valid)
+        {
+          std::memcpy(&m_emuRAMAddressStart, &(info.BaseAddress), sizeof(info.BaseAddress));
+          break;
+        }
+      }
     }
   }
   if (m_emuRAMAddressStart == 0)
@@ -147,5 +160,5 @@ bool WindowsDolphinProcess::writeToRAM(const u32 offset, const char* buffer, con
   delete[] bufferCopy;
   return (bResult && nread == size);
 }
-}
+} // namespace DolphinComm
 #endif
