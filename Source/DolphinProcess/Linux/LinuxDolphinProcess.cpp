@@ -20,7 +20,8 @@ bool LinuxDolphinProcess::findEmuRAMStartAddress()
   {
     if (line.length() > 73)
     {
-      if (line.substr(73, 19) == "/dev/shm/dolphinmem")
+      if (line.substr(73, 19) == "/dev/shm/dolphinmem" ||
+          line.substr(73, 20) == "/dev/shm/dolphin-emu")
       {
         u64 firstAddress = 0;
         u64 SecondAddress = 0;
