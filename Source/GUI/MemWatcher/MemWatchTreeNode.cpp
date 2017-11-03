@@ -4,6 +4,8 @@
 
 #include <sstream>
 
+#include "../GUICommon.h"
+
 MemWatchTreeNode::MemWatchTreeNode(MemWatchEntry* entry, MemWatchTreeNode* parent,
                                    const bool isGroup, const QString& groupName)
     : m_entry(entry), m_parent(parent), m_isGroup(isGroup), m_groupName(groupName)
@@ -218,5 +220,37 @@ void MemWatchTreeNode::writeToJson(QJsonObject& json) const
         json["pointerOffsets"] = offsets;
       }
     }
+  }
+}
+
+QString MemWatchTreeNode::writeAsCSV() const
+{
+  if (isGroup() || m_parent == nullptr)
+  {
+    QString rootCsv;
+    for (auto i : m_children)
+    {
+      QString theCsvLine = i->writeAsCSV();
+      rootCsv.append(theCsvLine);
+    }
+    return rootCsv;
+  }
+  else
+  {
+    std::stringstream ssAddress;
+    ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
+    if (m_entry->isBoundToPointer())
+    {
+      for (int i = 0; i < m_entry->getPointerLevel(); i++)
+      {
+        std::stringstream ssOffset;
+        ssOffset << std::hex << std::uppercase << m_entry->getPointerOffset(i);
+        ssAddress << "[" << ssOffset.str() << "]";
+      }
+    }
+    std::string csvLine =
+        m_entry->getLabel() + ";" + ssAddress.str() + ";" +
+        GUICommon::getStringFromType(m_entry->getType(), m_entry->getLength()).toStdString() + "\n";
+    return QString::fromStdString(csvLine);
   }
 }

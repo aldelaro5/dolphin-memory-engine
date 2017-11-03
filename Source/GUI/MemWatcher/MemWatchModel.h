@@ -50,6 +50,7 @@ public:
   void onFreezeTimer();
   void loadRootFromJsonRecursive(const QJsonObject& json);
   void writeRootToJsonRecursive(QJsonObject& json) const;
+  QString writeRootToCSVStringRecursive() const;
   bool hasAnyNodes() const;
   MemWatchTreeNode* getTreeNodeFromIndex(const QModelIndex& index) const;
 signals:

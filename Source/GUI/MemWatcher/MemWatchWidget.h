@@ -25,6 +25,7 @@ public:
   void openWatchFile();
   void saveWatchFile();
   void saveAsWatchFile();
+  void exportWatchListAsCSV();
   QTimer* getUpdateTimer() const;
   QTimer* getFreezeTimer() const;
   bool warnIfUnsavedChanges();

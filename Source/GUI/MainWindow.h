@@ -32,6 +32,7 @@ public:
   void onOpenWatchFile();
   void onSaveWatchFile();
   void onSaveAsWatchFile();
+  void onExportAsCSV();
   void onAbout();
   void onQuit();
 
@@ -57,6 +58,7 @@ private:
   QAction* m_actOpenWatchList;
   QAction* m_actSaveWatchList;
   QAction* m_actSaveAsWatchList;
+  QAction* m_actExportAsCSV;
   QAction* m_actViewScanner;
   QAction* m_actQuit;
   QAction* m_actAbout;

@@ -33,6 +33,7 @@ public:
 
   void readFromJson(const QJsonObject& json, MemWatchTreeNode* parent = nullptr);
   void writeToJson(QJsonObject& json) const;
+  QString writeAsCSV() const;
 
 private:
   bool m_isGroup;

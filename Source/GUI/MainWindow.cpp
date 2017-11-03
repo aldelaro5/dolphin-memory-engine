@@ -86,6 +86,7 @@ MainWindow::MainWindow()
   m_actOpenWatchList = new QAction("&Open...", this);
   m_actSaveWatchList = new QAction("&Save", this);
   m_actSaveAsWatchList = new QAction("&Save as...", this);
+  m_actExportAsCSV = new QAction("&Export as CSV...", this);
 
   m_actViewScanner = new QAction("&Scanner", this);
   m_actViewScanner->setCheckable(true);
@@ -96,12 +97,15 @@ MainWindow::MainWindow()
   connect(m_actOpenWatchList, &QAction::triggered, this, &MainWindow::onOpenWatchFile);
   connect(m_actSaveWatchList, &QAction::triggered, this, &MainWindow::onSaveWatchFile);
   connect(m_actSaveAsWatchList, &QAction::triggered, this, &MainWindow::onSaveAsWatchFile);
+  connect(m_actExportAsCSV, &QAction::triggered, this, &MainWindow::onExportAsCSV);
+
   connect(m_actViewScanner, static_cast<void (QAction::*)(bool)>(&QAction::toggled), this, [=] {
     if (m_actViewScanner->isChecked())
       m_scanner->show();
     else
       m_scanner->hide();
   });
+
   connect(m_actQuit, &QAction::triggered, this, &MainWindow::onQuit);
   connect(m_actAbout, &QAction::triggered, this, &MainWindow::onAbout);
 
@@ -109,6 +113,7 @@ MainWindow::MainWindow()
   m_menuFile->addAction(m_actOpenWatchList);
   m_menuFile->addAction(m_actSaveWatchList);
   m_menuFile->addAction(m_actSaveAsWatchList);
+  m_menuFile->addAction(m_actExportAsCSV);
   m_menuFile->addAction(m_actQuit);
 
   m_menuView = menuBar()->addMenu("&View");
@@ -283,6 +288,11 @@ void MainWindow::onSaveWatchFile()
 void MainWindow::onSaveAsWatchFile()
 {
   m_watcher->saveAsWatchFile();
+}
+
+void MainWindow::onExportAsCSV()
+{
+  m_watcher->exportWatchListAsCSV();
 }
 
 void MainWindow::onAbout()

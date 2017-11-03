@@ -15,6 +15,7 @@
 #include <QShortcut>
 #include <QSignalMapper>
 #include <QString>
+#include <QTextStream>
 #include <QVBoxLayout>
 #include <string>
 
@@ -478,6 +479,31 @@ void MemWatchWidget::saveAsWatchFile()
     watchFile.close();
     m_watchListFile = fileName;
     m_hasUnsavedChanges = false;
+  }
+}
+
+void MemWatchWidget::exportWatchListAsCSV()
+{
+  QString fileName = QFileDialog::getSaveFileName(this, "Export Watch List", m_watchListFile,
+                                                  "Column separated values file (*.csv)");
+  if (fileName != "")
+  {
+    if (!fileName.endsWith(".csv"))
+      fileName.append(".csv");
+    QFile csvFile(fileName);
+    if (!csvFile.open(QIODevice::WriteOnly))
+    {
+      QMessageBox* errorBox = new QMessageBox(
+          QMessageBox::Critical, "Error while creating file",
+          "An error occured while creating and opening the csv file for writting",
+          QMessageBox::Ok, this);
+      errorBox->exec();
+      return;
+    }
+    QTextStream outputStream(&csvFile);
+    QString csvContents = m_watchModel->writeRootToCSVStringRecursive();
+    outputStream << csvContents;
+    csvFile.close();
   }
 }
 

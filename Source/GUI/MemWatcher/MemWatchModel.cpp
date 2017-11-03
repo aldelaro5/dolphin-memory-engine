@@ -493,6 +493,15 @@ void MemWatchModel::writeRootToJsonRecursive(QJsonObject& json) const
   m_rootNode->writeToJson(json);
 }
 
+QString MemWatchModel::writeRootToCSVStringRecursive() const
+{
+  QString csv = QString("Name;Address[offsets] (in hex);Type\n");
+  csv.append(m_rootNode->writeAsCSV());
+  if (csv.endsWith("\n"))
+    csv.remove(csv.length() - 1, 1);
+  return csv;
+}
+
 bool MemWatchModel::hasAnyNodes() const
 {
   return m_rootNode->hasChildren();
