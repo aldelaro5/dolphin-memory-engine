@@ -462,6 +462,8 @@ void MemWatchWidget::saveAsWatchFile()
                                                   "Dolphin memory watches file (*.dmw)");
   if (fileName != "")
   {
+    if (!fileName.endsWith(".dmw"))
+      fileName.append(".dmw");
     QFile watchFile(fileName);
     if (!watchFile.open(QIODevice::WriteOnly))
     {
@@ -493,10 +495,10 @@ void MemWatchWidget::exportWatchListAsCSV()
     QFile csvFile(fileName);
     if (!csvFile.open(QIODevice::WriteOnly))
     {
-      QMessageBox* errorBox = new QMessageBox(
-          QMessageBox::Critical, "Error while creating file",
-          "An error occured while creating and opening the csv file for writting",
-          QMessageBox::Ok, this);
+      QMessageBox* errorBox =
+          new QMessageBox(QMessageBox::Critical, "Error while creating file",
+                          "An error occured while creating and opening the csv file for writting",
+                          QMessageBox::Ok, this);
       errorBox->exec();
       return;
     }
