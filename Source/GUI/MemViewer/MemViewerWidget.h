@@ -18,6 +18,7 @@ public:
   void onGoToMEM2Start();
   QTimer* getUpdateTimer() const;
   void hookStatusChanged(bool hook);
+  void onMEM2StatusChanged(bool enabled);
   void goToAddress(u32 address);
 
 signals:

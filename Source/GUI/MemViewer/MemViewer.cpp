@@ -88,6 +88,11 @@ void MemViewer::updateViewer()
     emit memErrorOccured();
 }
 
+u32 MemViewer::getCurrentFirstAddress() const
+{
+  return m_currentFirstAddress;
+}
+
 void MemViewer::jumpToAddress(const u32 address)
 {
   if (DolphinComm::DolphinAccessor::isValidConsoleAddress(address))

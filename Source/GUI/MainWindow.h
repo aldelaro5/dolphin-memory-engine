@@ -52,10 +52,12 @@ private:
   QWidget* m_mem2StatusWidget;
 
   QMenu* m_menuFile;
+  QMenu* m_menuView;
   QMenu* m_menuHelp;
   QAction* m_actOpenWatchList;
   QAction* m_actSaveWatchList;
   QAction* m_actSaveAsWatchList;
+  QAction* m_actViewScanner;
   QAction* m_actQuit;
   QAction* m_actAbout;
 };

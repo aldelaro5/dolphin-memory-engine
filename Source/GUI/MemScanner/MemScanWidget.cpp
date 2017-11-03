@@ -1,6 +1,7 @@
 #include "MemScanWidget.h"
 
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QMessageBox>
 #include <QRadioButton>
 #include <QRegExp>
@@ -17,16 +18,21 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
   m_lblResultCount = new QLabel("");
   m_tblResulstList = new QTableView();
   m_tblResulstList->setModel(m_resultsListModel);
+
+  m_tblResulstList->horizontalHeader()->setStretchLastSection(true);
+  m_tblResulstList->horizontalHeader()->resizeSection(0, 100);
+  m_tblResulstList->horizontalHeader()->setSectionResizeMode(ResultsListModel::RESULT_COL_ADDRESS,
+                                                             QHeaderView::Fixed);
+  m_tblResulstList->horizontalHeader()->resizeSection(ResultsListModel::RESULT_COL_SCANNED, 150);
+
   m_tblResulstList->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_tblResulstList->setSelectionMode(QAbstractItemView::ExtendedSelection);
-  connect(m_tblResulstList, static_cast<void (QAbstractItemView::*)(const QModelIndex&)>(
-                                &QAbstractItemView::doubleClicked),
-          this, static_cast<void (MemScanWidget::*)(const QModelIndex&)>(
-                    &MemScanWidget::onResultListDoubleClicked));
-
-  QVBoxLayout* results_layout = new QVBoxLayout();
-  results_layout->addWidget(m_lblResultCount);
-  results_layout->addWidget(m_tblResulstList);
+  connect(m_tblResulstList,
+          static_cast<void (QAbstractItemView::*)(const QModelIndex&)>(
+              &QAbstractItemView::doubleClicked),
+          this,
+          static_cast<void (MemScanWidget::*)(const QModelIndex&)>(
+              &MemScanWidget::onResultListDoubleClicked));
 
   m_btnFirstScan = new QPushButton("First scan");
   m_btnNextScan = new QPushButton("Next scan");
@@ -51,6 +57,7 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
   m_txbSearchTerm2 = new QLineEdit();
 
   QHBoxLayout* searchTerm2_layout = new QHBoxLayout();
+  searchTerm2_layout->setContentsMargins(0, 0, 0, 0);
   searchTerm2_layout->addWidget(lblAnd);
   searchTerm2_layout->addWidget(m_txbSearchTerm2);
 
@@ -60,6 +67,7 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
   QHBoxLayout* searchTerms_layout = new QHBoxLayout();
   searchTerms_layout->addWidget(m_txbSearchTerm1);
   searchTerms_layout->addWidget(m_searchTerm2Widget);
+  searchTerms_layout->setSizeConstraint(QLayout::SetMinimumSize);
   m_searchTerm2Widget->hide();
 
   m_cmbScanType = new QComboBox();
@@ -98,17 +106,28 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
   m_chkSignedScan = new QCheckBox("Signed value scan");
   m_chkSignedScan->setChecked(false);
 
-  QVBoxLayout* scanner_layout = new QVBoxLayout();
-  scanner_layout->addLayout(buttons_layout);
-  scanner_layout->addWidget(m_cmbScanType);
-  scanner_layout->addWidget(m_cmbScanFilter);
-  scanner_layout->addLayout(searchTerms_layout);
-  scanner_layout->addWidget(m_groupScanBase);
-  scanner_layout->addWidget(m_chkSignedScan);
+  QVBoxLayout* scannerParams_layout = new QVBoxLayout();
+  scannerParams_layout->addLayout(buttons_layout);
+  scannerParams_layout->addWidget(m_cmbScanType);
+  scannerParams_layout->addWidget(m_cmbScanFilter);
+  scannerParams_layout->addLayout(searchTerms_layout);
+  scannerParams_layout->addWidget(m_groupScanBase);
+  scannerParams_layout->addWidget(m_chkSignedScan);
+  scannerParams_layout->addStretch();
+  scannerParams_layout->setContentsMargins(0, 0, 0, 0);
 
-  QHBoxLayout* main_layout = new QHBoxLayout();
-  main_layout->addLayout(results_layout);
+  QWidget* scannerParamsWidget = new QWidget();
+  scannerParamsWidget->setLayout(scannerParams_layout);
+  scannerParamsWidget->setMinimumWidth(400);
+
+  QHBoxLayout* scanner_layout = new QHBoxLayout();
+  scanner_layout->addWidget(m_tblResulstList);
+  scanner_layout->addWidget(scannerParamsWidget);
+
+  QVBoxLayout* main_layout = new QVBoxLayout();
+  main_layout->addWidget(m_lblResultCount);
   main_layout->addLayout(scanner_layout);
+  main_layout->setContentsMargins(3, 0, 3, 0);
 
   setLayout(main_layout);
 

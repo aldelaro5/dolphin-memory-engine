@@ -40,6 +40,7 @@ DlgChangeType::DlgChangeType(QWidget* parent, const int typeIndex, const size_t 
   main_layout->addWidget(typeSelection);
   main_layout->addWidget(m_lengthSelection);
   main_layout->addWidget(buttonBox);
+  main_layout->setSpacing(1);
   setLayout(main_layout);
 
   Common::MemType theType = static_cast<Common::MemType>(typeIndex);
@@ -77,4 +78,5 @@ void DlgChangeType::onTypeChange(int index)
     m_lengthSelection->show();
   else
     m_lengthSelection->hide();
+  adjustSize();
 }

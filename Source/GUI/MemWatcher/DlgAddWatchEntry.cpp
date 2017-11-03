@@ -20,14 +20,18 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   QHBoxLayout* preview_layout = new QHBoxLayout;
   preview_layout->addWidget(lblPreview);
   preview_layout->addWidget(m_lblValuePreview);
+  preview_layout->addStretch();
   QWidget* preview_widget = new QWidget();
   preview_widget->setLayout(preview_layout);
 
   QLabel* lblAddress = new QLabel("Address: ", this);
   m_txbAddress = new QLineEdit(this);
+  m_txbAddress->setMaxLength(8);
+
   QHBoxLayout* layout_addressAndPreview = new QHBoxLayout;
   layout_addressAndPreview->addWidget(lblAddress);
   layout_addressAndPreview->addWidget(m_txbAddress);
+  layout_addressAndPreview->addStretch();
   QWidget* addressWidget = new QWidget(this);
   addressWidget->setLayout(layout_addressAndPreview);
   connect(m_txbAddress, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited),
@@ -53,9 +57,12 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
           &DlgAddWatchEntry::removePointerOffset);
 
   QVBoxLayout* pointerOffset_layout = new QVBoxLayout;
+  pointerOffset_layout->setSpacing(1);
   pointerOffset_layout->addWidget(lblOffset);
   pointerOffset_layout->addWidget(offsetsWidget);
   pointerOffset_layout->addWidget(pointerButtons_widget);
+  pointerOffset_layout->addStretch();
+  pointerOffset_layout->setContentsMargins(0, 0, 0, 0);
   m_pointerWidget = new QWidget(this);
   m_pointerWidget->setLayout(pointerOffset_layout);
 
@@ -93,6 +100,7 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
       new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
   QVBoxLayout* main_layout = new QVBoxLayout;
+  main_layout->setSpacing(1);
   main_layout->addWidget(preview_widget);
   main_layout->addWidget(m_chkBoundToPointer);
   main_layout->addWidget(addressWidget);
@@ -101,6 +109,7 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   main_layout->addWidget(typeWidget);
   main_layout->addWidget(m_lengtWidget);
   main_layout->addWidget(buttonBox);
+  main_layout->addStretch();
   setLayout(main_layout);
 
   connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgAddWatchEntry::accept);
@@ -143,6 +152,8 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
         QLabel* lblLevel =
             new QLabel(QString::fromStdString("Level " + std::to_string(i + 1) + ":"));
         QLineEdit* txbOffset = new QLineEdit();
+        txbOffset->setFixedWidth(100);
+        txbOffset->setMaxLength(7);
         txbOffset->setText(QString::fromStdString(ss.str()));
         connect(txbOffset, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited),
                 this, &DlgAddWatchEntry::onOffsetChanged);
@@ -368,6 +379,7 @@ void DlgAddWatchEntry::onIsPointerChanged()
     m_pointerWidget->show();
   else
     m_pointerWidget->hide();
+  adjustSize();
   m_entry->setBoundToPointer(m_chkBoundToPointer->isChecked());
   updatePreview();
 }

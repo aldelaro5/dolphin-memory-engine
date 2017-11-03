@@ -54,6 +54,7 @@ MainWindow::MainWindow()
   QVBoxLayout* mem2Status_layout = new QVBoxLayout();
   mem2Status_layout->addWidget(m_lblMem2Status);
   mem2Status_layout->addLayout(mem2Buttons_layout);
+  mem2Status_layout->setContentsMargins(3, 0, 3, 0);
 
   m_mem2StatusWidget = new QWidget();
   m_mem2StatusWidget->setLayout(mem2Status_layout);
@@ -62,27 +63,45 @@ MainWindow::MainWindow()
   connect(m_btnOpenMemViewer, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
           &MainWindow::onOpenMenViewer);
 
+  QFrame* separatorline = new QFrame();
+  separatorline->setFrameShape(QFrame::HLine);
+
   QVBoxLayout* main_layout = new QVBoxLayout;
   main_layout->addWidget(m_lblDolphinStatus);
   main_layout->addLayout(dolphinHookButtons_layout);
   main_layout->addWidget(m_mem2StatusWidget);
+  main_layout->addWidget(separatorline);
   main_layout->addWidget(m_scanner);
+  main_layout->addSpacing(5);
   main_layout->addWidget(m_btnOpenMemViewer);
+  main_layout->addSpacing(5);
   main_layout->addWidget(m_watcher);
 
   QWidget* main_widget = new QWidget(this);
   main_widget->setLayout(main_layout);
   setCentralWidget(main_widget);
 
+  setMinimumWidth(800);
+
   m_actOpenWatchList = new QAction("&Open...", this);
   m_actSaveWatchList = new QAction("&Save", this);
   m_actSaveAsWatchList = new QAction("&Save as...", this);
+
+  m_actViewScanner = new QAction("&Scanner", this);
+  m_actViewScanner->setCheckable(true);
+  m_actViewScanner->setChecked(true);
 
   m_actQuit = new QAction("&Quit", this);
   m_actAbout = new QAction("&About", this);
   connect(m_actOpenWatchList, &QAction::triggered, this, &MainWindow::onOpenWatchFile);
   connect(m_actSaveWatchList, &QAction::triggered, this, &MainWindow::onSaveWatchFile);
   connect(m_actSaveAsWatchList, &QAction::triggered, this, &MainWindow::onSaveAsWatchFile);
+  connect(m_actViewScanner, static_cast<void (QAction::*)(bool)>(&QAction::toggled), this, [=] {
+    if (m_actViewScanner->isChecked())
+      m_scanner->show();
+    else
+      m_scanner->hide();
+  });
   connect(m_actQuit, &QAction::triggered, this, &MainWindow::onQuit);
   connect(m_actAbout, &QAction::triggered, this, &MainWindow::onAbout);
 
@@ -91,6 +110,10 @@ MainWindow::MainWindow()
   m_menuFile->addAction(m_actSaveWatchList);
   m_menuFile->addAction(m_actSaveAsWatchList);
   m_menuFile->addAction(m_actQuit);
+
+  m_menuView = menuBar()->addMenu("&View");
+  m_menuView->addAction(m_actViewScanner);
+
   m_menuHelp = menuBar()->addMenu("&Help");
   m_menuHelp->addAction(m_actAbout);
 
@@ -145,6 +168,7 @@ void MainWindow::onToggleMem2()
 void MainWindow::onOpenMenViewer()
 {
   m_viewer->show();
+  m_viewer->raise();
 }
 
 void MainWindow::onOpenMemViewerWithAddress(u32 address)
@@ -159,6 +183,7 @@ void MainWindow::updateMem2Status()
     m_lblMem2Status->setText("MEM2 is enabled" + *m_strMem2Info);
   else
     m_lblMem2Status->setText("MEM2 is disabled" + *m_strMem2Info);
+  m_viewer->onMEM2StatusChanged(DolphinComm::DolphinAccessor::isMem2Enabled());
 }
 
 void MainWindow::updateDolphinHookingStatus()
@@ -224,6 +249,7 @@ void MainWindow::onHookAttempt()
     m_viewer->getUpdateTimer()->start(100);
     m_viewer->hookStatusChanged(true);
     m_btnMem2AutoDetect->setEnabled(true);
+    updateMem2Status();
   }
   else
   {
@@ -277,6 +303,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
   if (m_watcher->warnIfUnsavedChanges())
   {
+    m_viewer->close();
     event->accept();
   }
   else

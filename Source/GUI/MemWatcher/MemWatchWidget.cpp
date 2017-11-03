@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QIODevice>
 #include <QInputDialog>
 #include <QJsonDocument>
@@ -55,6 +56,21 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
               &MemWatchWidget::onWatchDoubleClicked));
   m_watchView->setItemDelegate(m_watchDelegate);
   m_watchView->setModel(m_watchModel);
+
+  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LOCK, 50);
+  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_LOCK,
+                                              QHeaderView::ResizeMode::Fixed);
+  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LABEL, 200);
+  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_TYPE, 160);
+  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_TYPE,
+                                              QHeaderView::ResizeMode::Fixed);
+  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LOCK, 50);
+  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_LOCK,
+                                              QHeaderView::ResizeMode::Fixed);
+  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_ADDRESS, 130);
+  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_ADDRESS,
+                                              QHeaderView::ResizeMode::Fixed);
+
   QShortcut* shortcut = new QShortcut(QKeySequence::Delete, m_watchView);
   connect(shortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteNode);
 
@@ -65,6 +81,7 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
 
   buttons_layout->addWidget(m_btnAddGroup);
   buttons_layout->addWidget(m_btnAddWatchEntry);
+  buttons_layout->setContentsMargins(0, 0, 0, 0);
   buttons->setLayout(buttons_layout);
   connect(m_btnAddGroup, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
           &MemWatchWidget::onAddGroup);
@@ -75,7 +92,7 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
 
   layout->addWidget(buttons);
   layout->addWidget(m_watchView);
-
+  layout->setContentsMargins(3, 0, 3, 0);
   setLayout(layout);
 
   connect(m_watchModel, &MemWatchModel::readFailed, this, &MemWatchWidget::mustUnhook);

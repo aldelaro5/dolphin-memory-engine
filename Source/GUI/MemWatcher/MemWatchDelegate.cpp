@@ -11,6 +11,8 @@ void MemWatchDelegate::setEditorData(QWidget* editor, const QModelIndex& index) 
   if (index.column() == MemWatchModel::WATCH_COL_VALUE && !node->isGroup())
   {
     node->setValueEditing(true);
+    QLineEdit* lineEditor = static_cast<QLineEdit*>(editor);
+    lineEditor->setText(QString::fromStdString(node->getEntry()->getStringFromMemory()));
   }
   else if (node->isGroup() && index.column() == MemWatchModel::WATCH_COL_LABEL)
   {

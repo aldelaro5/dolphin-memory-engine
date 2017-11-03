@@ -22,6 +22,7 @@ public:
   void keyPressEvent(QKeyEvent* event) override;
   void paintEvent(QPaintEvent* event) override;
   void scrollContentsBy(int dx, int dy) override;
+  u32 getCurrentFirstAddress() const;
   void jumpToAddress(const u32 address);
   void updateViewer();
   void memoryValidityChanged(const bool valid);

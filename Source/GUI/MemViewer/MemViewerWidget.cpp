@@ -72,6 +72,15 @@ void MemViewerWidget::hookStatusChanged(bool hook)
   m_memViewer->memoryValidityChanged(hook);
 }
 
+void MemViewerWidget::onMEM2StatusChanged(bool enabled)
+{
+  m_btnGoToMEM2Start->setEnabled(enabled);
+  if (!enabled && m_memViewer->getCurrentFirstAddress() >= Common::MEM2_START)
+  {
+    m_memViewer->jumpToAddress(Common::MEM1_START);
+  }
+}
+
 void MemViewerWidget::goToAddress(u32 address)
 {
   m_memViewer->jumpToAddress(address);
