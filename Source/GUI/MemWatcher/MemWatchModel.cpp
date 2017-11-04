@@ -45,7 +45,7 @@ bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QMode
       readSucess = updateNodeValueRecursive(i, theIndex, readSucess);
       if (!readSucess)
         return false;
-      if (!i->isValueEditing())
+      if (!GUICommon::g_valueEditing)
         emit dataChanged(theIndex, theIndex);
     }
   }

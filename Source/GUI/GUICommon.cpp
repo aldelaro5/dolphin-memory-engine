@@ -13,6 +13,8 @@ QStringList g_memScanFilter = QStringList({"Exact value", "Increased by", "Decre
                                            "Bigger than", "Smaller than", "Increased", "Decreased",
                                            "Changed", "Unchanged", "Unknown initial value"});
 
+bool g_valueEditing = false;
+
 QString getStringFromType(const Common::MemType type, const size_t length)
 {
   switch (type)
