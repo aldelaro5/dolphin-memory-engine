@@ -42,7 +42,9 @@ void MemWatchDelegate::setEditorData(QWidget* editor, const QModelIndex& index) 
 void MemWatchDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
                                     const QModelIndex& index) const
 {
-  QStyledItemDelegate::setModelData(editor, model, index);
+  QLineEdit* lineEditor = static_cast<QLineEdit*>(editor);
+  if (!lineEditor->text().isEmpty())
+    QStyledItemDelegate::setModelData(editor, model, index);
 }
 
 void MemWatchDelegate::destroyEditor(QWidget* editor, const QModelIndex& index) const
