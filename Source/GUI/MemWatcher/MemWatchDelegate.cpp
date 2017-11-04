@@ -29,7 +29,12 @@ void MemWatchDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
                                     const QModelIndex& index) const
 {
   QStyledItemDelegate::setModelData(editor, model, index);
+}
+
+void MemWatchDelegate::destroyEditor(QWidget* editor, const QModelIndex& index) const
+{
   MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
   if (index.column() == MemWatchModel::WATCH_COL_VALUE && !node->isGroup())
     node->setValueEditing(false);
+  editor->deleteLater();
 }
