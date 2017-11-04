@@ -59,18 +59,9 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
   m_watchView->setModel(m_watchModel);
 
   m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LOCK, 50);
-  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_LOCK,
-                                              QHeaderView::ResizeMode::Fixed);
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LABEL, 200);
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_TYPE, 160);
-  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_TYPE,
-                                              QHeaderView::ResizeMode::Fixed);
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LOCK, 50);
-  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_LOCK,
-                                              QHeaderView::ResizeMode::Fixed);
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_ADDRESS, 130);
-  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_ADDRESS,
-                                              QHeaderView::ResizeMode::Fixed);
+  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LABEL, 225);
+  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_TYPE, 130);
+  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_ADDRESS, 120);
 
   QShortcut* shortcut = new QShortcut(QKeySequence::Delete, m_watchView);
   connect(shortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteNode);
