@@ -9,8 +9,8 @@ This file explains the features that are planned so far in the future of the pro
 	* If possible, with a little animation showing what bytes updated
 	* Must also provide in place editing.
 * Greatly improve the UI.
-	* Fix all sizing issues
-	* Better manage UI space
+	* DONE - Fix all sizing issues
+	* DONE - Better manage UI space
 	* Consider the possibility to have dockWidget, status bar or toolbar and figure out something about hiding/showing the larger parts of the UI as the user desires.
 * Cheat Engine CT file importer
 	* Need to figure out something about whether or not the table is stored using pointers or static addresses.
@@ -18,7 +18,7 @@ This file explains the features that are planned so far in the future of the pro
 
 ## Features that preferably be implemented before 1.0:
 
-* CSV exporter
+* DONE - CSV exporter
 	* This would greatly help people who want to document their research. It would be possible with simple search and replace to have a TASVideos compatible table for resource pages.
 * Add more organization data about watches, such as a color display.
 * Add support for sorting on the watch list.
