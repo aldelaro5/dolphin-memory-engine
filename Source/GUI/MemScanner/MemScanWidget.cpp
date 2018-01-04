@@ -18,6 +18,7 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
   m_lblResultCount = new QLabel("");
   m_tblResulstList = new QTableView();
   m_tblResulstList->setModel(m_resultsListModel);
+  m_tblResulstList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   m_tblResulstList->horizontalHeader()->setStretchLastSection(true);
   m_tblResulstList->horizontalHeader()->resizeSection(0, 100);
@@ -34,15 +35,24 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
           static_cast<void (MemScanWidget::*)(const QModelIndex&)>(
               &MemScanWidget::onResultListDoubleClicked));
 
-  m_btnAddAll = new QPushButton("Add all to the watch list");
+  m_btnAddAll = new QPushButton("Add all");
   connect(m_btnAddAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
           &MemScanWidget::onAddAll);
   m_btnAddAll->setEnabled(false);
 
+  m_btnAddSelection = new QPushButton("Add selection");
+  connect(m_btnAddSelection, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
+          &MemScanWidget::onAddSelection);
+  m_btnAddSelection->setEnabled(false);
+
+  QHBoxLayout* multiAddButtons_layout = new QHBoxLayout();
+  multiAddButtons_layout->addWidget(m_btnAddSelection);
+  multiAddButtons_layout->addWidget(m_btnAddAll);
+
   QVBoxLayout* results_layout = new QVBoxLayout();
   results_layout->addWidget(m_lblResultCount);
   results_layout->addWidget(m_tblResulstList);
-  results_layout->addWidget(m_btnAddAll);
+  results_layout->addLayout(multiAddButtons_layout);
 
   m_btnFirstScan = new QPushButton("First scan");
   m_btnNextScan = new QPushButton("Next scan");
@@ -147,9 +157,19 @@ MemScanWidget::~MemScanWidget()
   delete m_memScanner;
 }
 
-std::vector<u32> MemScanWidget::getAllResults()
+ResultsListModel* MemScanWidget::getResultListModel() const
+{
+  return m_resultsListModel;
+}
+
+std::vector<u32> MemScanWidget::getAllResults() const
 {
   return m_memScanner->getResultsConsoleAddr();
+}
+
+QModelIndexList MemScanWidget::getSelectedResults() const
+{
+  return m_tblResulstList->selectionModel()->selectedRows();
 }
 
 MemScanner::ScanFiter MemScanWidget::getSelectedFilter() const
@@ -265,7 +285,10 @@ void MemScanWidget::onFirstScan()
     m_lblResultCount->setText(
         QString::number(m_memScanner->getResultCount()).append(" result(s) found"));
     if (m_memScanner->getResultCount() <= 1000 && m_memScanner->getResultCount() != 0)
+    {
       m_btnAddAll->setEnabled(true);
+      m_btnAddSelection->setEnabled(true);
+    }
     m_btnFirstScan->hide();
     m_btnNextScan->show();
     m_btnResetScan->show();
@@ -290,7 +313,10 @@ void MemScanWidget::onNextScan()
     m_lblResultCount->setText(
         QString::number(m_memScanner->getResultCount()).append(" result(s) found"));
     if (m_memScanner->getResultCount() <= 1000 && m_memScanner->getResultCount() != 0)
+    {
       m_btnAddAll->setEnabled(true);
+      m_btnAddSelection->setEnabled(true);
+    }
   }
 }
 
@@ -299,6 +325,7 @@ void MemScanWidget::onResetScan()
   m_memScanner->reset();
   m_lblResultCount->setText("");
   m_btnAddAll->setEnabled(false);
+  m_btnAddSelection->setEnabled(false);
   m_btnFirstScan->show();
   m_btnNextScan->hide();
   m_btnResetScan->hide();
@@ -307,6 +334,12 @@ void MemScanWidget::onResetScan()
   m_groupScanBase->setEnabled(true);
   m_resultsListModel->updateAfterScannerReset();
   updateScanFilterChoices();
+}
+
+void MemScanWidget::onAddSelection()
+{
+  emit requestAddSelectedResultsToWatchList(m_memScanner->getType(), m_memScanner->getLength(),
+                                            m_memScanner->getIsUnsigned(), m_memScanner->getBase());
 }
 
 void MemScanWidget::onAddAll()

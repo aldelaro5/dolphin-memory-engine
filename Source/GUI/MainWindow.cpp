@@ -30,6 +30,15 @@ MainWindow::MainWindow()
           static_cast<void (MainWindow::*)(Common::MemType type, size_t length, bool isUnsigned,
                                            Common::MemBase base)>(
               &MainWindow::addAllResultsToWatchList));
+  connect(m_scanner,
+          static_cast<void (MemScanWidget::*)(Common::MemType type, size_t length, bool isUnsigned,
+                                              Common::MemBase base)>(
+              &MemScanWidget::requestAddSelectedResultsToWatchList),
+          this,
+          static_cast<void (MainWindow::*)(Common::MemType type, size_t length, bool isUnsigned,
+                                           Common::MemBase base)>(
+              &MainWindow::addSelectedResultsToWatchList));
+
   m_watcher = new MemWatchWidget(this);
 
   m_btnAttempHook = new QPushButton("Hook");
@@ -148,6 +157,19 @@ MainWindow::MainWindow()
   {
     DolphinComm::DolphinAccessor::autoDetectMem2();
     updateMem2Status();
+  }
+}
+
+void MainWindow::addSelectedResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
+                                               Common::MemBase base)
+{
+  QModelIndexList selection = m_scanner->getSelectedResults();
+  for (int i = 0; i < selection.count(); i++)
+  {
+    u32 address = m_scanner->getResultListModel()->getResultAddress(i);
+    MemWatchEntry* newEntry =
+        new MemWatchEntry("No label", address, type, base, isUnsigned, length);
+    m_watcher->addWatchEntry(newEntry);
   }
 }
 

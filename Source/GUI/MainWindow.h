@@ -20,6 +20,8 @@ public:
   void closeEvent(QCloseEvent* event) override;
   void addWatchRequested(u32 address, Common::MemType type, size_t length, bool isUnsigned,
                          Common::MemBase base);
+  void addSelectedResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
+                                     Common::MemBase base);
   void addAllResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
                                 Common::MemBase base);
   void updateDolphinHookingStatus();
