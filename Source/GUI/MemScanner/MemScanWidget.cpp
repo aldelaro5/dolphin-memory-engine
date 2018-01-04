@@ -34,6 +34,16 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
           static_cast<void (MemScanWidget::*)(const QModelIndex&)>(
               &MemScanWidget::onResultListDoubleClicked));
 
+  m_btnAddAll = new QPushButton("Add all to the watch list");
+  connect(m_btnAddAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
+          &MemScanWidget::onAddAll);
+  m_btnAddAll->setEnabled(false);
+
+  QVBoxLayout* results_layout = new QVBoxLayout();
+  results_layout->addWidget(m_lblResultCount);
+  results_layout->addWidget(m_tblResulstList);
+  results_layout->addWidget(m_btnAddAll);
+
   m_btnFirstScan = new QPushButton("First scan");
   m_btnNextScan = new QPushButton("Next scan");
   m_btnNextScan->hide();
@@ -118,15 +128,11 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
 
   QWidget* scannerParamsWidget = new QWidget();
   scannerParamsWidget->setLayout(scannerParams_layout);
-  scannerParamsWidget->setMinimumWidth(400);
+  scannerParamsWidget->setMinimumWidth(425);
 
-  QHBoxLayout* scanner_layout = new QHBoxLayout();
-  scanner_layout->addWidget(m_tblResulstList);
-  scanner_layout->addWidget(scannerParamsWidget);
-
-  QVBoxLayout* main_layout = new QVBoxLayout();
-  main_layout->addWidget(m_lblResultCount);
-  main_layout->addLayout(scanner_layout);
+  QHBoxLayout* main_layout = new QHBoxLayout();
+  main_layout->addLayout(results_layout);
+  main_layout->addWidget(scannerParamsWidget);
   main_layout->setContentsMargins(3, 0, 3, 0);
 
   setLayout(main_layout);
@@ -139,6 +145,11 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
 MemScanWidget::~MemScanWidget()
 {
   delete m_memScanner;
+}
+
+std::vector<u32> MemScanWidget::getAllResults()
+{
+  return m_memScanner->getResultsConsoleAddr();
 }
 
 MemScanner::ScanFiter MemScanWidget::getSelectedFilter() const
@@ -253,6 +264,8 @@ void MemScanWidget::onFirstScan()
   {
     m_lblResultCount->setText(
         QString::number(m_memScanner->getResultCount()).append(" result(s) found"));
+    if (m_memScanner->getResultCount() <= 1000 && m_memScanner->getResultCount() != 0)
+      m_btnAddAll->setEnabled(true);
     m_btnFirstScan->hide();
     m_btnNextScan->show();
     m_btnResetScan->show();
@@ -276,6 +289,8 @@ void MemScanWidget::onNextScan()
   {
     m_lblResultCount->setText(
         QString::number(m_memScanner->getResultCount()).append(" result(s) found"));
+    if (m_memScanner->getResultCount() <= 1000 && m_memScanner->getResultCount() != 0)
+      m_btnAddAll->setEnabled(true);
   }
 }
 
@@ -283,6 +298,7 @@ void MemScanWidget::onResetScan()
 {
   m_memScanner->reset();
   m_lblResultCount->setText("");
+  m_btnAddAll->setEnabled(false);
   m_btnFirstScan->show();
   m_btnNextScan->hide();
   m_btnResetScan->hide();
@@ -291,6 +307,12 @@ void MemScanWidget::onResetScan()
   m_groupScanBase->setEnabled(true);
   m_resultsListModel->updateAfterScannerReset();
   updateScanFilterChoices();
+}
+
+void MemScanWidget::onAddAll()
+{
+  emit requestAddAllResultsToWatchList(m_memScanner->getType(), m_memScanner->getLength(),
+                                       m_memScanner->getIsUnsigned(), m_memScanner->getBase());
 }
 
 void MemScanWidget::handleScannerErrors(const Common::MemOperationReturnCode errorCode)

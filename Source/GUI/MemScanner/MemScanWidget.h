@@ -21,6 +21,8 @@ public:
   MemScanWidget(QWidget* parent);
   ~MemScanWidget();
 
+  std::vector<u32> getAllResults();
+
   void onScanFilterChanged();
   void onScanMemTypeChanged();
   void onCurrentValuesUpdateTimer();
@@ -29,11 +31,14 @@ public:
   void onFirstScan();
   void onNextScan();
   void onResetScan();
+  void onAddAll();
   QTimer* getUpdateTimer() const;
 
 signals:
   void requestAddWatchEntry(u32 address, Common::MemType type, size_t length, bool isUnsigned,
                             Common::MemBase base);
+  void requestAddAllResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
+                                       Common::MemBase base);
   void mustUnhook();
 
 private:
@@ -46,6 +51,7 @@ private:
   QPushButton* m_btnFirstScan;
   QPushButton* m_btnNextScan;
   QPushButton* m_btnResetScan;
+  QPushButton* m_btnAddAll;
   QLineEdit* m_txbSearchTerm1;
   QLineEdit* m_txbSearchTerm2;
   QWidget* m_searchTerm2Widget;
