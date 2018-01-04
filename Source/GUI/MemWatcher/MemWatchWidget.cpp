@@ -328,49 +328,58 @@ void MemWatchWidget::addWatchEntry(MemWatchEntry* entry)
   m_hasUnsavedChanges = true;
 }
 
+bool MemWatchWidget::isAnyAncestorSelected(const QModelIndex index)
+{
+  if (m_watchModel->parent(index) == QModelIndex())
+    return false;
+  else if (m_watchView->selectionModel()->isSelected(index.parent()))
+    return true;
+  else
+    return isAnyAncestorSelected(index.parent());
+}
+
 void MemWatchWidget::onDeleteNode()
 {
   QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
+  if (selection.count() == 0)
+    return;
+
   bool hasGroupWithChild = false;
   for (int i = 0; i < selection.count(); i++)
   {
     const QModelIndex index = selection.at(i);
     MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
     if (node->isGroup() && node->hasChildren())
-    {
       hasGroupWithChild = true;
-    }
   }
 
-  QString confirmationMsg = "Are you sure you want to delete these watches and/or groups?";
   if (hasGroupWithChild)
-    confirmationMsg +=
-        "\n\nThe current selection contains one or more groups with watches in them, deleting the "
+  {
+    QString confirmationMsg =
+        "The current selection contains one or more groups with watches in them, deleting the "
         "groups will also delete their watches, if you want to avoid this, move the watches out of "
         "the groups.";
-  QMessageBox* confirmationBox =
-      new QMessageBox(QMessageBox::Question, QString("Deleting confirmation"), confirmationMsg,
-                      QMessageBox::Yes | QMessageBox::No, this);
-  if (confirmationBox->exec() == QMessageBox::Yes)
-  {
-    // First, discard all indexes whose parent is selected already
-    QModelIndexList* toDeleteList = new QModelIndexList();
-    for (int i = 0; i < selection.count(); ++i)
-    {
-      const QModelIndex index = selection.at(i);
-      if (!m_watchView->selectionModel()->isSelected(index.parent()))
-      {
-        toDeleteList->append(index);
-      }
-    }
-
-    // Then, delete the rest (the children will be deleted too)
-    for (auto i : *toDeleteList)
-    {
-      m_watchModel->removeNode(i);
-    }
-    m_hasUnsavedChanges = true;
+    QMessageBox* confirmationBox =
+        new QMessageBox(QMessageBox::Question, QString("Deleting confirmation"), confirmationMsg,
+                        QMessageBox::Yes | QMessageBox::No, this);
+    if (confirmationBox->exec() != QMessageBox::Yes)
+      return;
   }
+
+  // First, discard all indexes whose parent is selected already
+  QModelIndexList* toDeleteList = new QModelIndexList();
+  for (int i = 0; i < selection.count(); ++i)
+  {
+    const QModelIndex index = selection.at(i);
+    if (!isAnyAncestorSelected(index))
+      toDeleteList->append(index);
+  }
+
+  // Then, delete the rest (the children will be deleted too)
+  for (auto i : *toDeleteList)
+    m_watchModel->removeNode(i);
+
+  m_hasUnsavedChanges = true;
 }
 
 void MemWatchWidget::onDropSucceeded()

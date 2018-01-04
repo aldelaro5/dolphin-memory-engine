@@ -42,7 +42,8 @@ private:
   QPushButton* m_btnAddWatchEntry;
   QTimer* m_updateTimer;
   QTimer* m_freezeTimer;
-
   QString m_watchListFile = "";
   bool m_hasUnsavedChanges = false;
+
+  bool isAnyAncestorSelected(const QModelIndex index);
 };
