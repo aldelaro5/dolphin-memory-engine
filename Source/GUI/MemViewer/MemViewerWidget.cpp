@@ -11,10 +11,10 @@ MemViewerWidget::MemViewerWidget(QWidget* parent, u32 consoleAddress) : QWidget(
 {
   QLabel* lblJumpToAddress = new QLabel("Jump to an address: ");
   m_txtJumpAddress = new QLineEdit(this);
-  m_btnGoToMEM1Start = new QPushButton("Go to the start of MEM1");
+  m_btnGoToMEM1Start = new QPushButton("Go to the common RAM");
   connect(m_btnGoToMEM1Start, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
           &MemViewerWidget::onGoToMEM1Start);
-  m_btnGoToMEM2Start = new QPushButton("Go to the start of MEM2");
+  m_btnGoToMEM2Start = new QPushButton("Go to the Wii-only RAM");
   connect(m_btnGoToMEM2Start, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
           &MemViewerWidget::onGoToMEM2Start);
   QHBoxLayout* controls_layout = new QHBoxLayout();

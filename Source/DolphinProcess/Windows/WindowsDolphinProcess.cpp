@@ -43,17 +43,43 @@ bool WindowsDolphinProcess::findPID()
   return true;
 }
 
-bool WindowsDolphinProcess::findEmuRAMStartAddress()
+bool WindowsDolphinProcess::obtainEmuRAMInformations()
 {
   MEMORY_BASIC_INFORMATION info;
+  bool MEM1Found = false;
   for (unsigned char* p = nullptr;
        VirtualQueryEx(m_hDolphin, p, &info, sizeof(info)) == sizeof(info); p += info.RegionSize)
   {
+    if (MEM1Found)
+    {
+      u64 regionBaseAddress = 0;
+      std::memcpy(&regionBaseAddress, &(info.BaseAddress), sizeof(info.BaseAddress));
+
+      if (regionBaseAddress == m_emuRAMAddressStart + 0x10000000)
+      {
+        // View the comment for MEM1.
+        PSAPI_WORKING_SET_EX_INFORMATION wsInfo;
+        wsInfo.VirtualAddress = info.BaseAddress;
+        if (QueryWorkingSetEx(m_hDolphin, &wsInfo, sizeof(PSAPI_WORKING_SET_EX_INFORMATION)))
+        {
+          if (wsInfo.VirtualAttributes.Valid)
+            m_MEM2Present = true;
+        }
+        break;
+      }
+      else if (regionBaseAddress > m_emuRAMAddressStart + 0x10000000)
+      {
+        m_MEM2Present = false;
+        break;
+      }
+      continue;
+    }
+
     if (info.RegionSize == 0x2000000 && info.Type == MEM_MAPPED)
     {
       // Here, it's likely the right page, but it can happen that multiple pages with these criteria
       // exists and have nothing to do with the emulated memory. Only the right page has valid
-      // working set information so an additional check is required that it is backed by phisical
+      // working set information so an additional check is required that it is backed by physical
       // memory.
       PSAPI_WORKING_SET_EX_INFORMATION wsInfo;
       wsInfo.VirtualAddress = info.BaseAddress;
@@ -62,7 +88,7 @@ bool WindowsDolphinProcess::findEmuRAMStartAddress()
         if (wsInfo.VirtualAttributes.Valid)
         {
           std::memcpy(&m_emuRAMAddressStart, &(info.BaseAddress), sizeof(info.BaseAddress));
-          break;
+          MEM1Found = true;
         }
       }
     }

@@ -15,7 +15,6 @@ namespace DolphinComm
 IDolphinProcess* DolphinAccessor::m_instance = nullptr;
 DolphinAccessor::DolphinStatus DolphinAccessor::m_status = DolphinStatus::unHooked;
 char* DolphinAccessor::m_updatedRAMCache = nullptr;
-bool DolphinAccessor::m_mem2Enabled = false;
 
 void DolphinAccessor::init()
 {
@@ -36,7 +35,7 @@ void DolphinAccessor::hook()
   {
     m_status = DolphinStatus::notRunning;
   }
-  else if (!m_instance->findEmuRAMStartAddress())
+  else if (!m_instance->obtainEmuRAMInformations())
   {
     m_status = DolphinStatus::noEmu;
   }
@@ -82,51 +81,9 @@ u64 DolphinAccessor::getEmuRAMAddressStart()
   return m_instance->getEmuRAMAddressStart();
 }
 
-void DolphinAccessor::enableMem2(const bool doEnable)
+bool DolphinAccessor::isMEM2Present()
 {
-  bool old = m_mem2Enabled;
-  m_mem2Enabled = doEnable;
-  if (old != m_mem2Enabled && m_status == DolphinStatus::hooked)
-    updateRAMCache();
-}
-
-bool DolphinAccessor::isMem2Enabled()
-{
-  return m_mem2Enabled;
-}
-
-void DolphinAccessor::autoDetectMem2()
-{
-  if (getStatus() == DolphinStatus::hooked)
-  {
-    char gameIdFirstChar = ' ';
-    if (readFromRAM(0, &gameIdFirstChar, 1, false))
-    {
-      switch (gameIdFirstChar)
-      {
-      case 'G': // Gamecube disc
-      case 'P': // Promotional games, guaranteed to be Gamecube
-        enableMem2(false);
-        break;
-
-      case 'R': // Wii disc, can be prototypes, but unlikely
-      case 'S': // Later Wii disc
-        enableMem2(true);
-        break;
-
-      // If there's no ID, likely to be a Wiiware, but this isn't guaranteed, could also be D, but
-      // this one is present on both, so let's just leave MEM2 enabled for these by default, the
-      // user can be the judge here, these are extremely unlikely cases anyway
-      default:
-        enableMem2(true);
-        break;
-      }
-    }
-    else
-    {
-      unHook();
-    }
-  }
+  return m_instance->isMEM2Present();
 }
 
 bool DolphinAccessor::isValidConsoleAddress(const u32 address)
@@ -134,7 +91,7 @@ bool DolphinAccessor::isValidConsoleAddress(const u32 address)
   if (getStatus() != DolphinStatus::hooked)
     return false;
   bool isMem1Address = address >= Common::MEM1_START && address < Common::MEM1_END;
-  if (m_mem2Enabled)
+  if (isMEM2Present())
   {
     return isMem1Address || (address >= Common::MEM2_START && address < Common::MEM2_END);
   }
@@ -147,7 +104,7 @@ Common::MemOperationReturnCode DolphinAccessor::updateRAMCache()
   m_updatedRAMCache = nullptr;
 
   // MEM2, if enabled, is read right after MEM1 in the cache so both regions are contigous
-  if (m_mem2Enabled)
+  if (isMEM2Present())
   {
     m_updatedRAMCache = new char[Common::MEM1_SIZE + Common::MEM2_SIZE - 1];
     // Read Wii extra RAM

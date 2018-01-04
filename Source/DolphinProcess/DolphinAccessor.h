@@ -27,9 +27,7 @@ public:
   static int getPID();
   static u64 getEmuRAMAddressStart();
   static DolphinStatus getStatus();
-  static void enableMem2(const bool doEnable);
-  static bool isMem2Enabled();
-  static void autoDetectMem2();
+  static bool isMEM2Present();
   static Common::MemOperationReturnCode updateRAMCache();
   static std::string getFormattedValueFromCache(const u32 ramIndex, Common::MemType memType,
                                                 size_t memSize, Common::MemBase memBase,
@@ -40,7 +38,6 @@ public:
 private:
   static IDolphinProcess* m_instance;
   static DolphinStatus m_status;
-  static bool m_mem2Enabled;
   static char* m_updatedRAMCache;
 };
 }

@@ -12,10 +12,11 @@
 
 namespace DolphinComm
 {
-bool LinuxDolphinProcess::findEmuRAMStartAddress()
+bool LinuxDolphinProcess::obtainEmuRAMInformations()
 {
   std::ifstream theMapsFile("/proc/" + std::to_string(m_PID) + "/maps");
   std::string line;
+  bool MEM1Found = false;
   while (getline(theMapsFile, line))
   {
     if (line.length() > 73)
@@ -31,12 +32,27 @@ bool LinuxDolphinProcess::findEmuRAMStartAddress()
         firstAddress = std::stoul(firstAddressStr, nullptr, 16);
         SecondAddress = std::stoul(secondAddressStr, nullptr, 16);
 
+        if (MEM1Found)
+        {
+          if (firstAddress == m_emuRAMAddressStart + 0x10000000)
+          {
+            m_MEM2Present = true;
+            break;
+          }
+          else if (firstAddress > m_emuRAMAddressStart + 0x10000000)
+          {
+            m_MEM2Present = false;
+            break;
+          }
+          continue;
+        }
+
         u64 test = SecondAddress - firstAddress;
 
         if (SecondAddress - firstAddress == 0x2000000)
         {
           m_emuRAMAddressStart = firstAddress;
-          break;
+          MEM1Found = true;
         }
       }
     }

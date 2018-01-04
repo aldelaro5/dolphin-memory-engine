@@ -17,7 +17,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
 {
   m_scanRAMCache = nullptr;
   u32 ramSize = 0;
-  if (DolphinComm::DolphinAccessor::isMem2Enabled())
+  if (DolphinComm::DolphinAccessor::isMEM2Present())
   {
     ramSize = Common::MEM1_SIZE + Common::MEM2_SIZE;
     m_scanRAMCache = new char[ramSize - 1];
@@ -150,7 +150,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
 {
   u32 ramSize = 0;
   char* newerRAMCache = nullptr;
-  if (DolphinComm::DolphinAccessor::isMem2Enabled())
+  if (DolphinComm::DolphinAccessor::isMEM2Present())
   {
     ramSize = Common::MEM1_SIZE + Common::MEM2_SIZE;
     newerRAMCache = new char[ramSize - 1];

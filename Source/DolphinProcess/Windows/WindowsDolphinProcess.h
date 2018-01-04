@@ -15,7 +15,7 @@ public:
   {
   }
   bool findPID() override;
-  bool findEmuRAMStartAddress() override;
+  bool obtainEmuRAMInformations() override;
   bool readFromRAM(const u32 offset, char* buffer, const size_t size,
                    const bool withBSwap) override;
   bool writeToRAM(const u32 offset, const char* buffer, const size_t size,
