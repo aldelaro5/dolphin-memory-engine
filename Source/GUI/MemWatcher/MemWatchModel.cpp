@@ -137,11 +137,7 @@ void MemWatchModel::removeNode(const QModelIndex& index)
 
     int toDeleteRow = toDelete->getRow();
 
-    const QModelIndex idx = createIndex(toDeleteRow, 0, parent);
-    if (parent == m_rootNode)
-      beginRemoveRows(QModelIndex(), toDeleteRow, toDeleteRow);
-    else
-      beginRemoveRows(idx.parent(), toDeleteRow, toDeleteRow);
+    beginRemoveRows(index.parent(), toDeleteRow, toDeleteRow);
     bool removeChildren = (toDelete->isGroup() && toDelete->hasChildren());
     if (removeChildren)
       beginRemoveRows(index, 0, toDelete->childrenCount());
