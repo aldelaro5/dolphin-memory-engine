@@ -12,7 +12,7 @@ QWidget* MemWatchDelegate::createEditor(QWidget* parent, const QStyleOptionViewI
   const MemWatchModel* model = static_cast<const MemWatchModel*>(index.model());
   MemWatchTreeNode* node = model->getTreeNodeFromIndex(index);
   if ((index.column() == MemWatchModel::WATCH_COL_VALUE && !node->isGroup()) ||
-      (node->isGroup() && index.column() == MemWatchModel::WATCH_COL_LABEL))
+      (index.column() == MemWatchModel::WATCH_COL_LABEL))
   {
     QLineEdit* editor = new QLineEdit(parent);
     editor->setFrame(false);
