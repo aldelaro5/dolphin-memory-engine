@@ -273,10 +273,15 @@ void MemWatchWidget::pasteWatchFromClipBoard(MemWatchTreeNode* node)
   QJsonDocument loadDoc(QJsonDocument::fromJson(nodeStr.toUtf8()));
   MemWatchTreeNode* copiedRootNode = new MemWatchTreeNode(nullptr);
   copiedRootNode->readFromJson(loadDoc.object(), nullptr);
-  for (auto i : copiedRootNode->getChildren())
-    node->appendChild(i);
+  if (copiedRootNode->hasChildren())
+  {
+    for (auto i : copiedRootNode->getChildren())
+      node->appendChild(i);
 
-  emit m_watchModel->layoutChanged();
+    emit m_watchModel->layoutChanged();
+
+    m_hasUnsavedChanges = true;
+  }
 }
 
 void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
@@ -586,7 +591,7 @@ void MemWatchWidget::exportWatchListAsCSV()
 
 bool MemWatchWidget::warnIfUnsavedChanges()
 {
-  if (m_hasUnsavedChanges)
+  if (m_hasUnsavedChanges && m_watchModel->getRootNode()->hasChildren())
   {
     QMessageBox* questionBox = new QMessageBox(
         QMessageBox::Question, "Unsaved changes",
