@@ -441,9 +441,14 @@ void MemWatchWidget::onDeleteNode()
       toDeleteList->append(index);
   }
 
+  // Let the timer take a break so the updates stalls while we are deleting.
+  m_updateTimer->stop();
+
   // Then, delete the rest (the children will be deleted too)
   for (auto i : *toDeleteList)
     m_watchModel->removeNode(i);
+
+  m_updateTimer->start();
 
   m_hasUnsavedChanges = true;
 }
