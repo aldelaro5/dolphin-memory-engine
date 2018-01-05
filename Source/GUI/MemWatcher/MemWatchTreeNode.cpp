@@ -12,6 +12,16 @@ MemWatchTreeNode::MemWatchTreeNode(MemWatchEntry* entry, MemWatchTreeNode* paren
 {
 }
 
+MemWatchTreeNode::MemWatchTreeNode(const MemWatchTreeNode& node)
+{
+  m_isGroup = node.m_isGroup;
+  m_isValueEditing = node.m_isValueEditing;
+  m_groupName = node.m_groupName;
+  m_entry = node.m_entry;
+  m_children = node.m_children;
+  m_parent = node.m_parent;
+}
+
 MemWatchTreeNode::~MemWatchTreeNode()
 {
   qDeleteAll(m_children);
@@ -80,7 +90,7 @@ MemWatchTreeNode* MemWatchTreeNode::getParent() const
 
 int MemWatchTreeNode::getRow() const
 {
-  if (m_parent)
+  if (m_parent != nullptr)
     return m_parent->m_children.indexOf(const_cast<MemWatchTreeNode*>(this));
 
   return 0;

@@ -11,6 +11,7 @@ class MemWatchTreeNode
 public:
   MemWatchTreeNode(MemWatchEntry* entry, MemWatchTreeNode* parent = nullptr,
                    const bool isGroup = false, const QString& groupName = "");
+  MemWatchTreeNode(const MemWatchTreeNode& node);
   ~MemWatchTreeNode();
 
   bool isGroup() const;

@@ -223,6 +223,9 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   QAction* copy = new QAction("Copy", this);
   connect(copy, &QAction::triggered, this, [=] { copySelectedWatchesToClipBoard(); });
   contextMenu->addAction(copy);
+  QAction* cut = new QAction("Cut", this);
+  connect(cut, &QAction::triggered, this, [=] { cutSelectedWatchesToClipBoard(); });
+  contextMenu->addAction(cut);
 
   if (canPasteInto)
   {
@@ -234,25 +237,36 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   contextMenu->popup(m_watchView->viewport()->mapToGlobal(pos));
 }
 
+void MemWatchWidget::cutSelectedWatchesToClipBoard()
+{
+  copySelectedWatchesToClipBoard();
+
+  QModelIndexList* cutList = simplifySelection();
+
+  if (cutList->count() > 0)
+  {
+    for (auto i : *cutList)
+    {
+      m_watchModel->removeNode(i);
+      emit m_watchModel->layoutChanged();
+    }
+
+    m_hasUnsavedChanges = true;
+  }
+}
+
 void MemWatchWidget::copySelectedWatchesToClipBoard()
 {
   QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
   if (selection.count() == 0)
     return;
 
-  // Discard all items whose parent is selected already.
-  QModelIndexList* toCopyList = new QModelIndexList();
-  for (int i = 0; i < selection.count(); ++i)
-  {
-    const QModelIndex index = selection.at(i);
-    if (!isAnyAncestorSelected(index))
-      toCopyList->append(index);
-  }
+  QModelIndexList* toCopyList = simplifySelection();
 
   MemWatchTreeNode* rootNodeCopy = new MemWatchTreeNode(nullptr, nullptr, false, QString(""));
   for (auto i : *toCopyList)
   {
-    MemWatchTreeNode* theNode = m_watchModel->getTreeNodeFromIndex(i);
+    MemWatchTreeNode* theNode = new MemWatchTreeNode(*(m_watchModel->getTreeNodeFromIndex(i)));
     rootNodeCopy->appendChild(theNode);
   }
 
@@ -399,7 +413,22 @@ void MemWatchWidget::addWatchEntry(MemWatchEntry* entry)
   m_hasUnsavedChanges = true;
 }
 
-bool MemWatchWidget::isAnyAncestorSelected(const QModelIndex index)
+QModelIndexList* MemWatchWidget::simplifySelection() const
+{
+  QModelIndexList* simplifiedSelection = new QModelIndexList();
+  QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
+
+  // Discard all indexes whose parent is selected already
+  for (int i = 0; i < selection.count(); ++i)
+  {
+    const QModelIndex index = selection.at(i);
+    if (!isAnyAncestorSelected(index))
+      simplifiedSelection->append(index);
+  }
+  return simplifiedSelection;
+}
+
+bool MemWatchWidget::isAnyAncestorSelected(const QModelIndex index) const
 {
   if (m_watchModel->parent(index) == QModelIndex())
     return false;
@@ -440,14 +469,7 @@ void MemWatchWidget::onDeleteNode()
   confirmationBox->setDefaultButton(QMessageBox::Yes);
   if (confirmationBox->exec() == QMessageBox::Yes)
   {
-    // First, discard all indexes whose parent is selected already
-    QModelIndexList* toDeleteList = new QModelIndexList();
-    for (int i = 0; i < selection.count(); ++i)
-    {
-      const QModelIndex index = selection.at(i);
-      if (!isAnyAncestorSelected(index))
-        toDeleteList->append(index);
-    }
+    QModelIndexList* toDeleteList = simplifySelection();
 
     // Let the timer take a break so the updates stalls while we are deleting.
     m_updateTimer->stop();

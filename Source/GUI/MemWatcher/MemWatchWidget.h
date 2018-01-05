@@ -24,6 +24,7 @@ public:
   void onDropSucceeded();
   void openWatchFile();
   void copySelectedWatchesToClipBoard();
+  void cutSelectedWatchesToClipBoard();
   void pasteWatchFromClipBoard(MemWatchTreeNode* node);
   void saveWatchFile();
   void saveAsWatchFile();
@@ -47,5 +48,6 @@ private:
   QString m_watchListFile = "";
   bool m_hasUnsavedChanges = false;
 
-  bool isAnyAncestorSelected(const QModelIndex index);
+  bool isAnyAncestorSelected(const QModelIndex index) const;
+  QModelIndexList* simplifySelection() const;
 };

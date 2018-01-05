@@ -37,7 +37,7 @@ bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QMode
                                              bool readSucess)
 {
   QVector<MemWatchTreeNode*> children = node->getChildren();
-  if (children.count() != 0)
+  if (children.count() > 0)
   {
     for (auto i : children)
     {
@@ -61,7 +61,7 @@ bool MemWatchModel::freezeNodeValueRecursive(MemWatchTreeNode* node, const QMode
                                              bool writeSucess)
 {
   QVector<MemWatchTreeNode*> children = node->getChildren();
-  if (children.count() != 0)
+  if (children.count() > 0)
   {
     for (auto i : children)
     {
