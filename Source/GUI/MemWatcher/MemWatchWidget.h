@@ -23,6 +23,8 @@ public:
   void onDeleteNode();
   void onDropSucceeded();
   void openWatchFile();
+  void copySelectedWatchesToClipBoard();
+  void pasteWatchFromClipBoard(MemWatchTreeNode* node);
   void saveWatchFile();
   void saveAsWatchFile();
   void exportWatchListAsCSV();

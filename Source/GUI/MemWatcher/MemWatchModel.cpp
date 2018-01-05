@@ -345,7 +345,7 @@ QModelIndex MemWatchModel::parent(const QModelIndex& index) const
   MemWatchTreeNode* childNode = static_cast<MemWatchTreeNode*>(index.internalPointer());
   MemWatchTreeNode* parentNode = childNode->getParent();
 
-  if (parentNode == m_rootNode)
+  if (parentNode == m_rootNode || parentNode == nullptr)
     return QModelIndex();
 
   return createIndex(parentNode->getRow(), 0, parentNode);
@@ -505,6 +505,11 @@ QString MemWatchModel::writeRootToCSVStringRecursive() const
 bool MemWatchModel::hasAnyNodes() const
 {
   return m_rootNode->hasChildren();
+}
+
+MemWatchTreeNode* MemWatchModel::getRootNode() const
+{
+  return m_rootNode;
 }
 
 MemWatchTreeNode* MemWatchModel::getTreeNodeFromIndex(const QModelIndex& index) const

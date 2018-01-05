@@ -1,7 +1,9 @@
 #include "MemWatchWidget.h"
 
 #include <QAction>
+#include <QApplication>
 #include <QByteArray>
+#include <QClipboard>
 #include <QFile>
 #include <QFileDialog>
 #include <QHBoxLayout>
@@ -99,16 +101,17 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
 void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
 {
   QModelIndex index = m_watchView->indexAt(pos);
+  QMenu* contextMenu = new QMenu(this);
+  MemWatchTreeNode* node = nullptr;
+  bool canPasteInto = true;
   if (index != QModelIndex())
   {
-    MemWatchTreeNode* node = m_watchModel->getTreeNodeFromIndex(index);
+    node = m_watchModel->getTreeNodeFromIndex(index);
     if (!node->isGroup())
     {
       MemWatchEntry* entry = m_watchModel->getEntryFromIndex(index);
       int typeIndex = static_cast<int>(entry->getType());
       Common::MemType theType = static_cast<Common::MemType>(typeIndex);
-
-      QMenu* contextMenu = new QMenu(this);
 
       if (entry->isBoundToPointer())
       {
@@ -208,9 +211,72 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
           }
         }
       }
-      contextMenu->popup(m_watchView->viewport()->mapToGlobal(pos));
+      contextMenu->addSeparator();
+      canPasteInto = false;
     }
   }
+  else
+  {
+    node = m_watchModel->getRootNode();
+  }
+
+  QAction* copy = new QAction("Copy", this);
+  connect(copy, &QAction::triggered, this, [=] { copySelectedWatchesToClipBoard(); });
+  contextMenu->addAction(copy);
+
+  if (canPasteInto)
+  {
+    QAction* paste = new QAction("Paste", this);
+    connect(paste, &QAction::triggered, this, [=] { pasteWatchFromClipBoard(node); });
+    contextMenu->addAction(paste);
+  }
+
+  contextMenu->popup(m_watchView->viewport()->mapToGlobal(pos));
+}
+
+void MemWatchWidget::copySelectedWatchesToClipBoard()
+{
+  QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
+  if (selection.count() == 0)
+    return;
+
+  // Discard all items whose parent is selected already.
+  QModelIndexList* toCopyList = new QModelIndexList();
+  for (int i = 0; i < selection.count(); ++i)
+  {
+    const QModelIndex index = selection.at(i);
+    if (!isAnyAncestorSelected(index))
+      toCopyList->append(index);
+  }
+
+  MemWatchTreeNode* rootNodeCopy = new MemWatchTreeNode(nullptr, nullptr, false, QString(""));
+  for (auto i : *toCopyList)
+  {
+    MemWatchTreeNode* theNode = m_watchModel->getTreeNodeFromIndex(i);
+    rootNodeCopy->appendChild(theNode);
+  }
+
+  QJsonObject jsonNode;
+  rootNodeCopy->writeToJson(jsonNode);
+  QJsonDocument doc(jsonNode);
+  QString nodeJsonStr(doc.toJson());
+
+  QClipboard* clipboard = QApplication::clipboard();
+  clipboard->setText(nodeJsonStr);
+}
+
+void MemWatchWidget::pasteWatchFromClipBoard(MemWatchTreeNode* node)
+{
+  QClipboard* clipboard = QApplication::clipboard();
+  QString nodeStr = clipboard->text();
+
+  QJsonDocument loadDoc(QJsonDocument::fromJson(nodeStr.toUtf8()));
+  MemWatchTreeNode* copiedRootNode = new MemWatchTreeNode(nullptr);
+  copiedRootNode->readFromJson(loadDoc.object(), nullptr);
+  for (auto i : copiedRootNode->getChildren())
+    node->appendChild(i);
+
+  emit m_watchModel->layoutChanged();
 }
 
 void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
