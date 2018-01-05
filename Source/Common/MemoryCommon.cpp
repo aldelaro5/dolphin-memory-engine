@@ -459,7 +459,13 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
   }
   case Common::MemType::type_string:
   {
-    return std::string(memory, length);
+    int actualLength = 0;
+    for (actualLength; actualLength < length; ++actualLength)
+    {
+      if (*(memory + actualLength) == 0x00)
+        break;
+    }
+    return std::string(memory, actualLength);
   }
   case Common::MemType::type_byteArray:
   {
