@@ -416,41 +416,45 @@ void MemWatchWidget::onDeleteNode()
     const QModelIndex index = selection.at(i);
     MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
     if (node->isGroup() && node->hasChildren())
+    {
       hasGroupWithChild = true;
+      break;
+    }
   }
 
+  QString confirmationMsg = "Are you sure you want to delete these watches and/or groups?";
   if (hasGroupWithChild)
-  {
-    QString confirmationMsg =
-        "The current selection contains one or more groups with watches in them, deleting the "
+    confirmationMsg +=
+        "\n\nThe current selection contains one or more groups with watches in them, deleting the "
         "groups will also delete their watches, if you want to avoid this, move the watches out of "
         "the groups.";
-    QMessageBox* confirmationBox =
-        new QMessageBox(QMessageBox::Question, QString("Deleting confirmation"), confirmationMsg,
-                        QMessageBox::Yes | QMessageBox::No, this);
-    if (confirmationBox->exec() != QMessageBox::Yes)
-      return;
-  }
 
-  // First, discard all indexes whose parent is selected already
-  QModelIndexList* toDeleteList = new QModelIndexList();
-  for (int i = 0; i < selection.count(); ++i)
+  QMessageBox* confirmationBox =
+      new QMessageBox(QMessageBox::Question, QString("Deleting confirmation"), confirmationMsg,
+                      QMessageBox::Yes | QMessageBox::No, this);
+  confirmationBox->setDefaultButton(QMessageBox::Yes);
+  if (confirmationBox->exec() == QMessageBox::Yes)
   {
-    const QModelIndex index = selection.at(i);
-    if (!isAnyAncestorSelected(index))
-      toDeleteList->append(index);
+    // First, discard all indexes whose parent is selected already
+    QModelIndexList* toDeleteList = new QModelIndexList();
+    for (int i = 0; i < selection.count(); ++i)
+    {
+      const QModelIndex index = selection.at(i);
+      if (!isAnyAncestorSelected(index))
+        toDeleteList->append(index);
+    }
+
+    // Let the timer take a break so the updates stalls while we are deleting.
+    m_updateTimer->stop();
+
+    // Then, delete the rest (the children will be deleted too)
+    for (auto i : *toDeleteList)
+      m_watchModel->removeNode(i);
+
+    m_updateTimer->start();
+
+    m_hasUnsavedChanges = true;
   }
-
-  // Let the timer take a break so the updates stalls while we are deleting.
-  m_updateTimer->stop();
-
-  // Then, delete the rest (the children will be deleted too)
-  for (auto i : *toDeleteList)
-    m_watchModel->removeNode(i);
-
-  m_updateTimer->start();
-
-  m_hasUnsavedChanges = true;
 }
 
 void MemWatchWidget::onDropSucceeded()
