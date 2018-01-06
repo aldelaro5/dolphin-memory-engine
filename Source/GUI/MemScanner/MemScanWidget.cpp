@@ -154,7 +154,10 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
 
 MemScanWidget::~MemScanWidget()
 {
-  delete m_memScanner;
+  if (m_memScanner != nullptr)
+    delete m_memScanner;
+  if (m_resultsListModel != nullptr)
+    delete m_resultsListModel;
 }
 
 ResultsListModel* MemScanWidget::getResultListModel() const

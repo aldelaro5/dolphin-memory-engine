@@ -24,7 +24,9 @@ MemWatchTreeNode::MemWatchTreeNode(const MemWatchTreeNode& node)
 
 MemWatchTreeNode::~MemWatchTreeNode()
 {
-  qDeleteAll(m_children);
+  if (hasChildren())
+    qDeleteAll(m_children);
+  m_parent = nullptr;
 }
 
 bool MemWatchTreeNode::isGroup() const
@@ -40,11 +42,6 @@ bool MemWatchTreeNode::hasChildren() const
 int MemWatchTreeNode::childrenCount() const
 {
   return m_children.count();
-}
-
-void MemWatchTreeNode::deleteAllChildren()
-{
-  qDeleteAll(m_children);
 }
 
 bool MemWatchTreeNode::isValueEditing() const

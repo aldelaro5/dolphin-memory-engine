@@ -9,6 +9,8 @@ MemScanner::MemScanner() : m_resultsConsoleAddr(std::vector<u32>())
 
 MemScanner::~MemScanner()
 {
+  if (m_scanRAMCache != nullptr)
+    delete[] m_scanRAMCache;
 }
 
 Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter filter,

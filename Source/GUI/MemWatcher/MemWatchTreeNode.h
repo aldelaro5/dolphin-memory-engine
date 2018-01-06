@@ -30,7 +30,6 @@ public:
   void appendChild(MemWatchTreeNode* node);
   void insertChild(const int row, MemWatchTreeNode* node);
   void removeChild(const int row);
-  void deleteAllChildren();
 
   void readFromJson(const QJsonObject& json, MemWatchTreeNode* parent = nullptr);
   void writeToJson(QJsonObject& json) const;

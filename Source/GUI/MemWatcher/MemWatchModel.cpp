@@ -14,7 +14,8 @@ MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
 
 MemWatchModel::~MemWatchModel()
 {
-  delete m_rootNode;
+  if (m_rootNode != nullptr)
+    delete m_rootNode;
 }
 
 void MemWatchModel::onUpdateTimer()

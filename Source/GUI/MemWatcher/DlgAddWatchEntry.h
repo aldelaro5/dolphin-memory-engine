@@ -16,6 +16,7 @@ class DlgAddWatchEntry : public QDialog
 {
 public:
   DlgAddWatchEntry(MemWatchEntry* entry);
+  ~DlgAddWatchEntry();
   void onTypeChange(int index);
   void accept();
   void onAddressChanged();

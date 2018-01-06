@@ -12,6 +12,7 @@ class MemViewerWidget : public QWidget
 
 public:
   MemViewerWidget(QWidget* parent, u32 consoleAddress);
+  ~MemViewerWidget();
 
   void onJumpToAddressTextChanged();
   void onGoToMEM1Start();

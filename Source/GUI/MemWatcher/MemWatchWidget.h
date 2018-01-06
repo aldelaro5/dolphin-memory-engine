@@ -13,6 +13,7 @@ class MemWatchWidget : public QWidget
 
 public:
   MemWatchWidget(QWidget* parent);
+  ~MemWatchWidget();
 
   void onMemWatchContextMenuRequested(const QPoint& pos);
   void onValueWriteError(const QModelIndex& index, Common::MemOperationReturnCode writeReturn);

@@ -98,6 +98,14 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
   connect(m_freezeTimer, &QTimer::timeout, m_watchModel, &MemWatchModel::onFreezeTimer);
 }
 
+MemWatchWidget::~MemWatchWidget()
+{
+  if (m_watchDelegate != nullptr)
+    delete m_watchDelegate;
+  if (m_watchModel != nullptr)
+    delete m_watchModel;
+}
+
 void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
 {
   QModelIndex index = m_watchView->indexAt(pos);

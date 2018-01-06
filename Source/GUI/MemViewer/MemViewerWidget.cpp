@@ -38,6 +38,12 @@ MemViewerWidget::MemViewerWidget(QWidget* parent, u32 consoleAddress) : QWidget(
   connect(m_updateMemoryTimer, &QTimer::timeout, m_memViewer, &MemViewer::updateViewer);
 }
 
+MemViewerWidget::~MemViewerWidget()
+{
+  if (m_memViewer != nullptr)
+    delete m_memViewer;
+}
+
 QTimer* MemViewerWidget::getUpdateTimer() const
 {
   return m_updateMemoryTimer;
