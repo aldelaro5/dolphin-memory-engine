@@ -77,8 +77,7 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   QLabel* lblType = new QLabel("Type: ", this);
   m_cmbTypes = new QComboBox(this);
   m_cmbTypes->addItems(GUICommon::g_memTypeNames);
-  connect(m_cmbTypes, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
-          &DlgAddWatchEntry::onTypeChange);
+
   QHBoxLayout* layout_type = new QHBoxLayout;
   layout_type->addWidget(lblType);
   layout_type->addWidget(m_cmbTypes);
@@ -93,8 +92,6 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   layout_length->addWidget(m_spnLength);
   m_lengtWidget = new QWidget;
   m_lengtWidget->setLayout(layout_length);
-  connect(m_spnLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this,
-          &DlgAddWatchEntry::onLengthChanged);
 
   QDialogButtonBox* buttonBox =
       new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -118,7 +115,6 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   if (entry == nullptr)
   {
     m_entry = new MemWatchEntry();
-    m_entry->setLength(1);
 
     m_cmbTypes->setCurrentIndex(0);
     m_spnLength->setValue(1);
@@ -131,8 +127,10 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   }
   else
   {
-    m_cmbTypes->setCurrentIndex(static_cast<int>(m_entry->getType()));
+    m_entry = entry;
+
     m_spnLength->setValue(static_cast<int>(m_entry->getLength()));
+    m_cmbTypes->setCurrentIndex(static_cast<int>(m_entry->getType()));
     if (m_entry->getType() == Common::MemType::type_string ||
         m_entry->getType() == Common::MemType::type_byteArray)
       m_lengtWidget->show();
@@ -142,7 +140,7 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
     std::stringstream ssAddress;
     ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
     m_txbAddress->setText(QString::fromStdString(ssAddress.str()));
-    if (entry->isBoundToPointer())
+    if (m_entry->isBoundToPointer())
     {
       m_pointerWidget->show();
       for (int i = 0; i < m_entry->getPointerLevel(); ++i)
@@ -172,9 +170,15 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
       m_pointerWidget->hide();
       addPointerOffset();
     }
-    // Implicitly calls updateValuePreview via an event
+
     m_chkBoundToPointer->setChecked(m_entry->isBoundToPointer());
+    updatePreview();
   }
+
+  connect(m_cmbTypes, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+          &DlgAddWatchEntry::onTypeChange);
+  connect(m_spnLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this,
+          &DlgAddWatchEntry::onLengthChanged);
 }
 
 DlgAddWatchEntry::~DlgAddWatchEntry()
@@ -254,7 +258,7 @@ void DlgAddWatchEntry::onTypeChange(int index)
     m_lengtWidget->show();
   else
     m_lengtWidget->hide();
-  m_entry->setType(theType);
+  m_entry->setTypeAndLength(theType, m_spnLength->value());
   if (validateAndSetAddress())
     updatePreview();
 }
@@ -374,7 +378,8 @@ void DlgAddWatchEntry::updatePreview()
 
 void DlgAddWatchEntry::onLengthChanged()
 {
-  m_entry->setLength(m_spnLength->value());
+  Common::MemType theType = static_cast<Common::MemType>(m_cmbTypes->currentIndex());
+  m_entry->setTypeAndLength(theType, m_spnLength->value());
   if (validateAndSetAddress())
     updatePreview();
 }

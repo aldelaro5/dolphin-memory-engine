@@ -91,8 +91,7 @@ bool MemWatchModel::freezeNodeValueRecursive(MemWatchTreeNode* node, const QMode
 void MemWatchModel::changeType(const QModelIndex& index, Common::MemType type, size_t length)
 {
   MemWatchEntry* entry = getEntryFromIndex(index);
-  entry->setType(type);
-  entry->setLength(length);
+  entry->setTypeAndLength(type, length);
   emit dataChanged(index, index);
 }
 

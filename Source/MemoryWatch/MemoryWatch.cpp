@@ -115,10 +115,11 @@ void MemWatchEntry::setConsoleAddress(const u32 address)
   m_consoleAddress = address;
 }
 
-void MemWatchEntry::setType(const Common::MemType type)
+void MemWatchEntry::setTypeAndLength(const Common::MemType type, const size_t length)
 {
   size_t oldSize = getSizeForType(m_type, m_length);
   m_type = type;
+  m_length = length;
   size_t newSize = getSizeForType(m_type, m_length);
   if (oldSize != newSize)
   {
@@ -149,11 +150,6 @@ void MemWatchEntry::setLock(const bool doLock)
     m_freezeMemSize = 0;
     delete[] m_freezeMemory;
   }
-}
-
-void MemWatchEntry::setLength(const size_t length)
-{
-  m_length = length;
 }
 
 void MemWatchEntry::setSignedUnsigned(const bool isUnsigned)

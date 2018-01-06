@@ -31,10 +31,9 @@ public:
   size_t getPointerLevel() const;
   void setLabel(const std::string& label);
   void setConsoleAddress(const u32 address);
-  void setType(const Common::MemType type);
+  void setTypeAndLength(const Common::MemType type, const size_t length = 1);
   void setBase(const Common::MemBase base);
   void setLock(const bool doLock);
-  void setLength(const size_t length);
   void setSignedUnsigned(const bool isUnsigned);
   void setBoundToPointer(const bool boundToPointer);
   void setPointerOffset(const int pointerOffset, const int index);
