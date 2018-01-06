@@ -23,7 +23,7 @@ QWidget* MemWatchDelegate::createEditor(QWidget* parent, const QStyleOptionViewI
     }
     return editor;
   }
-  return 0;
+  return nullptr;
 }
 
 void MemWatchDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const

@@ -38,4 +38,4 @@ protected:
   u64 m_emuRAMAddressStart = 0;
   bool m_MEM2Present = false;
 };
-}
+} // namespace DolphinComm

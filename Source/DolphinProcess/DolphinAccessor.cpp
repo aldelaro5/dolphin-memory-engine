@@ -147,4 +147,4 @@ void DolphinAccessor::copyRawMemoryFromCache(char* dest, const u32 consoleAddres
     std::memcpy(dest, m_updatedRAMCache + ramIndex, byteCount);
   }
 }
-}
+} // namespace DolphinComm

@@ -24,5 +24,5 @@ public:
 private:
   HANDLE m_hDolphin;
 };
-}
+} // namespace DolphinComm
 #endif

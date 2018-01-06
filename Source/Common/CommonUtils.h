@@ -48,4 +48,4 @@ inline u32 offsetToDolphinAddr(u32 offset)
 {
   return offset |= 0x80000000;
 }
-}
+} // namespace Common
