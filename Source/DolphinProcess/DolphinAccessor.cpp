@@ -48,8 +48,7 @@ void DolphinAccessor::hook()
 
 void DolphinAccessor::unHook()
 {
-  if (m_instance != nullptr)
-    delete m_instance;
+  delete m_instance;
   m_instance = nullptr;
   m_status = DolphinStatus::unHooked;
 }

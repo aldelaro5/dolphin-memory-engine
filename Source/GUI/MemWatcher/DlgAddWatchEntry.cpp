@@ -183,8 +183,7 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
 
 DlgAddWatchEntry::~DlgAddWatchEntry()
 {
-  if (m_entry != nullptr)
-    delete m_entry;
+  delete m_entry;
 }
 
 void DlgAddWatchEntry::addPointerOffset()

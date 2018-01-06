@@ -141,12 +141,9 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-  if (m_viewer != nullptr)
-    delete m_viewer;
-  if (m_scanner != nullptr)
-    delete m_scanner;
-  if (m_watcher != nullptr)
-    delete m_watcher;
+  delete m_viewer;
+  delete m_scanner;
+  delete m_watcher;
 }
 
 void MainWindow::addSelectedResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,

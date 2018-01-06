@@ -100,10 +100,8 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
 
 MemWatchWidget::~MemWatchWidget()
 {
-  if (m_watchDelegate != nullptr)
-    delete m_watchDelegate;
-  if (m_watchModel != nullptr)
-    delete m_watchModel;
+  delete m_watchDelegate;
+  delete m_watchModel;
 }
 
 void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
