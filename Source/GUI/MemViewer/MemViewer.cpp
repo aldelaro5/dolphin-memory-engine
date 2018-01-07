@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <sstream>
 
+#include <QApplication>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
@@ -13,17 +14,21 @@
 #include "../../Common/CommonUtils.h"
 #include "../../DolphinProcess/DolphinAccessor.h"
 
+#define VISIBLE_COLS 16 // Should be a multiple of 16, or the header doesn't make sense
+#define VISIBLE_ROWS 16
+#define NUM_BYTES (VISIBLE_COLS * VISIBLE_ROWS)
+
 MemViewer::MemViewer(QWidget* parent) : QAbstractScrollArea(parent)
 {
   initialise();
 
-  std::fill(m_memoryMsElapsedLastChange, m_memoryMsElapsedLastChange + 16 * 16, 0);
+  std::fill(m_memoryMsElapsedLastChange, m_memoryMsElapsedLastChange + NUM_BYTES, 0);
   updateMemoryData();
-  std::memcpy(m_lastRawMemoryData, m_updatedRawMemoryData, 16 * 16);
+  std::memcpy(m_lastRawMemoryData, m_updatedRawMemoryData, NUM_BYTES);
 
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  verticalScrollBar()->setRange(0, ((m_memViewEnd - m_memViewStart) / 16) - 1);
-  verticalScrollBar()->setPageStep(16);
+  changeMemoryRegion(false);
+  verticalScrollBar()->setPageStep(VISIBLE_ROWS);
 
   m_elapsedTimer.start();
 
@@ -40,25 +45,22 @@ MemViewer::~MemViewer()
 void MemViewer::initialise()
 {
 #ifdef __linux__
-  setFont(QFont("Monospace", 15));
+  setFont(QFont("Monospace", 10));
 #elif _WIN32
-  setFont(QFont("Courier New", 15));
+  setFont(QFont("Courier New", 10));
 #endif
 
-  m_hexKeyList = QList<int>({Qt::Key_0, Qt::Key_1, Qt::Key_2, Qt::Key_3, Qt::Key_4, Qt::Key_5,
-                             Qt::Key_6, Qt::Key_7, Qt::Key_8, Qt::Key_9, Qt::Key_A, Qt::Key_B,
-                             Qt::Key_C, Qt::Key_D, Qt::Key_E, Qt::Key_F});
   m_charWidthEm = fontMetrics().width(QLatin1Char('M'));
   m_charHeight = fontMetrics().height();
-  m_hexAreaWidth = 16 * (m_charWidthEm * 2 + m_charWidthEm / 2);
-  m_hexAreaHeight = 16 * m_charHeight;
+  m_hexAreaWidth = VISIBLE_COLS * (m_charWidthEm * 2 + m_charWidthEm / 2);
+  m_hexAreaHeight = VISIBLE_ROWS * m_charHeight;
   m_rowHeaderWidth = m_charWidthEm * (sizeof(u32) * 2 + 1) + m_charWidthEm / 2;
   m_hexAsciiSeparatorPosX = m_rowHeaderWidth + m_hexAreaWidth;
   m_columnHeaderHeight = m_charHeight + m_charWidthEm / 2;
   m_curosrRect = new QRect();
-  m_updatedRawMemoryData = new char[16 * 16];
-  m_lastRawMemoryData = new char[16 * 16];
-  m_memoryMsElapsedLastChange = new int[16 * 16];
+  m_updatedRawMemoryData = new char[NUM_BYTES];
+  m_lastRawMemoryData = new char[NUM_BYTES];
+  m_memoryMsElapsedLastChange = new int[NUM_BYTES];
   m_memViewStart = Common::MEM1_START;
   m_memViewEnd = Common::MEM1_END;
   m_currentFirstAddress = m_memViewStart;
@@ -84,7 +86,7 @@ void MemViewer::updateMemoryData()
       (DolphinComm::DolphinAccessor::updateRAMCache() == Common::MemOperationReturnCode::OK);
   if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress))
     DolphinComm::DolphinAccessor::copyRawMemoryFromCache(m_updatedRawMemoryData,
-                                                         m_currentFirstAddress, 16 * 16);
+                                                         m_currentFirstAddress, NUM_BYTES);
   if (!m_validMemory)
     emit memErrorOccured();
 }
@@ -112,15 +114,15 @@ void MemViewer::jumpToAddress(const u32 address)
     else if (address >= Common::MEM2_START && m_memViewStart != Common::MEM2_START)
       changeMemoryRegion(true);
 
-    if (m_currentFirstAddress > m_memViewEnd - 16 * 16)
-      m_currentFirstAddress = m_memViewEnd - 16 * 16;
-    std::fill(m_memoryMsElapsedLastChange, m_memoryMsElapsedLastChange + 16 * 16, 0);
+    if (m_currentFirstAddress > m_memViewEnd - NUM_BYTES)
+      m_currentFirstAddress = m_memViewEnd - NUM_BYTES;
+    std::fill(m_memoryMsElapsedLastChange, m_memoryMsElapsedLastChange + NUM_BYTES, 0);
     updateMemoryData();
-    std::memcpy(m_lastRawMemoryData, m_updatedRawMemoryData, 16 * 16);
+    std::memcpy(m_lastRawMemoryData, m_updatedRawMemoryData, NUM_BYTES);
     m_carretBetweenHex = false;
 
     m_disableScrollContentEvent = true;
-    verticalScrollBar()->setValue(((address & 0xFFFFFFF0) - m_memViewStart) / 16);
+    verticalScrollBar()->setValue(((address & 0xFFFFFFF0) - m_memViewStart) / VISIBLE_COLS);
     m_disableScrollContentEvent = false;
 
     viewport()->update();
@@ -131,25 +133,49 @@ void MemViewer::changeMemoryRegion(const bool isMEM2)
 {
   m_memViewStart = isMEM2 ? Common::MEM2_START : Common::MEM1_START;
   m_memViewEnd = isMEM2 ? Common::MEM2_END : Common::MEM1_END;
-  verticalScrollBar()->setRange(0, ((m_memViewEnd - m_memViewStart) / 16) - 1);
+  verticalScrollBar()->setRange(0, ((m_memViewEnd - m_memViewStart) / VISIBLE_COLS) - VISIBLE_ROWS);
 }
 
 void MemViewer::mousePressEvent(QMouseEvent* event)
 {
+  // Only handle left-click events
+  if (event->button() != Qt::MouseButton::LeftButton)
+    return;
+
   int x = event->pos().x();
   int y = event->pos().y();
-  if (x >= m_rowHeaderWidth && x <= m_rowHeaderWidth + m_hexAreaWidth && y >= m_columnHeaderHeight)
+
+  const bool wasEditingHex = m_editingHex;
+  const int spacing = m_charWidthEm / 2;
+  int clickedHexPosX = (x - m_rowHeaderWidth) / (spacing + m_charWidthEm * 2);
+  int clickedAsciiPosX = (x - m_hexAsciiSeparatorPosX - spacing) / m_charWidthEm;
+  int clickedPosY = (y - m_columnHeaderHeight) / m_charHeight;
+
+  // Ignore clicking the header
+  if (clickedPosY < 0)
+    return;
+
+  if (clickedHexPosX >= 0 && clickedHexPosX < VISIBLE_COLS)
   {
-    int oldSelectedPosX = m_byteSelectedPosX;
-    int oldSelectedPosY = m_byteSelectedPosY;
-    m_byteSelectedPosX = (x - m_rowHeaderWidth) / (m_charWidthEm / 2 + m_charWidthEm * 2);
-    m_byteSelectedPosY = (y - m_columnHeaderHeight) / m_charHeight;
-    if (oldSelectedPosX == m_byteSelectedPosX && oldSelectedPosY == m_byteSelectedPosY)
-      m_carretBetweenHex = !m_carretBetweenHex;
-    else
-      m_carretBetweenHex = false;
-    viewport()->update();
+    x = clickedHexPosX;
+    m_editingHex = true;
   }
+  else if (clickedAsciiPosX >= 0 && clickedAsciiPosX < VISIBLE_COLS)
+  {
+    x = clickedAsciiPosX;
+    m_editingHex = false;
+  }
+  else
+    return;
+
+  // Toggle carrot-between-hex when the same byte is clicked twice from the hex table
+  m_carretBetweenHex = (m_editingHex && wasEditingHex && !m_carretBetweenHex &&
+                        m_byteSelectedPosX == x && m_byteSelectedPosY == clickedPosY);
+
+  m_byteSelectedPosX = x;
+  m_byteSelectedPosY = clickedPosY;
+
+  viewport()->update();
 }
 
 bool MemViewer::handleNaviguationKey(const int key)
@@ -166,7 +192,7 @@ bool MemViewer::handleNaviguationKey(const int key)
     {
       scrollContentsBy(0, 1);
     }
-    return true;
+    break;
   case Qt::Key_Down:
     if (m_byteSelectedPosY != 15)
     {
@@ -177,7 +203,7 @@ bool MemViewer::handleNaviguationKey(const int key)
     {
       scrollContentsBy(0, -1);
     }
-    return true;
+    break;
   case Qt::Key_Left:
     if (m_byteSelectedPosX != 0)
     {
@@ -190,13 +216,13 @@ bool MemViewer::handleNaviguationKey(const int key)
       m_byteSelectedPosY--;
       viewport()->update();
     }
-    else
+    else if (verticalScrollBar()->value() > verticalScrollBar()->minimum())
     {
       m_byteSelectedPosX = 15;
-      m_byteSelectedPosY = 15;
+      m_byteSelectedPosY = 0;
       scrollContentsBy(0, 1);
     }
-    return true;
+    break;
   case Qt::Key_Right:
     if (m_byteSelectedPosX != 15)
     {
@@ -209,108 +235,127 @@ bool MemViewer::handleNaviguationKey(const int key)
       m_byteSelectedPosY++;
       viewport()->update();
     }
-    else
+    else if (verticalScrollBar()->value() < verticalScrollBar()->maximum())
     {
-      m_byteSelectedPosX = 0;
-      m_byteSelectedPosY = 0;
       scrollContentsBy(0, -1);
+      m_byteSelectedPosX = 0;
+      m_byteSelectedPosY = 15;
     }
-    return true;
+    break;
   case Qt::Key_PageUp:
-    scrollContentsBy(0, verticalScrollBar()->pageStep());
-    return true;
+    scrollContentsBy(0, std::min(verticalScrollBar()->pageStep(), verticalScrollBar()->value()));
+    break;
   case Qt::Key_PageDown:
-    scrollContentsBy(0, -verticalScrollBar()->pageStep());
-    return true;
+    scrollContentsBy(0, std::max(-verticalScrollBar()->pageStep(),
+                                 verticalScrollBar()->value() - verticalScrollBar()->maximum()));
+    break;
   case Qt::Key_Home:
     verticalScrollBar()->setValue(0);
-    return true;
+    m_byteSelectedPosX = 0;
+    m_byteSelectedPosY = 0;
+    break;
   case Qt::Key_End:
-    verticalScrollBar()->setValue((m_memViewEnd - m_memViewStart) / 16 - 1);
-    return true;
+    verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+    m_byteSelectedPosX = 15;
+    m_byteSelectedPosY = 15;
+    break;
   default:
     return false;
   }
+
+  // Always set the carrot at the start of a byte after navigating
+  m_carretBetweenHex = false;
+  return true;
 }
 
-bool MemViewer::writeHexCharacterToSelectedMemory(const std::string hexCharToWrite)
+bool MemViewer::writeCharacterToSelectedMemory(char byteToWrite)
 {
-  std::string editedByteStr = Common::formatMemoryToString(
-      m_updatedRawMemoryData + ((m_byteSelectedPosY * 16) + m_byteSelectedPosX),
-      Common::MemType::type_byteArray, 1, Common::MemBase::base_none, true);
-  if (m_carretBetweenHex)
-    editedByteStr[1] = hexCharToWrite[0];
-  else
-    editedByteStr[0] = hexCharToWrite[0];
+  const size_t memoryOffset = ((m_byteSelectedPosY * VISIBLE_COLS) + m_byteSelectedPosX);
+  if (m_editingHex)
+  {
+    // Convert ascii to actual value
+    if (byteToWrite >= 'A')
+      byteToWrite -= 'A' - 10;
+    else if (byteToWrite >= '0')
+      byteToWrite -= '0';
 
-  std::stringstream ss(editedByteStr);
-  unsigned int editedByteData = 0;
-  ss >> std::hex >> editedByteData;
-  char byteToWrite = static_cast<char>(editedByteData);
-  u32 offsetToWrite = Common::dolphinAddrToOffset(m_currentFirstAddress +
-                                                  (m_byteSelectedPosY * 16 + m_byteSelectedPosX));
+    const char selectedMemoryValue = *(m_updatedRawMemoryData + memoryOffset);
+    if (m_carretBetweenHex)
+      byteToWrite = selectedMemoryValue & 0xF0 | byteToWrite;
+    else
+      byteToWrite = selectedMemoryValue & 0x0F | (byteToWrite << 4);
+  }
+
+  u32 offsetToWrite = Common::dolphinAddrToOffset(m_currentFirstAddress + (u32)memoryOffset);
   return DolphinComm::DolphinAccessor::writeToRAM(offsetToWrite, &byteToWrite, 1, false);
 }
 
 void MemViewer::keyPressEvent(QKeyEvent* event)
 {
-  if (m_validMemory)
+  if (!m_validMemory)
   {
-    if (!m_hexKeyList.contains(event->key()))
+    event->ignore();
+    return;
+  }
+
+  QString text = event->text();
+
+  if (text.isEmpty())
+  {
+    if (!handleNaviguationKey(event->key()))
+      event->ignore();
+    return;
+  }
+
+  bool success = false;
+  if (m_editingHex)
+  {
+    // Beep when entering a non-valid value
+    const std::string hexChar = event->text().toUpper().toStdString();
+    const char value = hexChar[0];
+    if (!(value >= '0' && value <= '9') && !(value >= 'A' && value <= 'F'))
     {
-      if (!handleNaviguationKey(event->key()))
-        event->ignore();
+      QApplication::beep();
+      return;
     }
-    else
-    {
-      if (!writeHexCharacterToSelectedMemory(event->text().toUpper().toStdString()))
-      {
-        m_validMemory = false;
-        viewport()->update();
-        emit memErrorOccured();
-      }
-      else
-      {
-        if (!m_carretBetweenHex)
-        {
-          m_carretBetweenHex = true;
-        }
-        else
-        {
-          m_carretBetweenHex = false;
-          if (m_byteSelectedPosX == 15)
-          {
-            if (m_byteSelectedPosY != 15)
-            {
-              m_byteSelectedPosX = 0;
-              m_byteSelectedPosY++;
-            }
-          }
-          else
-          {
-            m_byteSelectedPosX++;
-          }
-        }
-        updateMemoryData();
-        viewport()->update();
-      }
-    }
+
+    success = writeCharacterToSelectedMemory(value);
+    m_carretBetweenHex = !m_carretBetweenHex;
   }
   else
   {
-    event->ignore();
+    std::string str = text.toStdString();
+    success = writeCharacterToSelectedMemory(str[0]);
   }
+
+  if (!success)
+  {
+    m_validMemory = false;
+    viewport()->update();
+    emit memErrorOccured();
+    return;
+  }
+
+  if (!m_carretBetweenHex || !m_editingHex)
+    handleNaviguationKey(Qt::Key::Key_Right);
+
+  updateMemoryData();
+  viewport()->update();
 }
 
 void MemViewer::scrollContentsBy(int dx, int dy)
 {
   if (!m_disableScrollContentEvent && m_validMemory)
   {
-    u32 newAddress = m_currentFirstAddress + 16 * (-dy);
+    u32 newAddress = m_currentFirstAddress + VISIBLE_COLS * (-dy);
+
+    // Move selection
+    m_byteSelectedPosY += dy;
+
     if (newAddress < m_memViewStart)
       newAddress = m_memViewStart;
-    else if (newAddress > m_memViewEnd - 16 * 16)
-      newAddress = m_memViewEnd - 16 * 16;
+    else if (newAddress > m_memViewEnd - NUM_BYTES)
+      newAddress = m_memViewEnd - NUM_BYTES;
 
     if (newAddress != m_currentFirstAddress)
     {
@@ -333,23 +378,15 @@ void MemViewer::renderColumnsHeaderText(QPainter& painter)
 {
   painter.drawText(m_charWidthEm / 2, m_charHeight, " Address");
   int posXHeaderText = m_rowHeaderWidth;
-  int i = m_currentFirstAddress & 0xF;
-  do
+  for (int i = 0; i < VISIBLE_COLS; i++)
   {
-    if (i >= 16)
-    {
-      i = 0;
-    }
-    else
-    {
-      std::stringstream ss;
-      ss << std::hex << std::uppercase << i;
-      std::string headerText = "." + ss.str();
-      painter.drawText(posXHeaderText, m_charHeight, QString::fromStdString(headerText));
-      posXHeaderText += m_charWidthEm * 2 + m_charWidthEm / 2;
-      i++;
-    }
-  } while (i != (m_currentFirstAddress & 0xF));
+    std::stringstream ss;
+    int byte = (m_currentFirstAddress + i) & 0xF;
+    ss << std::hex << std::uppercase << byte;
+    std::string headerText = "." + ss.str();
+    painter.drawText(posXHeaderText, m_charHeight, QString::fromStdString(headerText));
+    posXHeaderText += m_charWidthEm * 2 + m_charWidthEm / 2;
+  }
 
   painter.drawText(m_hexAsciiSeparatorPosX + m_charWidthEm / 2, m_charHeight, "  Text (ASCII)  ");
 }
@@ -358,9 +395,10 @@ void MemViewer::renderRowHeaderText(QPainter& painter, const int rowIndex)
 {
   std::stringstream ss;
   ss << std::setfill('0') << std::setw(sizeof(u32) * 2) << std::hex << std::uppercase
-     << m_currentFirstAddress + 16 * rowIndex;
-  painter.drawText(m_charWidthEm / 2, (rowIndex + 1) * m_charHeight + m_columnHeaderHeight,
-                   QString::fromStdString(ss.str()));
+     << m_currentFirstAddress + VISIBLE_COLS * rowIndex;
+  int x = m_charWidthEm / 2;
+  int y = (rowIndex + 1) * m_charHeight + m_columnHeaderHeight;
+  painter.drawText(x, y, QString::fromStdString(ss.str()));
 }
 
 void MemViewer::renderCarret(QPainter& painter, const int rowIndex, const int columnIndex)
@@ -389,21 +427,23 @@ void MemViewer::determineMemoryTextRenderProperties(const int rowIndex, const in
     drawCarret = true;
   }
   // If the byte changed since the last data update
-  else if (m_lastRawMemoryData[rowIndex * 16 + columnIndex] !=
-           m_updatedRawMemoryData[rowIndex * 16 + columnIndex])
+  else if (m_lastRawMemoryData[rowIndex * VISIBLE_COLS + columnIndex] !=
+           m_updatedRawMemoryData[rowIndex * VISIBLE_COLS + columnIndex])
   {
-    m_memoryMsElapsedLastChange[rowIndex * 16 + columnIndex] = m_elapsedTimer.elapsed();
+    m_memoryMsElapsedLastChange[rowIndex * VISIBLE_COLS + columnIndex] = m_elapsedTimer.elapsed();
     bgColor = QColor(Qt::red);
   }
   // If the last changes is less than a second old
-  else if (m_memoryMsElapsedLastChange[rowIndex * 16 + columnIndex] != 0 &&
-           m_elapsedTimer.elapsed() - m_memoryMsElapsedLastChange[rowIndex * 16 + columnIndex] <
+  else if (m_memoryMsElapsedLastChange[rowIndex * VISIBLE_COLS + columnIndex] != 0 &&
+           m_elapsedTimer.elapsed() -
+                   m_memoryMsElapsedLastChange[rowIndex * VISIBLE_COLS + columnIndex] <
                1000)
   {
     QColor baseColor = QColor(Qt::red);
-    float alphaPercentage = (1000 - (m_elapsedTimer.elapsed() -
-                                     m_memoryMsElapsedLastChange[rowIndex * 16 + columnIndex])) /
-                            (1000 / 100);
+    float alphaPercentage =
+        (1000 - (m_elapsedTimer.elapsed() -
+                 m_memoryMsElapsedLastChange[rowIndex * VISIBLE_COLS + columnIndex])) /
+        (1000 / 100);
     int newAlpha = std::trunc(baseColor.alpha() * (alphaPercentage / 100));
     bgColor = QColor(baseColor.red(), baseColor.green(), baseColor.blue(), newAlpha);
   }
@@ -414,8 +454,8 @@ void MemViewer::renderHexByte(QPainter& painter, const int rowIndex, const int c
 {
   int posXHex = m_rowHeaderWidth + (m_charWidthEm * 2 + m_charWidthEm / 2) * columnIndex;
   std::string hexByte = Common::formatMemoryToString(
-      m_updatedRawMemoryData + ((rowIndex * 16) + columnIndex), Common::MemType::type_byteArray, 1,
-      Common::MemBase::base_none, true);
+      m_updatedRawMemoryData + ((rowIndex * VISIBLE_COLS) + columnIndex),
+      Common::MemType::type_byteArray, 1, Common::MemBase::base_none, true);
   QRect* currentByteRect = new QRect(posXHex,
                                      m_columnHeaderHeight + rowIndex * m_charHeight +
                                          (m_charHeight - fontMetrics().overlinePos()),
@@ -435,8 +475,8 @@ void MemViewer::renderASCIIText(QPainter& painter, const int rowIndex, const int
                                 QColor& bgColor, QColor& fgColor)
 {
   std::string asciiStr = Common::formatMemoryToString(
-      m_updatedRawMemoryData + ((rowIndex * 16) + columnIndex), Common::MemType::type_string, 1,
-      Common::MemBase::base_none, true);
+      m_updatedRawMemoryData + ((rowIndex * VISIBLE_COLS) + columnIndex),
+      Common::MemType::type_string, 1, Common::MemBase::base_none, true);
   int asciiByte = (int)asciiStr[0];
   if (asciiByte > 0x7E || asciiByte < 0x20)
     asciiStr = ".";
@@ -455,10 +495,10 @@ void MemViewer::renderMemory(QPainter& painter, const int rowIndex, const int co
 {
   QColor oldPenColor = painter.pen().color();
   int posXHex = m_rowHeaderWidth + (m_charWidthEm * 2 + m_charWidthEm / 2) * columnIndex;
-  if (!(m_currentFirstAddress + (16 * rowIndex + columnIndex) >= m_memViewStart &&
-        m_currentFirstAddress + (16 * rowIndex + columnIndex) < m_memViewEnd) ||
-      !DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress +
-                                                           (16 * rowIndex + columnIndex)) ||
+  if (!(m_currentFirstAddress + (VISIBLE_COLS * rowIndex + columnIndex) >= m_memViewStart &&
+        m_currentFirstAddress + (VISIBLE_COLS * rowIndex + columnIndex) < m_memViewEnd) ||
+      !DolphinComm::DolphinAccessor::isValidConsoleAddress(
+          m_currentFirstAddress + (VISIBLE_COLS * rowIndex + columnIndex)) ||
       !m_validMemory)
   {
     painter.drawText(posXHex, (rowIndex + 1) * m_charHeight + m_columnHeaderHeight, "??");
@@ -487,10 +527,10 @@ void MemViewer::paintEvent(QPaintEvent* event)
   renderSeparatorLines(painter);
   renderColumnsHeaderText(painter);
 
-  for (int i = 0; i < 16; ++i)
+  for (int i = 0; i < VISIBLE_ROWS; ++i)
   {
     renderRowHeaderText(painter, i);
-    for (int j = 0; j < 16; ++j)
+    for (int j = 0; j < VISIBLE_COLS; ++j)
     {
       renderMemory(painter, i, j);
     }

@@ -34,7 +34,7 @@ private:
   void initialise();
 
   bool handleNaviguationKey(const int key);
-  bool writeHexCharacterToSelectedMemory(const std::string hexCharToWrite);
+  bool writeCharacterToSelectedMemory(char byteToWrite);
   void updateMemoryData();
   void changeMemoryRegion(const bool isMEM2);
   void renderColumnsHeaderText(QPainter& painter);
@@ -61,6 +61,7 @@ private:
   char* m_updatedRawMemoryData = nullptr;
   char* m_lastRawMemoryData = nullptr;
   int* m_memoryMsElapsedLastChange = nullptr;
+  bool m_editingHex = false;
   bool m_carretBetweenHex = false;
   bool m_disableScrollContentEvent = false;
   bool m_validMemory = false;
@@ -68,6 +69,5 @@ private:
   u32 m_memViewStart = 0;
   u32 m_memViewEnd = 0;
   QRect* m_curosrRect;
-  QList<int> m_hexKeyList;
   QElapsedTimer m_elapsedTimer;
 };
