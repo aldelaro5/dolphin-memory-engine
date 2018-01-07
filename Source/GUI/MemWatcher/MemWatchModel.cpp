@@ -3,6 +3,7 @@
 #include <QDataStream>
 #include <QMimeData>
 #include <cstring>
+#include <limits>
 #include <sstream>
 
 #include "../GUICommon.h"
@@ -388,6 +389,33 @@ QStringList MemWatchModel::mimeTypes() const
   return QStringList() << "application/x-memwatchtreenode";
 }
 
+int MemWatchModel::getNodeDeepness(const MemWatchTreeNode* node) const
+{
+  if (node == m_rootNode)
+    return 0;
+  else if (node->getParent() == m_rootNode)
+    return 1;
+  else
+    return getNodeDeepness(node->getParent()) + 1;
+}
+
+MemWatchTreeNode*
+MemWatchModel::getLeastDeepNodeFromList(const QList<MemWatchTreeNode*> nodes) const
+{
+  int leastLevelFound = std::numeric_limits<int>::max();
+  MemWatchTreeNode* returnNode = new MemWatchTreeNode(nullptr);
+  for (auto i : nodes)
+  {
+    int deepness = getNodeDeepness(i);
+    if (deepness < leastLevelFound)
+    {
+      returnNode = i;
+      leastLevelFound = deepness;
+    }
+  }
+  return returnNode;
+}
+
 QMimeData* MemWatchModel::mimeData(const QModelIndexList& indexes) const
 {
   QMimeData* mimeData = new QMimeData;
@@ -402,6 +430,10 @@ QMimeData* MemWatchModel::mimeData(const QModelIndexList& indexes) const
     if (!nodes.contains(node))
       nodes << node;
   }
+  qulonglong leastDeepPointer = 0;
+  MemWatchTreeNode* leastDeepNode = getLeastDeepNodeFromList(nodes);
+  std::memcpy(&leastDeepPointer, &leastDeepNode, sizeof(MemWatchTreeNode*));
+  stream << leastDeepPointer;
   stream << nodes.count();
   foreach (MemWatchTreeNode* node, nodes)
   {
@@ -417,9 +449,8 @@ bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, i
                                  const QModelIndex& parent)
 {
   if (!data->hasFormat("application/x-memwatchtreenode"))
-  {
     return false;
-  }
+
   QByteArray bytes = data->data("application/x-memwatchtreenode");
   QDataStream stream(&bytes, QIODevice::ReadOnly);
   MemWatchTreeNode* destParentNode = nullptr;
@@ -427,8 +458,12 @@ bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, i
     destParentNode = m_rootNode;
   else
     destParentNode = static_cast<MemWatchTreeNode*>(parent.internalPointer());
-  int count;
-  stream >> count;
+
+  qlonglong leastDeepNodePtr;
+  stream >> leastDeepNodePtr;
+  MemWatchTreeNode* leastDeepNode = nullptr;
+  std::memcpy(&leastDeepNode, &leastDeepNodePtr, sizeof(leastDeepNodePtr));
+
   if (row == -1)
   {
     if (parent.isValid() && destParentNode->isGroup())
@@ -436,6 +471,19 @@ bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, i
     else if (!parent.isValid())
       return false;
   }
+
+  // beginMoveRows will cause a segfault if it ends up with doing nothing (so moving one row to the
+  // same place), but there's also a discrepancy of 1 in the row received / the row given to
+  // beginMoveRows and the actuall row of the node.  This discrepancy has to be reversed before
+  // checking if we are trying to move the source (using the least deep one to accomodate
+  // multi-select) to the same place.
+  int trueRow = (leastDeepNode->getRow() < row) ? (row - 1) : (row);
+  if (destParentNode == leastDeepNode->getParent() && leastDeepNode->getRow() == trueRow)
+    return false;
+
+  int count;
+  stream >> count;
+
   for (int i = 0; i < count; ++i)
   {
     qlonglong nodePtr;
@@ -443,22 +491,20 @@ bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, i
     MemWatchTreeNode* srcNode = nullptr;
     std::memcpy(&srcNode, &nodePtr, sizeof(nodePtr));
 
+    // Since beginMoveRows uses the same row format then the one received, we want to keep that, but
+    // still use the correct row number for inserting.
+    int destMoveRow = row;
     if (srcNode->getRow() < row && destParentNode == srcNode->getParent())
       --row;
 
     const int srcNodeRow = srcNode->getRow();
+    const QModelIndex idx = createIndex(srcNodeRow, 0, srcNode);
 
-    const QModelIndex idx = createIndex(srcNodeRow, 0, destParentNode);
-    if (destParentNode == m_rootNode)
-      beginRemoveRows(QModelIndex(), srcNodeRow, srcNodeRow);
-    else
-      beginRemoveRows(idx.parent(), srcNodeRow, srcNodeRow);
+    // A move is imperative here to not have the view collapse the source on its own.
+    beginMoveRows(idx.parent(), srcNodeRow, srcNodeRow, parent, destMoveRow);
     srcNode->getParent()->removeChild(srcNodeRow);
-    endRemoveRows();
-
-    beginInsertRows(parent, row, row);
     destParentNode->insertChild(row, srcNode);
-    endInsertRows();
+    endMoveRows();
 
     ++row;
   }
