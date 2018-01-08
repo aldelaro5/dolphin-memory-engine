@@ -12,7 +12,6 @@ QWidget* MemWatchDelegate::createEditor(QWidget* parent, const QStyleOptionViewI
   const MemWatchModel* model = static_cast<const MemWatchModel*>(index.model());
   MemWatchTreeNode* node = model->getTreeNodeFromIndex(index);
   QLineEdit* editor = new QLineEdit(parent);
-  editor->setFrame(false);
   if (index.column() == MemWatchModel::WATCH_COL_VALUE && !node->isGroup())
     node->setValueEditing(true);
   GUICommon::g_valueEditing = true;
