@@ -6,6 +6,7 @@ AlwaysBreakBeforeMultilineStrings: 'true'
 AlwaysBreakTemplateDeclarations: 'true'
 BreakBeforeBraces: Allman
 BreakStringLiterals: 'true'
+FixNamespaceComments: 'true'
 ColumnLimit: '100'
 Cpp11BracedListStyle: 'true'
 Language: Cpp
