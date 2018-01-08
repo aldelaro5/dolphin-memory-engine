@@ -222,7 +222,7 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
   }
   else
   {
-    if (index.column() == 0 && role == Qt::DisplayRole)
+    if (index.column() == 0 && (role == Qt::DisplayRole || role == Qt::EditRole))
       return item->getGroupName();
   }
   return QVariant();
