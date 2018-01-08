@@ -40,4 +40,4 @@ private:
   static DolphinStatus m_status;
   static char* m_updatedRAMCache;
 };
-}
+} // namespace DolphinComm

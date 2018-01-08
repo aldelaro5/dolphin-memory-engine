@@ -39,10 +39,8 @@ MemWatchEntry::MemWatchEntry(MemWatchEntry* entry)
 
 MemWatchEntry::~MemWatchEntry()
 {
-  if (m_memory != nullptr)
-    delete[] m_memory;
-  if (m_freezeMemory != nullptr)
-    delete[] m_freezeMemory;
+  delete[] m_memory;
+  delete[] m_freezeMemory;
 }
 
 std::string MemWatchEntry::getLabel() const

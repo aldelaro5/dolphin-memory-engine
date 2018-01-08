@@ -203,5 +203,5 @@ bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const
 
   return true;
 }
-}
+} // namespace DolphinComm
 #endif

@@ -9,8 +9,7 @@ MemScanner::MemScanner() : m_resultsConsoleAddr(std::vector<u32>())
 
 MemScanner::~MemScanner()
 {
-  if (m_scanRAMCache != nullptr)
-    delete[] m_scanRAMCache;
+  delete[] m_scanRAMCache;
 }
 
 Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter filter,
@@ -268,8 +267,8 @@ void MemScanner::reset()
 {
   m_resultsConsoleAddr.clear();
   m_wasUnknownInitialValue = false;
-  if (m_scanRAMCache != nullptr)
-    delete[] m_scanRAMCache;
+  delete[] m_scanRAMCache;
+  m_scanRAMCache = nullptr;
   m_resultCount = 0;
   m_scanStarted = false;
 }

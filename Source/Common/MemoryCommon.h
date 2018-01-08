@@ -53,4 +53,4 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
 std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
                                  const MemBase base, const bool isUnsigned,
                                  const bool withBSwap = false);
-}
+} // namespace Common

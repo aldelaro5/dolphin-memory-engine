@@ -487,4 +487,4 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
     break;
   }
 }
-}
+} // namespace Common

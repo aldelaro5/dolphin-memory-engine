@@ -22,5 +22,5 @@ public:
   bool writeToRAM(const u32 offset, const char* buffer, const size_t size,
                   const bool withBSwap) override;
 };
-}
+} // namespace DolphinComm
 #endif

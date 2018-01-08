@@ -183,13 +183,12 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
 
 DlgAddWatchEntry::~DlgAddWatchEntry()
 {
-  if (m_entry != nullptr)
-    delete m_entry;
+  delete m_entry;
 }
 
 void DlgAddWatchEntry::addPointerOffset()
 {
-  int level = m_entry->getPointerLevel();
+  int level = static_cast<int>(m_entry->getPointerLevel());
   QLabel* lblLevel = new QLabel(QString::fromStdString("Level " + std::to_string(level + 1) + ":"));
   QLineEdit* txbOffset = new QLineEdit();
   txbOffset->setText(0);
@@ -210,7 +209,7 @@ void DlgAddWatchEntry::addPointerOffset()
 
 void DlgAddWatchEntry::removePointerOffset()
 {
-  int level = m_entry->getPointerLevel();
+  int level = static_cast<int>(m_entry->getPointerLevel());
 
   QLayoutItem* lblLevelItem = m_offsetsLayout->takeAt(
       m_offsetsLayout->indexOf(m_offsetsLayout->itemAtPosition(level - 1, 0)->widget()));
@@ -364,7 +363,7 @@ void DlgAddWatchEntry::updatePreview()
   m_lblValuePreview->setText(QString::fromStdString(m_entry->getStringFromMemory()));
   if (m_entry->isBoundToPointer())
   {
-    int level = m_entry->getPointerLevel();
+    size_t level = m_entry->getPointerLevel();
     for (int i = 0; i < level; ++i)
     {
       QWidget* test = m_offsetsLayout->itemAtPosition(i, 2)->widget();
