@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+	The settings in this file are used by the Visual Studio project files as default values.
+	Don't edit this file for your personal configuration, but change them from within Visual Studio.
+		Right-click project -> Properties
+	Any changes will be stored in a *.vcxproj.user file, which overrides the defaults here.
+  -->
+  <PropertyGroup>
+	<!-- Path to where Qt is installed (default) -->
+	<QTDIR>C:\Qt\5.10.0\msvc2017_64</QTDIR>
+	<!-- Used for running from Visual Studio. PATH needs to be set to load Qt's DLLs -->
+	<LocalDebuggerEnvironment>PATH=$(QTDIR)\bin;$(PATH)</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+	<!-- Show all files in Solution explorer (no need for filters) -->
+    <ShowAllFiles>true</ShowAllFiles>
+  </PropertyGroup>
+</Project>
