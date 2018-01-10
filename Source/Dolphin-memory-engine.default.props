@@ -7,12 +7,14 @@
 	Any changes will be stored in a *.vcxproj.user file, which overrides the defaults here.
   -->
   <PropertyGroup>
-	<!-- Path to Qt build files -->
-	<QTDIR>..\Externals\Qt\Qt5.10.0\5.10.0\msvc2017_64</QTDIR>
-	<!-- Used for running from Visual Studio. PATH needs to be set to load Qt's DLLs -->
-	<LocalDebuggerEnvironment>PATH=$(QTDIR)\bin;$(PATH)</LocalDebuggerEnvironment>
+    <!-- Root of project -->
+    <ProjectRoot>$(SolutionDir)..\</ProjectRoot>
+    <!-- Path to Qt build files -->
+    <QTDIR>$(ProjectRoot)Externals\Qt\Qt5.10.0\5.10.0\msvc2017_64\</QTDIR>
+    <!-- Used for running from Visual Studio. PATH needs to be set to load Qt's DLLs -->
+    <LocalDebuggerEnvironment>PATH=$(QTDIR)bin;$(PATH)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-	<!-- Show all files in Solution explorer (no need for filters) -->
+    <!-- Show all files in Solution explorer (no need for filters) -->
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
 </Project>

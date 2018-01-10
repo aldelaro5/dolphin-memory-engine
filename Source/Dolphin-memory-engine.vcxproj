@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="Dolphin-memory-engine.default.props" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -18,6 +17,7 @@
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="Dolphin-memory-engine.default.props" />
   <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -36,21 +36,13 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)'=='Debug'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)'=='Release'">
+  <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)obj\$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)d</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)obj\$(Configuration)\</IntDir>
+  <PropertyGroup>
+    <OutDir>$(ProjectDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
@@ -58,12 +50,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)include;$(QTDIR)include\QtCore;$(QTDIR)include\QtGui;$(QTDIR)include\QtWidgets</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
       <PreprocessorDefinitions>WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(QTDIR)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>qtmaind.lib;Qt5Widgetsd.lib;Qt5Cored.lib;Qt5Guid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -76,14 +68,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)include;$(QTDIR)include\QtCore;$(QTDIR)include\QtGui;$(QTDIR)include\QtWidgets</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
       <PreprocessorDefinitions>WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(QTDIR)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>qtmain.lib;Qt5Widgets.lib;Qt5Core.lib;Qt5Gui.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -135,52 +127,52 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="GUI\MainWindow.h">
-      <Command>$(QTDIR)\bin\moc.exe  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Command>$(QTDIR)bin\moc.exe  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)include" "-I.\GeneratedFiles\." "-I$(QTDIR)include\QtCore" "-I$(QTDIR)include\QtGui" "-I$(QTDIR)include\QtWidgets"</Command>
       <Message>Moc'ing %(Filename)%(Extension)</Message>
       <Outputs>.\GeneratedFiles\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs>$(QTDIR)bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="GUI\MemScanner\MemScanWidget.h">
-      <Command>$(QTDIR)\bin\moc.exe  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Command>$(QTDIR)bin\moc.exe  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)include" "-I.\GeneratedFiles\." "-I$(QTDIR)include\QtCore" "-I$(QTDIR)include\QtGui" "-I$(QTDIR)include\QtWidgets"</Command>
       <Message>Moc'ing %(Filename)%(Extension)</Message>
       <Outputs>.\GeneratedFiles\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs>$(QTDIR)bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="GUI\MemScanner\ResultsListModel.h">
-      <Command>$(QTDIR)\bin\moc.exe  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Command>$(QTDIR)bin\moc.exe  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)include" "-I.\GeneratedFiles\." "-I$(QTDIR)include\QtCore" "-I$(QTDIR)include\QtGui" "-I$(QTDIR)include\QtWidgets"</Command>
       <Message>Moc'ing %(Filename)%(Extension)</Message>
       <Outputs>.\GeneratedFiles\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs>$(QTDIR)bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="GUI\MemViewer\MemViewer.h">
-      <Command>$(QTDIR)\bin\moc.exe  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Command>$(QTDIR)bin\moc.exe  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)include" "-I.\GeneratedFiles\." "-I$(QTDIR)include\QtCore" "-I$(QTDIR)include\QtGui" "-I$(QTDIR)include\QtWidgets"</Command>
       <Message>Moc'ing %(Filename)%(Extension)</Message>
       <Outputs>.\GeneratedFiles\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs>$(QTDIR)bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="GUI\MemViewer\MemViewerWidget.h">
-      <Command>"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Command>"$(QTDIR)bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)include" "-I.\GeneratedFiles\." "-I$(QTDIR)include\QtCore" "-I$(QTDIR)include\QtGui" "-I$(QTDIR)include\QtWidgets"</Command>
       <Message>Moc'ing %(Filename)%(Extension)</Message>
       <Outputs>.\GeneratedFiles\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs>$(QTDIR)bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="GUI\MemWatcher\DlgChangeType.h">
-      <Command>$(QTDIR)\bin\moc.exe  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Command>$(QTDIR)bin\moc.exe  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)include" "-I.\GeneratedFiles\." "-I$(QTDIR)include\QtCore" "-I$(QTDIR)include\QtGui" "-I$(QTDIR)include\QtWidgets"</Command>
       <Message>Moc'ing %(Filename)%(Extension)</Message>
       <Outputs>.\GeneratedFiles\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs>$(QTDIR)bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="GUI\MemWatcher\MemWatchModel.h">
-      <Command>"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Command>"$(QTDIR)bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)include" "-I.\GeneratedFiles\." "-I$(QTDIR)include\QtCore" "-I$(QTDIR)include\QtGui" "-I$(QTDIR)include\QtWidgets"</Command>
       <Message>Moc'ing %(Filename)%(Extension)</Message>
       <Outputs>.\GeneratedFiles\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs>$(QTDIR)bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="GUI\MemWatcher\MemWatchWidget.h">
-      <Command>"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Command>"$(QTDIR)bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\moc_%(Filename).cpp"  -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)include" "-I.\GeneratedFiles\." "-I$(QTDIR)include\QtCore" "-I$(QTDIR)include\QtGui" "-I$(QTDIR)include\QtWidgets"</Command>
       <Message>Moc'ing MemWatchWidget.h</Message>
       <Outputs>.\GeneratedFiles\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs>$(QTDIR)bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
