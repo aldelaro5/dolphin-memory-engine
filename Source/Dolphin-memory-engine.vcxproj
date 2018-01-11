@@ -80,6 +80,32 @@
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
+
+  <!-- Files and target to copy to the output directory -->
+  <PropertyGroup>
+    <!--
+      Since the debug DLLs all end with "d" in the filename, this prevents having
+      two item groups, one for Debug and one for Release
+    -->
+    <DebugSuffix Condition="'$(Configuration)' == 'Debug'">d</DebugSuffix>
+  </PropertyGroup>
+  <ItemGroup>
+    <FilesToCopy Include="$(QTDIR)bin\Qt5Core$(DebugSuffix).dll" />
+    <FilesToCopy Include="$(QTDIR)bin\Qt5Gui$(DebugSuffix).dll" />
+    <FilesToCopy Include="$(QTDIR)bin\Qt5Widgets$(DebugSuffix).dll" />
+    <FilesToCopy Include="$(QTDIR)plugins\platforms\qwindows$(DebugSuffix).dll">
+      <SubDir>platforms\</SubDir>
+    </FilesToCopy>
+    <FilesToCopy Include="$(QTDIR)plugins\styles\qwindowsvistastyle$(DebugSuffix).dll">
+      <SubDir>styles\</SubDir>
+    </FilesToCopy>
+  </ItemGroup>
+  <Target Name="CopyDlls" AfterTargets="Build">
+    <Message Importance="High" Text="Copying required files for $(Configuration)..." />
+    <Message Importance="High" Text="Copying '%(FilesToCopy.FullPath)' -> '$(OutDir)%(FilesToCopy.SubDir)%(Filename)%(Extension)'." />
+    <Copy SourceFiles="@(FilesToCopy)" DestinationFiles="$(OutDir)%(FilesToCopy.SubDir)%(Filename)%(Extension)" />
+  </Target>
+
   <!-- Files -->
   <ItemGroup>
     <ClCompile Include="**\*.cpp" Exclude="GeneratedFiles\**\*.cpp" />
