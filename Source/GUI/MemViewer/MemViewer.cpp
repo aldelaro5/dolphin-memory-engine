@@ -15,28 +15,8 @@
 
 MemViewer::MemViewer(QWidget* parent) : QAbstractScrollArea(parent)
 {
-#ifdef __linux__
-  setFont(QFont("Monospace", 15));
-#elif _WIN32
-  setFont(QFont("Courier New", 15));
-#endif
-  m_hexKeyList = QList<int>({Qt::Key_0, Qt::Key_1, Qt::Key_2, Qt::Key_3, Qt::Key_4, Qt::Key_5,
-                             Qt::Key_6, Qt::Key_7, Qt::Key_8, Qt::Key_9, Qt::Key_A, Qt::Key_B,
-                             Qt::Key_C, Qt::Key_D, Qt::Key_E, Qt::Key_F});
-  m_charWidthEm = fontMetrics().width(QLatin1Char('M'));
-  m_charHeight = fontMetrics().height();
-  m_hexAreaWidth = 16 * (m_charWidthEm * 2 + m_charWidthEm / 2);
-  m_hexAreaHeight = 16 * m_charHeight;
-  m_rowHeaderWidth = m_charWidthEm * (sizeof(u32) * 2 + 1) + m_charWidthEm / 2;
-  m_hexAsciiSeparatorPosX = m_rowHeaderWidth + m_hexAreaWidth;
-  m_columnHeaderHeight = m_charHeight + m_charWidthEm / 2;
-  m_curosrRect = new QRect();
-  m_updatedRawMemoryData = new char[16 * 16];
-  m_lastRawMemoryData = new char[16 * 16];
-  m_memoryMsElapsedLastChange = new int[16 * 16];
-  m_memViewStart = Common::MEM1_START;
-  m_memViewEnd = Common::MEM1_END;
-  m_currentFirstAddress = m_memViewStart;
+  initialise();
+
   std::fill(m_memoryMsElapsedLastChange, m_memoryMsElapsedLastChange + 16 * 16, 0);
   updateMemoryData();
   std::memcpy(m_lastRawMemoryData, m_updatedRawMemoryData, 16 * 16);
@@ -55,6 +35,33 @@ MemViewer::~MemViewer()
   delete[] m_updatedRawMemoryData;
   delete[] m_lastRawMemoryData;
   delete[] m_memoryMsElapsedLastChange;
+}
+
+void MemViewer::initialise()
+{
+#ifdef __linux__
+  setFont(QFont("Monospace", 15));
+#elif _WIN32
+  setFont(QFont("Courier New", 15));
+#endif
+
+  m_hexKeyList = QList<int>({Qt::Key_0, Qt::Key_1, Qt::Key_2, Qt::Key_3, Qt::Key_4, Qt::Key_5,
+                             Qt::Key_6, Qt::Key_7, Qt::Key_8, Qt::Key_9, Qt::Key_A, Qt::Key_B,
+                             Qt::Key_C, Qt::Key_D, Qt::Key_E, Qt::Key_F});
+  m_charWidthEm = fontMetrics().width(QLatin1Char('M'));
+  m_charHeight = fontMetrics().height();
+  m_hexAreaWidth = 16 * (m_charWidthEm * 2 + m_charWidthEm / 2);
+  m_hexAreaHeight = 16 * m_charHeight;
+  m_rowHeaderWidth = m_charWidthEm * (sizeof(u32) * 2 + 1) + m_charWidthEm / 2;
+  m_hexAsciiSeparatorPosX = m_rowHeaderWidth + m_hexAreaWidth;
+  m_columnHeaderHeight = m_charHeight + m_charWidthEm / 2;
+  m_curosrRect = new QRect();
+  m_updatedRawMemoryData = new char[16 * 16];
+  m_lastRawMemoryData = new char[16 * 16];
+  m_memoryMsElapsedLastChange = new int[16 * 16];
+  m_memViewStart = Common::MEM1_START;
+  m_memViewEnd = Common::MEM1_END;
+  m_currentFirstAddress = m_memViewStart;
 }
 
 QSize MemViewer::sizeHint() const

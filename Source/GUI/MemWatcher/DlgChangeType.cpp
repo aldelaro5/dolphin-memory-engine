@@ -10,15 +10,30 @@
 DlgChangeType::DlgChangeType(QWidget* parent, const int typeIndex, const size_t length)
     : QDialog(parent), m_typeIndex(typeIndex), m_length(length)
 {
-  QLabel* lblType = new QLabel(QString("New type: "), this);
+  initialiseWidgets();
+  makeLayouts();
+}
+
+void DlgChangeType::initialiseWidgets()
+{
   m_cmbTypes = new QComboBox(this);
   m_cmbTypes->addItems(GUICommon::g_memTypeNames);
-  m_cmbTypes->setCurrentIndex(typeIndex);
+  m_cmbTypes->setCurrentIndex(m_typeIndex);
 
-  QLabel* lblLength = new QLabel(QString("Length: "), this);
+  m_lengthSelection = new QWidget;
+
   m_spnLength = new QSpinBox(this);
   m_spnLength->setMinimum(1);
-  m_spnLength->setValue(static_cast<int>(length));
+  m_spnLength->setValue(static_cast<int>(m_length));
+
+  connect(m_cmbTypes, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+          &DlgChangeType::onTypeChange);
+}
+
+void DlgChangeType::makeLayouts()
+{
+  QLabel* lblType = new QLabel(QString("New type: "), this);
+  QLabel* lblLength = new QLabel(QString("Length: "), this);
 
   QWidget* typeSelection = new QWidget(this);
   QHBoxLayout* typeSelectionLayout = new QHBoxLayout;
@@ -26,14 +41,19 @@ DlgChangeType::DlgChangeType(QWidget* parent, const int typeIndex, const size_t 
   typeSelectionLayout->addWidget(m_cmbTypes);
   typeSelection->setLayout(typeSelectionLayout);
 
-  m_lengthSelection = new QWidget;
   QHBoxLayout* lengthSelectionLayout = new QHBoxLayout;
   lengthSelectionLayout->addWidget(lblLength);
   lengthSelectionLayout->addWidget(m_spnLength);
   m_lengthSelection->setLayout(lengthSelectionLayout);
 
+  Common::MemType theType = static_cast<Common::MemType>(m_typeIndex);
+  if (theType != Common::MemType::type_string && theType != Common::MemType::type_byteArray)
+    m_lengthSelection->hide();
+
   QDialogButtonBox* buttonBox =
       new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgChangeType::accept);
+  connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgChangeType::reject);
 
   QVBoxLayout* main_layout = new QVBoxLayout;
 
@@ -42,15 +62,6 @@ DlgChangeType::DlgChangeType(QWidget* parent, const int typeIndex, const size_t 
   main_layout->addWidget(buttonBox);
   main_layout->setSpacing(1);
   setLayout(main_layout);
-
-  Common::MemType theType = static_cast<Common::MemType>(typeIndex);
-  if (theType != Common::MemType::type_string && theType != Common::MemType::type_byteArray)
-    m_lengthSelection->hide();
-
-  connect(m_cmbTypes, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
-          &DlgChangeType::onTypeChange);
-  connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgChangeType::accept);
-  connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgChangeType::reject);
 }
 
 int DlgChangeType::getTypeIndex() const

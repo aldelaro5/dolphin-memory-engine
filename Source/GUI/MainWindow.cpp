@@ -13,75 +13,23 @@
 
 MainWindow::MainWindow()
 {
-  m_scanner = new MemScanWidget(this);
-  connect(m_scanner,
-          static_cast<void (MemScanWidget::*)(u32 address, Common::MemType type, size_t length,
-                                              bool isUnsigned, Common::MemBase base)>(
-              &MemScanWidget::requestAddWatchEntry),
-          this,
-          static_cast<void (MainWindow::*)(u32 address, Common::MemType type, size_t length,
-                                           bool isUnsigned, Common::MemBase base)>(
-              &MainWindow::addWatchRequested));
-  connect(m_scanner,
-          static_cast<void (MemScanWidget::*)(Common::MemType type, size_t length, bool isUnsigned,
-                                              Common::MemBase base)>(
-              &MemScanWidget::requestAddAllResultsToWatchList),
-          this,
-          static_cast<void (MainWindow::*)(Common::MemType type, size_t length, bool isUnsigned,
-                                           Common::MemBase base)>(
-              &MainWindow::addAllResultsToWatchList));
-  connect(m_scanner,
-          static_cast<void (MemScanWidget::*)(Common::MemType type, size_t length, bool isUnsigned,
-                                              Common::MemBase base)>(
-              &MemScanWidget::requestAddSelectedResultsToWatchList),
-          this,
-          static_cast<void (MainWindow::*)(Common::MemType type, size_t length, bool isUnsigned,
-                                           Common::MemBase base)>(
-              &MainWindow::addSelectedResultsToWatchList));
+  initialiseWidgets();
+  makeLayouts();
+  makeMenus();
+  DolphinComm::DolphinAccessor::init();
+  makeMemViewer();
+  firstHookAttempt();
+}
 
-  m_watcher = new MemWatchWidget(this);
+MainWindow::~MainWindow()
+{
+  delete m_viewer;
+  delete m_scanner;
+  delete m_watcher;
+}
 
-  m_btnAttempHook = new QPushButton("Hook");
-  m_btnUnhook = new QPushButton("Unhook");
-  connect(m_btnAttempHook, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MainWindow::onHookAttempt);
-  connect(m_btnUnhook, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MainWindow::onUnhook);
-
-  QHBoxLayout* dolphinHookButtons_layout = new QHBoxLayout();
-  dolphinHookButtons_layout->addWidget(m_btnAttempHook);
-  dolphinHookButtons_layout->addWidget(m_btnUnhook);
-
-  m_lblDolphinStatus = new QLabel("");
-  m_lblDolphinStatus->setAlignment(Qt::AlignHCenter);
-
-  m_lblMem2Status = new QLabel("");
-  m_lblMem2Status->setAlignment(Qt::AlignHCenter);
-
-  m_btnOpenMemViewer = new QPushButton("Open memory viewer");
-  connect(m_btnOpenMemViewer, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MainWindow::onOpenMenViewer);
-
-  QFrame* separatorline = new QFrame();
-  separatorline->setFrameShape(QFrame::HLine);
-
-  QVBoxLayout* main_layout = new QVBoxLayout;
-  main_layout->addWidget(m_lblDolphinStatus);
-  main_layout->addLayout(dolphinHookButtons_layout);
-  main_layout->addWidget(m_lblMem2Status);
-  main_layout->addWidget(separatorline);
-  main_layout->addWidget(m_scanner);
-  main_layout->addSpacing(5);
-  main_layout->addWidget(m_btnOpenMemViewer);
-  main_layout->addSpacing(5);
-  main_layout->addWidget(m_watcher);
-
-  QWidget* main_widget = new QWidget(this);
-  main_widget->setLayout(main_layout);
-  setCentralWidget(main_widget);
-
-  setMinimumWidth(800);
-
+void MainWindow::makeMenus()
+{
   m_actOpenWatchList = new QAction("&Open...", this);
   m_actSaveWatchList = new QAction("&Save", this);
   m_actSaveAsWatchList = new QAction("&Save as...", this);
@@ -120,30 +68,101 @@ MainWindow::MainWindow()
 
   m_menuHelp = menuBar()->addMenu("&Help");
   m_menuHelp->addAction(m_actAbout);
+}
+
+void MainWindow::initialiseWidgets()
+{
+  m_scanner = new MemScanWidget(this);
+  connect(m_scanner,
+          static_cast<void (MemScanWidget::*)(u32 address, Common::MemType type, size_t length,
+                                              bool isUnsigned, Common::MemBase base)>(
+              &MemScanWidget::requestAddWatchEntry),
+          this,
+          static_cast<void (MainWindow::*)(u32 address, Common::MemType type, size_t length,
+                                           bool isUnsigned, Common::MemBase base)>(
+              &MainWindow::addWatchRequested));
+  connect(m_scanner,
+          static_cast<void (MemScanWidget::*)(Common::MemType type, size_t length, bool isUnsigned,
+                                              Common::MemBase base)>(
+              &MemScanWidget::requestAddAllResultsToWatchList),
+          this,
+          static_cast<void (MainWindow::*)(Common::MemType type, size_t length, bool isUnsigned,
+                                           Common::MemBase base)>(
+              &MainWindow::addAllResultsToWatchList));
+  connect(m_scanner,
+          static_cast<void (MemScanWidget::*)(Common::MemType type, size_t length, bool isUnsigned,
+                                              Common::MemBase base)>(
+              &MemScanWidget::requestAddSelectedResultsToWatchList),
+          this,
+          static_cast<void (MainWindow::*)(Common::MemType type, size_t length, bool isUnsigned,
+                                           Common::MemBase base)>(
+              &MainWindow::addSelectedResultsToWatchList));
+
+  m_watcher = new MemWatchWidget(this);
 
   connect(m_scanner, &MemScanWidget::mustUnhook, this, &MainWindow::onUnhook);
   connect(m_watcher, &MemWatchWidget::mustUnhook, this, &MainWindow::onUnhook);
 
-  DolphinComm::DolphinAccessor::init();
+  m_btnAttempHook = new QPushButton("Hook");
+  m_btnUnhook = new QPushButton("Unhook");
+  connect(m_btnAttempHook, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
+          &MainWindow::onHookAttempt);
+  connect(m_btnUnhook, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
+          &MainWindow::onUnhook);
 
+  m_lblDolphinStatus = new QLabel("");
+  m_lblDolphinStatus->setAlignment(Qt::AlignHCenter);
+
+  m_lblMem2Status = new QLabel("");
+  m_lblMem2Status->setAlignment(Qt::AlignHCenter);
+
+  m_btnOpenMemViewer = new QPushButton("Open memory viewer");
+  connect(m_btnOpenMemViewer, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
+          &MainWindow::onOpenMenViewer);
+}
+
+void MainWindow::makeLayouts()
+{
+  QHBoxLayout* dolphinHookButtons_layout = new QHBoxLayout();
+  dolphinHookButtons_layout->addWidget(m_btnAttempHook);
+  dolphinHookButtons_layout->addWidget(m_btnUnhook);
+
+  QFrame* separatorline = new QFrame();
+  separatorline->setFrameShape(QFrame::HLine);
+
+  QVBoxLayout* main_layout = new QVBoxLayout;
+  main_layout->addWidget(m_lblDolphinStatus);
+  main_layout->addLayout(dolphinHookButtons_layout);
+  main_layout->addWidget(m_lblMem2Status);
+  main_layout->addWidget(separatorline);
+  main_layout->addWidget(m_scanner);
+  main_layout->addSpacing(5);
+  main_layout->addWidget(m_btnOpenMemViewer);
+  main_layout->addSpacing(5);
+  main_layout->addWidget(m_watcher);
+
+  QWidget* main_widget = new QWidget(this);
+  main_widget->setLayout(main_layout);
+  setCentralWidget(main_widget);
+
+  setMinimumWidth(800);
+}
+
+void MainWindow::makeMemViewer()
+{
   m_viewer = new MemViewerWidget(nullptr, Common::MEM1_START);
   connect(m_viewer, &MemViewerWidget::mustUnhook, this, &MainWindow::onUnhook);
   connect(m_watcher,
           static_cast<void (MemWatchWidget::*)(u32)>(&MemWatchWidget::goToAddressInViewer), this,
           static_cast<void (MainWindow::*)(u32)>(&MainWindow::onOpenMemViewerWithAddress));
+}
 
-  // First attempt to hook
+void MainWindow::firstHookAttempt()
+{
   onHookAttempt();
   if (DolphinComm::DolphinAccessor::getStatus() ==
       DolphinComm::DolphinAccessor::DolphinStatus::hooked)
     updateMem2Status();
-}
-
-MainWindow::~MainWindow()
-{
-  delete m_viewer;
-  delete m_scanner;
-  delete m_watcher;
 }
 
 void MainWindow::addSelectedResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,

@@ -11,6 +11,18 @@
 
 MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
 {
+  initialiseWidgets();
+  makeLayouts();
+}
+
+MemScanWidget::~MemScanWidget()
+{
+  delete m_memScanner;
+  delete m_resultsListModel;
+}
+
+void MemScanWidget::initialiseWidgets()
+{
   m_memScanner = new MemScanner();
 
   m_resultsListModel = new ResultsListModel(this, m_memScanner);
@@ -45,15 +57,6 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
           &MemScanWidget::onAddSelection);
   m_btnAddSelection->setEnabled(false);
 
-  QHBoxLayout* multiAddButtons_layout = new QHBoxLayout();
-  multiAddButtons_layout->addWidget(m_btnAddSelection);
-  multiAddButtons_layout->addWidget(m_btnAddAll);
-
-  QVBoxLayout* results_layout = new QVBoxLayout();
-  results_layout->addWidget(m_lblResultCount);
-  results_layout->addWidget(m_tblResulstList);
-  results_layout->addLayout(multiAddButtons_layout);
-
   m_btnFirstScan = new QPushButton("First scan");
   m_btnNextScan = new QPushButton("Next scan");
   m_btnNextScan->hide();
@@ -67,27 +70,11 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
   connect(m_btnResetScan, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
           &MemScanWidget::onResetScan);
 
-  QHBoxLayout* buttons_layout = new QHBoxLayout();
-  buttons_layout->addWidget(m_btnFirstScan);
-  buttons_layout->addWidget(m_btnNextScan);
-  buttons_layout->addWidget(m_btnResetScan);
-
   m_txbSearchTerm1 = new QLineEdit();
-  QLabel* lblAnd = new QLabel("and");
   m_txbSearchTerm2 = new QLineEdit();
 
-  QHBoxLayout* searchTerm2_layout = new QHBoxLayout();
-  searchTerm2_layout->setContentsMargins(0, 0, 0, 0);
-  searchTerm2_layout->addWidget(lblAnd);
-  searchTerm2_layout->addWidget(m_txbSearchTerm2);
-
   m_searchTerm2Widget = new QWidget();
-  m_searchTerm2Widget->setLayout(searchTerm2_layout);
 
-  QHBoxLayout* searchTerms_layout = new QHBoxLayout();
-  searchTerms_layout->addWidget(m_txbSearchTerm1);
-  searchTerms_layout->addWidget(m_searchTerm2Widget);
-  searchTerms_layout->setSizeConstraint(QLayout::SetMinimumSize);
   m_searchTerm2Widget->hide();
 
   m_cmbScanType = new QComboBox();
@@ -102,29 +89,63 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
   connect(m_cmbScanFilter, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
           this, &MemScanWidget::onScanFilterChanged);
 
-  QRadioButton* rdbBaseDecimal = new QRadioButton("Decimal");
-  QRadioButton* rdbBaseHexadecimal = new QRadioButton("Hexadecimal");
-  QRadioButton* rdbBaseOctal = new QRadioButton("Octal");
-  QRadioButton* rdbBaseBinary = new QRadioButton("Binary");
+  m_rdbBaseDecimal = new QRadioButton("Decimal");
+  m_rdbBaseHexadecimal = new QRadioButton("Hexadecimal");
+  m_rdbBaseOctal = new QRadioButton("Octal");
+  m_rdbBaseBinary = new QRadioButton("Binary");
 
   m_btnGroupScanBase = new QButtonGroup();
-  m_btnGroupScanBase->addButton(rdbBaseDecimal, 0);
-  m_btnGroupScanBase->addButton(rdbBaseHexadecimal, 1);
-  m_btnGroupScanBase->addButton(rdbBaseOctal, 2);
-  m_btnGroupScanBase->addButton(rdbBaseBinary, 3);
-  rdbBaseDecimal->setChecked(true);
-
-  QHBoxLayout* layout_buttonsBase = new QHBoxLayout();
-  layout_buttonsBase->addWidget(rdbBaseDecimal);
-  layout_buttonsBase->addWidget(rdbBaseHexadecimal);
-  layout_buttonsBase->addWidget(rdbBaseOctal);
-  layout_buttonsBase->addWidget(rdbBaseBinary);
+  m_btnGroupScanBase->addButton(m_rdbBaseDecimal, 0);
+  m_btnGroupScanBase->addButton(m_rdbBaseHexadecimal, 1);
+  m_btnGroupScanBase->addButton(m_rdbBaseOctal, 2);
+  m_btnGroupScanBase->addButton(m_rdbBaseBinary, 3);
+  m_rdbBaseDecimal->setChecked(true);
 
   m_groupScanBase = new QGroupBox("Base to use");
-  m_groupScanBase->setLayout(layout_buttonsBase);
 
   m_chkSignedScan = new QCheckBox("Signed value scan");
   m_chkSignedScan->setChecked(false);
+
+  m_currentValuesUpdateTimer = new QTimer(this);
+  connect(m_currentValuesUpdateTimer, &QTimer::timeout, this,
+          &MemScanWidget::onCurrentValuesUpdateTimer);
+}
+
+void MemScanWidget::makeLayouts()
+{
+  QLabel* lblAnd = new QLabel("and");
+
+  QHBoxLayout* multiAddButtons_layout = new QHBoxLayout();
+  multiAddButtons_layout->addWidget(m_btnAddSelection);
+  multiAddButtons_layout->addWidget(m_btnAddAll);
+
+  QVBoxLayout* results_layout = new QVBoxLayout();
+  results_layout->addWidget(m_lblResultCount);
+  results_layout->addWidget(m_tblResulstList);
+  results_layout->addLayout(multiAddButtons_layout);
+
+  QHBoxLayout* buttons_layout = new QHBoxLayout();
+  buttons_layout->addWidget(m_btnFirstScan);
+  buttons_layout->addWidget(m_btnNextScan);
+  buttons_layout->addWidget(m_btnResetScan);
+
+  QHBoxLayout* searchTerm2_layout = new QHBoxLayout();
+  searchTerm2_layout->setContentsMargins(0, 0, 0, 0);
+  searchTerm2_layout->addWidget(lblAnd);
+  searchTerm2_layout->addWidget(m_txbSearchTerm2);
+  m_searchTerm2Widget->setLayout(searchTerm2_layout);
+
+  QHBoxLayout* searchTerms_layout = new QHBoxLayout();
+  searchTerms_layout->addWidget(m_txbSearchTerm1);
+  searchTerms_layout->addWidget(m_searchTerm2Widget);
+  searchTerms_layout->setSizeConstraint(QLayout::SetMinimumSize);
+
+  QHBoxLayout* layout_buttonsBase = new QHBoxLayout();
+  layout_buttonsBase->addWidget(m_rdbBaseDecimal);
+  layout_buttonsBase->addWidget(m_rdbBaseHexadecimal);
+  layout_buttonsBase->addWidget(m_rdbBaseOctal);
+  layout_buttonsBase->addWidget(m_rdbBaseBinary);
+  m_groupScanBase->setLayout(layout_buttonsBase);
 
   QVBoxLayout* scannerParams_layout = new QVBoxLayout();
   scannerParams_layout->addLayout(buttons_layout);
@@ -146,16 +167,6 @@ MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
   main_layout->setContentsMargins(3, 0, 3, 0);
 
   setLayout(main_layout);
-
-  m_currentValuesUpdateTimer = new QTimer(this);
-  connect(m_currentValuesUpdateTimer, &QTimer::timeout, this,
-          &MemScanWidget::onCurrentValuesUpdateTimer);
-}
-
-MemScanWidget::~MemScanWidget()
-{
-  delete m_memScanner;
-  delete m_resultsListModel;
 }
 
 ResultsListModel* MemScanWidget::getResultListModel() const

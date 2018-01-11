@@ -16,6 +16,9 @@ public:
   void onTypeChange(int index);
 
 private:
+  void initialiseWidgets();
+  void makeLayouts();
+
   int m_typeIndex;
   size_t m_length;
   QComboBox* m_cmbTypes;

@@ -39,6 +39,9 @@ signals:
   void goToAddressInViewer(u32 address);
 
 private:
+  void initialiseWidgets();
+  void makeLayouts();
+
   QTreeView* m_watchView;
   MemWatchModel* m_watchModel;
   MemWatchDelegate* m_watchDelegate;

@@ -26,6 +26,9 @@ signals:
   void mustUnhook();
 
 private:
+  void initialiseWidgets();
+  void makeLayouts();
+
   QLineEdit* m_txtJumpAddress;
   QPushButton* m_btnGoToMEM1Start;
   QPushButton* m_btnGoToMEM2Start;

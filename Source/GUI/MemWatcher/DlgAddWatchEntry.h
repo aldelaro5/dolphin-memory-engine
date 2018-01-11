@@ -26,6 +26,10 @@ public:
   MemWatchEntry* getEntry() const;
 
 private:
+  void initialiseWidgets();
+  void makeLayouts();
+  void fillFields(MemWatchEntry* entry);
+
   void updatePreview();
   bool validateAndSetAddress();
   bool validateAndSetOffset(int index);

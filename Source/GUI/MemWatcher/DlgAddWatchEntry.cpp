@@ -9,14 +9,65 @@
 #include "../../DolphinProcess/DolphinAccessor.h"
 #include "../GUICommon.h"
 
-DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
+DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry)
+{
+  initialiseWidgets();
+  makeLayouts();
+  fillFields(entry);
+
+  // These are connected at the end to avoid triggering the events when initialising.
+  connect(m_cmbTypes, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+          &DlgAddWatchEntry::onTypeChange);
+  connect(m_spnLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this,
+          &DlgAddWatchEntry::onLengthChanged);
+}
+
+DlgAddWatchEntry::~DlgAddWatchEntry()
+{
+  delete m_entry;
+}
+
+void DlgAddWatchEntry::initialiseWidgets()
 {
   m_chkBoundToPointer = new QCheckBox("This is a pointer", this);
   connect(m_chkBoundToPointer, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
           this, &DlgAddWatchEntry::onIsPointerChanged);
 
-  QLabel* lblPreview = new QLabel("Value preview: ");
   m_lblValuePreview = new QLabel("", this);
+
+  m_txbAddress = new QLineEdit(this);
+  m_txbAddress->setMaxLength(8);
+  connect(m_txbAddress, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited),
+          this, &DlgAddWatchEntry::onAddressChanged);
+
+  m_offsetsLayout = new QGridLayout;
+
+  m_offsets = QVector<QLineEdit*>();
+
+  m_btnAddOffset = new QPushButton("Add offset");
+  connect(m_btnAddOffset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
+          &DlgAddWatchEntry::addPointerOffset);
+
+  m_btnRemoveOffset = new QPushButton("Remove offset");
+  connect(m_btnRemoveOffset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
+          &DlgAddWatchEntry::removePointerOffset);
+
+  m_pointerWidget = new QWidget(this);
+
+  m_txbLabel = new QLineEdit(this);
+
+  m_cmbTypes = new QComboBox(this);
+  m_cmbTypes->addItems(GUICommon::g_memTypeNames);
+
+  m_lengtWidget = new QWidget;
+
+  m_spnLength = new QSpinBox(this);
+  m_spnLength->setMinimum(1);
+}
+
+void DlgAddWatchEntry::makeLayouts()
+{
+  QLabel* lblPreview = new QLabel("Value preview: ");
   QHBoxLayout* preview_layout = new QHBoxLayout;
   preview_layout->addWidget(lblPreview);
   preview_layout->addWidget(m_lblValuePreview);
@@ -25,8 +76,6 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   preview_widget->setLayout(preview_layout);
 
   QLabel* lblAddress = new QLabel("Address: ", this);
-  m_txbAddress = new QLineEdit(this);
-  m_txbAddress->setMaxLength(8);
 
   QHBoxLayout* layout_addressAndPreview = new QHBoxLayout;
   layout_addressAndPreview->addWidget(lblAddress);
@@ -34,27 +83,17 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   layout_addressAndPreview->addStretch();
   QWidget* addressWidget = new QWidget(this);
   addressWidget->setLayout(layout_addressAndPreview);
-  connect(m_txbAddress, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textEdited),
-          this, &DlgAddWatchEntry::onAddressChanged);
 
-  m_offsetsLayout = new QGridLayout;
-  m_offsets = QVector<QLineEdit*>();
   QWidget* offsetsWidget = new QWidget();
   offsetsWidget->setLayout(m_offsetsLayout);
 
   QLabel* lblOffset = new QLabel("Offsets (in hex): ", this);
 
-  m_btnAddOffset = new QPushButton("Add offset");
-  m_btnRemoveOffset = new QPushButton("Remove offset");
   QHBoxLayout* pointerButtons_layout = new QHBoxLayout;
   pointerButtons_layout->addWidget(m_btnAddOffset);
   pointerButtons_layout->addWidget(m_btnRemoveOffset);
   QWidget* pointerButtons_widget = new QWidget();
   pointerButtons_widget->setLayout(pointerButtons_layout);
-  connect(m_btnAddOffset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &DlgAddWatchEntry::addPointerOffset);
-  connect(m_btnRemoveOffset, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &DlgAddWatchEntry::removePointerOffset);
 
   QVBoxLayout* pointerOffset_layout = new QVBoxLayout;
   pointerOffset_layout->setSpacing(1);
@@ -63,11 +102,9 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   pointerOffset_layout->addWidget(pointerButtons_widget);
   pointerOffset_layout->addStretch();
   pointerOffset_layout->setContentsMargins(0, 0, 0, 0);
-  m_pointerWidget = new QWidget(this);
   m_pointerWidget->setLayout(pointerOffset_layout);
 
   QLabel* lblLabel = new QLabel("Label: ", this);
-  m_txbLabel = new QLineEdit(this);
   QHBoxLayout* layout_label = new QHBoxLayout;
   layout_label->addWidget(lblLabel);
   layout_label->addWidget(m_txbLabel);
@@ -75,8 +112,6 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   labelWidget->setLayout(layout_label);
 
   QLabel* lblType = new QLabel("Type: ", this);
-  m_cmbTypes = new QComboBox(this);
-  m_cmbTypes->addItems(GUICommon::g_memTypeNames);
 
   QHBoxLayout* layout_type = new QHBoxLayout;
   layout_type->addWidget(lblType);
@@ -85,12 +120,9 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
   typeWidget->setLayout(layout_type);
 
   QLabel* lblLength = new QLabel(QString("Length: "), this);
-  m_spnLength = new QSpinBox(this);
-  m_spnLength->setMinimum(1);
   QHBoxLayout* layout_length = new QHBoxLayout;
   layout_length->addWidget(lblLength);
   layout_length->addWidget(m_spnLength);
-  m_lengtWidget = new QWidget;
   m_lengtWidget->setLayout(layout_length);
 
   QDialogButtonBox* buttonBox =
@@ -111,7 +143,10 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
 
   connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgAddWatchEntry::accept);
   connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgAddWatchEntry::reject);
+}
 
+void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
+{
   if (entry == nullptr)
   {
     m_entry = new MemWatchEntry();
@@ -174,16 +209,6 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry) : m_entry(entry)
     m_chkBoundToPointer->setChecked(m_entry->isBoundToPointer());
     updatePreview();
   }
-
-  connect(m_cmbTypes, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
-          &DlgAddWatchEntry::onTypeChange);
-  connect(m_spnLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this,
-          &DlgAddWatchEntry::onLengthChanged);
-}
-
-DlgAddWatchEntry::~DlgAddWatchEntry()
-{
-  delete m_entry;
 }
 
 void DlgAddWatchEntry::addPointerOffset()

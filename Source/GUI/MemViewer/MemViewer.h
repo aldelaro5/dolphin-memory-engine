@@ -31,6 +31,8 @@ signals:
   void memErrorOccured();
 
 private:
+  void initialise();
+
   bool handleNaviguationKey(const int key);
   bool writeHexCharacterToSelectedMemory(const std::string hexCharToWrite);
   void updateMemoryData();

@@ -29,7 +29,28 @@
 
 MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
 {
+  initialiseWidgets();
+  makeLayouts();
+}
+
+MemWatchWidget::~MemWatchWidget()
+{
+  delete m_watchDelegate;
+  delete m_watchModel;
+}
+
+void MemWatchWidget::initialiseWidgets()
+{
   m_watchModel = new MemWatchModel(this);
+  connect(m_watchModel,
+          static_cast<void (MemWatchModel::*)(const QModelIndex&, Common::MemOperationReturnCode)>(
+              &MemWatchModel::writeFailed),
+          this,
+          static_cast<void (MemWatchWidget::*)(const QModelIndex&, Common::MemOperationReturnCode)>(
+              &MemWatchWidget::onValueWriteError));
+  connect(m_watchModel, &MemWatchModel::dropSucceeded, this, &MemWatchWidget::onDropSucceeded);
+  connect(m_watchModel, &MemWatchModel::readFailed, this, &MemWatchWidget::mustUnhook);
+
   m_watchDelegate = new MemWatchDelegate();
 
   m_watchView = new QTreeView;
@@ -44,13 +65,6 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
           static_cast<void (QWidget::*)(const QPoint&)>(&QWidget::customContextMenuRequested), this,
           static_cast<void (MemWatchWidget::*)(const QPoint&)>(
               &MemWatchWidget::onMemWatchContextMenuRequested));
-  connect(m_watchModel,
-          static_cast<void (MemWatchModel::*)(const QModelIndex&, Common::MemOperationReturnCode)>(
-              &MemWatchModel::writeFailed),
-          this,
-          static_cast<void (MemWatchWidget::*)(const QModelIndex&, Common::MemOperationReturnCode)>(
-              &MemWatchWidget::onValueWriteError));
-  connect(m_watchModel, &MemWatchModel::dropSucceeded, this, &MemWatchWidget::onDropSucceeded);
   connect(m_watchView,
           static_cast<void (QAbstractItemView::*)(const QModelIndex&)>(
               &QAbstractItemView::doubleClicked),
@@ -68,28 +82,13 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
   QShortcut* shortcut = new QShortcut(QKeySequence::Delete, m_watchView);
   connect(shortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteNode);
 
-  QWidget* buttons = new QWidget;
-  QHBoxLayout* buttons_layout = new QHBoxLayout;
   m_btnAddGroup = new QPushButton("Add group", this);
-  m_btnAddWatchEntry = new QPushButton("Add watch", this);
-
-  buttons_layout->addWidget(m_btnAddGroup);
-  buttons_layout->addWidget(m_btnAddWatchEntry);
-  buttons_layout->setContentsMargins(0, 0, 0, 0);
-  buttons->setLayout(buttons_layout);
   connect(m_btnAddGroup, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
           &MemWatchWidget::onAddGroup);
+
+  m_btnAddWatchEntry = new QPushButton("Add watch", this);
   connect(m_btnAddWatchEntry, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
           &MemWatchWidget::onAddWatchEntry);
-
-  QVBoxLayout* layout = new QVBoxLayout;
-
-  layout->addWidget(buttons);
-  layout->addWidget(m_watchView);
-  layout->setContentsMargins(3, 0, 3, 0);
-  setLayout(layout);
-
-  connect(m_watchModel, &MemWatchModel::readFailed, this, &MemWatchWidget::mustUnhook);
 
   m_updateTimer = new QTimer(this);
   connect(m_updateTimer, &QTimer::timeout, m_watchModel, &MemWatchModel::onUpdateTimer);
@@ -98,10 +97,22 @@ MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
   connect(m_freezeTimer, &QTimer::timeout, m_watchModel, &MemWatchModel::onFreezeTimer);
 }
 
-MemWatchWidget::~MemWatchWidget()
+void MemWatchWidget::makeLayouts()
 {
-  delete m_watchDelegate;
-  delete m_watchModel;
+  QWidget* buttons = new QWidget;
+  QHBoxLayout* buttons_layout = new QHBoxLayout;
+
+  buttons_layout->addWidget(m_btnAddGroup);
+  buttons_layout->addWidget(m_btnAddWatchEntry);
+  buttons_layout->setContentsMargins(0, 0, 0, 0);
+  buttons->setLayout(buttons_layout);
+
+  QVBoxLayout* layout = new QVBoxLayout;
+
+  layout->addWidget(buttons);
+  layout->addWidget(m_watchView);
+  layout->setContentsMargins(3, 0, 3, 0);
+  setLayout(layout);
 }
 
 void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)

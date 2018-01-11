@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QTableView>
 #include <QTimer>
 #include <QWidget>
@@ -47,6 +48,9 @@ signals:
   void mustUnhook();
 
 private:
+  void initialiseWidgets();
+  void makeLayouts();
+
   MemScanner::ScanFiter getSelectedFilter() const;
   void updateScanFilterChoices();
   void updateTypeAdditionalOptions();
@@ -67,6 +71,10 @@ private:
   QLabel* m_lblResultCount;
   QCheckBox* m_chkSignedScan;
   QButtonGroup* m_btnGroupScanBase;
+  QRadioButton* m_rdbBaseDecimal;
+  QRadioButton* m_rdbBaseHexadecimal;
+  QRadioButton* m_rdbBaseOctal;
+  QRadioButton* m_rdbBaseBinary;
   QGroupBox* m_groupScanBase;
   QTableView* m_tblResulstList;
   bool m_variableLengthType;

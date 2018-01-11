@@ -40,6 +40,12 @@ public:
   void onQuit();
 
 private:
+  void makeMenus();
+  void initialiseWidgets();
+  void makeLayouts();
+  void makeMemViewer();
+  void firstHookAttempt();
+
   MemWatchWidget* m_watcher;
   MemScanWidget* m_scanner;
   MemViewerWidget* m_viewer;

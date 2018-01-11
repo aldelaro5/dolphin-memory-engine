@@ -9,14 +9,36 @@
 
 MemViewerWidget::MemViewerWidget(QWidget* parent, u32 consoleAddress) : QWidget(parent)
 {
-  QLabel* lblJumpToAddress = new QLabel("Jump to an address: ");
+  initialiseWidgets();
+  makeLayouts();
+}
+
+MemViewerWidget::~MemViewerWidget()
+{
+  delete m_memViewer;
+}
+
+void MemViewerWidget::initialiseWidgets()
+{
   m_txtJumpAddress = new QLineEdit(this);
+  connect(m_txtJumpAddress, &QLineEdit::textChanged, this,
+          &MemViewerWidget::onJumpToAddressTextChanged);
   m_btnGoToMEM1Start = new QPushButton("Go to the common RAM");
   connect(m_btnGoToMEM1Start, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
           &MemViewerWidget::onGoToMEM1Start);
   m_btnGoToMEM2Start = new QPushButton("Go to the Wii-only RAM");
   connect(m_btnGoToMEM2Start, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
           &MemViewerWidget::onGoToMEM2Start);
+  m_memViewer = new MemViewer(this);
+  connect(m_memViewer, &MemViewer::memErrorOccured, this, &MemViewerWidget::mustUnhook);
+  m_updateMemoryTimer = new QTimer(this);
+  connect(m_updateMemoryTimer, &QTimer::timeout, m_memViewer, &MemViewer::updateViewer);
+}
+
+void MemViewerWidget::makeLayouts()
+{
+  QLabel* lblJumpToAddress = new QLabel("Jump to an address: ");
+
   QHBoxLayout* controls_layout = new QHBoxLayout();
   controls_layout->addWidget(lblJumpToAddress);
   controls_layout->addWidget(m_txtJumpAddress);
@@ -24,23 +46,10 @@ MemViewerWidget::MemViewerWidget(QWidget* parent, u32 consoleAddress) : QWidget(
   controls_layout->addWidget(m_btnGoToMEM2Start);
 
   QVBoxLayout* main_layout = new QVBoxLayout();
-  connect(m_txtJumpAddress, &QLineEdit::textChanged, this,
-          &MemViewerWidget::onJumpToAddressTextChanged);
-  m_memViewer = new MemViewer(this);
   main_layout->addLayout(controls_layout);
   main_layout->addWidget(m_memViewer);
   setLayout(main_layout);
   layout()->setSizeConstraint(QLayout::SetFixedSize);
-
-  connect(m_memViewer, &MemViewer::memErrorOccured, this, &MemViewerWidget::mustUnhook);
-
-  m_updateMemoryTimer = new QTimer(this);
-  connect(m_updateMemoryTimer, &QTimer::timeout, m_memViewer, &MemViewer::updateViewer);
-}
-
-MemViewerWidget::~MemViewerWidget()
-{
-  delete m_memViewer;
 }
 
 QTimer* MemViewerWidget::getUpdateTimer() const
