@@ -1,6 +1,8 @@
 Source/[Bb]uild*/
 Source/[Bb]inary/
+Source/bin/
 Source/obj/
+Source/GeneratedFiles/
 Source/*.ipch
 Source/*.opensdf
 Source/*.sdf
