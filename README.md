@@ -23,7 +23,7 @@ On Linux, you need to install the Qt 5 package of your respective distribution.
 
 Before proceeding, make sure you have initialised the Qt submodule by running the command `git submodule update --init` at the repository's root.  The files should appear at the `Externals\Qt` directory.
 
-Once this is done, open Visual Studio and open the solution located in the `Source` directory.  If you are using Visual Studio 2017, this is all you need to do, simply select the build configuration and build the solution.  If you are using Visual Studio 2015 however, you may have to change the toolset of the project to the one that comes with Visual Studio 2015.  To do so, right click on the project from the Solution Explorer and click properties.  From there, change the "Platform Toolset" to the one that you have installed.  Please note that this will change the settings in the `cxproj` file so if you plan to submit a Pull Request, make sure to not stage this change.
+Once this is done, open Visual Studio and open the solution located in the `Source` directory.  If you are using Visual Studio 2017, this is all you need to do, simply select the build configuration and build the solution.  If you are using Visual Studio 2015 however, you may have to change the toolset of the project to the one that comes with Visual Studio 2015.  To do so, right click on the project from the Solution Explorer and click properties.  From there, change the "Platform Toolset" to the one that you have installed.  Please note that this will change the settings in the `vcxproj` file so if you plan to submit a Pull Request, make sure to not stage this change.
 
 
 ### Linux
