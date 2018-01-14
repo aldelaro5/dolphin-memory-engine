@@ -22,7 +22,7 @@
 #include <string>
 
 #include "../../Common/MemoryCommon.h"
-#include "../../MemoryWatch/MemoryWatch.h"
+#include "../../MemoryWatch/MemWatchEntry.h"
 #include "../GUICommon.h"
 #include "DlgAddWatchEntry.h"
 #include "DlgChangeType.h"

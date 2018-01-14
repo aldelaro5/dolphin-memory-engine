@@ -3,8 +3,8 @@
 #include <QAbstractItemModel>
 #include <QJsonObject>
 
-#include "../../MemoryWatch/MemoryWatch.h"
-#include "MemWatchTreeNode.h"
+#include "../../MemoryWatch/MemWatchEntry.h"
+#include "../../MemoryWatch/MemWatchTreeNode.h"
 
 class MemWatchModel : public QAbstractItemModel
 {

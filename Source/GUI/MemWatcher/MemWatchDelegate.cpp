@@ -4,7 +4,7 @@
 
 #include "../GUICommon.h"
 #include "MemWatchModel.h"
-#include "MemWatchTreeNode.h"
+#include "../../MemoryWatch/MemWatchTreeNode.h"
 
 QWidget* MemWatchDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option,
                                         const QModelIndex& index) const

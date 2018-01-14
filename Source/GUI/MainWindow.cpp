@@ -9,7 +9,7 @@
 #include <string>
 
 #include "../DolphinProcess/DolphinAccessor.h"
-#include "../MemoryWatch/MemoryWatch.h"
+#include "../MemoryWatch/MemWatchEntry.h"
 
 MainWindow::MainWindow()
 {

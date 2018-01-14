@@ -4,7 +4,7 @@
 
 #include <sstream>
 
-#include "../GUICommon.h"
+#include "../GUI/GUICommon.h"
 
 MemWatchTreeNode::MemWatchTreeNode(MemWatchEntry* entry, MemWatchTreeNode* parent,
                                    const bool isGroup, const QString& groupName)

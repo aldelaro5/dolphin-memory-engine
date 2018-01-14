@@ -12,10 +12,10 @@ endif(UNIX)
 set(SRCS ${DolphinProcessSrc}
          DolphinProcess/DolphinAccessor.cpp  
          Common/MemoryCommon.cpp
-         MemoryWatch/MemoryWatch.cpp   
+         MemoryWatch/MemWatchEntry.cpp   
+         MemoryWatch/MemWatchTreeNode.cpp
          MemoryScanner/MemoryScanner.cpp
          GUI/GUICommon.cpp
-         GUI/MemWatcher/MemWatchTreeNode.cpp
          GUI/MemWatcher/MemWatchDelegate.cpp
          GUI/MemWatcher/MemWatchModel.cpp    
          GUI/MemWatcher/DlgChangeType.cpp 

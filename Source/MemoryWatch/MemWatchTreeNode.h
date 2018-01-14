@@ -4,7 +4,7 @@
 #include <QString>
 #include <QVector>
 
-#include "../../MemoryWatch/MemoryWatch.h"
+#include "MemWatchEntry.h"
 
 class MemWatchTreeNode
 {
