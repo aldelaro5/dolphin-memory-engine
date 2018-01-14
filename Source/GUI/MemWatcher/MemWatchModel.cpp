@@ -6,6 +6,7 @@
 #include <limits>
 #include <sstream>
 
+#include "../../CheatEngineParser/CheatEngineParser.h"
 #include "../GUICommon.h"
 
 MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
@@ -526,6 +527,15 @@ QString MemWatchModel::getAddressString(u32 address, bool isPointer) const
 void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json)
 {
   m_rootNode->readFromJson(json);
+  emit layoutChanged();
+}
+
+void MemWatchModel::importRootFromCTFile(QFile* CTFile, const bool useDolphinPointer,
+                                         const u64 CEStart)
+{
+  CheatEngineParser parser = CheatEngineParser();
+  parser.setTableStartAddress(CEStart);
+  m_rootNode = parser.parseCTFile(CTFile, useDolphinPointer);
   emit layoutChanged();
 }
 

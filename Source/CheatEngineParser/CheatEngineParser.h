@@ -2,16 +2,24 @@
 
 #include <QFile>
 #include <QString>
+#include <QXmlStreamReader>
 
 #include "../MemoryWatch/MemWatchTreeNode.h"
 
 class CheatEngineParser
 {
 public:
-  static void setTableStartAddress(const u32 tableStartAddress);
-  static MemWatchTreeNode* parseCTFile(const QFile& CTFile, const bool useDolphinPointer);
+  CheatEngineParser();
+
+  void setTableStartAddress(const u64 tableStartAddress);
+  MemWatchTreeNode* parseCTFile(QIODevice* CTFileIODevice, const bool useDolphinPointer);
 
 private:
-  static u32 m_tableStartAddress;
-  static QString m_errorMessages;
+  MemWatchTreeNode* parseCheatTable(MemWatchTreeNode* rootNode, const bool useDolphinPointer);
+  MemWatchTreeNode* parseCheatEntries(MemWatchTreeNode* node, const bool useDolphinPointer);
+  void parseCheatEntry(MemWatchTreeNode* node, const bool useDolphinPointer);
+
+  u64 m_tableStartAddress = 0;
+  QString m_errorMessages = "";
+  QXmlStreamReader* m_xmlReader;
 };

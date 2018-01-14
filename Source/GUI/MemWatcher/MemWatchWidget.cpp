@@ -21,7 +21,6 @@
 #include <QVBoxLayout>
 #include <string>
 
-#include "../../CheatEngineParser/CheatEngineParser.h"
 #include "../../Common/MemoryCommon.h"
 #include "../../MemoryWatch/MemWatchEntry.h"
 #include "../GUICommon.h"
@@ -603,8 +602,8 @@ void MemWatchWidget::importFromCTFile()
                                                   "Cheat Engine's cheat table (*.CT)");
   if (fileName != "")
   {
-    QFile CTFile(fileName);
-    if (!CTFile.exists())
+    QFile* CTFile = new QFile(fileName);
+    if (!CTFile->exists())
     {
       QMessageBox* errorBox = new QMessageBox(
           QMessageBox::Critical, QString("Error while opening file"),
@@ -612,7 +611,17 @@ void MemWatchWidget::importFromCTFile()
       errorBox->exec();
       return;
     }
-    CheatEngineParser::parseCTFile(CTFile, true);
+    if (!CTFile->open(QIODevice::ReadOnly))
+    {
+      QMessageBox* errorBox = new QMessageBox(
+          QMessageBox::Critical, "Error while opening file",
+          "An error occured while opening the cheat table file for reading", QMessageBox::Ok, this);
+      errorBox->exec();
+      return;
+    }
+
+    m_watchModel->importRootFromCTFile(CTFile, true);
+    CTFile->close();
   }
 }
 
