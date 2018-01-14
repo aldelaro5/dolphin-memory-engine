@@ -14,6 +14,7 @@ set(SRCS ${DolphinProcessSrc}
          Common/MemoryCommon.cpp
          MemoryWatch/MemWatchEntry.cpp   
          MemoryWatch/MemWatchTreeNode.cpp
+         CheatEngineParser/CheatEngineParser.cpp
          MemoryScanner/MemoryScanner.cpp
          GUI/GUICommon.cpp
          GUI/MemWatcher/MemWatchDelegate.cpp

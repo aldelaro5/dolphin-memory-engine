@@ -33,6 +33,7 @@ void MainWindow::makeMenus()
   m_actOpenWatchList = new QAction("&Open...", this);
   m_actSaveWatchList = new QAction("&Save", this);
   m_actSaveAsWatchList = new QAction("&Save as...", this);
+  m_actImportFromCT = new QAction("&Import from Cheat Engine's CT file...");
   m_actExportAsCSV = new QAction("&Export as CSV...", this);
 
   m_actViewScanner = new QAction("&Scanner", this);
@@ -44,6 +45,7 @@ void MainWindow::makeMenus()
   connect(m_actOpenWatchList, &QAction::triggered, this, &MainWindow::onOpenWatchFile);
   connect(m_actSaveWatchList, &QAction::triggered, this, &MainWindow::onSaveWatchFile);
   connect(m_actSaveAsWatchList, &QAction::triggered, this, &MainWindow::onSaveAsWatchFile);
+  connect(m_actImportFromCT, &QAction::triggered, this, &MainWindow::onImportFromCT);
   connect(m_actExportAsCSV, &QAction::triggered, this, &MainWindow::onExportAsCSV);
 
   connect(m_actViewScanner, static_cast<void (QAction::*)(bool)>(&QAction::toggled), this, [=] {
@@ -60,6 +62,7 @@ void MainWindow::makeMenus()
   m_menuFile->addAction(m_actOpenWatchList);
   m_menuFile->addAction(m_actSaveWatchList);
   m_menuFile->addAction(m_actSaveAsWatchList);
+  m_menuFile->addAction(m_actImportFromCT);
   m_menuFile->addAction(m_actExportAsCSV);
   m_menuFile->addAction(m_actQuit);
 
@@ -308,6 +311,11 @@ void MainWindow::onSaveWatchFile()
 void MainWindow::onSaveAsWatchFile()
 {
   m_watcher->saveAsWatchFile();
+}
+
+void MainWindow::onImportFromCT()
+{
+  m_watcher->importFromCTFile();
 }
 
 void MainWindow::onExportAsCSV()

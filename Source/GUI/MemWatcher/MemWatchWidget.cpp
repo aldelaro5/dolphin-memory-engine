@@ -21,6 +21,7 @@
 #include <QVBoxLayout>
 #include <string>
 
+#include "../../CheatEngineParser/CheatEngineParser.h"
 #include "../../Common/MemoryCommon.h"
 #include "../../MemoryWatch/MemWatchEntry.h"
 #include "../GUICommon.h"
@@ -593,6 +594,25 @@ void MemWatchWidget::saveAsWatchFile()
     watchFile.close();
     m_watchListFile = fileName;
     m_hasUnsavedChanges = false;
+  }
+}
+
+void MemWatchWidget::importFromCTFile()
+{
+  QString fileName = QFileDialog::getOpenFileName(this, "Open Cheat Table", m_watchListFile,
+                                                  "Cheat Engine's cheat table (*.CT)");
+  if (fileName != "")
+  {
+    QFile CTFile(fileName);
+    if (!CTFile.exists())
+    {
+      QMessageBox* errorBox = new QMessageBox(
+          QMessageBox::Critical, QString("Error while opening file"),
+          QString("The cheat table file " + fileName + " does not exist"), QMessageBox::Ok, this);
+      errorBox->exec();
+      return;
+    }
+    CheatEngineParser::parseCTFile(CTFile, true);
   }
 }
 
