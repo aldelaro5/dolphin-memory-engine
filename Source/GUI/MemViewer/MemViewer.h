@@ -19,6 +19,7 @@ public:
   ~MemViewer();
   QSize sizeHint() const override;
   void mousePressEvent(QMouseEvent* event) override;
+  void wheelEvent(QWheelEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
   void paintEvent(QPaintEvent* event) override;
   void scrollContentsBy(int dx, int dy) override;
@@ -33,6 +34,7 @@ signals:
 private:
   void initialise();
 
+  void updateFontSize(int newSize);
   bool handleNaviguationKey(const int key);
   bool writeCharacterToSelectedMemory(char byteToWrite);
   void updateMemoryData();
@@ -49,6 +51,7 @@ private:
   void determineMemoryTextRenderProperties(const int rowIndex, const int columnIndex,
                                            bool& drawCarret, QColor& bgColor, QColor& fgColor);
 
+  int m_memoryFontSize = 15;
   int m_byteSelectedPosX = -1;
   int m_byteSelectedPosY = -1;
   int m_charWidthEm = 0;

@@ -44,19 +44,7 @@ MemViewer::~MemViewer()
 
 void MemViewer::initialise()
 {
-#ifdef __linux__
-  setFont(QFont("Monospace", 10));
-#elif _WIN32
-  setFont(QFont("Courier New", 10));
-#endif
-
-  m_charWidthEm = fontMetrics().width(QLatin1Char('M'));
-  m_charHeight = fontMetrics().height();
-  m_hexAreaWidth = VISIBLE_COLS * (m_charWidthEm * 2 + m_charWidthEm / 2);
-  m_hexAreaHeight = VISIBLE_ROWS * m_charHeight;
-  m_rowHeaderWidth = m_charWidthEm * (sizeof(u32) * 2 + 1) + m_charWidthEm / 2;
-  m_hexAsciiSeparatorPosX = m_rowHeaderWidth + m_hexAreaWidth;
-  m_columnHeaderHeight = m_charHeight + m_charWidthEm / 2;
+  updateFontSize(m_memoryFontSize);
   m_curosrRect = new QRect();
   m_updatedRawMemoryData = new char[NUM_BYTES];
   m_lastRawMemoryData = new char[NUM_BYTES];
@@ -176,6 +164,42 @@ void MemViewer::mousePressEvent(QMouseEvent* event)
   m_byteSelectedPosY = clickedPosY;
 
   viewport()->update();
+}
+
+void MemViewer::wheelEvent(QWheelEvent* event)
+{
+  if (event->modifiers().testFlag(Qt::ControlModifier))
+  {
+    if (event->delta() < 0 && m_memoryFontSize > 5)
+      updateFontSize(m_memoryFontSize - 1);
+    else if (event->delta() > 0)
+      updateFontSize(m_memoryFontSize + 1);
+
+    viewport()->update();
+  }
+  else
+  {
+    QAbstractScrollArea::wheelEvent(event);
+  }
+}
+
+void MemViewer::updateFontSize(int newSize)
+{
+  m_memoryFontSize = newSize;
+
+#ifdef __linux__
+  setFont(QFont("Monospace", m_memoryFontSize));
+#elif _WIN32
+  setFont(QFont("Courier New", m_memoryFontSize));
+#endif
+
+  m_charWidthEm = fontMetrics().width(QLatin1Char('M'));
+  m_charHeight = fontMetrics().height();
+  m_hexAreaWidth = VISIBLE_COLS * (m_charWidthEm * 2 + m_charWidthEm / 2);
+  m_hexAreaHeight = VISIBLE_ROWS * m_charHeight;
+  m_rowHeaderWidth = m_charWidthEm * (sizeof(u32) * 2 + 1) + m_charWidthEm / 2;
+  m_hexAsciiSeparatorPosX = m_rowHeaderWidth + m_hexAreaWidth;
+  m_columnHeaderHeight = m_charHeight + m_charWidthEm / 2;
 }
 
 bool MemViewer::handleNaviguationKey(const int key)
