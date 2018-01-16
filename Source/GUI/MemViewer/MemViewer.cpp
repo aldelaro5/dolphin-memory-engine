@@ -131,44 +131,36 @@ void MemViewer::mousePressEvent(QMouseEvent* event)
 
   const bool wasEditingHex = m_editingHex;
   const int spacing = m_charWidthEm / 2;
-  int clickedHexPosX = x - m_rowHeaderWidth + spacing / 2;
-  int clickedAsciiPosX = x - (m_hexAsciiSeparatorPosX + spacing);
-  int clickedPosY = y - m_columnHeaderHeight;
+  const int hexCellWidth = m_charWidthEm * 2 + spacing;
+  const int hexAreaLeft = m_rowHeaderWidth - spacing / 2;
+  const int asciiAreaLeft = m_hexAsciiSeparatorPosX + spacing;
+  const int areaTop = m_columnHeaderHeight + m_charHeight - fontMetrics().overlinePos();
+  QRect hexArea(hexAreaLeft, areaTop, m_hexAreaWidth, m_charHeight * m_numRows);
+  QRect asciiArea(asciiAreaLeft, areaTop, m_charWidthEm * m_numColumns, m_charHeight * m_numRows);
 
-  // Ignore clicking the headers
-  if (clickedPosY < 0 || clickedHexPosX < 0)
-    return;
-
-  // Ignore space between HEX and ASCII table
-  if (clickedHexPosX > m_hexAreaWidth && clickedAsciiPosX < 0)
-    return;
-
-  // Transform click positions to table positions
-  clickedHexPosX /= spacing + m_charWidthEm * 2;
-  clickedAsciiPosX /= m_charWidthEm;
-  clickedPosY /= m_charHeight;
-
-  // Ignore clicking the padding at the bottom
-  if (clickedPosY >= m_numRows)
-    return;
-
-  if (clickedHexPosX >= 0 && clickedHexPosX < m_numColumns)
+  // Transform x and y to indices for column and row
+  if (hexArea.contains(x, y, false))
   {
-    x = clickedHexPosX;
+    x = (x - hexAreaLeft) / hexCellWidth;
     m_editingHex = true;
   }
-  else if (clickedAsciiPosX >= 0 && clickedAsciiPosX < m_numColumns)
+  else if (asciiArea.contains(x, y, false))
   {
-    x = clickedAsciiPosX;
+    x = (x - asciiAreaLeft) / m_charWidthEm;
     m_editingHex = false;
   }
+  else
+  {
+      return;
+  }
+  y = (y - areaTop) / m_charHeight;
 
   // Toggle carrot-between-hex when the same byte is clicked twice from the hex table
   m_carretBetweenHex = (m_editingHex && wasEditingHex && !m_carretBetweenHex &&
-                        m_byteSelectedPosX == x && m_byteSelectedPosY == clickedPosY);
+                        m_byteSelectedPosX == x && m_byteSelectedPosY == y);
 
   m_byteSelectedPosX = x;
-  m_byteSelectedPosY = clickedPosY;
+  m_byteSelectedPosY = y;
 
   viewport()->update();
 }
@@ -442,7 +434,7 @@ void MemViewer::renderCarret(QPainter& painter, const int rowIndex, const int co
                        m_columnHeaderHeight,
                    carretPosX,
                    rowIndex * m_charHeight + (m_charHeight - fontMetrics().overlinePos()) +
-                       m_columnHeaderHeight + m_charHeight);
+                       m_columnHeaderHeight + m_charHeight - 1);
   painter.setPen(oldPenColor);
 }
 
