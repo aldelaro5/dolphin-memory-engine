@@ -19,6 +19,7 @@ public:
   ~MemViewer();
   QSize sizeHint() const override;
   void mousePressEvent(QMouseEvent* event) override;
+  void wheelEvent(QWheelEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
   void paintEvent(QPaintEvent* event) override;
   void scrollContentsBy(int dx, int dy) override;
@@ -33,8 +34,10 @@ signals:
 private:
   void initialise();
 
+  void updateFontSize(int newSize);
+  void scrollToSelection();
   bool handleNaviguationKey(const int key);
-  bool writeHexCharacterToSelectedMemory(const std::string hexCharToWrite);
+  bool writeCharacterToSelectedMemory(char byteToWrite);
   void updateMemoryData();
   void changeMemoryRegion(const bool isMEM2);
   void renderColumnsHeaderText(QPainter& painter);
@@ -49,6 +52,10 @@ private:
   void determineMemoryTextRenderProperties(const int rowIndex, const int columnIndex,
                                            bool& drawCarret, QColor& bgColor, QColor& fgColor);
 
+  const int m_numRows = 16;
+  const int m_numColumns = 16; // Should be a multiple of 16, or the header doesn't make much sense
+  const int m_numCells = m_numRows * m_numColumns;
+  int m_memoryFontSize = 15;
   int m_byteSelectedPosX = -1;
   int m_byteSelectedPosY = -1;
   int m_charWidthEm = 0;
@@ -61,6 +68,7 @@ private:
   char* m_updatedRawMemoryData = nullptr;
   char* m_lastRawMemoryData = nullptr;
   int* m_memoryMsElapsedLastChange = nullptr;
+  bool m_editingHex = false;
   bool m_carretBetweenHex = false;
   bool m_disableScrollContentEvent = false;
   bool m_validMemory = false;
@@ -68,6 +76,5 @@ private:
   u32 m_memViewStart = 0;
   u32 m_memViewEnd = 0;
   QRect* m_curosrRect;
-  QList<int> m_hexKeyList;
   QElapsedTimer m_elapsedTimer;
 };
