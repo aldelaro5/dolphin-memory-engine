@@ -26,6 +26,7 @@
 #include "../GUICommon.h"
 #include "DlgAddWatchEntry.h"
 #include "DlgChangeType.h"
+#include "DlgImportCTFile.h"
 
 MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
 {
@@ -598,16 +599,16 @@ void MemWatchWidget::saveAsWatchFile()
 
 void MemWatchWidget::importFromCTFile()
 {
-  QString fileName = QFileDialog::getOpenFileName(this, "Open Cheat Table", m_watchListFile,
-                                                  "Cheat Engine's cheat table (*.CT)");
-  if (fileName != "")
+  DlgImportCTFile* dlg = new DlgImportCTFile(this);
+  if (dlg->exec() == QDialog::Accepted)
   {
-    QFile* CTFile = new QFile(fileName);
+    QFile* CTFile = new QFile(dlg->getFileName());
     if (!CTFile->exists())
     {
-      QMessageBox* errorBox = new QMessageBox(
-          QMessageBox::Critical, QString("Error while opening file"),
-          QString("The cheat table file " + fileName + " does not exist"), QMessageBox::Ok, this);
+      QMessageBox* errorBox =
+          new QMessageBox(QMessageBox::Critical, QString("Error while opening file"),
+                          QString("The cheat table file " + CTFile->fileName() + " does not exist"),
+                          QMessageBox::Ok, this);
       errorBox->exec();
       return;
     }
@@ -620,7 +621,11 @@ void MemWatchWidget::importFromCTFile()
       return;
     }
 
-    m_watchModel->importRootFromCTFile(CTFile, true);
+    bool useDolphinPointers = dlg->willUseDolphinPointers();
+    if (useDolphinPointers)
+      m_watchModel->importRootFromCTFile(CTFile, useDolphinPointers);
+    else
+      m_watchModel->importRootFromCTFile(CTFile, useDolphinPointers, dlg->getCommonBase());
     CTFile->close();
   }
 }
