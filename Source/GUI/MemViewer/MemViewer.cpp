@@ -151,7 +151,7 @@ void MemViewer::mousePressEvent(QMouseEvent* event)
   }
   else
   {
-      return;
+    return;
   }
   y = (y - areaTop) / m_charHeight;
 
