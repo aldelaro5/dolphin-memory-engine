@@ -34,7 +34,7 @@ void DlgImportCTFile::initialiseWidgets()
   m_groupImportAddressMethod =
       new QGroupBox("Addresses import method (select the option that describes the table)");
 
-  m_rdbUseCommonBase = new QRadioButton("Using an assumed common RAN start address");
+  m_rdbUseCommonBase = new QRadioButton("Using an assumed common RAM start address");
   m_rdbUseDolphinPointers = new QRadioButton("Using an internal Dolphin pointer");
 
   m_btnGroupImportAddressMethod = new QButtonGroup();
