@@ -6,6 +6,7 @@
 #include <limits>
 #include <sstream>
 
+#include "../../CheatEngineParser/CheatEngineParser.h"
 #include "../GUICommon.h"
 
 MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
@@ -527,6 +528,24 @@ void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json)
 {
   m_rootNode->readFromJson(json);
   emit layoutChanged();
+}
+
+MemWatchModel::CTParsingErrors
+MemWatchModel::importRootFromCTFile(QFile* CTFile, const bool useDolphinPointer, const u64 CEStart)
+{
+  CheatEngineParser parser = CheatEngineParser();
+  parser.setTableStartAddress(CEStart);
+  MemWatchTreeNode* importedRoot = parser.parseCTFile(CTFile, useDolphinPointer);
+  if (importedRoot != nullptr)
+    m_rootNode = importedRoot;
+
+  CTParsingErrors parsingErrors;
+  parsingErrors.errorStr = parser.getErrorMessages();
+  parsingErrors.isCritical = parser.hasACriticalErrorOccured();
+  if (!parsingErrors.isCritical)
+    emit layoutChanged();
+
+  return parsingErrors;
 }
 
 void MemWatchModel::writeRootToJsonRecursive(QJsonObject& json) const

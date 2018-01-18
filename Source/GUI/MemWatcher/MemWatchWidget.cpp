@@ -26,6 +26,7 @@
 #include "../GUICommon.h"
 #include "DlgAddWatchEntry.h"
 #include "DlgChangeType.h"
+#include "DlgImportCTFile.h"
 
 MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
 {
@@ -593,6 +594,69 @@ void MemWatchWidget::saveAsWatchFile()
     watchFile.close();
     m_watchListFile = fileName;
     m_hasUnsavedChanges = false;
+  }
+}
+
+void MemWatchWidget::importFromCTFile()
+{
+  DlgImportCTFile* dlg = new DlgImportCTFile(this);
+  if (dlg->exec() == QDialog::Accepted)
+  {
+    QFile* CTFile = new QFile(dlg->getFileName());
+    if (!CTFile->exists())
+    {
+      QMessageBox* errorBox =
+          new QMessageBox(QMessageBox::Critical, QString("Error while opening file"),
+                          QString("The cheat table file " + CTFile->fileName() + " does not exist"),
+                          QMessageBox::Ok, this);
+      errorBox->exec();
+      return;
+    }
+    if (!CTFile->open(QIODevice::ReadOnly))
+    {
+      QMessageBox* errorBox = new QMessageBox(
+          QMessageBox::Critical, "Error while opening file",
+          "An error occured while opening the cheat table file for reading", QMessageBox::Ok, this);
+      errorBox->exec();
+      return;
+    }
+
+    bool useDolphinPointers = dlg->willUseDolphinPointers();
+    MemWatchModel::CTParsingErrors parsingErrors;
+    if (useDolphinPointers)
+      parsingErrors = m_watchModel->importRootFromCTFile(CTFile, useDolphinPointers);
+    else
+      parsingErrors =
+          m_watchModel->importRootFromCTFile(CTFile, useDolphinPointers, dlg->getCommonBase());
+    CTFile->close();
+
+    if (parsingErrors.errorStr.isEmpty())
+    {
+      QMessageBox* errorBox = new QMessageBox(
+          QMessageBox::Information, "Import sucessfull",
+          "The Cheat Table was imported sucessfully without errors.", QMessageBox::Ok, this);
+      errorBox->exec();
+    }
+    else if (parsingErrors.isCritical)
+    {
+      QMessageBox* errorBox = new QMessageBox(
+          QMessageBox::Critical, "Import failed",
+          "The Cheat Table could not have been imported, here are the details of the error:\n\n" +
+              parsingErrors.errorStr,
+          QMessageBox::Ok, this);
+      errorBox->exec();
+    }
+    else
+    {
+      QMessageBox* errorBox =
+          new QMessageBox(QMessageBox::Warning, "Cheat table imported with errors",
+                          "The Cheat Table was imported with error(s), click \"Show details...\" "
+                          "to see the error(s) detail(s) (you can right-click to select all the "
+                          "details and copy it to the clipboard)",
+                          QMessageBox::Ok, this);
+      errorBox->setDetailedText(parsingErrors.errorStr);
+      errorBox->exec();
+    }
   }
 }
 

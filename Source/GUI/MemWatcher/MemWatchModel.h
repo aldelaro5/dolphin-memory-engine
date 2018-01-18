@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QAbstractItemModel>
+#include <QFile>
 #include <QJsonObject>
 
 #include "../../MemoryWatch/MemWatchEntry.h"
@@ -19,6 +20,12 @@ public:
     WATCH_COL_LOCK,
     WATCH_COL_VALUE,
     WATCH_COL_NUM
+  };
+
+  struct CTParsingErrors
+  {
+    QString errorStr;
+    bool isCritical;
   };
 
   MemWatchModel(QObject* parent);
@@ -49,6 +56,8 @@ public:
   void onUpdateTimer();
   void onFreezeTimer();
   void loadRootFromJsonRecursive(const QJsonObject& json);
+  CTParsingErrors importRootFromCTFile(QFile* CTFile, const bool useDolphinPointer,
+                                       const u64 CEStart = 0);
   void writeRootToJsonRecursive(QJsonObject& json) const;
   QString writeRootToCSVStringRecursive() const;
   bool hasAnyNodes() const;
