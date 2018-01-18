@@ -110,6 +110,11 @@ void MemWatchTreeNode::removeChild(const int row)
   m_children.remove(row);
 }
 
+void MemWatchTreeNode::clearAllChild()
+{
+  m_children.clear();
+}
+
 void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* parent)
 {
   m_parent = parent;

@@ -597,6 +597,17 @@ void MemWatchWidget::saveAsWatchFile()
   }
 }
 
+void MemWatchWidget::clearWatchList()
+{
+  if (!m_watchModel->hasAnyNodes())
+    return;
+
+  if (!warnIfUnsavedChanges())
+    return;
+
+  m_watchModel->clearRoot();
+}
+
 void MemWatchWidget::importFromCTFile()
 {
   DlgImportCTFile* dlg = new DlgImportCTFile(this);

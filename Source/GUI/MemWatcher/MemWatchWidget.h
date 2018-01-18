@@ -29,6 +29,7 @@ public:
   void pasteWatchFromClipBoard(MemWatchTreeNode* node);
   void saveWatchFile();
   void saveAsWatchFile();
+  void clearWatchList();
   void importFromCTFile();
   void exportWatchListAsCSV();
   QTimer* getUpdateTimer() const;

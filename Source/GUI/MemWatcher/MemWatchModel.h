@@ -52,6 +52,7 @@ public:
   void addGroup(const QString& name);
   void addEntry(MemWatchEntry* entry);
   void editEntry(MemWatchEntry* entry, const QModelIndex& index);
+  void clearRoot();
   void removeNode(const QModelIndex& index);
   void onUpdateTimer();
   void onFreezeTimer();
