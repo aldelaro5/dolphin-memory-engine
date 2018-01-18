@@ -530,13 +530,22 @@ void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json)
   emit layoutChanged();
 }
 
-void MemWatchModel::importRootFromCTFile(QFile* CTFile, const bool useDolphinPointer,
-                                         const u64 CEStart)
+MemWatchModel::CTParsingErrors
+MemWatchModel::importRootFromCTFile(QFile* CTFile, const bool useDolphinPointer, const u64 CEStart)
 {
   CheatEngineParser parser = CheatEngineParser();
   parser.setTableStartAddress(CEStart);
-  m_rootNode = parser.parseCTFile(CTFile, useDolphinPointer);
-  emit layoutChanged();
+  MemWatchTreeNode* importedRoot = parser.parseCTFile(CTFile, useDolphinPointer);
+  if (importedRoot != nullptr)
+    m_rootNode = importedRoot;
+
+  CTParsingErrors parsingErrors;
+  parsingErrors.errorStr = parser.getErrorMessages();
+  parsingErrors.isCritical = parser.hasACriticalErrorOccured();
+  if (!parsingErrors.isCritical)
+    emit layoutChanged();
+
+  return parsingErrors;
 }
 
 void MemWatchModel::writeRootToJsonRecursive(QJsonObject& json) const

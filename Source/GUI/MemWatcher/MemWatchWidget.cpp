@@ -622,11 +622,41 @@ void MemWatchWidget::importFromCTFile()
     }
 
     bool useDolphinPointers = dlg->willUseDolphinPointers();
+    MemWatchModel::CTParsingErrors parsingErrors;
     if (useDolphinPointers)
-      m_watchModel->importRootFromCTFile(CTFile, useDolphinPointers);
+      parsingErrors = m_watchModel->importRootFromCTFile(CTFile, useDolphinPointers);
     else
-      m_watchModel->importRootFromCTFile(CTFile, useDolphinPointers, dlg->getCommonBase());
+      parsingErrors =
+          m_watchModel->importRootFromCTFile(CTFile, useDolphinPointers, dlg->getCommonBase());
     CTFile->close();
+
+    if (parsingErrors.errorStr.isEmpty())
+    {
+      QMessageBox* errorBox = new QMessageBox(
+          QMessageBox::Information, "Import sucessfull",
+          "The Cheat Table was imported sucessfully without errors.", QMessageBox::Ok, this);
+      errorBox->exec();
+    }
+    else if (parsingErrors.isCritical)
+    {
+      QMessageBox* errorBox = new QMessageBox(
+          QMessageBox::Critical, "Import failed",
+          "The Cheat Table could not have been imported, here are the details of the error:\n\n" +
+              parsingErrors.errorStr,
+          QMessageBox::Ok, this);
+      errorBox->exec();
+    }
+    else
+    {
+      QMessageBox* errorBox =
+          new QMessageBox(QMessageBox::Warning, "Cheat table imported with errors",
+                          "The Cheat Table was imported with error(s), click \"Show details...\" "
+                          "to see the error(s) detail(s) (you can right-click to select all the "
+                          "details and copy it to the clipboard)",
+                          QMessageBox::Ok, this);
+      errorBox->setDetailedText(parsingErrors.errorStr);
+      errorBox->exec();
+    }
   }
 }
 
