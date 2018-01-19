@@ -82,7 +82,7 @@ void MemWatchWidget::initialiseWidgets()
   m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_ADDRESS, 120);
 
   QShortcut* shortcut = new QShortcut(QKeySequence::Delete, m_watchView);
-  connect(shortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteNode);
+  connect(shortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteSelection);
 
   m_btnAddGroup = new QPushButton("Add group", this);
   connect(m_btnAddGroup, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
@@ -456,7 +456,7 @@ bool MemWatchWidget::isAnyAncestorSelected(const QModelIndex index) const
     return isAnyAncestorSelected(index.parent());
 }
 
-void MemWatchWidget::onDeleteNode()
+void MemWatchWidget::onDeleteSelection()
 {
   QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
   if (selection.count() == 0)

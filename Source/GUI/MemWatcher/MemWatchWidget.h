@@ -21,7 +21,7 @@ public:
   void onAddGroup();
   void onAddWatchEntry();
   void addWatchEntry(MemWatchEntry* entry);
-  void onDeleteNode();
+  void onDeleteSelection();
   void onDropSucceeded();
   void openWatchFile();
   void copySelectedWatchesToClipBoard();
