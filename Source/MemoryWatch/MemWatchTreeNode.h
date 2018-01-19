@@ -20,6 +20,7 @@ public:
   MemWatchEntry* getEntry() const;
   void setEntry(MemWatchEntry* entry);
   QVector<MemWatchTreeNode*> getChildren() const;
+  void setChildren(QVector<MemWatchTreeNode*> children);
   MemWatchTreeNode* getParent() const;
   int getRow() const;
   bool isValueEditing() const;

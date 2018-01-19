@@ -73,6 +73,7 @@ void MemWatchWidget::initialiseWidgets()
           static_cast<void (MemWatchWidget::*)(const QModelIndex&)>(
               &MemWatchWidget::onWatchDoubleClicked));
   m_watchView->setItemDelegate(m_watchDelegate);
+  m_watchView->setSortingEnabled(true);
   m_watchView->setModel(m_watchModel);
 
   m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LOCK, 50);

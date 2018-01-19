@@ -80,6 +80,11 @@ QVector<MemWatchTreeNode*> MemWatchTreeNode::getChildren() const
   return m_children;
 }
 
+void MemWatchTreeNode::setChildren(QVector<MemWatchTreeNode*> children)
+{
+  m_children = children;
+}
+
 MemWatchTreeNode* MemWatchTreeNode::getParent() const
 {
   return m_parent;

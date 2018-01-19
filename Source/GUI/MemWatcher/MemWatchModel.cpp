@@ -518,6 +518,120 @@ bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, i
   return true;
 }
 
+void MemWatchModel::sort(int column, Qt::SortOrder order)
+{
+  sortRecursive(column, order, m_rootNode);
+  emit layoutChanged();
+}
+
+void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeNode* parent)
+{
+  if (!parent->hasChildren())
+    return;
+
+  QVector<MemWatchTreeNode*> children = parent->getChildren();
+
+  switch (column)
+  {
+  case WATCH_COL_LABEL:
+  {
+    std::sort(
+        children.begin(), children.end(), [=](MemWatchTreeNode* left, MemWatchTreeNode* right) {
+          if (left->isGroup() && right->isGroup())
+          {
+            int compareResult =
+                QString::compare(left->getGroupName(), right->getGroupName(), Qt::CaseInsensitive);
+            return order == Qt::AscendingOrder ? compareResult < 0 : compareResult > 0;
+          }
+          else if (left->isGroup())
+            return true;
+          else if (right->isGroup())
+            return false;
+
+          int compareResult = QString::compare(
+              QString::fromStdString(left->getEntry()->getLabel()),
+              QString::fromStdString(right->getEntry()->getLabel()), Qt::CaseInsensitive);
+          return order == Qt::AscendingOrder ? compareResult < 0 : compareResult > 0;
+        });
+    break;
+  }
+  case WATCH_COL_TYPE:
+  {
+    std::sort(children.begin(), children.end(),
+              [=](MemWatchTreeNode* left, MemWatchTreeNode* right) {
+                if (left->isGroup())
+                  return true;
+                else if (right->isGroup())
+                  return false;
+
+                int compareResult = static_cast<int>(left->getEntry()->getType()) -
+                                    static_cast<int>(right->getEntry()->getType());
+                return order == Qt::AscendingOrder ? compareResult < 0 : compareResult > 0;
+              });
+    break;
+  }
+  case WATCH_COL_ADDRESS:
+  {
+    std::sort(children.begin(), children.end(),
+              [=](MemWatchTreeNode* left, MemWatchTreeNode* right) {
+                if (left->isGroup())
+                  return true;
+                else if (right->isGroup())
+                  return false;
+
+                u32 leftAddress = left->getEntry()->getConsoleAddress();
+                u32 rightAddress = right->getEntry()->getConsoleAddress();
+
+                return order == Qt::AscendingOrder ? leftAddress < rightAddress
+                                                   : leftAddress > rightAddress;
+              });
+    break;
+  }
+  case WATCH_COL_LOCK:
+  {
+    std::sort(children.begin(), children.end(),
+              [=](MemWatchTreeNode* left, MemWatchTreeNode* right) {
+                if (left->isGroup())
+                  return true;
+                else if (right->isGroup())
+                  return false;
+
+                bool lessThan = !left->getEntry()->isLocked() && right->getEntry()->isLocked();
+                bool equal = left->getEntry()->isLocked() == right->getEntry()->isLocked();
+                return order == Qt::AscendingOrder ? lessThan : !lessThan && !equal;
+              });
+    break;
+  }
+  case WATCH_COL_VALUE:
+  {
+    std::sort(
+        children.begin(), children.end(), [=](MemWatchTreeNode* left, MemWatchTreeNode* right) {
+          if (left->isGroup() && right->isGroup())
+            return false;
+          else if (left->isGroup())
+            return true;
+          else if (right->isGroup())
+            return false;
+
+          int compareResult =
+              QString::compare(QString::fromStdString(left->getEntry()->getStringFromMemory()),
+                               QString::fromStdString(right->getEntry()->getStringFromMemory()),
+                               Qt::CaseInsensitive);
+          return order == Qt::AscendingOrder ? compareResult < 0 : compareResult > 0;
+        });
+    break;
+  }
+  }
+
+  parent->setChildren(children);
+
+  for (auto i : parent->getChildren())
+  {
+    if (i->isGroup())
+      sortRecursive(column, order, i);
+  }
+}
+
 QString MemWatchModel::getAddressString(u32 address, bool isPointer) const
 {
   std::stringstream ss;
