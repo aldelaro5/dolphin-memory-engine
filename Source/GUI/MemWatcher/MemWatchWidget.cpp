@@ -134,8 +134,8 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
 
       if (entry->isBoundToPointer())
       {
-        QMenu* memViewerSubMenu = contextMenu->addMenu("Browse memory at");
-        QAction* showPointerInViewer = new QAction("The pointer address...", this);
+        QMenu* memViewerSubMenu = contextMenu->addMenu("Browse &memory at");
+        QAction* showPointerInViewer = new QAction("The &pointer address...", this);
         connect(showPointerInViewer, &QAction::triggered, this,
                 [=] { emit goToAddressInViewer(entry->getConsoleAddress()); });
         memViewerSubMenu->addAction(showPointerInViewer);
@@ -145,19 +145,19 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
           if (strAddressOfPath == "???")
             break;
           QAction* showAddressOfPathInViewer =
-              new QAction("The pointed address at level " + QString::number(i + 1) + "...", this);
+              new QAction("The pointed address at &level " + QString::number(i + 1) + "...", this);
           connect(showAddressOfPathInViewer, &QAction::triggered, this,
                   [=] { emit goToAddressInViewer(entry->getAddressForPointerLevel(i + 1)); });
           memViewerSubMenu->addAction(showAddressOfPathInViewer);
         }
 
-        QAction* showInViewer = new QAction("Browse memory at this address...", this);
+        QAction* showInViewer = new QAction("Browse memory at this &address...", this);
         connect(showInViewer, &QAction::triggered, this,
                 [=] { emit goToAddressInViewer(entry->getConsoleAddress()); });
       }
       else
       {
-        QAction* showInViewer = new QAction("Browse memory at this address...", this);
+        QAction* showInViewer = new QAction("Browse memory at this &address...", this);
         connect(showInViewer, &QAction::triggered, this,
                 [=] { emit goToAddressInViewer(entry->getConsoleAddress()); });
 
@@ -167,10 +167,10 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       {
         contextMenu->addSeparator();
 
-        QAction* viewDec = new QAction("View as Decimal", this);
-        QAction* viewHex = new QAction("View as Hexadecimal", this);
-        QAction* viewOct = new QAction("View as Octal", this);
-        QAction* viewBin = new QAction("View as Binary", this);
+        QAction* viewDec = new QAction("View as &Decimal", this);
+        QAction* viewHex = new QAction("View as &Hexadecimal", this);
+        QAction* viewOct = new QAction("View as &Octal", this);
+        QAction* viewBin = new QAction("View as &Binary", this);
 
         connect(viewDec, &QAction::triggered, m_watchModel, [=] {
           entry->setBase(Common::MemBase::base_decimal);
@@ -201,8 +201,8 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
 
         if (theBase == Common::MemBase::base_decimal)
         {
-          QAction* viewSigned = new QAction("View as Signed", this);
-          QAction* viewUnsigned = new QAction("View as Unsigned", this);
+          QAction* viewSigned = new QAction("View as &Signed", this);
+          QAction* viewUnsigned = new QAction("View as &Unsigned", this);
 
           connect(viewSigned, &QAction::triggered, m_watchModel, [=] {
             entry->setSignedUnsigned(false);
@@ -239,18 +239,31 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
     node = m_watchModel->getRootNode();
   }
 
-  QAction* copy = new QAction("Copy", this);
-  connect(copy, &QAction::triggered, this, [=] { copySelectedWatchesToClipBoard(); });
-  contextMenu->addAction(copy);
-  QAction* cut = new QAction("Cut", this);
+  QAction* cut = new QAction("Cu&t", this);
   connect(cut, &QAction::triggered, this, [=] { cutSelectedWatchesToClipBoard(); });
   contextMenu->addAction(cut);
+  QAction* copy = new QAction("&Copy", this);
+  connect(copy, &QAction::triggered, this, [=] { copySelectedWatchesToClipBoard(); });
+  contextMenu->addAction(copy);
 
   if (canPasteInto)
   {
-    QAction* paste = new QAction("Paste", this);
+    QAction* paste = new QAction("&Paste", this);
     connect(paste, &QAction::triggered, this, [=] { pasteWatchFromClipBoard(node); });
     contextMenu->addAction(paste);
+  }
+
+  contextMenu->addSeparator();
+  QAction* deleteSelection = new QAction("&Delete", this);
+  connect(deleteSelection, &QAction::triggered, this, [=] { onDeleteSelection(); });
+  contextMenu->addAction(deleteSelection);
+
+  QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
+  if (selection.count() == 0)
+  {
+    copy->setEnabled(false);
+    cut->setEnabled(false);
+    deleteSelection->setEnabled(false);
   }
 
   contextMenu->popup(m_watchView->viewport()->mapToGlobal(pos));
@@ -362,7 +375,8 @@ void MemWatchWidget::onValueWriteError(const QModelIndex& index,
                      GUICommon::g_memTypeNames.at(typeIndex));
     if (entry->getType() == Common::MemType::type_byteArray)
       errorMsg +=
-          (" is invalid, you must enter the bytes in hexadecimal with one space between each byte");
+          (" is invalid, you must enter the bytes in hexadecimal with one space between each "
+           "byte");
     else
       errorMsg += (" in the base " + GUICommon::g_memBaseNames.at(baseIndex) + " is invalid");
     QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, QString("Invalid value"),
@@ -477,8 +491,10 @@ void MemWatchWidget::onDeleteSelection()
   QString confirmationMsg = "Are you sure you want to delete these watches and/or groups?";
   if (hasGroupWithChild)
     confirmationMsg +=
-        "\n\nThe current selection contains one or more groups with watches in them, deleting the "
-        "groups will also delete their watches, if you want to avoid this, move the watches out of "
+        "\n\nThe current selection contains one or more groups with watches in them, deleting "
+        "the "
+        "groups will also delete their watches, if you want to avoid this, move the watches out "
+        "of "
         "the groups.";
 
   QMessageBox* confirmationBox =
