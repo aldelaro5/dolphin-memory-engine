@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <QRadioButton>
 
-#include "../../Common/CommonTypes.h"
+#include "../../../Common/CommonTypes.h"
 
 class DlgImportCTFile : public QDialog
 {

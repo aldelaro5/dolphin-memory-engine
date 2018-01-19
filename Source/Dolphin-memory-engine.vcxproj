@@ -122,10 +122,10 @@
     <ClInclude Include="**\*.h" Exclude="GUI\**\*.h" />
     <!-- These files don't need to be Moc'ed -->
     <ClInclude Include="GUI\GUICommon.h" />
-    <ClInclude Include="GUI\MemWatcher\DlgAddWatchEntry.h" />
+    <ClInclude Include="GUI\MemWatcher\Dialogs\DlgAddWatchEntry.h" />
     <ClInclude Include="GUI\MemWatcher\MemWatchDelegate.h" />
     <ClInclude Include="GUI\MemWatcher\MemWatchTreeNode.h" />
-    <ClInclude Include="GUI\MemWatcher\DlgImportCTFile.h" />
+    <ClInclude Include="GUI\MemWatcher\Dialogs\DlgImportCTFile.h" />
   </ItemGroup>
   <ItemGroup>
     <!-- All files except for GUICommon need to be Moc'ed -->

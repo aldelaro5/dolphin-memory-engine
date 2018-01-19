@@ -10,7 +10,7 @@
 #include <QSpinBox>
 #include <QVector>
 
-#include "../../MemoryWatch/MemWatchEntry.h"
+#include "../../../MemoryWatch/MemWatchEntry.h"
 
 class DlgAddWatchEntry : public QDialog
 {

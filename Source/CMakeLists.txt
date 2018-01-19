@@ -19,10 +19,10 @@ set(SRCS ${DolphinProcessSrc}
          GUI/GUICommon.cpp
          GUI/MemWatcher/MemWatchDelegate.cpp
          GUI/MemWatcher/MemWatchModel.cpp    
-         GUI/MemWatcher/DlgChangeType.cpp 
-         GUI/MemWatcher/DlgAddWatchEntry.cpp 
+         GUI/MemWatcher/Dialogs/DlgChangeType.cpp 
+         GUI/MemWatcher/Dialogs/DlgAddWatchEntry.cpp 
          GUI/MemWatcher/MemWatchWidget.cpp  
-         GUI/MemWatcher/DlgImportCTFile.cpp
+         GUI/MemWatcher/Dialogs/DlgImportCTFile.cpp
          GUI/MemScanner/ResultsListModel.cpp 
          GUI/MemScanner/MemScanWidget.cpp
          GUI/MemViewer/MemViewer.cpp

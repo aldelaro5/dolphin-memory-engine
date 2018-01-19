@@ -6,8 +6,8 @@
 #include <QVBoxLayout>
 #include <sstream>
 
-#include "../../DolphinProcess/DolphinAccessor.h"
-#include "../GUICommon.h"
+#include "../../../DolphinProcess/DolphinAccessor.h"
+#include "../../GUICommon.h"
 
 DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry)
 {

@@ -24,9 +24,9 @@
 #include "../../Common/MemoryCommon.h"
 #include "../../MemoryWatch/MemWatchEntry.h"
 #include "../GUICommon.h"
-#include "DlgAddWatchEntry.h"
-#include "DlgChangeType.h"
-#include "DlgImportCTFile.h"
+#include "Dialogs/DlgAddWatchEntry.h"
+#include "Dialogs/DlgChangeType.h"
+#include "Dialogs/DlgImportCTFile.h"
 
 MemWatchWidget::MemWatchWidget(QWidget* parent) : QWidget(parent)
 {
