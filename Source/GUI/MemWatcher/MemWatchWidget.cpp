@@ -624,6 +624,9 @@ void MemWatchWidget::clearWatchList()
 
 void MemWatchWidget::importFromCTFile()
 {
+  if (!warnIfUnsavedChanges())
+    return;
+
   DlgImportCTFile* dlg = new DlgImportCTFile(this);
   if (dlg->exec() == QDialog::Accepted)
   {
