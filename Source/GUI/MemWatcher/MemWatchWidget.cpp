@@ -516,6 +516,19 @@ void MemWatchWidget::openWatchFile()
                                                   "Dolphin memory watches file (*.dmw)");
   if (fileName != "")
   {
+    if (m_watchModel->hasAnyNodes())
+    {
+      QMessageBox* questionBox = new QMessageBox(
+          QMessageBox::Question, "Asking to merge lists",
+          "The current watch list has entries in it, do you want to merge it with this one?",
+          QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, this);
+      int answer = questionBox->exec();
+      if (answer == QMessageBox::Cancel)
+        return;
+      else if (answer == QMessageBox::No)
+        m_watchModel->clearRoot();
+    }
+
     QFile watchFile(fileName);
     if (!watchFile.exists())
     {
