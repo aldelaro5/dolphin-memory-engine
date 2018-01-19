@@ -675,7 +675,7 @@ void MemWatchWidget::importFromCTFile()
     {
       QMessageBox* errorBox =
           new QMessageBox(QMessageBox::Warning, "Cheat table imported with errors",
-                          "The Cheat Table was imported with error(s), click \"Show details...\" "
+                          "The Cheat Table was imported with error(s), click \"Show Details...\" "
                           "to see the error(s) detail(s) (you can right-click to select all the "
                           "details and copy it to the clipboard)",
                           QMessageBox::Ok, this);
