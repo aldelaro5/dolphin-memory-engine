@@ -21,7 +21,7 @@ This file explains the features that are planned so far in the future of the pro
 	* This would greatly help people who want to document their research. It would be possible with simple search and replace to have a TASVideos compatible table for resource pages.
 * Add more organization data about watches, such as a color display.
 * DONE - Add support for sorting on the watch list.
-* Add an optional alignment setting in the scanner.
+* DONE - Add an optional alignment setting in the scanner.
 	* This must be optional as the GameCube and Wii support unaligned addresses, but as told in dolphin-dev IRC, it's typically not used, would make the results count much closer to Cheat Engine's defaults.
 * Consider the possibility of having timer duration settings.
 	* Not too hard to implement, but needs more testing and UI consideration.
