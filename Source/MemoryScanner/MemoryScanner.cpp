@@ -88,7 +88,8 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   char* noOffset = new char[m_memSize];
   std::memset(noOffset, 0, m_memSize);
 
-  for (u32 i = 0; i < (ramSize - m_memSize); ++i)
+  int increment = m_enforceMemAlignement ? Common::getNbrBytesAlignementForType(m_memType) : 1;
+  for (u32 i = 0; i < (ramSize - m_memSize); i += increment)
   {
     char* memoryCandidate = &m_scanRAMCache[i];
     bool isResult = false;
@@ -223,7 +224,9 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   if (m_wasUnknownInitialValue)
   {
     m_wasUnknownInitialValue = false;
-    for (u32 i = 0; i < (ramSize - m_memSize); ++i)
+
+    int increment = m_enforceMemAlignement ? Common::getNbrBytesAlignementForType(m_memType) : 1;
+    for (u32 i = 0; i < (ramSize - m_memSize); i += increment)
     {
       u32 consoleOffset = 0;
       if (i >= Common::MEM1_SIZE)
@@ -419,6 +422,11 @@ void MemScanner::setType(const Common::MemType type)
 void MemScanner::setBase(const Common::MemBase base)
 {
   m_memBase = base;
+}
+
+void MemScanner::setEnforceMemAlignement(const bool enforceAlignement)
+{
+  m_enforceMemAlignement = enforceAlignement;
 }
 
 void MemScanner::setIsSigned(const bool isSigned)

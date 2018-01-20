@@ -33,13 +33,12 @@ void MemScanWidget::initialiseWidgets()
   m_tblResulstList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   m_tblResulstList->horizontalHeader()->setStretchLastSection(true);
-  m_tblResulstList->horizontalHeader()->resizeSection(0, 100);
-  m_tblResulstList->horizontalHeader()->setSectionResizeMode(ResultsListModel::RESULT_COL_ADDRESS,
-                                                             QHeaderView::Fixed);
+  m_tblResulstList->horizontalHeader()->resizeSection(ResultsListModel::RESULT_COL_ADDRESS, 125);
   m_tblResulstList->horizontalHeader()->resizeSection(ResultsListModel::RESULT_COL_SCANNED, 150);
 
   m_tblResulstList->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_tblResulstList->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  m_tblResulstList->setMinimumWidth(385);
   connect(m_tblResulstList,
           static_cast<void (QAbstractItemView::*)(const QModelIndex&)>(
               &QAbstractItemView::doubleClicked),
@@ -106,6 +105,9 @@ void MemScanWidget::initialiseWidgets()
   m_chkSignedScan = new QCheckBox("Signed value scan");
   m_chkSignedScan->setChecked(false);
 
+  m_chkEnforceMemAlignement = new QCheckBox("Enforce alignement");
+  m_chkEnforceMemAlignement->setChecked(true);
+
   m_currentValuesUpdateTimer = new QTimer(this);
   connect(m_currentValuesUpdateTimer, &QTimer::timeout, this,
           &MemScanWidget::onCurrentValuesUpdateTimer);
@@ -147,13 +149,17 @@ void MemScanWidget::makeLayouts()
   layout_buttonsBase->addWidget(m_rdbBaseBinary);
   m_groupScanBase->setLayout(layout_buttonsBase);
 
+  QHBoxLayout* layout_extraParams = new QHBoxLayout();
+  layout_extraParams->addWidget(m_chkEnforceMemAlignement);
+  layout_extraParams->addWidget(m_chkSignedScan);
+
   QVBoxLayout* scannerParams_layout = new QVBoxLayout();
   scannerParams_layout->addLayout(buttons_layout);
   scannerParams_layout->addWidget(m_cmbScanType);
   scannerParams_layout->addWidget(m_cmbScanFilter);
   scannerParams_layout->addLayout(searchTerms_layout);
   scannerParams_layout->addWidget(m_groupScanBase);
-  scannerParams_layout->addWidget(m_chkSignedScan);
+  scannerParams_layout->addLayout(layout_extraParams);
   scannerParams_layout->addStretch();
   scannerParams_layout->setContentsMargins(0, 0, 0, 0);
 
@@ -284,6 +290,7 @@ void MemScanWidget::onFirstScan()
 {
   m_memScanner->setType(static_cast<Common::MemType>(m_cmbScanType->currentIndex()));
   m_memScanner->setIsSigned(m_chkSignedScan->isChecked());
+  m_memScanner->setEnforceMemAlignement(m_chkEnforceMemAlignement->isChecked());
   m_memScanner->setBase(static_cast<Common::MemBase>(m_btnGroupScanBase->checkedId()));
   Common::MemOperationReturnCode scannerReturn =
       m_memScanner->firstScan(getSelectedFilter(), m_txbSearchTerm1->text().toStdString(),
@@ -306,6 +313,7 @@ void MemScanWidget::onFirstScan()
     m_btnResetScan->show();
     m_cmbScanType->setDisabled(true);
     m_chkSignedScan->setDisabled(true);
+    m_chkEnforceMemAlignement->setDisabled(true);
     m_groupScanBase->setDisabled(true);
     updateScanFilterChoices();
   }
@@ -343,6 +351,7 @@ void MemScanWidget::onResetScan()
   m_btnResetScan->hide();
   m_cmbScanType->setEnabled(true);
   m_chkSignedScan->setEnabled(true);
+  m_chkEnforceMemAlignement->setEnabled(true);
   m_groupScanBase->setEnabled(true);
   m_resultsListModel->updateAfterScannerReset();
   updateScanFilterChoices();

@@ -57,6 +57,29 @@ bool shouldBeBSwappedForType(const MemType type)
   }
 }
 
+int getNbrBytesAlignementForType(const MemType type)
+{
+  switch (type)
+  {
+  case MemType::type_byte:
+    return 1;
+  case MemType::type_halfword:
+    return 2;
+  case MemType::type_word:
+    return 4;
+  case MemType::type_float:
+    return 4;
+  case MemType::type_double:
+    return 4;
+  case MemType::type_string:
+    return 1;
+  case MemType::type_byteArray:
+    return 1;
+  default:
+    return 1;
+  }
+}
+
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
                            const std::string inputString, const MemBase base, const MemType type,
                            const size_t length)

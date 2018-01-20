@@ -124,6 +124,7 @@ public:
 
   void setType(const Common::MemType type);
   void setBase(const Common::MemBase base);
+  void setEnforceMemAlignement(const bool enforceAlignement);
   void setIsSigned(const bool isSigned);
 
   std::vector<u32> getResultsConsoleAddr() const;
@@ -148,6 +149,7 @@ private:
   Common::MemType m_memType = Common::MemType::type_byte;
   Common::MemBase m_memBase = Common::MemBase::base_decimal;
   size_t m_memSize;
+  bool m_enforceMemAlignement = true;
   bool m_memIsSigned = false;
   std::vector<u32> m_resultsConsoleAddr;
   bool m_wasUnknownInitialValue = false;
