@@ -491,6 +491,7 @@ void MemViewer::renderHexByte(QPainter& painter, const int rowIndex, const int c
   painter.setPen(fgColor);
   painter.drawText(posXHex, (rowIndex + 1) * m_charHeight + m_columnHeaderHeight,
                    QString::fromStdString(hexByte));
+  delete currentByteRect;
 }
 
 void MemViewer::renderASCIIText(QPainter& painter, const int rowIndex, const int columnIndex,
@@ -511,6 +512,7 @@ void MemViewer::renderASCIIText(QPainter& painter, const int rowIndex, const int
   painter.drawText((columnIndex * m_charWidthEm) + m_hexAsciiSeparatorPosX + m_charWidthEm / 2,
                    (rowIndex + 1) * m_charHeight + m_columnHeaderHeight,
                    QString::fromStdString(asciiStr));
+  delete currentCharRect;
 }
 
 void MemViewer::renderMemory(QPainter& painter, const int rowIndex, const int columnIndex)
