@@ -30,10 +30,8 @@ bool WindowsDolphinProcess::findPID()
 
   CloseHandle(snapshot);
   if (m_PID == -1)
-  {
     // Here, Dolphin doesn't appear to be running on the system
     return false;
-  }
 
   // Get the handle if Dolphin is running since it's required on Windows to read or write into the
   // RAM of the process and to query the RAM mapping information

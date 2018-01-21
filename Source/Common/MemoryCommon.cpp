@@ -88,20 +88,14 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
   switch (base)
   {
   case MemBase::base_octal:
-  {
     ss >> std::oct;
     break;
-  }
   case MemBase::base_decimal:
-  {
     ss >> std::dec;
     break;
-  }
   case MemBase::base_hexadecimal:
-  {
     ss >> std::hex;
     break;
-  }
   }
 
   char* buffer = new char[getSizeForType(type, length)];
@@ -331,20 +325,14 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
   switch (base)
   {
   case Common::MemBase::base_octal:
-  {
     ss << std::oct;
     break;
-  }
   case Common::MemBase::base_decimal:
-  {
     ss << std::dec;
     break;
-  }
   case Common::MemBase::base_hexadecimal:
-  {
     ss << std::hex << std::uppercase;
     break;
-  }
   }
 
   switch (type)

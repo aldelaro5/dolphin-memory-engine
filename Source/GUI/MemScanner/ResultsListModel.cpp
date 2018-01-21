@@ -31,20 +31,11 @@ QVariant ResultsListModel::data(const QModelIndex& index, int role) const
     switch (index.column())
     {
     case RESULT_COL_ADDRESS:
-    {
       return QString::number(m_scanner->getResultsConsoleAddr().at(index.row()), 16).toUpper();
-      break;
-    }
     case RESULT_COL_SCANNED:
-    {
       return QString::fromStdString(m_scanner->getFormattedScannedValueAt(index.row()));
-      break;
-    }
     case RESULT_COL_CURRENT:
-    {
       return QString::fromStdString(m_scanner->getFormattedCurrentValueAt(index.row()));
-      break;
-    }
     }
   }
   return QVariant();
@@ -63,13 +54,10 @@ QVariant ResultsListModel::headerData(int section, Qt::Orientation orientation, 
     {
     case RESULT_COL_ADDRESS:
       return QString("Address");
-      break;
     case RESULT_COL_SCANNED:
       return QString("Scanned");
-      break;
     case RESULT_COL_CURRENT:
       return QString("Current");
-      break;
     }
   }
   return QVariant();

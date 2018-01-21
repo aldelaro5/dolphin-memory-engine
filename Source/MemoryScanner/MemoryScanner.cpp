@@ -57,16 +57,13 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   size_t termActualLength = 0;
   size_t termMaxLength = 0;
   if (m_memType == Common::MemType::type_string)
-  {
     // This is just to have the string formatted with the appropriate length, byte arrays don't need
     // this because they get copied byte per byte
     termMaxLength = searchTerm1.length();
-  }
   else
-  {
     // Have no restriction on the length for the rest
     termMaxLength = ramSize;
-  }
+
   char* memoryToCompare1 = Common::formatStringToMemory(scanReturn, termActualLength, searchTerm1,
                                                         m_memBase, m_memType, termMaxLength);
   if (scanReturn != Common::MemOperationReturnCode::OK)
@@ -194,16 +191,13 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   size_t termActualLength = 0;
   size_t termMaxLength = 0;
   if (m_memType == Common::MemType::type_string)
-  {
     // This is just to have the string formatted with the appropriate length, byte arrays don't need
     // this because they get copied byte per byte
     termMaxLength = searchTerm1.length();
-  }
   else
-  {
     // Have no restriction on the length for the rest
     termMaxLength = ramSize;
-  }
+
   char* memoryToCompare1 = nullptr;
   if (filter != ScanFiter::increased && filter != ScanFiter::decreased &&
       filter != ScanFiter::changed && filter != ScanFiter::unchanged)
@@ -304,7 +298,6 @@ inline bool MemScanner::isHitNextScan(const MemScanner::ScanFiter filter,
     else
       return (compareMemoryAsNumbers(newerMemory, memoryToCompare1, noOffset, false, false,
                                      realSize) == MemScanner::CompareResult::equal);
-    break;
   }
   case ScanFiter::between:
   {
@@ -316,43 +309,36 @@ inline bool MemScanner::isHitNextScan(const MemScanner::ScanFiter filter,
              result1 == MemScanner::CompareResult::equal) &&
             (result2 == MemScanner::CompareResult::smaller ||
              result2 == MemScanner::CompareResult::equal));
-    break;
   }
   case ScanFiter::biggerThan:
   {
     return (compareMemoryAsNumbers(newerMemory, memoryToCompare1, noOffset, false, false,
                                    realSize) == MemScanner::CompareResult::bigger);
-    break;
   }
   case ScanFiter::smallerThan:
   {
     return (compareMemoryAsNumbers(newerMemory, memoryToCompare1, noOffset, false, false,
                                    realSize) == MemScanner::CompareResult::smaller);
-    break;
   }
   case ScanFiter::increasedBy:
   {
     return (compareMemoryAsNumbers(newerMemory, olderMemory, memoryToCompare1, false, true,
                                    realSize) == MemScanner::CompareResult::equal);
-    break;
   }
   case ScanFiter::decreasedBy:
   {
     return (compareMemoryAsNumbers(newerMemory, olderMemory, memoryToCompare1, true, true,
                                    realSize) == MemScanner::CompareResult::equal);
-    break;
   }
   case ScanFiter::increased:
   {
     return (compareMemoryAsNumbers(newerMemory, olderMemory, noOffset, false, true, realSize) ==
             MemScanner::CompareResult::bigger);
-    break;
   }
   case ScanFiter::decreased:
   {
     return (compareMemoryAsNumbers(newerMemory, olderMemory, noOffset, false, true, realSize) ==
             MemScanner::CompareResult::smaller);
-    break;
   }
   case ScanFiter::changed:
   {
@@ -360,13 +346,11 @@ inline bool MemScanner::isHitNextScan(const MemScanner::ScanFiter filter,
         compareMemoryAsNumbers(newerMemory, olderMemory, noOffset, false, true, realSize);
     return (result == MemScanner::CompareResult::bigger ||
             result == MemScanner::CompareResult::smaller);
-    break;
   }
   case ScanFiter::unchanged:
   {
     return (compareMemoryAsNumbers(newerMemory, olderMemory, noOffset, false, true, realSize) ==
             MemScanner::CompareResult::equal);
-    break;
   }
   default:
   {
@@ -382,46 +366,23 @@ MemScanner::compareMemoryAsNumbers(const char* first, const char* second, const 
   switch (m_memType)
   {
   case Common::MemType::type_byte:
-  {
     if (m_memIsSigned)
-    {
       return compareMemoryAsNumbersWithType<s8>(first, second, offset, offsetInvert, bswapSecond);
-    }
     return compareMemoryAsNumbersWithType<u8>(first, second, offset, offsetInvert, bswapSecond);
-    break;
-  }
   case Common::MemType::type_halfword:
-  {
     if (m_memIsSigned)
-    {
       return compareMemoryAsNumbersWithType<s16>(first, second, offset, offsetInvert, bswapSecond);
-    }
     return compareMemoryAsNumbersWithType<u16>(first, second, offset, offsetInvert, bswapSecond);
-    break;
-  }
   case Common::MemType::type_word:
-  {
     if (m_memIsSigned)
-    {
       return compareMemoryAsNumbersWithType<s32>(first, second, offset, offsetInvert, bswapSecond);
-    }
     return compareMemoryAsNumbersWithType<u32>(first, second, offset, offsetInvert, bswapSecond);
-    break;
-  }
   case Common::MemType::type_float:
-  {
     return compareMemoryAsNumbersWithType<float>(first, second, offset, offsetInvert, bswapSecond);
-    break;
-  }
   case Common::MemType::type_double:
-  {
     return compareMemoryAsNumbersWithType<double>(first, second, offset, offsetInvert, bswapSecond);
-    break;
-  }
   default:
-  {
     return MemScanner::CompareResult::nan;
-  }
   }
 }
 

@@ -189,6 +189,7 @@ u32 MemWatchEntry::getAddressForPointerLevel(const int level)
 {
   if (!m_boundToPointer && level > m_pointerOffsets.size() && level > 0)
     return 0;
+
   u32 address = m_consoleAddress;
   char addressBuffer[sizeof(u32)] = {0};
   for (int i = 0; i < level; ++i)
@@ -258,13 +259,8 @@ Common::MemOperationReturnCode MemWatchEntry::readMemoryFromRAM()
   if (DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(realConsoleAddress),
                                                 m_memory, getSizeForType(m_type, m_length),
                                                 shouldBeBSwappedForType(m_type)))
-  {
     return Common::MemOperationReturnCode::OK;
-  }
-  else
-  {
-    return Common::MemOperationReturnCode::operationFailed;
-  }
+  return Common::MemOperationReturnCode::operationFailed;
 }
 
 Common::MemOperationReturnCode MemWatchEntry::writeMemoryToRAM(const char* memory,
@@ -301,13 +297,8 @@ Common::MemOperationReturnCode MemWatchEntry::writeMemoryToRAM(const char* memor
 
   if (DolphinComm::DolphinAccessor::writeToRAM(Common::dolphinAddrToOffset(realConsoleAddress),
                                                memory, size, shouldBeBSwappedForType(m_type)))
-  {
     return Common::MemOperationReturnCode::OK;
-  }
-  else
-  {
-    return Common::MemOperationReturnCode::operationFailed;
-  }
+  return Common::MemOperationReturnCode::operationFailed;
 }
 
 std::string MemWatchEntry::getStringFromMemory() const

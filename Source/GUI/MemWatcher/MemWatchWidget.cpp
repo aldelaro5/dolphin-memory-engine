@@ -278,9 +278,7 @@ void MemWatchWidget::cutSelectedWatchesToClipBoard()
   if (cutList->count() > 0)
   {
     for (auto i : *cutList)
-    {
       m_watchModel->removeNode(i);
-    }
 
     m_hasUnsavedChanges = true;
   }
@@ -434,9 +432,7 @@ void MemWatchWidget::onAddWatchEntry()
 {
   DlgAddWatchEntry* dlg = new DlgAddWatchEntry(nullptr);
   if (dlg->exec() == QDialog::Accepted)
-  {
     addWatchEntry(dlg->getEntry());
-  }
 }
 
 void MemWatchWidget::addWatchEntry(MemWatchEntry* entry)

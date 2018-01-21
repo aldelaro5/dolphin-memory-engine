@@ -22,17 +22,13 @@ MemWatchModel::~MemWatchModel()
 void MemWatchModel::onUpdateTimer()
 {
   if (!updateNodeValueRecursive(m_rootNode))
-  {
     emit readFailed();
-  }
 }
 
 void MemWatchModel::onFreezeTimer()
 {
   if (!freezeNodeValueRecursive(m_rootNode))
-  {
     emit writeFailed(QModelIndex(), Common::MemOperationReturnCode::operationFailed);
-  }
 }
 
 bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QModelIndex& parent,
@@ -185,9 +181,7 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
   if (!item->isGroup())
   {
     if (role == Qt::EditRole && index.column() == WATCH_COL_TYPE)
-    {
       return QVariant(static_cast<int>(item->getEntry()->getType()));
-    }
 
     MemWatchEntry* entry = item->getEntry();
     if (role == Qt::DisplayRole || role == Qt::EditRole)
@@ -197,26 +191,22 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       case WATCH_COL_LABEL:
       {
         return QString::fromStdString(entry->getLabel());
-        break;
       }
       case WATCH_COL_TYPE:
       {
         Common::MemType type = entry->getType();
         size_t length = entry->getLength();
         return GUICommon::getStringFromType(type, length);
-        break;
       }
       case WATCH_COL_ADDRESS:
       {
         u32 address = entry->getConsoleAddress();
         bool isPointer = entry->isBoundToPointer();
         return getAddressString(address, isPointer);
-        break;
       }
       case WATCH_COL_VALUE:
       {
         return QString::fromStdString(entry->getStringFromMemory());
-        break;
       }
       }
     }
@@ -256,7 +246,6 @@ bool MemWatchModel::setData(const QModelIndex& index, const QVariant& value, int
         entry->setLabel((value.toString().toStdString()));
         emit dataChanged(index, index);
         return true;
-        break;
       }
       case WATCH_COL_VALUE:
       {
@@ -269,10 +258,11 @@ bool MemWatchModel::setData(const QModelIndex& index, const QVariant& value, int
         }
         emit dataChanged(index, index);
         return true;
-        break;
       }
       default:
+      {
         return false;
+      }
       }
     }
     else if (role == Qt::CheckStateRole && index.column() == WATCH_COL_LOCK)
@@ -362,19 +352,14 @@ QVariant MemWatchModel::headerData(int section, Qt::Orientation orientation, int
     {
     case WATCH_COL_LABEL:
       return QString("Name");
-      break;
     case WATCH_COL_TYPE:
       return QString("Type");
-      break;
     case WATCH_COL_ADDRESS:
       return QString("Address");
-      break;
     case WATCH_COL_VALUE:
       return QString("Value");
-      break;
     case WATCH_COL_LOCK:
       return QString("Lock");
-      break;
     }
   }
   return QVariant();

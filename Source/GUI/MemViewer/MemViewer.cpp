@@ -381,9 +381,7 @@ void MemViewer::scrollContentsBy(int dx, int dy)
       newAddress = m_memViewEnd - m_numCells;
 
     if (newAddress != m_currentFirstAddress)
-    {
       jumpToAddress(newAddress);
-    }
   }
 }
 
@@ -486,9 +484,8 @@ void MemViewer::renderHexByte(QPainter& painter, const int rowIndex, const int c
 
   painter.fillRect(*currentByteRect, bgColor);
   if (drawCarret)
-  {
     renderCarret(painter, rowIndex, columnIndex);
-  }
+
   painter.setPen(fgColor);
   painter.drawText(posXHex, (rowIndex + 1) * m_charHeight + m_columnHeaderHeight,
                    QString::fromStdString(hexByte));
@@ -556,8 +553,6 @@ void MemViewer::paintEvent(QPaintEvent* event)
   {
     renderRowHeaderText(painter, i);
     for (int j = 0; j < m_numColumns; ++j)
-    {
       renderMemory(painter, i, j);
-    }
   }
 }

@@ -270,9 +270,7 @@ void DlgAddWatchEntry::onOffsetChanged()
   m_offsetsLayout->getItemPosition(m_offsetsLayout->indexOf(theLineEdit), &index, &column, &rowSpan,
                                    &columnSpan);
   if (validateAndSetOffset(index))
-  {
     updatePreview();
-  }
 }
 
 void DlgAddWatchEntry::onTypeChange(int index)
@@ -295,9 +293,8 @@ void DlgAddWatchEntry::accept()
         "The address you entered is invalid, make sure it is an "
         "hexadecimal number between 0x80000000 and 0x817FFFFF");
     if (DolphinComm::DolphinAccessor::isMEM2Present())
-    {
       errorMsg.append(" or between 0x90000000 and 0x93FFFFFF");
-    }
+
     QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, QString("Invalid address"),
                                             errorMsg, QMessageBox::Ok, this);
     errorBox->exec();
@@ -373,13 +370,9 @@ bool DlgAddWatchEntry::validateAndSetOffset(int index)
 void DlgAddWatchEntry::onAddressChanged()
 {
   if (validateAndSetAddress())
-  {
     updatePreview();
-  }
   else
-  {
     m_lblValuePreview->setText("???");
-  }
 }
 
 void DlgAddWatchEntry::updatePreview()

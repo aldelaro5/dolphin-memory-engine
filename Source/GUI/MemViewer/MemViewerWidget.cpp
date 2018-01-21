@@ -63,9 +63,7 @@ void MemViewerWidget::onJumpToAddressTextChanged()
   u32 jumpAddress = 0;
   ss >> std::hex >> std::uppercase >> jumpAddress;
   if (!ss.fail())
-  {
     m_memViewer->jumpToAddress(jumpAddress);
-  }
 }
 
 void MemViewerWidget::onGoToMEM1Start()
@@ -90,9 +88,7 @@ void MemViewerWidget::onMEM2StatusChanged(bool enabled)
 {
   m_btnGoToMEM2Start->setEnabled(enabled);
   if (!enabled && m_memViewer->getCurrentFirstAddress() >= Common::MEM2_START)
-  {
     m_memViewer->jumpToAddress(Common::MEM1_START);
-  }
 }
 
 void MemViewerWidget::goToAddress(u32 address)

@@ -392,9 +392,7 @@ void MemScanWidget::onCurrentValuesUpdateTimer()
   {
     Common::MemOperationReturnCode updateReturn = m_resultsListModel->updateScannerCurrentCache();
     if (updateReturn != Common::MemOperationReturnCode::OK)
-    {
       handleScannerErrors(updateReturn);
-    }
   }
 }
 

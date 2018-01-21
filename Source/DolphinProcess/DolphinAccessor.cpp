@@ -89,11 +89,10 @@ bool DolphinAccessor::isValidConsoleAddress(const u32 address)
 {
   if (getStatus() != DolphinStatus::hooked)
     return false;
+
   bool isMem1Address = address >= Common::MEM1_START && address < Common::MEM1_END;
   if (isMEM2Present())
-  {
     return isMem1Address || (address >= Common::MEM2_START && address < Common::MEM2_END);
-  }
   return isMem1Address;
 }
 
@@ -116,6 +115,7 @@ Common::MemOperationReturnCode DolphinAccessor::updateRAMCache()
   {
     m_updatedRAMCache = new char[Common::MEM1_SIZE];
   }
+
   // Read GameCube and Wii basic RAM
   if (!DolphinComm::DolphinAccessor::readFromRAM(0, m_updatedRAMCache, Common::MEM1_SIZE, false))
     return Common::MemOperationReturnCode::operationFailed;

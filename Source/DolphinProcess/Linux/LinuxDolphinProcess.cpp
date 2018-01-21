@@ -69,9 +69,8 @@ bool LinuxDolphinProcess::findPID()
 {
   DIR* directoryPointer = opendir("/proc/");
   if (directoryPointer == nullptr)
-  {
     return false;
-  }
+
   struct dirent* directoryEntry = nullptr;
   while (m_PID == -1 && (directoryEntry = readdir(directoryPointer)))
   {
@@ -84,18 +83,15 @@ bool LinuxDolphinProcess::findPID()
     aCmdLineFile.open("/proc/" + std::string(directoryEntry->d_name) + "/comm");
     getline(aCmdLineFile, line);
     if (line == "dolphin-emu")
-    {
       m_PID = aPID;
-    }
+
     aCmdLineFile.close();
   }
   closedir(directoryPointer);
 
   if (m_PID == -1)
-  {
     // Here, Dolphin apparently isn't running on the system
     return false;
-  }
   return true;
 }
 

@@ -130,9 +130,7 @@ void DlgImportCTFile::onBrowseFiles()
   QString fileName = QFileDialog::getOpenFileName(this, "Open Cheat Table", QString(),
                                                   "Cheat Engine's cheat table (*.CT)");
   if (fileName != "")
-  {
     m_txbFileName->setText(fileName);
-  }
 }
 
 void DlgImportCTFile::accept()
