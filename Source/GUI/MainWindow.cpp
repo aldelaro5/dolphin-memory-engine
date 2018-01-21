@@ -33,8 +33,8 @@ void MainWindow::makeMenus()
   m_actOpenWatchList = new QAction("&Open...", this);
   m_actSaveWatchList = new QAction("&Save", this);
   m_actSaveAsWatchList = new QAction("&Save as...", this);
-  m_actClearWatchList = new QAction("&Clear the watch list");
-  m_actImportFromCT = new QAction("&Import from Cheat Engine's CT file...");
+  m_actClearWatchList = new QAction("&Clear the watch list", this);
+  m_actImportFromCT = new QAction("&Import from Cheat Engine's CT file...", this);
   m_actExportAsCSV = new QAction("&Export as CSV...", this);
 
   m_actViewScanner = new QAction("&Scanner", this);

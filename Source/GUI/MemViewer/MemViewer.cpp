@@ -36,6 +36,7 @@ MemViewer::~MemViewer()
   delete[] m_updatedRawMemoryData;
   delete[] m_lastRawMemoryData;
   delete[] m_memoryMsElapsedLastChange;
+  delete m_curosrRect;
 }
 
 void MemViewer::initialise()

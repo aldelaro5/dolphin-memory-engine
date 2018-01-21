@@ -10,6 +10,7 @@ class CheatEngineParser
 {
 public:
   CheatEngineParser();
+  ~CheatEngineParser();
 
   QString getErrorMessages() const;
   bool hasACriticalErrorOccured() const;

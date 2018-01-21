@@ -12,6 +12,11 @@ CheatEngineParser::CheatEngineParser()
   m_xmlReader = new QXmlStreamReader();
 }
 
+CheatEngineParser::~CheatEngineParser()
+{
+  delete m_xmlReader;
+}
+
 QString CheatEngineParser::getErrorMessages() const
 {
   return m_errorMessages;

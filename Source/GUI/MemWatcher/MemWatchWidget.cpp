@@ -646,7 +646,7 @@ void MemWatchWidget::importFromCTFile()
   DlgImportCTFile* dlg = new DlgImportCTFile(this);
   if (dlg->exec() == QDialog::Accepted)
   {
-    QFile* CTFile = new QFile(dlg->getFileName());
+    QFile* CTFile = new QFile(dlg->getFileName(), this);
     if (!CTFile->exists())
     {
       QMessageBox* errorBox =

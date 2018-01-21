@@ -21,10 +21,10 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   if (DolphinComm::DolphinAccessor::isMEM2Present())
   {
     ramSize = Common::MEM1_SIZE + Common::MEM2_SIZE;
-    m_scanRAMCache = new char[ramSize - 1];
+    m_scanRAMCache = new char[ramSize];
     if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM2_START),
                                                    m_scanRAMCache + Common::MEM1_SIZE,
-                                                   Common::MEM2_SIZE - 1, false))
+                                                   Common::MEM2_SIZE, false))
     {
       delete[] m_scanRAMCache;
       return Common::MemOperationReturnCode::operationFailed;
@@ -33,11 +33,11 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   else
   {
     ramSize = Common::MEM1_SIZE;
-    m_scanRAMCache = new char[ramSize - 1];
+    m_scanRAMCache = new char[ramSize];
   }
 
   if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM1_START),
-                                                 m_scanRAMCache, Common::MEM1_SIZE - 1, false))
+                                                 m_scanRAMCache, Common::MEM1_SIZE, false))
   {
     delete[] m_scanRAMCache;
     return Common::MemOperationReturnCode::operationFailed;
@@ -70,7 +70,11 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   char* memoryToCompare1 = Common::formatStringToMemory(scanReturn, termActualLength, searchTerm1,
                                                         m_memBase, m_memType, termMaxLength);
   if (scanReturn != Common::MemOperationReturnCode::OK)
+  {
+    delete[] memoryToCompare1;
+    delete[] m_scanRAMCache;
     return scanReturn;
+  }
 
   char* memoryToCompare2 = nullptr;
   if (filter == ScanFiter::between)
@@ -78,7 +82,12 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     memoryToCompare2 = Common::formatStringToMemory(scanReturn, termActualLength, searchTerm2,
                                                     m_memBase, m_memType, ramSize);
     if (scanReturn != Common::MemOperationReturnCode::OK)
+    {
+      delete[] memoryToCompare1;
+      delete[] memoryToCompare2;
+      delete[] m_scanRAMCache;
       return scanReturn;
+    }
   }
 
   bool withBSwap = Common::shouldBeBSwappedForType(m_memType);
@@ -141,6 +150,8 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     }
   }
   delete[] noOffset;
+  delete[] memoryToCompare1;
+  delete[] memoryToCompare2;
   m_resultCount = m_resultsConsoleAddr.size();
   m_scanStarted = true;
   return Common::MemOperationReturnCode::OK;
@@ -155,10 +166,10 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   if (DolphinComm::DolphinAccessor::isMEM2Present())
   {
     ramSize = Common::MEM1_SIZE + Common::MEM2_SIZE;
-    newerRAMCache = new char[ramSize - 1];
+    newerRAMCache = new char[ramSize];
     if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM2_START),
                                                    newerRAMCache + Common::MEM1_SIZE,
-                                                   Common::MEM2_SIZE - 1, false))
+                                                   Common::MEM2_SIZE, false))
     {
       delete[] m_scanRAMCache;
       delete[] newerRAMCache;
@@ -168,11 +179,11 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   else
   {
     ramSize = Common::MEM1_SIZE;
-    newerRAMCache = new char[ramSize - 1];
+    newerRAMCache = new char[ramSize];
   }
 
   if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM1_START),
-                                                 newerRAMCache, Common::MEM1_SIZE - 1, false))
+                                                 newerRAMCache, Common::MEM1_SIZE, false))
   {
     delete[] m_scanRAMCache;
     delete[] newerRAMCache;

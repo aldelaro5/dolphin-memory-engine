@@ -27,6 +27,7 @@ MemWatchTreeNode::~MemWatchTreeNode()
   if (hasChildren())
     qDeleteAll(m_children);
   m_parent = nullptr;
+  delete m_entry;
 }
 
 bool MemWatchTreeNode::isGroup() const

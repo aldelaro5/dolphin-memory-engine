@@ -23,7 +23,10 @@ MemWatchEntry::MemWatchEntry(const std::string label, const u32 consoleAddress,
 MemWatchEntry::MemWatchEntry()
 {
   m_type = Common::MemType::type_byte;
+  m_base = Common::MemBase::base_decimal;
   m_memory = new char[sizeof(u8)];
+  *m_memory = 0;
+  m_isUnsigned = false;
   m_consoleAddress = 0x80000000;
 }
 
@@ -123,6 +126,7 @@ void MemWatchEntry::setTypeAndLength(const Common::MemType type, const size_t le
   {
     delete[] m_memory;
     m_memory = new char[newSize];
+    std::fill(m_memory, m_memory + newSize, 0);
   }
 }
 

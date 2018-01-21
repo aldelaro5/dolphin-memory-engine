@@ -105,20 +105,19 @@ Common::MemOperationReturnCode DolphinAccessor::updateRAMCache()
   // MEM2, if enabled, is read right after MEM1 in the cache so both regions are contigous
   if (isMEM2Present())
   {
-    m_updatedRAMCache = new char[Common::MEM1_SIZE + Common::MEM2_SIZE - 1];
+    m_updatedRAMCache = new char[Common::MEM1_SIZE + Common::MEM2_SIZE];
     // Read Wii extra RAM
     if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM2_START),
                                                    m_updatedRAMCache + Common::MEM1_SIZE,
-                                                   Common::MEM2_SIZE - 1, false))
+                                                   Common::MEM2_SIZE, false))
       return Common::MemOperationReturnCode::operationFailed;
   }
   else
   {
-    m_updatedRAMCache = new char[Common::MEM1_SIZE - 1];
+    m_updatedRAMCache = new char[Common::MEM1_SIZE];
   }
   // Read GameCube and Wii basic RAM
-  if (!DolphinComm::DolphinAccessor::readFromRAM(0, m_updatedRAMCache, Common::MEM1_SIZE - 1,
-                                                 false))
+  if (!DolphinComm::DolphinAccessor::readFromRAM(0, m_updatedRAMCache, Common::MEM1_SIZE, false))
     return Common::MemOperationReturnCode::operationFailed;
   return Common::MemOperationReturnCode::OK;
 }

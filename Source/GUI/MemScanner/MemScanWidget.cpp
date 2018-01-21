@@ -93,7 +93,7 @@ void MemScanWidget::initialiseWidgets()
   m_rdbBaseOctal = new QRadioButton("Octal");
   m_rdbBaseBinary = new QRadioButton("Binary");
 
-  m_btnGroupScanBase = new QButtonGroup();
+  m_btnGroupScanBase = new QButtonGroup(this);
   m_btnGroupScanBase->addButton(m_rdbBaseDecimal, 0);
   m_btnGroupScanBase->addButton(m_rdbBaseHexadecimal, 1);
   m_btnGroupScanBase->addButton(m_rdbBaseOctal, 2);
