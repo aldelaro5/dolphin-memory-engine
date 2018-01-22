@@ -27,6 +27,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
                                                    Common::MEM2_SIZE, false))
     {
       delete[] m_scanRAMCache;
+      m_scanRAMCache = nullptr;
       return Common::MemOperationReturnCode::operationFailed;
     }
   }
@@ -40,6 +41,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
                                                  m_scanRAMCache, Common::MEM1_SIZE, false))
   {
     delete[] m_scanRAMCache;
+    m_scanRAMCache = nullptr;
     return Common::MemOperationReturnCode::operationFailed;
   }
 
@@ -74,6 +76,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   {
     delete[] memoryToCompare1;
     delete[] m_scanRAMCache;
+    m_scanRAMCache = nullptr;
     return scanReturn;
   }
 
@@ -87,6 +90,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
       delete[] memoryToCompare1;
       delete[] memoryToCompare2;
       delete[] m_scanRAMCache;
+      m_scanRAMCache = nullptr;
       return scanReturn;
     }
   }
@@ -173,6 +177,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
                                                    Common::MEM2_SIZE, false))
     {
       delete[] m_scanRAMCache;
+      m_scanRAMCache = nullptr;
       delete[] newerRAMCache;
       return Common::MemOperationReturnCode::operationFailed;
     }
@@ -187,6 +192,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
                                                  newerRAMCache, Common::MEM1_SIZE, false))
   {
     delete[] m_scanRAMCache;
+    m_scanRAMCache = nullptr;
     delete[] newerRAMCache;
     return Common::MemOperationReturnCode::operationFailed;
   }
@@ -274,6 +280,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   m_resultsConsoleAddr.clear();
   std::swap(m_resultsConsoleAddr, newerResults);
   delete[] m_scanRAMCache;
+  m_scanRAMCache = nullptr;
   m_scanRAMCache = newerRAMCache;
   m_resultCount = m_resultsConsoleAddr.size();
   return Common::MemOperationReturnCode::OK;
