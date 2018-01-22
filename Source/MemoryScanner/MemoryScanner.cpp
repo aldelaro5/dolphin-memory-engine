@@ -64,8 +64,12 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     // Have no restriction on the length for the rest
     termMaxLength = ramSize;
 
-  char* memoryToCompare1 = Common::formatStringToMemory(scanReturn, termActualLength, searchTerm1,
-                                                        m_memBase, m_memType, termMaxLength);
+  std::string formattedSearchTerm1;
+  if (m_memType == Common::MemType::type_byteArray)
+    formattedSearchTerm1 = addSpacesToBytesArrays(searchTerm1);
+
+  char* memoryToCompare1 = Common::formatStringToMemory(
+      scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength);
   if (scanReturn != Common::MemOperationReturnCode::OK)
   {
     delete[] memoryToCompare1;
@@ -202,8 +206,12 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   if (filter != ScanFiter::increased && filter != ScanFiter::decreased &&
       filter != ScanFiter::changed && filter != ScanFiter::unchanged)
   {
-    memoryToCompare1 = Common::formatStringToMemory(scanReturn, termActualLength, searchTerm1,
-                                                    m_memBase, m_memType, termMaxLength);
+    std::string formattedSearchTerm1;
+    if (m_memType == Common::MemType::type_byteArray)
+      formattedSearchTerm1 = addSpacesToBytesArrays(searchTerm1);
+
+    memoryToCompare1 = Common::formatStringToMemory(
+        scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength);
     if (scanReturn != Common::MemOperationReturnCode::OK)
       return scanReturn;
   }
@@ -460,6 +468,25 @@ std::string MemScanner::getFormattedCurrentValueAt(const int index) const
                                                                     m_memBase, !m_memIsSigned);
   }
   return "";
+}
+
+std::string MemScanner::addSpacesToBytesArrays(const std::string& bytesArray) const
+{
+  std::string result(bytesArray);
+  int spacesAdded = 0;
+  for (int i = 2; i < bytesArray.length(); i += 2)
+  {
+    if (bytesArray[i] != ' ')
+    {
+      result.insert(i + spacesAdded, 1, ' ');
+      spacesAdded++;
+    }
+    else
+    {
+      i++;
+    }
+  }
+  return result;
 }
 
 size_t MemScanner::getResultCount() const

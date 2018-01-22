@@ -145,6 +145,7 @@ private:
                             const char* memoryToCompare2, const char* noOffset,
                             const char* newerRAMCache, const size_t realSize,
                             const u32 consoleOffset) const;
+  std::string addSpacesToBytesArrays(const std::string& bytesArray) const;
 
   Common::MemType m_memType = Common::MemType::type_byte;
   Common::MemBase m_memBase = Common::MemBase::base_decimal;
