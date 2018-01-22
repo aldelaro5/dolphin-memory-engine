@@ -69,6 +69,8 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   std::string formattedSearchTerm1;
   if (m_memType == Common::MemType::type_byteArray)
     formattedSearchTerm1 = addSpacesToBytesArrays(searchTerm1);
+  else
+    formattedSearchTerm1 = searchTerm1;
 
   char* memoryToCompare1 = Common::formatStringToMemory(
       scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength);
@@ -215,6 +217,8 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
     std::string formattedSearchTerm1;
     if (m_memType == Common::MemType::type_byteArray)
       formattedSearchTerm1 = addSpacesToBytesArrays(searchTerm1);
+    else
+      formattedSearchTerm1 = searchTerm1;
 
     memoryToCompare1 = Common::formatStringToMemory(
         scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength);
