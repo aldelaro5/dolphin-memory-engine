@@ -39,9 +39,9 @@ The compiled binaries should be appear in the directory named `build`.
 
 
 ## General usage
-First, open Dolphin and start a game, then run this program. Make sure that it reports that the Wii-only extra memory is present for Wii games and absent for GameCube games.
+First, open Dolphin and start a game, then run this program. Make sure that it reports that the memory type matches the system being emulated; Wii for Wii games and GameCube for GameCube games.
 
->_Exclusive to the Wii, this is an extra region of memory added as part of the enhancements from the earlier GameCube hardware. Consequently, the presence of this extra memory affects what is considered a valid watch address, as well as what areas of memory the scanner will look though._
+>_Added as part of the enhancements from the earlier GameCube hardware, the Wii has an extra region of memory onboard. Consequently, the presence of this extra memory affects what is a valid watch address and therefore what regions of memory the scanner will look though._
 
 If the hooking process is successful, the UI should be enabled, otherwise, you will need to click the hook button before the program can be of any use.
 

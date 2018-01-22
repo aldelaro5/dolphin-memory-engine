@@ -193,9 +193,9 @@ void MainWindow::onOpenMemViewerWithAddress(u32 address)
 void MainWindow::updateMem2Status()
 {
   if (DolphinComm::DolphinAccessor::isMEM2Present())
-    m_lblMem2Status->setText("The extended Wii-only memory is present");
+    m_lblMem2Status->setText("Memory type: Wii");
   else
-    m_lblMem2Status->setText("The extended Wii-only memory is absent");
+    m_lblMem2Status->setText("Memory type: GameCube");
   m_viewer->onMEM2StatusChanged(DolphinComm::DolphinAccessor::isMEM2Present());
 }
 
