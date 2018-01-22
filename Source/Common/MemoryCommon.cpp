@@ -84,6 +84,12 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
                            const std::string inputString, const MemBase base, const MemType type,
                            const size_t length)
 {
+  if (inputString.length() == 0)
+  {
+    returnCode = MemOperationReturnCode::invalidInput;
+    return nullptr;
+  }
+
   std::stringstream ss(inputString);
   switch (base)
   {
