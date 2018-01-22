@@ -47,7 +47,10 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
 
   if (filter == ScanFiter::unknownInitial)
   {
-    m_resultCount = (ramSize - Common::getSizeForType(m_memType, static_cast<size_t>(1)));
+    int alignementDivision =
+        m_enforceMemAlignement ? Common::getNbrBytesAlignementForType(m_memType) : 1;
+    m_resultCount = ((ramSize / alignementDivision) -
+                     Common::getSizeForType(m_memType, static_cast<size_t>(1)));
     m_wasUnknownInitialValue = true;
     m_memSize = 1;
     m_scanStarted = true;
