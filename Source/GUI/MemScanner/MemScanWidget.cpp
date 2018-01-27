@@ -39,21 +39,15 @@ void MemScanWidget::initialiseWidgets()
   m_tblResulstList->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_tblResulstList->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_tblResulstList->setMinimumWidth(385);
-  connect(m_tblResulstList,
-          static_cast<void (QAbstractItemView::*)(const QModelIndex&)>(
-              &QAbstractItemView::doubleClicked),
-          this,
-          static_cast<void (MemScanWidget::*)(const QModelIndex&)>(
-              &MemScanWidget::onResultListDoubleClicked));
+  connect(m_tblResulstList, &QAbstractItemView::doubleClicked, this,
+          &MemScanWidget::onResultListDoubleClicked);
 
   m_btnAddAll = new QPushButton("Add all");
-  connect(m_btnAddAll, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MemScanWidget::onAddAll);
+  connect(m_btnAddAll, &QPushButton::clicked, this, &MemScanWidget::onAddAll);
   m_btnAddAll->setEnabled(false);
 
   m_btnAddSelection = new QPushButton("Add selection");
-  connect(m_btnAddSelection, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MemScanWidget::onAddSelection);
+  connect(m_btnAddSelection, &QPushButton::clicked, this, &MemScanWidget::onAddSelection);
   m_btnAddSelection->setEnabled(false);
 
   m_btnFirstScan = new QPushButton("First scan");
@@ -62,12 +56,9 @@ void MemScanWidget::initialiseWidgets()
   m_btnResetScan = new QPushButton("Reset scan");
   m_btnResetScan->hide();
 
-  connect(m_btnFirstScan, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MemScanWidget::onFirstScan);
-  connect(m_btnNextScan, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MemScanWidget::onNextScan);
-  connect(m_btnResetScan, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MemScanWidget::onResetScan);
+  connect(m_btnFirstScan, &QPushButton::clicked, this, &MemScanWidget::onFirstScan);
+  connect(m_btnNextScan, &QPushButton::clicked, this, &MemScanWidget::onNextScan);
+  connect(m_btnResetScan, &QPushButton::clicked, this, &MemScanWidget::onResetScan);
 
   m_txbSearchTerm1 = new QLineEdit();
   m_txbSearchTerm2 = new QLineEdit();
@@ -79,14 +70,14 @@ void MemScanWidget::initialiseWidgets()
   m_cmbScanType = new QComboBox();
   m_cmbScanType->addItems(GUICommon::g_memTypeNames);
   m_cmbScanType->setCurrentIndex(0);
-  connect(m_cmbScanType, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-          this, &MemScanWidget::onScanMemTypeChanged);
+  connect(m_cmbScanType, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+          &MemScanWidget::onScanMemTypeChanged);
   m_variableLengthType = false;
 
   m_cmbScanFilter = new QComboBox();
   updateScanFilterChoices();
-  connect(m_cmbScanFilter, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-          this, &MemScanWidget::onScanFilterChanged);
+  connect(m_cmbScanFilter, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+          &MemScanWidget::onScanFilterChanged);
 
   m_rdbBaseDecimal = new QRadioButton("Decimal");
   m_rdbBaseHexadecimal = new QRadioButton("Hexadecimal");

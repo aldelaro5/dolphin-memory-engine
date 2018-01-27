@@ -28,8 +28,7 @@ void DlgImportCTFile::initialiseWidgets()
   m_widgetAddressMethod = new QWidget();
 
   m_btnBrowseFiles = new QPushButton("Browse...");
-  connect(m_btnBrowseFiles, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &DlgImportCTFile::onBrowseFiles);
+  connect(m_btnBrowseFiles, &QPushButton::clicked, this, &DlgImportCTFile::onBrowseFiles);
 
   m_groupImportAddressMethod =
       new QGroupBox("Addresses import method (select the option that describes the table)");

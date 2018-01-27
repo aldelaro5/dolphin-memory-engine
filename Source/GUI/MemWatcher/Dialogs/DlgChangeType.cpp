@@ -26,7 +26,7 @@ void DlgChangeType::initialiseWidgets()
   m_spnLength->setMinimum(1);
   m_spnLength->setValue(static_cast<int>(m_length));
 
-  connect(m_cmbTypes, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+  connect(m_cmbTypes, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
           &DlgChangeType::onTypeChange);
 }
 
