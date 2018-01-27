@@ -43,12 +43,7 @@ MemWatchWidget::~MemWatchWidget()
 void MemWatchWidget::initialiseWidgets()
 {
   m_watchModel = new MemWatchModel(this);
-  connect(m_watchModel,
-          static_cast<void (MemWatchModel::*)(const QModelIndex&, Common::MemOperationReturnCode)>(
-              &MemWatchModel::writeFailed),
-          this,
-          static_cast<void (MemWatchWidget::*)(const QModelIndex&, Common::MemOperationReturnCode)>(
-              &MemWatchWidget::onValueWriteError));
+  connect(m_watchModel, &MemWatchModel::writeFailed, this, &MemWatchWidget::onValueWriteError);
   connect(m_watchModel, &MemWatchModel::dropSucceeded, this, &MemWatchWidget::onDropSucceeded);
   connect(m_watchModel, &MemWatchModel::readFailed, this, &MemWatchWidget::mustUnhook);
 
@@ -62,16 +57,10 @@ void MemWatchWidget::initialiseWidgets()
   m_watchView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_watchView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_watchView->setContextMenuPolicy(Qt::CustomContextMenu);
-  connect(m_watchView,
-          static_cast<void (QWidget::*)(const QPoint&)>(&QWidget::customContextMenuRequested), this,
-          static_cast<void (MemWatchWidget::*)(const QPoint&)>(
-              &MemWatchWidget::onMemWatchContextMenuRequested));
-  connect(m_watchView,
-          static_cast<void (QAbstractItemView::*)(const QModelIndex&)>(
-              &QAbstractItemView::doubleClicked),
-          this,
-          static_cast<void (MemWatchWidget::*)(const QModelIndex&)>(
-              &MemWatchWidget::onWatchDoubleClicked));
+  connect(m_watchView, &QWidget::customContextMenuRequested, this,
+          &MemWatchWidget::onMemWatchContextMenuRequested);
+  connect(m_watchView, &QAbstractItemView::doubleClicked, this,
+          &MemWatchWidget::onWatchDoubleClicked);
   m_watchView->setItemDelegate(m_watchDelegate);
   m_watchView->setSortingEnabled(true);
   m_watchView->setModel(m_watchModel);
@@ -85,12 +74,10 @@ void MemWatchWidget::initialiseWidgets()
   connect(shortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteSelection);
 
   m_btnAddGroup = new QPushButton("Add group", this);
-  connect(m_btnAddGroup, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MemWatchWidget::onAddGroup);
+  connect(m_btnAddGroup, &QPushButton::clicked, this, &MemWatchWidget::onAddGroup);
 
   m_btnAddWatchEntry = new QPushButton("Add watch", this);
-  connect(m_btnAddWatchEntry, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MemWatchWidget::onAddWatchEntry);
+  connect(m_btnAddWatchEntry, &QPushButton::clicked, this, &MemWatchWidget::onAddWatchEntry);
 
   m_updateTimer = new QTimer(this);
   connect(m_updateTimer, &QTimer::timeout, m_watchModel, &MemWatchModel::onUpdateTimer);

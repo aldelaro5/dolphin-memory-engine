@@ -24,11 +24,9 @@ void MemViewerWidget::initialiseWidgets()
   connect(m_txtJumpAddress, &QLineEdit::textChanged, this,
           &MemViewerWidget::onJumpToAddressTextChanged);
   m_btnGoToMEM1Start = new QPushButton("Go to the common RAM");
-  connect(m_btnGoToMEM1Start, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MemViewerWidget::onGoToMEM1Start);
+  connect(m_btnGoToMEM1Start, &QPushButton::clicked, this, &MemViewerWidget::onGoToMEM1Start);
   m_btnGoToMEM2Start = new QPushButton("Go to the Wii-only RAM");
-  connect(m_btnGoToMEM2Start, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MemViewerWidget::onGoToMEM2Start);
+  connect(m_btnGoToMEM2Start, &QPushButton::clicked, this, &MemViewerWidget::onGoToMEM2Start);
   m_memViewer = new MemViewer(this);
   connect(m_memViewer, &MemViewer::memErrorOccured, this, &MemViewerWidget::mustUnhook);
   m_updateMemoryTimer = new QTimer(this);

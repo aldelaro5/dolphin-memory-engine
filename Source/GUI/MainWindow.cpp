@@ -50,7 +50,7 @@ void MainWindow::makeMenus()
   connect(m_actImportFromCT, &QAction::triggered, this, &MainWindow::onImportFromCT);
   connect(m_actExportAsCSV, &QAction::triggered, this, &MainWindow::onExportAsCSV);
 
-  connect(m_actViewScanner, static_cast<void (QAction::*)(bool)>(&QAction::toggled), this, [=] {
+  connect(m_actViewScanner, &QAction::toggled, this, [=] {
     if (m_actViewScanner->isChecked())
       m_scanner->show();
     else
@@ -79,30 +79,11 @@ void MainWindow::makeMenus()
 void MainWindow::initialiseWidgets()
 {
   m_scanner = new MemScanWidget(this);
-  connect(m_scanner,
-          static_cast<void (MemScanWidget::*)(u32 address, Common::MemType type, size_t length,
-                                              bool isUnsigned, Common::MemBase base)>(
-              &MemScanWidget::requestAddWatchEntry),
-          this,
-          static_cast<void (MainWindow::*)(u32 address, Common::MemType type, size_t length,
-                                           bool isUnsigned, Common::MemBase base)>(
-              &MainWindow::addWatchRequested));
-  connect(m_scanner,
-          static_cast<void (MemScanWidget::*)(Common::MemType type, size_t length, bool isUnsigned,
-                                              Common::MemBase base)>(
-              &MemScanWidget::requestAddAllResultsToWatchList),
-          this,
-          static_cast<void (MainWindow::*)(Common::MemType type, size_t length, bool isUnsigned,
-                                           Common::MemBase base)>(
-              &MainWindow::addAllResultsToWatchList));
-  connect(m_scanner,
-          static_cast<void (MemScanWidget::*)(Common::MemType type, size_t length, bool isUnsigned,
-                                              Common::MemBase base)>(
-              &MemScanWidget::requestAddSelectedResultsToWatchList),
-          this,
-          static_cast<void (MainWindow::*)(Common::MemType type, size_t length, bool isUnsigned,
-                                           Common::MemBase base)>(
-              &MainWindow::addSelectedResultsToWatchList));
+  connect(m_scanner, &MemScanWidget::requestAddWatchEntry, this, &MainWindow::addWatchRequested);
+  connect(m_scanner, &MemScanWidget::requestAddAllResultsToWatchList, this,
+          &MainWindow::addAllResultsToWatchList);
+  connect(m_scanner, &MemScanWidget::requestAddSelectedResultsToWatchList, this,
+          &MainWindow::addSelectedResultsToWatchList);
 
   m_watcher = new MemWatchWidget(this);
 
@@ -111,10 +92,8 @@ void MainWindow::initialiseWidgets()
 
   m_btnAttempHook = new QPushButton("Hook");
   m_btnUnhook = new QPushButton("Unhook");
-  connect(m_btnAttempHook, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MainWindow::onHookAttempt);
-  connect(m_btnUnhook, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MainWindow::onUnhook);
+  connect(m_btnAttempHook, &QPushButton::clicked, this, &MainWindow::onHookAttempt);
+  connect(m_btnUnhook, &QPushButton::clicked, this, &MainWindow::onUnhook);
 
   m_lblDolphinStatus = new QLabel("");
   m_lblDolphinStatus->setAlignment(Qt::AlignHCenter);
@@ -123,8 +102,7 @@ void MainWindow::initialiseWidgets()
   m_lblMem2Status->setAlignment(Qt::AlignHCenter);
 
   m_btnOpenMemViewer = new QPushButton("Open memory viewer");
-  connect(m_btnOpenMemViewer, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
-          &MainWindow::onOpenMenViewer);
+  connect(m_btnOpenMemViewer, &QPushButton::clicked, this, &MainWindow::onOpenMenViewer);
 }
 
 void MainWindow::makeLayouts()
@@ -158,9 +136,8 @@ void MainWindow::makeMemViewer()
 {
   m_viewer = new MemViewerWidget(nullptr, Common::MEM1_START);
   connect(m_viewer, &MemViewerWidget::mustUnhook, this, &MainWindow::onUnhook);
-  connect(m_watcher,
-          static_cast<void (MemWatchWidget::*)(u32)>(&MemWatchWidget::goToAddressInViewer), this,
-          static_cast<void (MainWindow::*)(u32)>(&MainWindow::onOpenMemViewerWithAddress));
+  connect(m_watcher, &MemWatchWidget::goToAddressInViewer, this,
+          &MainWindow::onOpenMemViewerWithAddress);
 }
 
 void MainWindow::firstHookAttempt()
