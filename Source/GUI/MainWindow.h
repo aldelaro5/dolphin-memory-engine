@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QAction>
-#include <QCloseEvent>
-#include <QMainWindow>
-#include <QMenu>
+#include <QtGui/QCloseEvent>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
 
 #include "../Common/CommonTypes.h"
 #include "../Common/MemoryCommon.h"

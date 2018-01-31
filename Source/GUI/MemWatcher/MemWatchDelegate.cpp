@@ -1,6 +1,6 @@
 #include "MemWatchDelegate.h"
 
-#include <QLineEdit>
+#include <QtWidgets/QLineEdit>
 
 #include "../../MemoryWatch/MemWatchTreeNode.h"
 #include "../GUICommon.h"

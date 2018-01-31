@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QString>
-#include <QStringList>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
 
 #include "../Common/MemoryCommon.h"
 

@@ -2,8 +2,8 @@
 
 #include <sstream>
 
-#include <QLabel>
-#include <QVBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QVBoxLayout>
 
 #include "../../DolphinProcess/DolphinAccessor.h"
 

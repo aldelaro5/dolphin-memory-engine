@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QFile>
-#include <QString>
-#include <QXmlStreamReader>
+#include <QtCore/QFile>
+#include <QtCore/QString>
+#include <QtCore/QXmlStreamReader>
 
 #include "../MemoryWatch/MemWatchTreeNode.h"
 

@@ -50,7 +50,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)include;$(QTDIR)include\QtCore;$(QTDIR)include\QtGui;$(QTDIR)include\QtWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)include</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
       <PreprocessorDefinitions>WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -68,7 +68,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)include;$(QTDIR)include\QtCore;$(QTDIR)include\QtGui;$(QTDIR)include\QtWidgets</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)include</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
       <PreprocessorDefinitions>WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -80,7 +80,6 @@
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
-
   <!-- Files and target to copy to the output directory -->
   <PropertyGroup>
     <!--
@@ -102,10 +101,9 @@
   </ItemGroup>
   <Target Name="CopyDlls" AfterTargets="Build">
     <Message Importance="High" Text="Copying required files for $(Configuration)..." />
-    <Message Importance="High" Text="Copying '%(FilesToCopy.FullPath)' -> '$(OutDir)%(FilesToCopy.SubDir)%(Filename)%(Extension)'." />
+    <Message Importance="High" Text="Copying '%(FilesToCopy.FullPath)' -&gt; '$(OutDir)%(FilesToCopy.SubDir)%(Filename)%(Extension)'." />
     <Copy SourceFiles="@(FilesToCopy)" DestinationFiles="$(OutDir)%(FilesToCopy.SubDir)%(Filename)%(Extension)" />
   </Target>
-
   <!-- Files -->
   <ItemGroup>
     <ClCompile Include="**\*.cpp" Exclude="GeneratedFiles\**\*.cpp" />
@@ -130,7 +128,7 @@
   <ItemGroup>
     <!-- All files except for GUICommon need to be Moc'ed -->
     <CustomBuild Include="GUI\**\*.h" Exclude="@(ClInclude)">
-      <Command>"$(QTDIR)bin\moc.exe" "%(FullPath)" -o ".\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp" $(QtMocFlags) "-I." "-I$(QTDIR)include" "-I$(OutDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)include\QtCore" "-I$(QTDIR)include\QtGui" "-I$(QTDIR)include\QtWidgets"</Command>
+      <Command>"$(QTDIR)bin\moc.exe" "%(FullPath)" -o ".\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp" $(QtMocFlags) "-I." "-I$(QTDIR)include" "-I$(OutDir)GeneratedFiles\$(ConfigurationName)\."</Command>
       <Message>Moc'ing %(Filename)%(Extension)...</Message>
       <Outputs>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs>$(QTDIR)bin\moc.exe;%(FullPath)</AdditionalInputs>

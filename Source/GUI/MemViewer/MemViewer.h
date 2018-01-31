@@ -1,12 +1,12 @@
 #pragma once
 
-#include <QAbstractScrollArea>
-#include <QColor>
-#include <QElapsedTimer>
-#include <QList>
-#include <QRect>
-#include <QTimer>
-#include <QWidget>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QList>
+#include <QtCore/QRect>
+#include <QtCore/QTimer>
+#include <QtGui/QColor>
+#include <QtWidgets/QAbstractScrollArea>
+#include <QtWidgets/QWidget>
 
 #include "../../Common/CommonTypes.h"
 

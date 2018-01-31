@@ -1,6 +1,6 @@
 #include "GUICommon.h"
 
-#include <QStringList>
+#include <QtCore/QStringList>
 
 namespace GUICommon
 {

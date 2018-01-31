@@ -1,10 +1,11 @@
 #include "DlgAddWatchEntry.h"
 
-#include <QDialogButtonBox>
-#include <QHBoxLayout>
-#include <QMessageBox>
-#include <QVBoxLayout>
 #include <sstream>
+
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QVBoxLayout>
 
 #include "../../../DolphinProcess/DolphinAccessor.h"
 #include "../../GUICommon.h"

@@ -1,9 +1,9 @@
 #include "DlgChangeType.h"
 
-#include <QDialogButtonBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QVBoxLayout>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QVBoxLayout>
 
 #include "../../GUICommon.h"
 

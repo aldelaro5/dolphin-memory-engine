@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QAbstractTableModel>
+#include <QtCore/QAbstractTableModel>
 
 #include "../../MemoryScanner/MemoryScanner.h"
 

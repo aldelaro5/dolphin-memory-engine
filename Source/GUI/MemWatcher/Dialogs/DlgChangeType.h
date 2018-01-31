@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QComboBox>
-#include <QDialog>
-#include <QSpinBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QSpinBox>
 
 class DlgChangeType : public QDialog
 {

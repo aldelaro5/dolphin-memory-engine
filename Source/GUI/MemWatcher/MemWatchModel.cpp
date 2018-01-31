@@ -1,10 +1,11 @@
 #include "MemWatchModel.h"
 
-#include <QDataStream>
-#include <QMimeData>
 #include <cstring>
 #include <limits>
 #include <sstream>
+
+#include <QtCore/QDataStream>
+#include <QtCore/QMimeData>
 
 #include "../../CheatEngineParser/CheatEngineParser.h"
 #include "../GUICommon.h"
