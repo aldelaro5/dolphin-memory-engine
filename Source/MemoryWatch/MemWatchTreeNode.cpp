@@ -1,8 +1,8 @@
 #include "MemWatchTreeNode.h"
 
-#include <QJsonArray>
-
 #include <sstream>
+
+#include <QtCore/QJsonArray>
 
 #include "../GUI/GUICommon.h"
 

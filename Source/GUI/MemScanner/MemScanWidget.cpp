@@ -1,11 +1,11 @@
 #include "MemScanWidget.h"
 
-#include <QHBoxLayout>
-#include <QHeaderView>
-#include <QMessageBox>
-#include <QRadioButton>
-#include <QRegExp>
-#include <QVBoxLayout>
+#include <QtCore/QRegExp>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QVBoxLayout>
 
 #include "../GUICommon.h"
 

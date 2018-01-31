@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QLineEdit>
-#include <QPushButton>
-#include <QWidget>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QWidget>
 
 #include "MemViewer.h"
 

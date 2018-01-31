@@ -1,14 +1,14 @@
 #pragma once
 
-#include <QCheckBox>
-#include <QComboBox>
-#include <QDialog>
-#include <QGridLayout>
-#include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QSpinBox>
-#include <QVector>
+#include <QtCore/QVector>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpinBox>
 
 #include "../../../MemoryWatch/MemWatchEntry.h"
 

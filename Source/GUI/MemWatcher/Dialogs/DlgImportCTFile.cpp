@@ -2,11 +2,11 @@
 
 #include <sstream>
 
-#include <QDialogButtonBox>
-#include <QFileDialog>
-#include <QHBoxLayout>
-#include <QMessageBox>
-#include <QVBoxLayout>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QVBoxLayout>
 
 DlgImportCTFile::DlgImportCTFile(QWidget* parent)
 {

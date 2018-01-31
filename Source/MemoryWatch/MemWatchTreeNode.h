@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QJsonObject>
-#include <QString>
-#include <QVector>
+#include <QtCore/QJsonObject>
+#include <QtCore/QString>
+#include <QtCore/QVector>
 
 #include "MemWatchEntry.h"
 

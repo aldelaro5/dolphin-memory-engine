@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QAbstractItemModel>
-#include <QFile>
-#include <QJsonObject>
+#include <QtCore/QAbstractItemModel>
+#include <QtCore/QFile>
+#include <QtCore/QJsonObject>
 
 #include "../../MemoryWatch/MemWatchEntry.h"
 #include "../../MemoryWatch/MemWatchTreeNode.h"

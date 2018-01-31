@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QPushButton>
-#include <QTimer>
-#include <QTreeView>
+#include <QtCore/QTimer>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QTreeView>
 
 #include "MemWatchDelegate.h"
 #include "MemWatchModel.h"

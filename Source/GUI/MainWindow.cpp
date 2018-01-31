@@ -1,12 +1,13 @@
 #include "MainWindow.h"
 
-#include <QHBoxLayout>
-#include <QMenuBar>
-#include <QMessageBox>
-#include <QShortcut>
-#include <QString>
-#include <QVBoxLayout>
 #include <string>
+
+#include <QtCore/QString>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QShortcut>
+#include <QtWidgets/QVBoxLayout>
 
 #include "../DolphinProcess/DolphinAccessor.h"
 #include "../MemoryWatch/MemWatchEntry.h"

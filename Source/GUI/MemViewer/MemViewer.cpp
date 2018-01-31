@@ -6,10 +6,10 @@
 #include <iomanip>
 #include <sstream>
 
-#include <QApplication>
-#include <QMouseEvent>
-#include <QPainter>
-#include <QScrollBar>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QScrollBar>
 
 #include "../../Common/CommonUtils.h"
 #include "../../DolphinProcess/DolphinAccessor.h"

@@ -1,25 +1,26 @@
 #include "MemWatchWidget.h"
 
-#include <QAction>
-#include <QApplication>
-#include <QByteArray>
-#include <QClipboard>
-#include <QFile>
-#include <QFileDialog>
-#include <QHBoxLayout>
-#include <QHeaderView>
-#include <QIODevice>
-#include <QInputDialog>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QMenu>
-#include <QMessageBox>
-#include <QShortcut>
-#include <QSignalMapper>
-#include <QString>
-#include <QTextStream>
-#include <QVBoxLayout>
 #include <string>
+
+#include <QtCore/QByteArray>
+#include <QtCore/QFile>
+#include <QtCore/QIODevice>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QSignalMapper>
+#include <QtCore/QString>
+#include <QtCore/QTextStream>
+#include <QtGui/QClipboard>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QShortcut>
+#include <QtWidgets/QVBoxLayout>
 
 #include "../../Common/MemoryCommon.h"
 #include "../../MemoryWatch/MemWatchEntry.h"
