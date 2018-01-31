@@ -130,8 +130,8 @@
   <ItemGroup>
     <!-- All files except for GUICommon need to be Moc'ed -->
     <CustomBuild Include="GUI\**\*.h" Exclude="@(ClInclude)">
-      <Command>"$(QTDIR)bin\moc.exe" "%(FullPath)" -o ".\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp" $(QtMocFlags) "-I." "-I$(QTDIR)include" "-I$(OutDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)include\QtCore" "-I$(QTDIR)include\QtGui" "-I$(QTDIR)include\QtWidgets"</Command>
       <Message>Moc'ing %(Filename)%(Extension)...</Message>
+      <Command>"$(QTDIR)bin\moc.exe" "%(FullPath)" -o ".\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp" $(QtMocFlags) "-I." "-I$(QTDIR)include" "-I$(OutDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)include\QtCore" "-I$(QTDIR)include\QtGui" "-I$(QTDIR)include\QtWidgets"</Command>
       <Outputs>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs>$(QTDIR)bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
