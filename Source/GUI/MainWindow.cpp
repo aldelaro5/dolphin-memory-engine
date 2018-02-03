@@ -128,8 +128,6 @@ void MainWindow::makeLayouts()
   QWidget* main_widget = new QWidget(this);
   main_widget->setLayout(main_layout);
   setCentralWidget(main_widget);
-
-  setMinimumWidth(800);
 }
 
 void MainWindow::makeMemViewer()
