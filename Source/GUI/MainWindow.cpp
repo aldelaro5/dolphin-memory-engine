@@ -24,8 +24,8 @@ MainWindow::MainWindow()
 MainWindow::~MainWindow()
 {
   delete m_viewer;
-  delete m_scanner;
   delete m_watcher;
+  DolphinComm::DolphinAccessor::free();
 }
 
 void MainWindow::makeMenus()
@@ -78,7 +78,7 @@ void MainWindow::makeMenus()
 
 void MainWindow::initialiseWidgets()
 {
-  m_scanner = new MemScanWidget(this);
+  m_scanner = new MemScanWidget();
   connect(m_scanner, &MemScanWidget::requestAddWatchEntry, this, &MainWindow::addWatchRequested);
   connect(m_scanner, &MemScanWidget::requestAddAllResultsToWatchList, this,
           &MainWindow::addAllResultsToWatchList);
@@ -114,20 +114,20 @@ void MainWindow::makeLayouts()
   QFrame* separatorline = new QFrame();
   separatorline->setFrameShape(QFrame::HLine);
 
-  QVBoxLayout* main_layout = new QVBoxLayout;
-  main_layout->addWidget(m_lblDolphinStatus);
-  main_layout->addLayout(dolphinHookButtons_layout);
-  main_layout->addWidget(m_lblMem2Status);
-  main_layout->addWidget(separatorline);
-  main_layout->addWidget(m_scanner);
-  main_layout->addSpacing(5);
-  main_layout->addWidget(m_btnOpenMemViewer);
-  main_layout->addSpacing(5);
-  main_layout->addWidget(m_watcher);
+  QVBoxLayout* mainLayout = new QVBoxLayout;
+  mainLayout->addWidget(m_lblDolphinStatus);
+  mainLayout->addLayout(dolphinHookButtons_layout);
+  mainLayout->addWidget(m_lblMem2Status);
+  mainLayout->addWidget(separatorline);
+  mainLayout->addWidget(m_scanner);
+  mainLayout->addSpacing(5);
+  mainLayout->addWidget(m_btnOpenMemViewer);
+  mainLayout->addSpacing(5);
+  mainLayout->addWidget(m_watcher);
 
-  QWidget* main_widget = new QWidget(this);
-  main_widget->setLayout(main_layout);
-  setCentralWidget(main_widget);
+  QWidget* mainWidget = new QWidget();
+  mainWidget->setLayout(mainLayout);
+  setCentralWidget(mainWidget);
 
   setMinimumWidth(800);
 }

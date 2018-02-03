@@ -19,6 +19,7 @@ public:
   };
 
   static void init();
+  static void free();
   static void hook();
   static void unHook();
   static bool readFromRAM(const u32 offset, char* buffer, const size_t size, const bool withBSwap);
