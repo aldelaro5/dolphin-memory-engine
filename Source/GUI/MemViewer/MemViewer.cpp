@@ -18,10 +18,6 @@ MemViewer::MemViewer(QWidget* parent) : QAbstractScrollArea(parent)
 {
   initialise();
 
-  std::fill(m_memoryMsElapsedLastChange, m_memoryMsElapsedLastChange + m_numCells, 0);
-  updateMemoryData();
-  std::memcpy(m_lastRawMemoryData, m_updatedRawMemoryData, m_numCells);
-
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   changeMemoryRegion(false);
   verticalScrollBar()->setPageStep(m_numRows);
@@ -49,6 +45,10 @@ void MemViewer::initialise()
   m_memViewStart = Common::MEM1_START;
   m_memViewEnd = Common::MEM1_END;
   m_currentFirstAddress = m_memViewStart;
+
+  std::fill(m_memoryMsElapsedLastChange, m_memoryMsElapsedLastChange + m_numCells, 0);
+  updateMemoryData();
+  std::memcpy(m_lastRawMemoryData, m_updatedRawMemoryData, m_numCells);
 }
 
 QSize MemViewer::sizeHint() const
