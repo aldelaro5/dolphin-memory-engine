@@ -23,9 +23,9 @@ void MemViewerWidget::initialiseWidgets()
   m_txtJumpAddress = new QLineEdit(this);
   connect(m_txtJumpAddress, &QLineEdit::textChanged, this,
           &MemViewerWidget::onJumpToAddressTextChanged);
-  m_btnGoToMEM1Start = new QPushButton("Go to the common RAM");
+  m_btnGoToMEM1Start = new QPushButton(tr("Go to the common RAM"));
   connect(m_btnGoToMEM1Start, &QPushButton::clicked, this, &MemViewerWidget::onGoToMEM1Start);
-  m_btnGoToMEM2Start = new QPushButton("Go to the Wii-only RAM");
+  m_btnGoToMEM2Start = new QPushButton(tr("Go to the Wii-only RAM"));
   connect(m_btnGoToMEM2Start, &QPushButton::clicked, this, &MemViewerWidget::onGoToMEM2Start);
   m_memViewer = new MemViewer(this);
   connect(m_memViewer, &MemViewer::memErrorOccured, this, &MemViewerWidget::mustUnhook);
@@ -35,7 +35,7 @@ void MemViewerWidget::initialiseWidgets()
 
 void MemViewerWidget::makeLayouts()
 {
-  QLabel* lblJumpToAddress = new QLabel("Jump to an address: ");
+  QLabel* lblJumpToAddress = new QLabel(tr("Jump to an address: "));
 
   QHBoxLayout* controls_layout = new QHBoxLayout();
   controls_layout->addWidget(lblJumpToAddress);

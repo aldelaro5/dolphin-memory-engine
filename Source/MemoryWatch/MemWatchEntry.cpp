@@ -10,7 +10,7 @@
 #include "../Common/CommonUtils.h"
 #include "../DolphinProcess/DolphinAccessor.h"
 
-MemWatchEntry::MemWatchEntry(const std::string label, const u32 consoleAddress,
+MemWatchEntry::MemWatchEntry(const QString label, const u32 consoleAddress,
                              const Common::MemType type, const Common::MemBase base,
                              const bool isUnsigned, const size_t length,
                              const bool isBoundToPointer)
@@ -46,7 +46,7 @@ MemWatchEntry::~MemWatchEntry()
   delete[] m_freezeMemory;
 }
 
-std::string MemWatchEntry::getLabel() const
+QString MemWatchEntry::getLabel() const
 {
   return m_label;
 }
@@ -106,7 +106,7 @@ bool MemWatchEntry::isUnsigned() const
   return m_isUnsigned;
 }
 
-void MemWatchEntry::setLabel(const std::string& label)
+void MemWatchEntry::setLabel(const QString& label)
 {
   m_label = label;
 }
