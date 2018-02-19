@@ -9,6 +9,7 @@
 
 namespace DolphinComm
 {
+
 bool WindowsDolphinProcess::findPID()
 {
   PROCESSENTRY32 entry;
@@ -35,9 +36,9 @@ bool WindowsDolphinProcess::findPID()
 
   // Get the handle if Dolphin is running since it's required on Windows to read or write into the
   // RAM of the process and to query the RAM mapping information
-  m_hDolphin = m_hDolphin = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION |
-                                            PROCESS_VM_READ | PROCESS_VM_WRITE,
-                                        FALSE, m_PID);
+  m_hDolphin = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_READ |
+                               PROCESS_VM_WRITE,
+                           FALSE, m_PID);
   return true;
 }
 
