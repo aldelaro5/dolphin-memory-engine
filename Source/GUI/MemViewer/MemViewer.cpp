@@ -397,6 +397,8 @@ void MemViewer::renderSeparatorLines(QPainter& painter)
 
 void MemViewer::renderColumnsHeaderText(QPainter& painter)
 {
+  QColor oldPenColor = painter.pen().color();
+  painter.setPen(QGuiApplication::palette().color(QPalette::WindowText));
   painter.drawText(m_charWidthEm / 2, m_charHeight, " Address");
   int posXHeaderText = m_rowHeaderWidth;
   for (int i = 0; i < m_numColumns; i++)
@@ -410,6 +412,7 @@ void MemViewer::renderColumnsHeaderText(QPainter& painter)
   }
 
   painter.drawText(m_hexAsciiSeparatorPosX + m_charWidthEm / 2, m_charHeight, "  Text (ASCII)  ");
+  painter.setPen(oldPenColor);
 }
 
 void MemViewer::renderRowHeaderText(QPainter& painter, const int rowIndex)
@@ -419,7 +422,10 @@ void MemViewer::renderRowHeaderText(QPainter& painter, const int rowIndex)
      << m_currentFirstAddress + m_numColumns * rowIndex;
   int x = m_charWidthEm / 2;
   int y = (rowIndex + 1) * m_charHeight + m_columnHeaderHeight;
+  QColor oldPenColor = painter.pen().color();
+  painter.setPen(QGuiApplication::palette().color(QPalette::WindowText));
   painter.drawText(x, y, QString::fromStdString(ss.str()));
+  painter.setPen(oldPenColor);
 }
 
 void MemViewer::renderCarret(QPainter& painter, const int rowIndex, const int columnIndex)
@@ -443,8 +449,8 @@ void MemViewer::determineMemoryTextRenderProperties(const int rowIndex, const in
 {
   if (rowIndex == m_byteSelectedPosY && columnIndex == m_byteSelectedPosX)
   {
-    bgColor = QColor(Qt::darkBlue);
-    fgColor = QColor(Qt::white);
+    bgColor = QGuiApplication::palette().color(QPalette::Highlight);
+    fgColor = QGuiApplication::palette().color(QPalette::HighlightedText);
     drawCarret = true;
   }
   // If the byte changed since the last data update
@@ -530,7 +536,7 @@ void MemViewer::renderMemory(QPainter& painter, const int rowIndex, const int co
   else
   {
     QColor bgColor = QColor(Qt::transparent);
-    QColor fgColor = QColor(Qt::black);
+    QColor fgColor = QGuiApplication::palette().color(QPalette::WindowText);
     bool drawCarret = false;
 
     determineMemoryTextRenderProperties(rowIndex, columnIndex, drawCarret, bgColor, fgColor);
