@@ -153,7 +153,7 @@ void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* p
   {
     m_isGroup = false;
     m_entry = new MemWatchEntry();
-    m_entry->setLabel(json["label"].toString().toStdString());
+    m_entry->setLabel(json["label"].toString());
     std::stringstream ss(json["address"].toString().toStdString());
     u32 address = 0;
     ss >> std::hex >> std::uppercase >> address;
@@ -212,7 +212,7 @@ void MemWatchTreeNode::writeToJson(QJsonObject& json) const
     }
     else
     {
-      json["label"] = QString::fromStdString(m_entry->getLabel());
+      json["label"] = m_entry->getLabel();
       std::stringstream ss;
       ss << std::hex << std::uppercase << m_entry->getConsoleAddress();
       json["address"] = QString::fromStdString(ss.str());
@@ -264,7 +264,7 @@ QString MemWatchTreeNode::writeAsCSV() const
       }
     }
     std::string csvLine =
-        m_entry->getLabel() + ";" + ssAddress.str() + ";" +
+        m_entry->getLabel().toStdString() + ";" + ssAddress.str() + ";" +
         GUICommon::getStringFromType(m_entry->getType(), m_entry->getLength()).toStdString() + "\n";
     return QString::fromStdString(csvLine);
   }

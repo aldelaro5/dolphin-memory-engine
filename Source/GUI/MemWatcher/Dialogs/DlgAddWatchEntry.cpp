@@ -168,7 +168,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
       m_lengtWidget->show();
     else
       m_lengtWidget->hide();
-    m_txbLabel->setText(QString::fromStdString(m_entry->getLabel()));
+    m_txbLabel->setText(m_entry->getLabel());
     std::stringstream ssAddress;
     ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
     m_txbAddress->setText(QString::fromStdString(ssAddress.str()));
@@ -284,14 +284,14 @@ void DlgAddWatchEntry::accept()
 {
   if (!validateAndSetAddress())
   {
-    QString errorMsg = QString(
-        "The address you entered is invalid, make sure it is an "
-        "hexadecimal number between 0x80000000 and 0x817FFFFF");
+    QString errorMsg =
+        tr("The address you entered is invalid, make sure it is an "
+           "hexadecimal number between 0x80000000 and 0x817FFFFF");
     if (DolphinComm::DolphinAccessor::isMEM2Present())
-      errorMsg.append(" or between 0x90000000 and 0x93FFFFFF");
+      errorMsg.append(tr(" or between 0x90000000 and 0x93FFFFFF"));
 
-    QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, QString("Invalid address"),
-                                            errorMsg, QMessageBox::Ok, this);
+    QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid address"), errorMsg,
+                                            QMessageBox::Ok, this);
     errorBox->exec();
   }
   else
@@ -321,7 +321,7 @@ void DlgAddWatchEntry::accept()
     if (m_txbLabel->text() == "")
       m_entry->setLabel("No label");
     else
-      m_entry->setLabel(m_txbLabel->text().toStdString());
+      m_entry->setLabel(m_txbLabel->text());
     m_entry->setBase(Common::MemBase::base_decimal);
     m_entry->setSignedUnsigned(false);
     setResult(QDialog::Accepted);

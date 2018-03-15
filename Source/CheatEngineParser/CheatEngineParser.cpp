@@ -287,8 +287,8 @@ void CheatEngineParser::parseCheatEntry(MemWatchTreeNode* node, const bool useDo
 
   if (!isGroup)
   {
-    MemWatchEntry* entry =
-        new MemWatchEntry(label, consoleAddress, type, base, isUnsigned, length, false);
+    MemWatchEntry* entry = new MemWatchEntry(QString::fromStdString(label), consoleAddress, type,
+                                             base, isUnsigned, length, false);
     MemWatchTreeNode* newNode = new MemWatchTreeNode(entry, node, false, "");
     node->appendChild(newNode);
     verifyCheatEntryParsingErrors(currentCheatEntryState, entry, false, useDolphinPointer);
@@ -365,7 +365,7 @@ void CheatEngineParser::verifyCheatEntryParsingErrors(cheatEntryParsingState sta
 QString CheatEngineParser::formatImportedEntryBasicInfo(const MemWatchEntry* entry) const
 {
   QString formatedEntry = "";
-  formatedEntry += "Label: " + QString::fromStdString(entry->getLabel()) + "\n";
+  formatedEntry += "Label: " + entry->getLabel() + "\n";
   formatedEntry +=
       "Type: " + GUICommon::getStringFromType(entry->getType(), entry->getLength()) + "\n";
   std::stringstream ss;

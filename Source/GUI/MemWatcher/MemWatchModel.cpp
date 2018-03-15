@@ -190,7 +190,7 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       {
       case WATCH_COL_LABEL:
       {
-        return QString::fromStdString(entry->getLabel());
+        return entry->getLabel();
       }
       case WATCH_COL_TYPE:
       {
@@ -243,7 +243,7 @@ bool MemWatchModel::setData(const QModelIndex& index, const QVariant& value, int
       {
       case WATCH_COL_LABEL:
       {
-        entry->setLabel((value.toString().toStdString()));
+        entry->setLabel(value.toString());
         emit dataChanged(index, index);
         return true;
       }
@@ -351,15 +351,15 @@ QVariant MemWatchModel::headerData(int section, Qt::Orientation orientation, int
     switch (section)
     {
     case WATCH_COL_LABEL:
-      return QString("Name");
+      return tr("Name");
     case WATCH_COL_TYPE:
-      return QString("Type");
+      return tr("Type");
     case WATCH_COL_ADDRESS:
-      return QString("Address");
+      return tr("Address");
     case WATCH_COL_VALUE:
-      return QString("Value");
+      return tr("Value");
     case WATCH_COL_LOCK:
-      return QString("Lock");
+      return tr("Lock");
     }
   }
   return QVariant();
@@ -533,9 +533,8 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
           else if (right->isGroup())
             return false;
 
-          int compareResult = QString::compare(
-              QString::fromStdString(left->getEntry()->getLabel()),
-              QString::fromStdString(right->getEntry()->getLabel()), Qt::CaseInsensitive);
+          int compareResult = QString::compare(left->getEntry()->getLabel(),
+                                               right->getEntry()->getLabel(), Qt::CaseInsensitive);
           return order == Qt::AscendingOrder ? compareResult < 0 : compareResult > 0;
         });
     break;

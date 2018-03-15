@@ -23,18 +23,18 @@ void DlgImportCTFile::initialiseWidgets()
   m_txbFileName->setReadOnly(true);
 
   m_txbCommonBase = new QLineEdit("");
-  m_txbCommonBase->setPlaceholderText("Hex number ex. 7FFF0000");
+  m_txbCommonBase->setPlaceholderText(tr("Hex number ex. 7FFF0000"));
 
   m_widgetAddressMethod = new QWidget();
 
-  m_btnBrowseFiles = new QPushButton("Browse...");
+  m_btnBrowseFiles = new QPushButton(tr("Browse..."));
   connect(m_btnBrowseFiles, &QPushButton::clicked, this, &DlgImportCTFile::onBrowseFiles);
 
   m_groupImportAddressMethod =
-      new QGroupBox("Addresses import method (select the option that describes the table)");
+      new QGroupBox(tr("Addresses import method (select the option that describes the table)"));
 
-  m_rdbUseCommonBase = new QRadioButton("Using an assumed common RAM start address");
-  m_rdbUseDolphinPointers = new QRadioButton("Using an internal Dolphin pointer");
+  m_rdbUseCommonBase = new QRadioButton(tr("Using an assumed common RAM start address"));
+  m_rdbUseDolphinPointers = new QRadioButton(tr("Using an internal Dolphin pointer"));
 
   m_btnGroupImportAddressMethod = new QButtonGroup();
   m_btnGroupImportAddressMethod->addButton(m_rdbUseCommonBase, 0);
@@ -47,7 +47,7 @@ void DlgImportCTFile::initialiseWidgets()
 
 void DlgImportCTFile::makeLayouts()
 {
-  QLabel* lblFileSelect = new QLabel("Select the Cheat Table file to import: ");
+  QLabel* lblFileSelect = new QLabel(tr("Select the Cheat Table file to import: "));
 
   QHBoxLayout* fileSelectInput_layout = new QHBoxLayout();
   fileSelectInput_layout->addWidget(m_txbFileName);
@@ -58,7 +58,7 @@ void DlgImportCTFile::makeLayouts()
   fileSelect_layout->addWidget(lblFileSelect);
   fileSelect_layout->addLayout(fileSelectInput_layout);
 
-  QLabel* lblCommonBaseInput = new QLabel("Enter the assumed start address: ");
+  QLabel* lblCommonBaseInput = new QLabel(tr("Enter the assumed start address: "));
 
   QHBoxLayout* commonBase_layout = new QHBoxLayout();
   commonBase_layout->setContentsMargins(20, 0, 0, 0);
@@ -67,15 +67,15 @@ void DlgImportCTFile::makeLayouts()
 
   m_widgetAddressMethod->setLayout(commonBase_layout);
 
-  QLabel* lblCommonBase = new QLabel(
-      "The table assumes a common RAM start address, every entry\n"
-      "use an address from the address field of the entry and are\n"
-      "offset according to the assumed RAM start address");
+  QLabel* lblCommonBase =
+      new QLabel(tr("The table assumes a common RAM start address, every entry\n"
+                    "use an address from the address field of the entry and are\n"
+                    "offset according to the assumed RAM start address"));
   lblCommonBase->setContentsMargins(20, 0, 0, 0);
-  QLabel* lblDolphinPointer = new QLabel(
-      "Every entry of the table use a Dolphin internal pointer\n"
-      "that points to the start of the RAM and the offset from\n"
-      "the start is in the offset field of the entry");
+  QLabel* lblDolphinPointer =
+      new QLabel(tr("Every entry of the table use a Dolphin internal pointer\n"
+                    "that points to the start of the RAM and the offset from\n"
+                    "the start is in the offset field of the entry"));
   lblDolphinPointer->setContentsMargins(20, 0, 0, 0);
 
   QVBoxLayout* addressImport_layout = new QVBoxLayout();
@@ -126,8 +126,8 @@ void DlgImportCTFile::onAddressImportMethodChanged()
 
 void DlgImportCTFile::onBrowseFiles()
 {
-  QString fileName = QFileDialog::getOpenFileName(this, "Open Cheat Table", QString(),
-                                                  "Cheat Engine's cheat table (*.CT)");
+  QString fileName = QFileDialog::getOpenFileName(this, tr("Open Cheat Table"), QString(),
+                                                  tr("Cheat Engine's cheat table (*.CT)"));
   if (fileName != "")
     m_txbFileName->setText(fileName);
 }
@@ -137,8 +137,8 @@ void DlgImportCTFile::accept()
   if (m_txbFileName->text().isEmpty())
   {
     QMessageBox* errorBox =
-        new QMessageBox(QMessageBox::Critical, "No Cheat Table file provided",
-                        "Please provide a Cheat Table file to import.", QMessageBox::Ok, this);
+        new QMessageBox(QMessageBox::Critical, tr("No Cheat Table file provided"),
+                        tr("Please provide a Cheat Table file to import."), QMessageBox::Ok, this);
     errorBox->exec();
     return;
   }
@@ -147,9 +147,9 @@ void DlgImportCTFile::accept()
     if (m_txbCommonBase->text().isEmpty())
     {
       QMessageBox* errorBox = new QMessageBox(
-          QMessageBox::Critical, "No assumed RAM start address provided",
-          "To use the assumed common start address import method for importing the addresses, "
-          "you need to provide the assumed start address of the table.",
+          QMessageBox::Critical, tr("No assumed RAM start address provided"),
+          tr("To use the assumed common start address import method for importing the addresses, "
+             "you need to provide the assumed start address of the table."),
           QMessageBox::Ok, this);
       errorBox->exec();
       return;
@@ -161,8 +161,8 @@ void DlgImportCTFile::accept()
     if (ss.fail())
     {
       QMessageBox* errorBox = new QMessageBox(
-          QMessageBox::Critical, "The assumed start address provided is invalid",
-          "Please enter a valid hexadecimal number representing the assumed RAM start address.",
+          QMessageBox::Critical, tr("The assumed start address provided is invalid"),
+          tr("Please enter a valid hexadecimal number representing the assumed RAM start address."),
           QMessageBox::Ok, this);
       errorBox->exec();
       return;

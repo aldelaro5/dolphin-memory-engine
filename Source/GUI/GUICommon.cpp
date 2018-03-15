@@ -1,17 +1,36 @@
 #include "GUICommon.h"
 
+#include <QCoreApplication>
 #include <QStringList>
 
 namespace GUICommon
 {
-QStringList g_memTypeNames = QStringList({"Byte", "2 bytes (Halfword)", "4 bytes (Word)", "Float",
-                                          "Double", "String", "Array of bytes"});
+QStringList g_memTypeNames =
+    QStringList({QCoreApplication::translate("Common", "Byte"),
+                 QCoreApplication::translate("Common", "2 bytes (Halfword)"),
+                 QCoreApplication::translate("Common", "4 bytes (Word)"),
+                 QCoreApplication::translate("Common", "Float"),
+                 QCoreApplication::translate("Common", "Double"),
+                 QCoreApplication::translate("Common", "String"),
+                 QCoreApplication::translate("Common", "Array of bytes")});
 
-QStringList g_memBaseNames = QStringList({"Decimal", "Hexadecimal", "Octal", "Binary"});
+QStringList g_memBaseNames = QStringList({QCoreApplication::translate("Common", "Decimal"),
+                                          QCoreApplication::translate("Common", "Hexadecimal"),
+                                          QCoreApplication::translate("Common", "Octal"),
+                                          QCoreApplication::translate("Common", "Binary")});
 
-QStringList g_memScanFilter = QStringList({"Exact value", "Increased by", "Decreased by", "Between",
-                                           "Bigger than", "Smaller than", "Increased", "Decreased",
-                                           "Changed", "Unchanged", "Unknown initial value"});
+QStringList g_memScanFilter =
+    QStringList({QCoreApplication::translate("Common", "Exact value"),
+                 QCoreApplication::translate("Common", "Increased by"),
+                 QCoreApplication::translate("Common", "Decreased by"),
+                 QCoreApplication::translate("Common", "Between"),
+                 QCoreApplication::translate("Common", "Bigger than"),
+                 QCoreApplication::translate("Common", "Smaller than"),
+                 QCoreApplication::translate("Common", "Increased"),
+                 QCoreApplication::translate("Common", "Decreased"),
+                 QCoreApplication::translate("Common", "Changed"),
+                 QCoreApplication::translate("Common", "Unchanged"),
+                 QCoreApplication::translate("Common", "Unknown initial value")});
 
 bool g_valueEditing = false;
 
@@ -39,13 +58,13 @@ QString getNameFromBase(const Common::MemBase base)
   switch (base)
   {
   case Common::MemBase::base_binary:
-    return QString("binary");
+    return QCoreApplication::translate("Common", "binary");
   case Common::MemBase::base_octal:
-    return QString("octal");
+    return QCoreApplication::translate("Common", "octal");
   case Common::MemBase::base_decimal:
-    return QString("decimal");
+    return QCoreApplication::translate("Common", "decimal");
   case Common::MemBase::base_hexadecimal:
-    return QString("hexadecimal");
+    return QCoreApplication::translate("Common", "hexadecimal");
   default:
     return QString("");
   }

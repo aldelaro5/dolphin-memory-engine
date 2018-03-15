@@ -104,7 +104,8 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     break;
   }
 
-  char* buffer = new char[getSizeForType(type, length)];
+  size_t size = getSizeForType(type, length);
+  char* buffer = new char[size];
 
   switch (type)
   {
@@ -141,7 +142,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       theByte = static_cast<u8>(theByteInt);
     }
 
-    std::memcpy(buffer, &theByte, sizeof(u8));
+    std::memcpy(buffer, &theByte, size);
     actualLength = sizeof(u8);
     break;
   }
@@ -177,7 +178,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       }
     }
 
-    std::memcpy(buffer, &theHalfword, sizeof(u16));
+    std::memcpy(buffer, &theHalfword, size);
     actualLength = sizeof(u16);
     break;
   }
@@ -213,7 +214,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       }
     }
 
-    std::memcpy(buffer, &theWord, sizeof(u32));
+    std::memcpy(buffer, &theWord, size);
     actualLength = sizeof(u32);
     break;
   }
@@ -230,7 +231,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       returnCode = MemOperationReturnCode::invalidInput;
       return buffer;
     }
-    std::memcpy(buffer, &theFloat, sizeof(float));
+    std::memcpy(buffer, &theFloat, size);
     actualLength = sizeof(float);
     break;
   }
@@ -247,7 +248,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       returnCode = MemOperationReturnCode::invalidInput;
       return buffer;
     }
-    std::memcpy(buffer, &theDouble, sizeof(double));
+    std::memcpy(buffer, &theDouble, size);
     actualLength = sizeof(double);
     break;
   }
@@ -300,7 +301,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     }
 
     int index = 0;
-    for (auto i : bytes)
+    for (const auto& i : bytes)
     {
       std::stringstream byteStream(i);
       ss >> std::hex;

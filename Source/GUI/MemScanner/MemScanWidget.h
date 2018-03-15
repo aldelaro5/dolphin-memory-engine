@@ -19,7 +19,7 @@ class MemScanWidget : public QWidget
   Q_OBJECT
 
 public:
-  MemScanWidget(QWidget* parent);
+  MemScanWidget();
   ~MemScanWidget();
 
   ResultsListModel* getResultListModel() const;
