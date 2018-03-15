@@ -9,7 +9,7 @@
 
 #include "../GUICommon.h"
 
-MemScanWidget::MemScanWidget(QWidget* parent) : QWidget(parent)
+MemScanWidget::MemScanWidget()
 {
   initialiseWidgets();
   makeLayouts();
