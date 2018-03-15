@@ -28,6 +28,12 @@ void DolphinAccessor::init()
   }
 }
 
+void DolphinAccessor::free()
+{
+    delete m_instance;
+    delete[] m_updatedRAMCache;
+}
+
 void DolphinAccessor::hook()
 {
   init();
