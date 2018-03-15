@@ -2,6 +2,8 @@
 
 ![Screenshot](https://raw.githubusercontent.com/aldelaro5/Dolphin-memory-engine/master/Docs/screenshot.png)
 
+[![AppVeyor CI Build Status](https://ci.appveyor.com/api/projects/status/sdf1o4kh3g1e68m9?svg=true)](https://ci.appveyor.com/project/aldelaro5/dolphin-memory-engine)
+
 A RAM search specifically designed to search, track, and edit the emulated memory of [the Dolphin emulator](https://github.com/dolphin-emu/dolphin) at runtime. The primary goal is to make research, tool-assisted speedruns, and reverse engineering of GameCube & Wii games more convenient and easier than with the alternative solution, Cheat Engine. Its name is derived from Cheat Engine to symbolize that.
 
 The GUI has been designed with convenience in mind, without disrupting the performance of the emulation. Qt 5 is used to help accomplish this.
