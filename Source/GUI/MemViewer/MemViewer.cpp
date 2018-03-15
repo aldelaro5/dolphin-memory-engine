@@ -399,7 +399,7 @@ void MemViewer::renderColumnsHeaderText(QPainter& painter)
 {
   QColor oldPenColor = painter.pen().color();
   painter.setPen(QGuiApplication::palette().color(QPalette::WindowText));
-  painter.drawText(m_charWidthEm / 2, m_charHeight, " Address");
+  painter.drawText(m_charWidthEm * 1.5f, m_charHeight, tr("Address"));
   int posXHeaderText = m_rowHeaderWidth;
   for (int i = 0; i < m_numColumns; i++)
   {
@@ -411,7 +411,8 @@ void MemViewer::renderColumnsHeaderText(QPainter& painter)
     posXHeaderText += m_charWidthEm * 2 + m_charWidthEm / 2;
   }
 
-  painter.drawText(m_hexAsciiSeparatorPosX + m_charWidthEm / 2, m_charHeight, "  Text (ASCII)  ");
+  painter.drawText(m_hexAsciiSeparatorPosX + m_charWidthEm * 2.5f, m_charHeight, tr("Text (ASCII)"));
+  painter.drawText(0, 0, 0, 0, 0, QString());
   painter.setPen(oldPenColor);
 }
 

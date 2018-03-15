@@ -53,11 +53,11 @@ QVariant ResultsListModel::headerData(int section, Qt::Orientation orientation, 
     switch (section)
     {
     case RESULT_COL_ADDRESS:
-      return QString("Address");
+      return tr("Address");
     case RESULT_COL_SCANNED:
-      return QString("Scanned");
+      return tr("Scanned");
     case RESULT_COL_CURRENT:
-      return QString("Current");
+      return tr("Current");
     }
   }
   return QVariant();

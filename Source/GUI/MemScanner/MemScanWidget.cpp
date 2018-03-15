@@ -42,18 +42,18 @@ void MemScanWidget::initialiseWidgets()
   connect(m_tblResulstList, &QAbstractItemView::doubleClicked, this,
           &MemScanWidget::onResultListDoubleClicked);
 
-  m_btnAddAll = new QPushButton("Add all");
+  m_btnAddAll = new QPushButton(tr("Add all"));
   connect(m_btnAddAll, &QPushButton::clicked, this, &MemScanWidget::onAddAll);
   m_btnAddAll->setEnabled(false);
 
-  m_btnAddSelection = new QPushButton("Add selection");
+  m_btnAddSelection = new QPushButton(tr("Add selection"));
   connect(m_btnAddSelection, &QPushButton::clicked, this, &MemScanWidget::onAddSelection);
   m_btnAddSelection->setEnabled(false);
 
-  m_btnFirstScan = new QPushButton("First scan");
-  m_btnNextScan = new QPushButton("Next scan");
+  m_btnFirstScan = new QPushButton(tr("First scan"));
+  m_btnNextScan = new QPushButton(tr("Next scan"));
   m_btnNextScan->hide();
-  m_btnResetScan = new QPushButton("Reset scan");
+  m_btnResetScan = new QPushButton(tr("Reset scan"));
   m_btnResetScan->hide();
 
   connect(m_btnFirstScan, &QPushButton::clicked, this, &MemScanWidget::onFirstScan);
@@ -79,10 +79,10 @@ void MemScanWidget::initialiseWidgets()
   connect(m_cmbScanFilter, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
           &MemScanWidget::onScanFilterChanged);
 
-  m_rdbBaseDecimal = new QRadioButton("Decimal");
-  m_rdbBaseHexadecimal = new QRadioButton("Hexadecimal");
-  m_rdbBaseOctal = new QRadioButton("Octal");
-  m_rdbBaseBinary = new QRadioButton("Binary");
+  m_rdbBaseDecimal = new QRadioButton(tr("Decimal"));
+  m_rdbBaseHexadecimal = new QRadioButton(tr("Hexadecimal"));
+  m_rdbBaseOctal = new QRadioButton(tr("Octal"));
+  m_rdbBaseBinary = new QRadioButton(tr("Binary"));
 
   m_btnGroupScanBase = new QButtonGroup(this);
   m_btnGroupScanBase->addButton(m_rdbBaseDecimal, 0);
@@ -91,12 +91,12 @@ void MemScanWidget::initialiseWidgets()
   m_btnGroupScanBase->addButton(m_rdbBaseBinary, 3);
   m_rdbBaseDecimal->setChecked(true);
 
-  m_groupScanBase = new QGroupBox("Base to use");
+  m_groupScanBase = new QGroupBox(tr("Base to use"));
 
-  m_chkSignedScan = new QCheckBox("Signed value scan");
+  m_chkSignedScan = new QCheckBox(tr("Signed value scan"));
   m_chkSignedScan->setChecked(false);
 
-  m_chkEnforceMemAlignement = new QCheckBox("Enforce alignement");
+  m_chkEnforceMemAlignement = new QCheckBox(tr("Enforce alignement"));
   m_chkEnforceMemAlignement->setChecked(true);
 
   m_currentValuesUpdateTimer = new QTimer(this);
@@ -106,7 +106,7 @@ void MemScanWidget::initialiseWidgets()
 
 void MemScanWidget::makeLayouts()
 {
-  QLabel* lblAnd = new QLabel("and");
+  QLabel* lblAnd = new QLabel(tr("and"));
 
   QHBoxLayout* multiAddButtons_layout = new QHBoxLayout();
   multiAddButtons_layout->addWidget(m_btnAddSelection);
@@ -292,9 +292,10 @@ void MemScanWidget::onFirstScan()
   }
   else
   {
+    int resultsFound = static_cast<int>(m_memScanner->getResultCount());
     m_lblResultCount->setText(
-        QString::number(m_memScanner->getResultCount()).append(" result(s) found"));
-    if (m_memScanner->getResultCount() <= 1000 && m_memScanner->getResultCount() != 0)
+        tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
+    if (resultsFound <= 1000 && resultsFound != 0)
     {
       m_btnAddAll->setEnabled(true);
       m_btnAddSelection->setEnabled(true);
@@ -321,9 +322,10 @@ void MemScanWidget::onNextScan()
   }
   else
   {
+    int resultsFound = static_cast<int>(m_memScanner->getResultCount());
     m_lblResultCount->setText(
-        QString::number(m_memScanner->getResultCount()).append(" result(s) found"));
-    if (m_memScanner->getResultCount() <= 1000 && m_memScanner->getResultCount() != 0)
+        tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
+    if (resultsFound <= 1000 && resultsFound != 0)
     {
       m_btnAddAll->setEnabled(true);
       m_btnAddSelection->setEnabled(true);
@@ -365,9 +367,9 @@ void MemScanWidget::handleScannerErrors(const Common::MemOperationReturnCode err
   if (errorCode == Common::MemOperationReturnCode::invalidInput)
   {
     QMessageBox* errorBox =
-        new QMessageBox(QMessageBox::Critical, "Invalid term(s)",
-                        QString("The search term(s) you entered for the type " +
-                                m_cmbScanType->currentText() + " is/are invalid"),
+        new QMessageBox(QMessageBox::Critical, tr("Invalid term(s)"),
+                        tr("The search term(s) you entered for the type %1 is/are invalid")
+                            .arg(m_cmbScanType->currentText()),
                         QMessageBox::Ok, this);
     errorBox->exec();
   }

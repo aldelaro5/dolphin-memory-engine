@@ -32,8 +32,8 @@ void DlgChangeType::initialiseWidgets()
 
 void DlgChangeType::makeLayouts()
 {
-  QLabel* lblType = new QLabel(QString("New type: "), this);
-  QLabel* lblLength = new QLabel(QString("Length: "), this);
+  QLabel* lblType = new QLabel(tr("New type: "), this);
+  QLabel* lblLength = new QLabel(tr("Length: "), this);
 
   QWidget* typeSelection = new QWidget(this);
   QHBoxLayout* typeSelectionLayout = new QHBoxLayout;

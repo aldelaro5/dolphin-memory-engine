@@ -30,19 +30,19 @@ MainWindow::~MainWindow()
 
 void MainWindow::makeMenus()
 {
-  m_actOpenWatchList = new QAction("&Open...", this);
-  m_actSaveWatchList = new QAction("&Save", this);
-  m_actSaveAsWatchList = new QAction("&Save as...", this);
-  m_actClearWatchList = new QAction("&Clear the watch list", this);
-  m_actImportFromCT = new QAction("&Import from Cheat Engine's CT file...", this);
-  m_actExportAsCSV = new QAction("&Export as CSV...", this);
+  m_actOpenWatchList = new QAction(tr("&Open..."), this);
+  m_actSaveWatchList = new QAction(tr("&Save"), this);
+  m_actSaveAsWatchList = new QAction(tr("&Save as..."), this);
+  m_actClearWatchList = new QAction(tr("&Clear the watch list"), this);
+  m_actImportFromCT = new QAction(tr("&Import from Cheat Engine's CT file..."), this);
+  m_actExportAsCSV = new QAction(tr("&Export as CSV..."), this);
 
-  m_actViewScanner = new QAction("&Scanner", this);
+  m_actViewScanner = new QAction(tr("&Scanner"), this);
   m_actViewScanner->setCheckable(true);
   m_actViewScanner->setChecked(true);
 
-  m_actQuit = new QAction("&Quit", this);
-  m_actAbout = new QAction("&About", this);
+  m_actQuit = new QAction(tr("&Quit"), this);
+  m_actAbout = new QAction(tr("&About"), this);
   connect(m_actOpenWatchList, &QAction::triggered, this, &MainWindow::onOpenWatchFile);
   connect(m_actSaveWatchList, &QAction::triggered, this, &MainWindow::onSaveWatchFile);
   connect(m_actSaveAsWatchList, &QAction::triggered, this, &MainWindow::onSaveAsWatchFile);
@@ -60,7 +60,7 @@ void MainWindow::makeMenus()
   connect(m_actQuit, &QAction::triggered, this, &MainWindow::onQuit);
   connect(m_actAbout, &QAction::triggered, this, &MainWindow::onAbout);
 
-  m_menuFile = menuBar()->addMenu("&File");
+  m_menuFile = menuBar()->addMenu(tr("&File"));
   m_menuFile->addAction(m_actOpenWatchList);
   m_menuFile->addAction(m_actSaveWatchList);
   m_menuFile->addAction(m_actSaveAsWatchList);
@@ -69,10 +69,10 @@ void MainWindow::makeMenus()
   m_menuFile->addAction(m_actExportAsCSV);
   m_menuFile->addAction(m_actQuit);
 
-  m_menuView = menuBar()->addMenu("&View");
+  m_menuView = menuBar()->addMenu(tr("&View"));
   m_menuView->addAction(m_actViewScanner);
 
-  m_menuHelp = menuBar()->addMenu("&Help");
+  m_menuHelp = menuBar()->addMenu(tr("&Help"));
   m_menuHelp->addAction(m_actAbout);
 }
 
@@ -90,8 +90,8 @@ void MainWindow::initialiseWidgets()
   connect(m_scanner, &MemScanWidget::mustUnhook, this, &MainWindow::onUnhook);
   connect(m_watcher, &MemWatchWidget::mustUnhook, this, &MainWindow::onUnhook);
 
-  m_btnAttempHook = new QPushButton("Hook");
-  m_btnUnhook = new QPushButton("Unhook");
+  m_btnAttempHook = new QPushButton(tr("Hook"));
+  m_btnUnhook = new QPushButton(tr("Unhook"));
   connect(m_btnAttempHook, &QPushButton::clicked, this, &MainWindow::onHookAttempt);
   connect(m_btnUnhook, &QPushButton::clicked, this, &MainWindow::onUnhook);
 
@@ -101,7 +101,7 @@ void MainWindow::initialiseWidgets()
   m_lblMem2Status = new QLabel("");
   m_lblMem2Status->setAlignment(Qt::AlignHCenter);
 
-  m_btnOpenMemViewer = new QPushButton("Open memory viewer");
+  m_btnOpenMemViewer = new QPushButton(tr("Open memory viewer"));
   connect(m_btnOpenMemViewer, &QPushButton::clicked, this, &MainWindow::onOpenMenViewer);
 }
 
@@ -156,7 +156,7 @@ void MainWindow::addSelectedResultsToWatchList(Common::MemType type, size_t leng
   {
     u32 address = m_scanner->getResultListModel()->getResultAddress(i);
     MemWatchEntry* newEntry =
-        new MemWatchEntry("No label", address, type, base, isUnsigned, length);
+        new MemWatchEntry(tr("No label"), address, type, base, isUnsigned, length);
     m_watcher->addWatchEntry(newEntry);
   }
 }
@@ -166,7 +166,8 @@ void MainWindow::addAllResultsToWatchList(Common::MemType type, size_t length, b
 {
   for (auto item : m_scanner->getAllResults())
   {
-    MemWatchEntry* newEntry = new MemWatchEntry("No label", item, type, base, isUnsigned, length);
+    MemWatchEntry* newEntry =
+        new MemWatchEntry(tr("No label"), item, type, base, isUnsigned, length);
     m_watcher->addWatchEntry(newEntry);
   }
 }
@@ -174,7 +175,8 @@ void MainWindow::addAllResultsToWatchList(Common::MemType type, size_t length, b
 void MainWindow::addWatchRequested(u32 address, Common::MemType type, size_t length,
                                    bool isUnsigned, Common::MemBase base)
 {
-  MemWatchEntry* newEntry = new MemWatchEntry("No label", address, type, base, isUnsigned, length);
+  MemWatchEntry* newEntry =
+      new MemWatchEntry(tr("No label"), address, type, base, isUnsigned, length);
   m_watcher->addWatchEntry(newEntry);
 }
 
@@ -193,9 +195,9 @@ void MainWindow::onOpenMemViewerWithAddress(u32 address)
 void MainWindow::updateMem2Status()
 {
   if (DolphinComm::DolphinAccessor::isMEM2Present())
-    m_lblMem2Status->setText("The extended Wii-only memory is present");
+    m_lblMem2Status->setText(tr("The extended Wii-only memory is present"));
   else
-    m_lblMem2Status->setText("The extended Wii-only memory is absent");
+    m_lblMem2Status->setText(tr("The extended Wii-only memory is absent"));
   m_viewer->onMEM2StatusChanged(DolphinComm::DolphinAccessor::isMEM2Present());
 }
 
@@ -206,7 +208,7 @@ void MainWindow::updateDolphinHookingStatus()
   case DolphinComm::DolphinAccessor::DolphinStatus::hooked:
   {
     m_lblDolphinStatus->setText(
-        "Hooked successfully to Dolphin, current start address: " +
+        tr("Hooked successfully to Dolphin, current start address: ") +
         QString::number(DolphinComm::DolphinAccessor::getEmuRAMAddressStart(), 16).toUpper());
     m_scanner->setEnabled(true);
     m_watcher->setEnabled(true);
@@ -217,7 +219,7 @@ void MainWindow::updateDolphinHookingStatus()
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::notRunning:
   {
-    m_lblDolphinStatus->setText("Cannot hook to Dolphin, the process is not running");
+    m_lblDolphinStatus->setText(tr("Cannot hook to Dolphin, the process is not running"));
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
     m_btnOpenMemViewer->setDisabled(true);
@@ -228,7 +230,7 @@ void MainWindow::updateDolphinHookingStatus()
   case DolphinComm::DolphinAccessor::DolphinStatus::noEmu:
   {
     m_lblDolphinStatus->setText(
-        "Cannot hook to Dolphin, the process is running, but no emulation has been started");
+        tr("Cannot hook to Dolphin, the process is running, but no emulation has been started"));
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
     m_btnOpenMemViewer->setDisabled(true);
@@ -238,7 +240,7 @@ void MainWindow::updateDolphinHookingStatus()
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::unHooked:
   {
-    m_lblDolphinStatus->setText("Unhooked, press \"Hook\" to hook to Dolphin again");
+    m_lblDolphinStatus->setText(tr("Unhooked, press \"Hook\" to hook to Dolphin again"));
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
     m_btnOpenMemViewer->setDisabled(true);
@@ -310,11 +312,13 @@ void MainWindow::onExportAsCSV()
 
 void MainWindow::onAbout()
 {
-  QMessageBox::about(this, "About Dolphin memory engine",
-                     "Beta version 0.4\n\nA RAM search made to facilitate research and "
-                     "reverse engineering of GameCube and Wii games using the Dolphin "
-                     "emulator.\n\nThis program is licensed under the MIT license. You "
-                     "should have received a copy of the MIT license along with this program");
+  QString title = tr("About Dolphin memory engine");
+  QString text =
+      "Beta version 0.4\n\n" +
+      tr("A RAM search made to facilitate research and reverse engineering of GameCube and Wii "
+         "games using the Dolphin emulator.\n\nThis program is licensed under the MIT license. You "
+         "should have received a copy of the MIT license along with this program");
+  QMessageBox::about(this, title, text);
 }
 
 void MainWindow::onQuit()

@@ -73,10 +73,10 @@ void MemWatchWidget::initialiseWidgets()
   QShortcut* shortcut = new QShortcut(QKeySequence::Delete, m_watchView);
   connect(shortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteSelection);
 
-  m_btnAddGroup = new QPushButton("Add group", this);
+  m_btnAddGroup = new QPushButton(tr("Add group"), this);
   connect(m_btnAddGroup, &QPushButton::clicked, this, &MemWatchWidget::onAddGroup);
 
-  m_btnAddWatchEntry = new QPushButton("Add watch", this);
+  m_btnAddWatchEntry = new QPushButton(tr("Add watch"), this);
   connect(m_btnAddWatchEntry, &QPushButton::clicked, this, &MemWatchWidget::onAddWatchEntry);
 
   m_updateTimer = new QTimer(this);
@@ -121,8 +121,8 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
 
       if (entry->isBoundToPointer())
       {
-        QMenu* memViewerSubMenu = contextMenu->addMenu("Browse &memory at");
-        QAction* showPointerInViewer = new QAction("The &pointer address...", this);
+        QMenu* memViewerSubMenu = contextMenu->addMenu(tr("Browse &memory at"));
+        QAction* showPointerInViewer = new QAction(tr("The &pointer address..."), this);
         connect(showPointerInViewer, &QAction::triggered, this,
                 [=] { emit goToAddressInViewer(entry->getConsoleAddress()); });
         memViewerSubMenu->addAction(showPointerInViewer);
@@ -131,20 +131,20 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
           std::string strAddressOfPath = entry->getAddressStringForPointerLevel(i + 1);
           if (strAddressOfPath == "???")
             break;
-          QAction* showAddressOfPathInViewer =
-              new QAction("The pointed address at &level " + QString::number(i + 1) + "...", this);
+          QAction* showAddressOfPathInViewer = new QAction(
+              tr("The pointed address at &level %1...").arg(QString::number(i + 1)), this);
           connect(showAddressOfPathInViewer, &QAction::triggered, this,
                   [=] { emit goToAddressInViewer(entry->getAddressForPointerLevel(i + 1)); });
           memViewerSubMenu->addAction(showAddressOfPathInViewer);
         }
 
-        QAction* showInViewer = new QAction("Browse memory at this &address...", this);
+        QAction* showInViewer = new QAction(tr("Browse memory at this &address..."), this);
         connect(showInViewer, &QAction::triggered, this,
                 [=] { emit goToAddressInViewer(entry->getConsoleAddress()); });
       }
       else
       {
-        QAction* showInViewer = new QAction("Browse memory at this &address...", this);
+        QAction* showInViewer = new QAction(tr("Browse memory at this &address..."), this);
         connect(showInViewer, &QAction::triggered, this,
                 [=] { emit goToAddressInViewer(entry->getConsoleAddress()); });
 
@@ -154,10 +154,10 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       {
         contextMenu->addSeparator();
 
-        QAction* viewDec = new QAction("View as &Decimal", this);
-        QAction* viewHex = new QAction("View as &Hexadecimal", this);
-        QAction* viewOct = new QAction("View as &Octal", this);
-        QAction* viewBin = new QAction("View as &Binary", this);
+        QAction* viewDec = new QAction(tr("View as &Decimal"), this);
+        QAction* viewHex = new QAction(tr("View as &Hexadecimal"), this);
+        QAction* viewOct = new QAction(tr("View as &Octal"), this);
+        QAction* viewBin = new QAction(tr("View as &Binary"), this);
 
         connect(viewDec, &QAction::triggered, m_watchModel, [=] {
           entry->setBase(Common::MemBase::base_decimal);
@@ -188,8 +188,8 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
 
         if (theBase == Common::MemBase::base_decimal)
         {
-          QAction* viewSigned = new QAction("View as &Signed", this);
-          QAction* viewUnsigned = new QAction("View as &Unsigned", this);
+          QAction* viewSigned = new QAction(tr("View as &Signed"), this);
+          QAction* viewUnsigned = new QAction(tr("View as &Unsigned"), this);
 
           connect(viewSigned, &QAction::triggered, m_watchModel, [=] {
             entry->setSignedUnsigned(false);
@@ -226,22 +226,22 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
     node = m_watchModel->getRootNode();
   }
 
-  QAction* cut = new QAction("Cu&t", this);
+  QAction* cut = new QAction(tr("Cu&t"), this);
   connect(cut, &QAction::triggered, this, [=] { cutSelectedWatchesToClipBoard(); });
   contextMenu->addAction(cut);
-  QAction* copy = new QAction("&Copy", this);
+  QAction* copy = new QAction(tr("&Copy"), this);
   connect(copy, &QAction::triggered, this, [=] { copySelectedWatchesToClipBoard(); });
   contextMenu->addAction(copy);
 
   if (canPasteInto)
   {
-    QAction* paste = new QAction("&Paste", this);
+    QAction* paste = new QAction(tr("&Paste"), this);
     connect(paste, &QAction::triggered, this, [=] { pasteWatchFromClipBoard(node); });
     contextMenu->addAction(paste);
   }
 
   contextMenu->addSeparator();
-  QAction* deleteSelection = new QAction("&Delete", this);
+  QAction* deleteSelection = new QAction(tr("&Delete"), this);
   connect(deleteSelection, &QAction::triggered, this, [=] { onDeleteSelection(); });
   contextMenu->addAction(deleteSelection);
 
@@ -356,16 +356,17 @@ void MemWatchWidget::onValueWriteError(const QModelIndex& index,
     int typeIndex = static_cast<int>(entry->getType());
     int baseIndex = static_cast<int>(entry->getBase());
 
-    QString errorMsg("The value you entered for the type " +
-                     GUICommon::g_memTypeNames.at(typeIndex));
+    QString errorMsg;
     if (entry->getType() == Common::MemType::type_byteArray)
-      errorMsg +=
-          (" is invalid, you must enter the bytes in hexadecimal with one space between each "
-           "byte");
+      errorMsg = tr("The value you entered for the type %1 is invalid, you must enter the bytes in "
+                    "hexadecimal with one space between each byte")
+                     .arg(GUICommon::g_memTypeNames.at(typeIndex));
     else
-      errorMsg += (" in the base " + GUICommon::g_memBaseNames.at(baseIndex) + " is invalid");
-    QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, QString("Invalid value"),
-                                            errorMsg, QMessageBox::Ok, this);
+      errorMsg = tr("The value you entered for the type %1 in the base %2 is invalid")
+                     .arg(GUICommon::g_memTypeNames.at(typeIndex))
+                     .arg(GUICommon::g_memBaseNames.at(baseIndex));
+    QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid value"), errorMsg,
+                                            QMessageBox::Ok, this);
     errorBox->exec();
     break;
   }
