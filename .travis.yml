@@ -1,0 +1,26 @@
+dist: trusty
+sudo: enabled
+language:
+  - cpp
+compiler:
+  - gcc
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - sourceline: "ppa:beineri/opt-qt-5.10.1-trusty"
+    packages:
+      - gcc-6
+      - g++-6
+      - qt510-meta-minimal
+      - cmake
+script:
+  - QT_ENV_SCRIPT=$(find /opt -name 'qt*-env.sh')
+  - source $QT_ENV_SCRIPT
+  - sudo ln -s /usr/bin/gcc-6 /usr/local/bin/gcc
+  - sudo ln -s /usr/bin/g++-6 /usr/local/bin/g++
+  - cd Source
+  - mkdir build && cd build
+  - cmake ..
+  - make
+  
