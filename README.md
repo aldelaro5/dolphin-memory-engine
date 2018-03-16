@@ -54,6 +54,13 @@ If the program unhooks itself from Dolphin, it means a read/write operation fail
 
 Finally, the program also includes a memory viewer which shows an hexadecimal view and an ASCII view of the memory. Simply click on the corresponding button or right click on a watch to browse the memory using the memory viewer.
 
+## Troubleshouting
+
+On Linux, the program may require additional kernel permissions to be able to read and write memory to external processes (which is required to read and write the memory of Dolphin).  If the program instantly unhooks itself freqeuntly after an attempt to hook to Dolphin while nothing happened to Dolphin, this might indicate the program is missing the required permissions.  It is possible to grant these permissions by running the following command as root:
+
+	setcap cap_sys_ptrace=eip DME
+	
+Where `DME` is the path of the Dolphin Memory Engine executable.  Once the command is run, this should fix the permission problem for future executions.
 
 ## License
 This program is licensed under the MIT license which grants you the permission to do  anything you wish to with the software, as long as you preserve all copyright notices. (See the file LICENSE for the legal text.)
