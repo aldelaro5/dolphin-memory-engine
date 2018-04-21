@@ -22,17 +22,14 @@ On Linux, installation of the Qt 5 package(s) is required.
 
 ## How to Build
 ### Microsoft Windows
-> *An installation of Microsoft Visual Studio 2015 or 2017 with Visual C++ is needed. Previous versions are untested. Building works best with VS2017, but small adjustments can be made for VS2015 to work.*
+This repository provides a solution file for Visual Studio 2015 and later. The Windows SDK Version 10.0.16299.0 (Windows 10 Fall Creators Update) is required*.
 
 Before proceeding, ensure the Qt submodule is initialized by running `git submodule update --init` at the repository's root. The files should appear at the `Externals\Qt` directory.
 
-Once complete, open Visual Studio then open the solution located in the `Source` directory.
+Once complete, open the solution file `Dolphin-memory-engine.sln` located in the `Source` directory with Visual Studio. Select the build configuration and build it.
 
-##### Visual Studio 2017
-Select the build configuration and build the solution.
-
-##### Visual Studio 2015
-Change of the project's toolset may be required. Right click on the project from the Solution Explorer and click properties. From there, change the "Platform Toolset" to the one that you have installed. Please note that this will change the settings in the `vcxproj` file so if you plan to submit a Pull Request, make sure to not stage this change.
+#### Windows SDK
+The Windows SDK version 10.0.16299.0 comes with the C++ Desktop Development Workload of Visual Studio 2017 — other versions may work but are untested. To use a different Windows SDK you'll need to select the it in the project properties window. Please note that this will change the `vcxproj` file, so if you plan to submit a Pull Request, make sure to not stage this change.
 
 
 ### Linux

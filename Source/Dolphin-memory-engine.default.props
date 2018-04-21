@@ -7,6 +7,8 @@
     Any changes will be stored in a *.vcxproj.user file, which overrides the defaults here.
   -->
   <PropertyGroup>
+    <!-- Let visual studio pick its toolset instead of setting one -->
+    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
     <!-- Root of project -->
     <ProjectRoot>$(SolutionDir)..\</ProjectRoot>
     <!-- Path to Qt build files -->
