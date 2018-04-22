@@ -22,7 +22,8 @@ bool WindowsDolphinProcess::findPID()
     do
     {
       if (std::string(entry.szExeFile) == "Dolphin.exe" ||
-          std::string(entry.szExeFile) == "DolphinQt2.exe")
+          std::string(entry.szExeFile) == "DolphinQt2.exe" ||
+          std::string(entry.szExeFile) == "DolphinWx.exe")
       {
         m_PID = entry.th32ProcessID;
         break;
