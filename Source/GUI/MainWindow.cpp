@@ -157,7 +157,7 @@ void MainWindow::addSelectedResultsToWatchList(Common::MemType type, size_t leng
   QModelIndexList selection = m_scanner->getSelectedResults();
   for (int i = 0; i < selection.count(); i++)
   {
-    u32 address = m_scanner->getResultListModel()->getResultAddress(i);
+    u32 address = m_scanner->getResultListModel()->getResultAddress(selection.at(i).row());
     MemWatchEntry* newEntry =
         new MemWatchEntry(tr("No label"), address, type, base, isUnsigned, length);
     m_watcher->addWatchEntry(newEntry);
