@@ -328,7 +328,7 @@ void CheatEngineParser::verifyCheatEntryParsingErrors(cheatEntryParsingState sta
     }
     else if (!state.validType)
     {
-      stateErrors += "A type wa found, but was invalid\n";
+      stateErrors += "A type was found, but was invalid\n";
     }
     else if (entry->getType() == Common::MemType::type_string)
     {
