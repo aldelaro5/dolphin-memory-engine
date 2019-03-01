@@ -151,6 +151,7 @@ void MemWatchEntry::setLock(const bool doLock)
   {
     m_freezeMemSize = 0;
     delete[] m_freezeMemory;
+    m_freezeMemory = nullptr;
   }
 }
 
