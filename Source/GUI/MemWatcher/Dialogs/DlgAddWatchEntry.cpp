@@ -60,6 +60,7 @@ void DlgAddWatchEntry::initialiseWidgets()
 
   m_spnLength = new QSpinBox(this);
   m_spnLength->setMinimum(1);
+  m_spnLength->setMaximum(9999);
 }
 
 void DlgAddWatchEntry::makeLayouts()
