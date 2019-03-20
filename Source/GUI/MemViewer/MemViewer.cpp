@@ -411,7 +411,8 @@ void MemViewer::renderColumnsHeaderText(QPainter& painter)
     posXHeaderText += m_charWidthEm * 2 + m_charWidthEm / 2;
   }
 
-  painter.drawText(m_hexAsciiSeparatorPosX + m_charWidthEm * 2.5f, m_charHeight, tr("Text (ASCII)"));
+  painter.drawText(m_hexAsciiSeparatorPosX + m_charWidthEm * 2.5f, m_charHeight,
+                   tr("Text (ASCII)"));
   painter.drawText(0, 0, 0, 0, 0, QString());
   painter.setPen(oldPenColor);
 }
@@ -523,6 +524,7 @@ void MemViewer::renderASCIIText(QPainter& painter, const int rowIndex, const int
 void MemViewer::renderMemory(QPainter& painter, const int rowIndex, const int columnIndex)
 {
   QColor oldPenColor = painter.pen().color();
+  QColor fgColor = QGuiApplication::palette().color(QPalette::WindowText);
   int posXHex = m_rowHeaderWidth + (m_charWidthEm * 2 + m_charWidthEm / 2) * columnIndex;
   if (!(m_currentFirstAddress + (m_numColumns * rowIndex + columnIndex) >= m_memViewStart &&
         m_currentFirstAddress + (m_numColumns * rowIndex + columnIndex) < m_memViewEnd) ||
@@ -530,6 +532,7 @@ void MemViewer::renderMemory(QPainter& painter, const int rowIndex, const int co
           m_currentFirstAddress + (m_numColumns * rowIndex + columnIndex)) ||
       !m_validMemory)
   {
+    painter.setPen(fgColor);
     painter.drawText(posXHex, (rowIndex + 1) * m_charHeight + m_columnHeaderHeight, "??");
     painter.drawText((columnIndex * m_charWidthEm) + m_hexAsciiSeparatorPosX + m_charWidthEm / 2,
                      (rowIndex + 1) * m_charHeight + m_columnHeaderHeight, "?");
@@ -537,15 +540,14 @@ void MemViewer::renderMemory(QPainter& painter, const int rowIndex, const int co
   else
   {
     QColor bgColor = QColor(Qt::transparent);
-    QColor fgColor = QGuiApplication::palette().color(QPalette::WindowText);
     bool drawCarret = false;
 
     determineMemoryTextRenderProperties(rowIndex, columnIndex, drawCarret, bgColor, fgColor);
 
     renderHexByte(painter, rowIndex, columnIndex, bgColor, fgColor, drawCarret);
     renderASCIIText(painter, rowIndex, columnIndex, bgColor, fgColor);
-    painter.setPen(oldPenColor);
   }
+  painter.setPen(oldPenColor);
 }
 
 void MemViewer::paintEvent(QPaintEvent* event)
