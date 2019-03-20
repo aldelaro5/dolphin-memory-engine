@@ -10,6 +10,8 @@
 
 #include "../DolphinProcess/DolphinAccessor.h"
 #include "../MemoryWatch/MemWatchEntry.h"
+#include "Settings/DlgSettings.h"
+#include "Settings/SConfig.h"
 
 MainWindow::MainWindow()
 {
@@ -42,6 +44,8 @@ void MainWindow::makeMenus()
   m_actSaveAsWatchList->setShortcut(Qt::Modifier::CTRL + Qt::Modifier::SHIFT + Qt::Key::Key_S);
   m_actImportFromCT->setShortcut(Qt::Modifier::CTRL + Qt::Key::Key_I);
 
+  m_actSettings = new QAction(tr("&Settings"), this);
+
   m_actViewScanner = new QAction(tr("&Scanner"), this);
   m_actViewScanner->setCheckable(true);
   m_actViewScanner->setChecked(true);
@@ -54,6 +58,8 @@ void MainWindow::makeMenus()
   connect(m_actClearWatchList, &QAction::triggered, this, &MainWindow::onClearWatchList);
   connect(m_actImportFromCT, &QAction::triggered, this, &MainWindow::onImportFromCT);
   connect(m_actExportAsCSV, &QAction::triggered, this, &MainWindow::onExportAsCSV);
+
+  connect(m_actSettings, &QAction::triggered, this, &MainWindow::onOpenSettings);
 
   connect(m_actViewScanner, &QAction::toggled, this, [=] {
     if (m_actViewScanner->isChecked())
@@ -73,6 +79,9 @@ void MainWindow::makeMenus()
   m_menuFile->addAction(m_actImportFromCT);
   m_menuFile->addAction(m_actExportAsCSV);
   m_menuFile->addAction(m_actQuit);
+
+  m_menuEdit = menuBar()->addMenu(tr("&Edit"));
+  m_menuEdit->addAction(m_actSettings);
 
   m_menuView = menuBar()->addMenu(tr("&View"));
   m_menuView->addAction(m_actViewScanner);
@@ -261,10 +270,10 @@ void MainWindow::onHookAttempt()
   if (DolphinComm::DolphinAccessor::getStatus() ==
       DolphinComm::DolphinAccessor::DolphinStatus::hooked)
   {
-    m_scanner->getUpdateTimer()->start(100);
-    m_watcher->getUpdateTimer()->start(10);
-    m_watcher->getFreezeTimer()->start(10);
-    m_viewer->getUpdateTimer()->start(100);
+    m_scanner->getUpdateTimer()->start(SConfig::getInstance().getScannerUpdateTimerMs());
+    m_watcher->getUpdateTimer()->start(SConfig::getInstance().getWatcherUpdateTimerMs());
+    m_watcher->getFreezeTimer()->start(SConfig::getInstance().getFreezeTimerMs());
+    m_viewer->getUpdateTimer()->start(SConfig::getInstance().getViewerUpdateTimerMs());
     m_viewer->hookStatusChanged(true);
     updateMem2Status();
   }
@@ -311,6 +320,28 @@ void MainWindow::onImportFromCT()
 void MainWindow::onExportAsCSV()
 {
   m_watcher->exportWatchListAsCSV();
+}
+
+void MainWindow::onOpenSettings()
+{
+  DlgSettings* dlg = new DlgSettings(this);
+  int dlgResult = dlg->exec();
+  delete dlg;
+  if (dlgResult == QDialog::Accepted)
+  {
+    m_scanner->getUpdateTimer()->stop();
+    m_watcher->getUpdateTimer()->stop();
+    m_watcher->getFreezeTimer()->stop();
+    m_viewer->getUpdateTimer()->stop();
+    if (DolphinComm::DolphinAccessor::getStatus() ==
+        DolphinComm::DolphinAccessor::DolphinStatus::hooked)
+    {
+      m_scanner->getUpdateTimer()->start(SConfig::getInstance().getScannerUpdateTimerMs());
+      m_watcher->getUpdateTimer()->start(SConfig::getInstance().getWatcherUpdateTimerMs());
+      m_watcher->getFreezeTimer()->start(SConfig::getInstance().getFreezeTimerMs());
+      m_viewer->getUpdateTimer()->start(SConfig::getInstance().getViewerUpdateTimerMs());
+    }
+  }
 }
 
 void MainWindow::onAbout()

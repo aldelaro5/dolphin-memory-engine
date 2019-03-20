@@ -36,6 +36,7 @@ public:
   void onSaveWatchFile();
   void onSaveAsWatchFile();
   void onClearWatchList();
+  void onOpenSettings();
   void onImportFromCT();
   void onExportAsCSV();
   void onAbout();
@@ -59,6 +60,7 @@ private:
   QPushButton* m_btnOpenMemViewer;
 
   QMenu* m_menuFile;
+  QMenu* m_menuEdit;
   QMenu* m_menuView;
   QMenu* m_menuHelp;
   QAction* m_actOpenWatchList;
@@ -68,6 +70,7 @@ private:
   QAction* m_actImportFromCT;
   QAction* m_actExportAsCSV;
   QAction* m_actViewScanner;
+  QAction* m_actSettings;
   QAction* m_actQuit;
   QAction* m_actAbout;
 };

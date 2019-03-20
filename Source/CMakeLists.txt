@@ -17,6 +17,8 @@ set(SRCS ${DolphinProcessSrc}
          CheatEngineParser/CheatEngineParser.cpp
          MemoryScanner/MemoryScanner.cpp
          GUI/GUICommon.cpp
+         GUI/Settings/SConfig.cpp
+         GUI/Settings/DlgSettings.cpp
          GUI/MemWatcher/MemWatchDelegate.cpp
          GUI/MemWatcher/MemWatchModel.cpp    
          GUI/MemWatcher/Dialogs/DlgChangeType.cpp 
