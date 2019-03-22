@@ -154,7 +154,7 @@ MemViewer::bytePosFromMouse MemViewer::mousePosToBytePos(QPoint pos)
   }
   else
   {
-    bytePos.isInViewer - false;
+    bytePos.isInViewer = false;
     return bytePos;
   }
   bytePos.y = (y - areaTop) / m_charHeight;
@@ -332,19 +332,19 @@ void MemViewer::copySelection()
   int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
   size_t selectionLength = static_cast<size_t>(indexEnd - indexStart + 1);
 
-  char selectedMem[selectionLength] = {0};
+  char* selectedMem = new char[selectionLength];
   if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress))
   {
     DolphinComm::DolphinAccessor::copyRawMemoryFromCache(
         selectedMem, m_currentFirstAddress + indexStart, selectionLength);
+    std::string hexBytes =
+        Common::formatMemoryToString(selectedMem, Common::MemType::type_byteArray, selectionLength,
+                                     Common::MemBase::base_none, true);
+
+    QClipboard* clipboard = QGuiApplication::clipboard();
+    clipboard->setText(QString::fromStdString(hexBytes));
   }
-
-  std::string hexBytes =
-      Common::formatMemoryToString(selectedMem, Common::MemType::type_byteArray, selectionLength,
-                                   Common::MemBase::base_none, true);
-
-  QClipboard* clipboard = QGuiApplication::clipboard();
-  clipboard->setText(QString::fromStdString(hexBytes));
+  delete[] selectedMem;
 }
 
 bool MemViewer::handleNaviguationKey(const int key)
