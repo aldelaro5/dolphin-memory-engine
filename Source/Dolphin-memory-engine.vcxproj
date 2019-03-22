@@ -124,6 +124,8 @@
     <ClInclude Include="GUI\MemWatcher\MemWatchDelegate.h" />
     <ClInclude Include="GUI\MemWatcher\MemWatchTreeNode.h" />
     <ClInclude Include="GUI\MemWatcher\Dialogs\DlgImportCTFile.h" />
+    <ClInclude Include="GUI\Settings\SConfig.h" />
+    <ClInclude Include="GUI\Settings\DlgSettings.h" />
   </ItemGroup>
   <ItemGroup>
     <!-- All files except for GUICommon need to be Moc'ed -->
