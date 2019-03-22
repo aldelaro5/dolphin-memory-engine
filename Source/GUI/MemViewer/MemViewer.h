@@ -19,6 +19,7 @@ public:
   ~MemViewer();
   QSize sizeHint() const override;
   void mousePressEvent(QMouseEvent* event) override;
+  void mouseMoveEvent(QMouseEvent* event) override;
   void wheelEvent(QWheelEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
   void paintEvent(QPaintEvent* event) override;
@@ -32,6 +33,12 @@ signals:
   void memErrorOccured();
 
 private:
+  enum class SelectionType
+  {
+    upward,
+    downward
+  };
+
   void initialise();
 
   void updateFontSize(int newSize);
@@ -56,8 +63,11 @@ private:
   const int m_numColumns = 16; // Should be a multiple of 16, or the header doesn't make much sense
   const int m_numCells = m_numRows * m_numColumns;
   int m_memoryFontSize = 15;
-  int m_byteSelectedPosX = -1;
-  int m_byteSelectedPosY = -1;
+  int m_StartBytesSelectionPosX = -1;
+  int m_StartBytesSelectionPosY = -1;
+  int m_EndBytesSelectionPosX = -1;
+  int m_EndBytesSelectionPosY = -1;
+  SelectionType m_selectionType;
   int m_charWidthEm = 0;
   int m_charHeight = 0;
   int m_hexAreaWidth = 0;

@@ -158,10 +158,102 @@ void MemViewer::mousePressEvent(QMouseEvent* event)
 
   // Toggle carrot-between-hex when the same byte is clicked twice from the hex table
   m_carretBetweenHex = (m_editingHex && wasEditingHex && !m_carretBetweenHex &&
-                        m_byteSelectedPosX == x && m_byteSelectedPosY == y);
+                        m_StartBytesSelectionPosX == x && m_StartBytesSelectionPosY == y &&
+                        m_EndBytesSelectionPosX == x && m_EndBytesSelectionPosY == y);
 
-  m_byteSelectedPosX = x;
-  m_byteSelectedPosY = y;
+  m_StartBytesSelectionPosX = x;
+  m_StartBytesSelectionPosY = y;
+  m_EndBytesSelectionPosX = x;
+  m_EndBytesSelectionPosY = y;
+
+  viewport()->update();
+}
+
+void MemViewer::mouseMoveEvent(QMouseEvent* event)
+{
+  if (!(event->buttons() & Qt::LeftButton))
+    return;
+
+  int x = event->pos().x();
+  int y = event->pos().y();
+
+  const bool wasEditingHex = m_editingHex;
+  const int spacing = m_charWidthEm / 2;
+  const int hexCellWidth = m_charWidthEm * 2 + spacing;
+  const int hexAreaLeft = m_rowHeaderWidth - spacing / 2;
+  const int asciiAreaLeft = m_hexAsciiSeparatorPosX + spacing;
+  const int areaTop = m_columnHeaderHeight + m_charHeight - fontMetrics().overlinePos();
+  QRect hexArea(hexAreaLeft, areaTop, m_hexAreaWidth, m_charHeight * m_numRows);
+  QRect asciiArea(asciiAreaLeft, areaTop, m_charWidthEm * m_numColumns, m_charHeight * m_numRows);
+
+  // Transform x and y to indices for column and row
+  if (hexArea.contains(x, y, false))
+  {
+    x = (x - hexAreaLeft) / hexCellWidth;
+    m_editingHex = true;
+  }
+  else if (asciiArea.contains(x, y, false))
+  {
+    x = (x - asciiAreaLeft) / m_charWidthEm;
+    m_editingHex = false;
+  }
+  else
+  {
+    return;
+  }
+  y = (y - areaTop) / m_charHeight;
+
+  int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
+  int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
+  int indexDrag = y * m_numColumns + x;
+
+  // The selection is getting retracted, but still goes the same direction as before
+  if (indexDrag > indexStart && indexDrag < indexEnd)
+  {
+    if (m_selectionType == SelectionType::upward)
+    {
+      m_StartBytesSelectionPosX = x;
+      m_StartBytesSelectionPosY = y;
+    }
+    else if (m_selectionType == SelectionType::downward)
+    {
+      m_EndBytesSelectionPosX = x;
+      m_EndBytesSelectionPosY = y;
+    }
+  }
+  // The selection either expands upwards OR it switches to upward
+  else if (indexDrag < indexStart && indexDrag < indexEnd)
+  {
+    if (m_selectionType == SelectionType::downward)
+    {
+      m_EndBytesSelectionPosX = m_StartBytesSelectionPosX;
+      m_EndBytesSelectionPosY = m_StartBytesSelectionPosY;
+    }
+    m_StartBytesSelectionPosX = x;
+    m_StartBytesSelectionPosY = y;
+    m_selectionType = SelectionType::upward;
+  }
+  // The selection either expands downward OR it switches to downward
+  else if (indexDrag > indexStart && indexDrag > indexEnd)
+  {
+    if (m_selectionType == SelectionType::upward)
+    {
+      m_StartBytesSelectionPosX = m_EndBytesSelectionPosX;
+      m_StartBytesSelectionPosY = m_EndBytesSelectionPosY;
+    }
+    m_EndBytesSelectionPosX = x;
+    m_EndBytesSelectionPosY = y;
+    m_selectionType = SelectionType::downward;
+  }
+  // The selection is just one byte
+  else if ((indexDrag == indexStart && m_selectionType == SelectionType::downward) ||
+           (indexDrag == indexEnd && m_selectionType == SelectionType::upward))
+  {
+    m_StartBytesSelectionPosX = x;
+    m_StartBytesSelectionPosY = y;
+    m_EndBytesSelectionPosX = x;
+    m_EndBytesSelectionPosY = y;
+  }
 
   viewport()->update();
 }
@@ -204,10 +296,10 @@ void MemViewer::updateFontSize(int newSize)
 
 void MemViewer::scrollToSelection()
 {
-  if (m_byteSelectedPosY < 0)
-    scrollContentsBy(0, -m_byteSelectedPosY);
-  else if (m_byteSelectedPosY >= m_numRows)
-    scrollContentsBy(0, m_numRows - m_byteSelectedPosY - 1);
+  if (m_StartBytesSelectionPosY < 0)
+    scrollContentsBy(0, -m_StartBytesSelectionPosY);
+  else if (m_StartBytesSelectionPosY >= m_numRows)
+    scrollContentsBy(0, m_numRows - m_StartBytesSelectionPosY - 1);
   viewport()->update();
 }
 
@@ -216,49 +308,50 @@ bool MemViewer::handleNaviguationKey(const int key)
   switch (key)
   {
   case Qt::Key_Up:
-    if (verticalScrollBar()->value() + m_byteSelectedPosY <= verticalScrollBar()->minimum())
+    if (verticalScrollBar()->value() + m_StartBytesSelectionPosY <= verticalScrollBar()->minimum())
       QApplication::beep();
     else
-      m_byteSelectedPosY--;
+      m_StartBytesSelectionPosY--;
     scrollToSelection();
     break;
   case Qt::Key_Down:
-    if (verticalScrollBar()->value() + m_byteSelectedPosY >= verticalScrollBar()->maximum())
+    if (verticalScrollBar()->value() + m_StartBytesSelectionPosY >= verticalScrollBar()->maximum())
       QApplication::beep();
     else
-      m_byteSelectedPosY++;
+      m_StartBytesSelectionPosY++;
     scrollToSelection();
     break;
   case Qt::Key_Left:
-    if (m_byteSelectedPosX <= 0 && m_byteSelectedPosY <= 0 &&
+    if (m_StartBytesSelectionPosX <= 0 && m_StartBytesSelectionPosY <= 0 &&
         verticalScrollBar()->value() == verticalScrollBar()->minimum())
     {
       QApplication::beep();
     }
     else
     {
-      m_byteSelectedPosX--;
-      if (m_byteSelectedPosX < 0)
+      m_StartBytesSelectionPosX--;
+      if (m_StartBytesSelectionPosX < 0)
       {
-        m_byteSelectedPosX += m_numColumns;
-        m_byteSelectedPosY--;
+        m_StartBytesSelectionPosX += m_numColumns;
+        m_StartBytesSelectionPosY--;
       }
       scrollToSelection();
     }
     break;
   case Qt::Key_Right:
-    if (m_byteSelectedPosX >= m_numColumns - 1 && m_byteSelectedPosY >= m_numRows - 1 &&
+    if (m_StartBytesSelectionPosX >= m_numColumns - 1 &&
+        m_StartBytesSelectionPosY >= m_numRows - 1 &&
         verticalScrollBar()->value() == verticalScrollBar()->maximum())
     {
       QApplication::beep();
     }
     else
     {
-      m_byteSelectedPosX++;
-      if (m_byteSelectedPosX >= m_numColumns)
+      m_StartBytesSelectionPosX++;
+      if (m_StartBytesSelectionPosX >= m_numColumns)
       {
-        m_byteSelectedPosX -= m_numColumns;
-        m_byteSelectedPosY++;
+        m_StartBytesSelectionPosX -= m_numColumns;
+        m_StartBytesSelectionPosY++;
       }
       scrollToSelection();
     }
@@ -272,14 +365,14 @@ bool MemViewer::handleNaviguationKey(const int key)
     break;
   case Qt::Key_Home:
     verticalScrollBar()->setValue(0);
-    m_byteSelectedPosX = 0;
-    m_byteSelectedPosY = 0;
+    m_StartBytesSelectionPosX = 0;
+    m_StartBytesSelectionPosY = 0;
     viewport()->update();
     break;
   case Qt::Key_End:
     verticalScrollBar()->setValue(verticalScrollBar()->maximum());
-    m_byteSelectedPosX = m_numColumns - 1;
-    m_byteSelectedPosY = m_numRows - 1;
+    m_StartBytesSelectionPosX = m_numColumns - 1;
+    m_StartBytesSelectionPosY = m_numRows - 1;
     viewport()->update();
     break;
   default:
@@ -293,7 +386,8 @@ bool MemViewer::handleNaviguationKey(const int key)
 
 bool MemViewer::writeCharacterToSelectedMemory(char byteToWrite)
 {
-  const size_t memoryOffset = ((m_byteSelectedPosY * m_numColumns) + m_byteSelectedPosX);
+  const size_t memoryOffset =
+      ((m_StartBytesSelectionPosY * m_numColumns) + m_StartBytesSelectionPosX);
   if (m_editingHex)
   {
     // Convert ascii to actual value
@@ -373,7 +467,8 @@ void MemViewer::scrollContentsBy(int dx, int dy)
     u32 newAddress = m_currentFirstAddress + m_numColumns * (-dy);
 
     // Move selection
-    m_byteSelectedPosY += dy;
+    m_StartBytesSelectionPosY += dy;
+    m_EndBytesSelectionPosY += dy;
 
     if (newAddress < m_memViewStart)
       newAddress = m_memViewStart;
@@ -449,11 +544,16 @@ void MemViewer::determineMemoryTextRenderProperties(const int rowIndex, const in
                                                     bool& drawCarret, QColor& bgColor,
                                                     QColor& fgColor)
 {
-  if (rowIndex == m_byteSelectedPosY && columnIndex == m_byteSelectedPosX)
+  int currentIndex = rowIndex * m_numColumns + columnIndex;
+  int selectionStartIndex = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
+  int selectionEndIndex = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
+
+  if (currentIndex >= selectionStartIndex && currentIndex <= selectionEndIndex)
   {
     bgColor = QGuiApplication::palette().color(QPalette::Highlight);
     fgColor = QGuiApplication::palette().color(QPalette::HighlightedText);
-    drawCarret = true;
+    if (selectionStartIndex == selectionEndIndex)
+      drawCarret = true;
   }
   // If the byte changed since the last data update
   else if (m_lastRawMemoryData[rowIndex * m_numColumns + columnIndex] !=
