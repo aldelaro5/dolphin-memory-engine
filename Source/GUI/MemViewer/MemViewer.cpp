@@ -7,6 +7,8 @@
 #include <sstream>
 
 #include <QApplication>
+#include <QClipboard>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
@@ -23,6 +25,9 @@ MemViewer::MemViewer(QWidget* parent) : QAbstractScrollArea(parent)
   verticalScrollBar()->setPageStep(m_numRows);
 
   m_elapsedTimer.start();
+
+  m_copyShortcut = new QShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key::Key_C), parent);
+  connect(m_copyShortcut, &QShortcut::activated, this, &MemViewer::copySelection);
 
   // The viewport is implicitly updated at the constructor's end
 }
@@ -121,16 +126,11 @@ void MemViewer::changeMemoryRegion(const bool isMEM2)
   verticalScrollBar()->setRange(0, ((m_memViewEnd - m_memViewStart) / m_numColumns) - m_numRows);
 }
 
-void MemViewer::mousePressEvent(QMouseEvent* event)
+MemViewer::bytePosFromMouse MemViewer::mousePosToBytePos(QPoint pos)
 {
-  // Only handle left-click events
-  if (event->button() != Qt::MouseButton::LeftButton)
-    return;
+  int x = pos.x();
+  int y = pos.y();
 
-  int x = event->pos().x();
-  int y = event->pos().y();
-
-  const bool wasEditingHex = m_editingHex;
   const int spacing = m_charWidthEm / 2;
   const int hexCellWidth = m_charWidthEm * 2 + spacing;
   const int hexAreaLeft = m_rowHeaderWidth - spacing / 2;
@@ -139,32 +139,52 @@ void MemViewer::mousePressEvent(QMouseEvent* event)
   QRect hexArea(hexAreaLeft, areaTop, m_hexAreaWidth, m_charHeight * m_numRows);
   QRect asciiArea(asciiAreaLeft, areaTop, m_charWidthEm * m_numColumns, m_charHeight * m_numRows);
 
+  bytePosFromMouse bytePos;
+
   // Transform x and y to indices for column and row
   if (hexArea.contains(x, y, false))
   {
-    x = (x - hexAreaLeft) / hexCellWidth;
+    bytePos.x = (x - hexAreaLeft) / hexCellWidth;
     m_editingHex = true;
   }
   else if (asciiArea.contains(x, y, false))
   {
-    x = (x - asciiAreaLeft) / m_charWidthEm;
+    bytePos.x = (x - asciiAreaLeft) / m_charWidthEm;
     m_editingHex = false;
   }
   else
   {
-    return;
+    bytePos.isInViewer - false;
+    return bytePos;
   }
-  y = (y - areaTop) / m_charHeight;
+  bytePos.y = (y - areaTop) / m_charHeight;
+  bytePos.isInViewer = true;
+  return bytePos;
+}
+
+void MemViewer::mousePressEvent(QMouseEvent* event)
+{
+  // Only handle left-click events
+  if (event->button() != Qt::MouseButton::LeftButton)
+    return;
+
+  bytePosFromMouse bytePos = mousePosToBytePos(event->pos());
+
+  if (!bytePos.isInViewer)
+    return;
+
+  const bool wasEditingHex = m_editingHex;
 
   // Toggle carrot-between-hex when the same byte is clicked twice from the hex table
-  m_carretBetweenHex = (m_editingHex && wasEditingHex && !m_carretBetweenHex &&
-                        m_StartBytesSelectionPosX == x && m_StartBytesSelectionPosY == y &&
-                        m_EndBytesSelectionPosX == x && m_EndBytesSelectionPosY == y);
+  m_carretBetweenHex =
+      (m_editingHex && wasEditingHex && !m_carretBetweenHex &&
+       m_StartBytesSelectionPosX == bytePos.x && m_StartBytesSelectionPosY == bytePos.y &&
+       m_EndBytesSelectionPosX == bytePos.x && m_EndBytesSelectionPosY == bytePos.y);
 
-  m_StartBytesSelectionPosX = x;
-  m_StartBytesSelectionPosY = y;
-  m_EndBytesSelectionPosX = x;
-  m_EndBytesSelectionPosY = y;
+  m_StartBytesSelectionPosX = bytePos.x;
+  m_StartBytesSelectionPosY = bytePos.y;
+  m_EndBytesSelectionPosX = bytePos.x;
+  m_EndBytesSelectionPosY = bytePos.y;
 
   viewport()->update();
 }
@@ -174,51 +194,27 @@ void MemViewer::mouseMoveEvent(QMouseEvent* event)
   if (!(event->buttons() & Qt::LeftButton))
     return;
 
-  int x = event->pos().x();
-  int y = event->pos().y();
+  bytePosFromMouse bytePos = mousePosToBytePos(event->pos());
 
-  const bool wasEditingHex = m_editingHex;
-  const int spacing = m_charWidthEm / 2;
-  const int hexCellWidth = m_charWidthEm * 2 + spacing;
-  const int hexAreaLeft = m_rowHeaderWidth - spacing / 2;
-  const int asciiAreaLeft = m_hexAsciiSeparatorPosX + spacing;
-  const int areaTop = m_columnHeaderHeight + m_charHeight - fontMetrics().overlinePos();
-  QRect hexArea(hexAreaLeft, areaTop, m_hexAreaWidth, m_charHeight * m_numRows);
-  QRect asciiArea(asciiAreaLeft, areaTop, m_charWidthEm * m_numColumns, m_charHeight * m_numRows);
-
-  // Transform x and y to indices for column and row
-  if (hexArea.contains(x, y, false))
-  {
-    x = (x - hexAreaLeft) / hexCellWidth;
-    m_editingHex = true;
-  }
-  else if (asciiArea.contains(x, y, false))
-  {
-    x = (x - asciiAreaLeft) / m_charWidthEm;
-    m_editingHex = false;
-  }
-  else
-  {
+  if (!bytePos.isInViewer)
     return;
-  }
-  y = (y - areaTop) / m_charHeight;
 
   int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
   int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
-  int indexDrag = y * m_numColumns + x;
+  int indexDrag = bytePos.y * m_numColumns + bytePos.x;
 
   // The selection is getting retracted, but still goes the same direction as before
   if (indexDrag > indexStart && indexDrag < indexEnd)
   {
     if (m_selectionType == SelectionType::upward)
     {
-      m_StartBytesSelectionPosX = x;
-      m_StartBytesSelectionPosY = y;
+      m_StartBytesSelectionPosX = bytePos.x;
+      m_StartBytesSelectionPosY = bytePos.y;
     }
     else if (m_selectionType == SelectionType::downward)
     {
-      m_EndBytesSelectionPosX = x;
-      m_EndBytesSelectionPosY = y;
+      m_EndBytesSelectionPosX = bytePos.x;
+      m_EndBytesSelectionPosY = bytePos.y;
     }
   }
   // The selection either expands upwards OR it switches to upward
@@ -229,8 +225,8 @@ void MemViewer::mouseMoveEvent(QMouseEvent* event)
       m_EndBytesSelectionPosX = m_StartBytesSelectionPosX;
       m_EndBytesSelectionPosY = m_StartBytesSelectionPosY;
     }
-    m_StartBytesSelectionPosX = x;
-    m_StartBytesSelectionPosY = y;
+    m_StartBytesSelectionPosX = bytePos.x;
+    m_StartBytesSelectionPosY = bytePos.y;
     m_selectionType = SelectionType::upward;
   }
   // The selection either expands downward OR it switches to downward
@@ -241,21 +237,48 @@ void MemViewer::mouseMoveEvent(QMouseEvent* event)
       m_StartBytesSelectionPosX = m_EndBytesSelectionPosX;
       m_StartBytesSelectionPosY = m_EndBytesSelectionPosY;
     }
-    m_EndBytesSelectionPosX = x;
-    m_EndBytesSelectionPosY = y;
+    m_EndBytesSelectionPosX = bytePos.x;
+    m_EndBytesSelectionPosY = bytePos.y;
     m_selectionType = SelectionType::downward;
   }
   // The selection is just one byte
   else if ((indexDrag == indexStart && m_selectionType == SelectionType::downward) ||
            (indexDrag == indexEnd && m_selectionType == SelectionType::upward))
   {
-    m_StartBytesSelectionPosX = x;
-    m_StartBytesSelectionPosY = y;
-    m_EndBytesSelectionPosX = x;
-    m_EndBytesSelectionPosY = y;
+    m_StartBytesSelectionPosX = bytePos.x;
+    m_StartBytesSelectionPosY = bytePos.y;
+    m_EndBytesSelectionPosX = bytePos.x;
+    m_EndBytesSelectionPosY = bytePos.y;
   }
 
   viewport()->update();
+}
+
+void MemViewer::contextMenuEvent(QContextMenuEvent* event)
+{
+  if (event->reason() == QContextMenuEvent::Reason::Mouse)
+  {
+    bytePosFromMouse bytePos = mousePosToBytePos(event->pos());
+    if (!bytePos.isInViewer)
+    {
+      event->ignore();
+      return;
+    }
+
+    int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
+    int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
+    int indexMouse = bytePos.y * m_numColumns + bytePos.x;
+
+    if (indexMouse < indexStart || indexMouse > indexEnd)
+      return;
+  }
+
+  QMenu* contextMenu = new QMenu(this);
+  QAction* copyAction = new QAction(tr("&Copy"));
+  connect(copyAction, &QAction::triggered, this, &MemViewer::copySelection);
+  contextMenu->addAction(copyAction);
+
+  contextMenu->popup(viewport()->mapToGlobal(event->pos()));
 }
 
 void MemViewer::wheelEvent(QWheelEvent* event)
@@ -301,6 +324,27 @@ void MemViewer::scrollToSelection()
   else if (m_StartBytesSelectionPosY >= m_numRows)
     scrollContentsBy(0, m_numRows - m_StartBytesSelectionPosY - 1);
   viewport()->update();
+}
+
+void MemViewer::copySelection()
+{
+  int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
+  int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
+  size_t selectionLength = static_cast<size_t>(indexEnd - indexStart + 1);
+
+  char selectedMem[selectionLength] = {0};
+  if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress))
+  {
+    DolphinComm::DolphinAccessor::copyRawMemoryFromCache(
+        selectedMem, m_currentFirstAddress + indexStart, selectionLength);
+  }
+
+  std::string hexBytes =
+      Common::formatMemoryToString(selectedMem, Common::MemType::type_byteArray, selectionLength,
+                                   Common::MemBase::base_none, true);
+
+  QClipboard* clipboard = QGuiApplication::clipboard();
+  clipboard->setText(QString::fromStdString(hexBytes));
 }
 
 bool MemViewer::handleNaviguationKey(const int key)

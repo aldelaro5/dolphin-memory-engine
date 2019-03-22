@@ -5,6 +5,7 @@
 #include <QElapsedTimer>
 #include <QList>
 #include <QRect>
+#include <QShortcut>
 #include <QTimer>
 #include <QWidget>
 
@@ -20,6 +21,7 @@ public:
   QSize sizeHint() const override;
   void mousePressEvent(QMouseEvent* event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
+  void contextMenuEvent(QContextMenuEvent* event) override;
   void wheelEvent(QWheelEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
   void paintEvent(QPaintEvent* event) override;
@@ -39,10 +41,19 @@ private:
     downward
   };
 
+  struct bytePosFromMouse
+  {
+    int x = 0;
+    int y = 0;
+    bool isInViewer = false;
+  };
+
   void initialise();
 
   void updateFontSize(int newSize);
+  bytePosFromMouse mousePosToBytePos(QPoint pos);
   void scrollToSelection();
+  void copySelection();
   bool handleNaviguationKey(const int key);
   bool writeCharacterToSelectedMemory(char byteToWrite);
   void updateMemoryData();
@@ -63,10 +74,10 @@ private:
   const int m_numColumns = 16; // Should be a multiple of 16, or the header doesn't make much sense
   const int m_numCells = m_numRows * m_numColumns;
   int m_memoryFontSize = 15;
-  int m_StartBytesSelectionPosX = -1;
-  int m_StartBytesSelectionPosY = -1;
-  int m_EndBytesSelectionPosX = -1;
-  int m_EndBytesSelectionPosY = -1;
+  int m_StartBytesSelectionPosX = 0;
+  int m_StartBytesSelectionPosY = 0;
+  int m_EndBytesSelectionPosX = 0;
+  int m_EndBytesSelectionPosY = 0;
   SelectionType m_selectionType;
   int m_charWidthEm = 0;
   int m_charHeight = 0;
@@ -86,5 +97,6 @@ private:
   u32 m_memViewStart = 0;
   u32 m_memViewEnd = 0;
   QRect* m_curosrRect;
+  QShortcut* m_copyShortcut;
   QElapsedTimer m_elapsedTimer;
 };
