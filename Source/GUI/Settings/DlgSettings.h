@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QComboBox>
 #include <QDialog>
 #include <QSpinBox>
 
@@ -15,9 +16,10 @@ private:
   void loadSettings();
   void saveSettings() const;
 
-  QSpinBox* spnWatcherUpdateTimerMs;
-  QSpinBox* spnScannerUpdateTimerMs;
-  QSpinBox* spnViewerUpdateTimerMs;
-  QSpinBox* spnFreezeTimerMs;
+  QSpinBox* m_spnWatcherUpdateTimerMs;
+  QSpinBox* m_spnScannerUpdateTimerMs;
+  QSpinBox* m_spnViewerUpdateTimerMs;
+  QSpinBox* m_spnFreezeTimerMs;
+  QComboBox* m_cmbViewerBytesSeparator;
   QDialogButtonBox* m_buttonsDlg;
 };

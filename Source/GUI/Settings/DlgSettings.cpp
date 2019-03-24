@@ -12,24 +12,24 @@ DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
 {
   QGroupBox* grbTimerSettings = new QGroupBox("Timer settings");
 
-  spnWatcherUpdateTimerMs = new QSpinBox();
-  spnWatcherUpdateTimerMs->setMinimum(1);
-  spnWatcherUpdateTimerMs->setMaximum(10000);
-  spnScannerUpdateTimerMs = new QSpinBox();
-  spnScannerUpdateTimerMs->setMinimum(1);
-  spnScannerUpdateTimerMs->setMaximum(10000);
-  spnViewerUpdateTimerMs = new QSpinBox();
-  spnViewerUpdateTimerMs->setMinimum(1);
-  spnViewerUpdateTimerMs->setMaximum(10000);
-  spnFreezeTimerMs = new QSpinBox();
-  spnFreezeTimerMs->setMinimum(1);
-  spnFreezeTimerMs->setMaximum(10000);
+  m_spnWatcherUpdateTimerMs = new QSpinBox();
+  m_spnWatcherUpdateTimerMs->setMinimum(1);
+  m_spnWatcherUpdateTimerMs->setMaximum(10000);
+  m_spnScannerUpdateTimerMs = new QSpinBox();
+  m_spnScannerUpdateTimerMs->setMinimum(1);
+  m_spnScannerUpdateTimerMs->setMaximum(10000);
+  m_spnViewerUpdateTimerMs = new QSpinBox();
+  m_spnViewerUpdateTimerMs->setMinimum(1);
+  m_spnViewerUpdateTimerMs->setMaximum(10000);
+  m_spnFreezeTimerMs = new QSpinBox();
+  m_spnFreezeTimerMs->setMinimum(1);
+  m_spnFreezeTimerMs->setMaximum(10000);
 
   QFormLayout* timerSettingsInputLayout = new QFormLayout();
-  timerSettingsInputLayout->addRow("Watcher update timer (ms)", spnWatcherUpdateTimerMs);
-  timerSettingsInputLayout->addRow("Scanner results update timer (ms)", spnScannerUpdateTimerMs);
-  timerSettingsInputLayout->addRow("Memory viewer update timer (ms)", spnViewerUpdateTimerMs);
-  timerSettingsInputLayout->addRow("Address value lock timer (ms)", spnFreezeTimerMs);
+  timerSettingsInputLayout->addRow("Watcher update timer (ms)", m_spnWatcherUpdateTimerMs);
+  timerSettingsInputLayout->addRow("Scanner results update timer (ms)", m_spnScannerUpdateTimerMs);
+  timerSettingsInputLayout->addRow("Memory viewer update timer (ms)", m_spnViewerUpdateTimerMs);
+  timerSettingsInputLayout->addRow("Address value lock timer (ms)", m_spnFreezeTimerMs);
   timerSettingsInputLayout->setLabelAlignment(Qt::AlignRight);
 
   QLabel* lblTimerSettingsDescription = new QLabel(
@@ -46,6 +46,23 @@ DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
 
   grbTimerSettings->setLayout(timerSettingsLayout);
 
+  QGroupBox* grbViewerSettings = new QGroupBox("Viewer settings");
+
+  m_cmbViewerBytesSeparator = new QComboBox();
+  m_cmbViewerBytesSeparator->addItem("No separator", 0);
+  m_cmbViewerBytesSeparator->addItem("Separate every bytes", 1);
+  m_cmbViewerBytesSeparator->addItem("Separate every 2 bytes", 2);
+  m_cmbViewerBytesSeparator->addItem("Separate every 4 bytes", 4);
+  m_cmbViewerBytesSeparator->addItem("Separate every 8 bytes", 8);
+
+  QFormLayout* viewerSettingsInputLayout = new QFormLayout();
+  viewerSettingsInputLayout->addRow("Bytes separators setting", m_cmbViewerBytesSeparator);
+
+  QVBoxLayout* viewerSettingsLayout = new QVBoxLayout;
+  viewerSettingsLayout->addLayout(viewerSettingsInputLayout);
+
+  grbViewerSettings->setLayout(viewerSettingsLayout);
+
   m_buttonsDlg = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
   connect(m_buttonsDlg, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -59,6 +76,7 @@ DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(grbTimerSettings);
+  mainLayout->addWidget(grbViewerSettings);
   mainLayout->addWidget(m_buttonsDlg);
   setLayout(mainLayout);
 
@@ -74,16 +92,20 @@ DlgSettings::~DlgSettings()
 
 void DlgSettings::loadSettings()
 {
-  spnWatcherUpdateTimerMs->setValue(SConfig::getInstance().getWatcherUpdateTimerMs());
-  spnScannerUpdateTimerMs->setValue(SConfig::getInstance().getScannerUpdateTimerMs());
-  spnViewerUpdateTimerMs->setValue(SConfig::getInstance().getViewerUpdateTimerMs());
-  spnFreezeTimerMs->setValue(SConfig::getInstance().getFreezeTimerMs());
+  m_spnWatcherUpdateTimerMs->setValue(SConfig::getInstance().getWatcherUpdateTimerMs());
+  m_spnScannerUpdateTimerMs->setValue(SConfig::getInstance().getScannerUpdateTimerMs());
+  m_spnViewerUpdateTimerMs->setValue(SConfig::getInstance().getViewerUpdateTimerMs());
+  m_spnFreezeTimerMs->setValue(SConfig::getInstance().getFreezeTimerMs());
+  m_cmbViewerBytesSeparator->setCurrentIndex(
+      m_cmbViewerBytesSeparator->findData(SConfig::getInstance().getViewerNbrBytesSeparator()));
 }
 
 void DlgSettings::saveSettings() const
 {
-  SConfig::getInstance().setWatcherUpdateTimerMs(spnWatcherUpdateTimerMs->value());
-  SConfig::getInstance().setScannerUpdateTimerMs(spnScannerUpdateTimerMs->value());
-  SConfig::getInstance().setViewerUpdateTimerMs(spnViewerUpdateTimerMs->value());
-  SConfig::getInstance().setFreezeTimerMs(spnFreezeTimerMs->value());
+  SConfig::getInstance().setWatcherUpdateTimerMs(m_spnWatcherUpdateTimerMs->value());
+  SConfig::getInstance().setScannerUpdateTimerMs(m_spnScannerUpdateTimerMs->value());
+  SConfig::getInstance().setViewerUpdateTimerMs(m_spnViewerUpdateTimerMs->value());
+  SConfig::getInstance().setFreezeTimerMs(m_spnFreezeTimerMs->value());
+  SConfig::getInstance().setViewerNbrBytesSeparator(
+      m_cmbViewerBytesSeparator->currentData().toInt());
 }

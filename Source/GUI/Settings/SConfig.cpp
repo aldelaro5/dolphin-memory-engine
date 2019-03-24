@@ -36,6 +36,11 @@ int SConfig::getViewerUpdateTimerMs() const
   return m_settings->value("timerSettings/viewerUpdateTimerMs", 100).toInt();
 }
 
+int SConfig::getViewerNbrBytesSeparator() const
+{
+  return m_settings->value("viewerSettings/nbrBytesSeparator", 1).toInt();
+}
+
 void SConfig::setWatcherUpdateTimerMs(const int updateTimerMs)
 {
   m_settings->setValue("timerSettings/watcherUpdateTimerMs", updateTimerMs);
@@ -54,4 +59,9 @@ void SConfig::setScannerUpdateTimerMs(const int scannerUpdateTimerMs)
 void SConfig::setViewerUpdateTimerMs(const int viewerUpdateTimerMs)
 {
   m_settings->setValue("timerSettings/viewerUpdateTimerMs", viewerUpdateTimerMs);
+}
+
+void SConfig::setViewerNbrBytesSeparator(const int viewerNbrBytesSeparator)
+{
+  m_settings->setValue("viewerSettings/nbrBytesSeparator", viewerNbrBytesSeparator);
 }

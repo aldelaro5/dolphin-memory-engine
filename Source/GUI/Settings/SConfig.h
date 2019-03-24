@@ -14,10 +14,14 @@ public:
   int getScannerUpdateTimerMs() const;
   int getViewerUpdateTimerMs() const;
 
+  int getViewerNbrBytesSeparator() const;
+
   void setWatcherUpdateTimerMs(const int watcherUpdateTimerMs);
   void setFreezeTimerMs(const int freezeTimerMs);
   void setScannerUpdateTimerMs(const int scannerUpdateTimerMs);
   void setViewerUpdateTimerMs(const int viewerUpdateTimerMs);
+
+  void setViewerNbrBytesSeparator(const int viewerNbrBytesSeparator);
 
 private:
   SConfig();

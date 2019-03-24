@@ -15,6 +15,7 @@
 
 #include "../../Common/CommonUtils.h"
 #include "../../DolphinProcess/DolphinAccessor.h"
+#include "../Settings/SConfig.h"
 
 MemViewer::MemViewer(QWidget* parent) : QAbstractScrollArea(parent)
 {
@@ -526,12 +527,29 @@ void MemViewer::scrollContentsBy(int dx, int dy)
 
 void MemViewer::renderSeparatorLines(QPainter& painter)
 {
+  QColor oldPenColor = painter.pen().color();
+  painter.setPen(QGuiApplication::palette().color(QPalette::WindowText));
+
   painter.drawLine(m_hexAsciiSeparatorPosX, 0, m_hexAsciiSeparatorPosX,
                    m_columnHeaderHeight + m_hexAreaHeight);
   painter.drawLine(m_rowHeaderWidth - m_charWidthEm / 2, 0, m_rowHeaderWidth - m_charWidthEm / 2,
                    m_columnHeaderHeight + m_hexAreaHeight);
   painter.drawLine(0, m_columnHeaderHeight, m_hexAsciiSeparatorPosX + 17 * m_charWidthEm,
                    m_columnHeaderHeight);
+
+  if (SConfig::getInstance().getViewerNbrBytesSeparator() != 0)
+  {
+    int bytesSeparatorXPos = m_rowHeaderWidth - m_charWidthEm / 2 + m_charWidthEm / 4;
+    for (int i = 0; i < m_numColumns / SConfig::getInstance().getViewerNbrBytesSeparator() - 1; i++)
+    {
+      bytesSeparatorXPos +=
+          (m_charWidthEm * 2) * SConfig::getInstance().getViewerNbrBytesSeparator() +
+          (m_charWidthEm / 2) * SConfig::getInstance().getViewerNbrBytesSeparator();
+      painter.drawLine(bytesSeparatorXPos, 0, bytesSeparatorXPos,
+                       m_columnHeaderHeight + m_hexAreaHeight);
+    }
+  }
+  painter.setPen(oldPenColor);
 }
 
 void MemViewer::renderColumnsHeaderText(QPainter& painter)
