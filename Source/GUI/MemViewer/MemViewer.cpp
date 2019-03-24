@@ -186,6 +186,7 @@ void MemViewer::mousePressEvent(QMouseEvent* event)
   m_StartBytesSelectionPosY = bytePos.y;
   m_EndBytesSelectionPosX = bytePos.x;
   m_EndBytesSelectionPosY = bytePos.y;
+  m_selectionType = SelectionType::single;
 
   viewport()->update();
 }
@@ -250,6 +251,7 @@ void MemViewer::mouseMoveEvent(QMouseEvent* event)
     m_StartBytesSelectionPosY = bytePos.y;
     m_EndBytesSelectionPosX = bytePos.x;
     m_EndBytesSelectionPosY = bytePos.y;
+    m_selectionType = SelectionType::single;
   }
 
   viewport()->update();
@@ -320,10 +322,21 @@ void MemViewer::updateFontSize(int newSize)
 
 void MemViewer::scrollToSelection()
 {
-  if (m_StartBytesSelectionPosY < 0)
-    scrollContentsBy(0, -m_StartBytesSelectionPosY);
-  else if (m_StartBytesSelectionPosY >= m_numRows)
-    scrollContentsBy(0, m_numRows - m_StartBytesSelectionPosY - 1);
+  if (m_selectionType != SelectionType::downward)
+  {
+    if (m_StartBytesSelectionPosY < 0)
+      scrollContentsBy(0, -m_StartBytesSelectionPosY);
+    else if (m_StartBytesSelectionPosY >= m_numRows)
+      scrollContentsBy(0, m_numRows - m_StartBytesSelectionPosY - 1);
+  }
+  else
+  {
+    if (m_EndBytesSelectionPosY < 0)
+      scrollContentsBy(0, -m_EndBytesSelectionPosY);
+    else if (m_EndBytesSelectionPosY >= m_numRows)
+      scrollContentsBy(0, m_numRows - m_EndBytesSelectionPosY - 1);
+  }
+
   viewport()->update();
 }
 
@@ -348,22 +361,88 @@ void MemViewer::copySelection()
   delete[] selectedMem;
 }
 
-bool MemViewer::handleNaviguationKey(const int key)
+bool MemViewer::handleNaviguationKey(const int key, bool shiftIsHeld)
 {
   switch (key)
   {
   case Qt::Key_Up:
     if (verticalScrollBar()->value() + m_StartBytesSelectionPosY <= verticalScrollBar()->minimum())
+    {
       QApplication::beep();
+    }
     else
-      m_StartBytesSelectionPosY--;
+    {
+      if (m_selectionType == SelectionType::downward && shiftIsHeld)
+      {
+        m_EndBytesSelectionPosY--;
+        int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
+        int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
+        if (indexEnd <= indexStart)
+        {
+          std::swap(m_StartBytesSelectionPosX, m_EndBytesSelectionPosX);
+          std::swap(m_StartBytesSelectionPosY, m_EndBytesSelectionPosY);
+          if (indexEnd == indexStart)
+            m_selectionType = SelectionType::single;
+          else
+            m_selectionType = SelectionType::upward;
+        }
+      }
+      else
+      {
+        m_StartBytesSelectionPosY--;
+        if (!shiftIsHeld)
+        {
+          m_EndBytesSelectionPosX = m_StartBytesSelectionPosX;
+          m_EndBytesSelectionPosY = m_StartBytesSelectionPosY;
+          m_selectionType = SelectionType::single;
+        }
+        else
+        {
+          m_selectionType = SelectionType::upward;
+        }
+      }
+    }
+
     scrollToSelection();
     break;
   case Qt::Key_Down:
     if (verticalScrollBar()->value() + m_StartBytesSelectionPosY >= verticalScrollBar()->maximum())
+    {
       QApplication::beep();
+    }
     else
-      m_StartBytesSelectionPosY++;
+    {
+      if (m_selectionType == SelectionType::upward && shiftIsHeld)
+      {
+        m_StartBytesSelectionPosY++;
+        int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
+        int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
+        if (indexEnd <= indexStart)
+        {
+          std::swap(m_StartBytesSelectionPosX, m_EndBytesSelectionPosX);
+          std::swap(m_StartBytesSelectionPosY, m_EndBytesSelectionPosY);
+          if (indexEnd == indexStart)
+            m_selectionType = SelectionType::single;
+          else
+            m_selectionType = SelectionType::downward;
+        }
+      }
+      else
+      {
+        m_EndBytesSelectionPosY++;
+        if (!shiftIsHeld)
+        {
+          m_StartBytesSelectionPosX = m_EndBytesSelectionPosX;
+          m_StartBytesSelectionPosY = m_EndBytesSelectionPosY;
+          m_selectionType = SelectionType::single;
+        }
+        else
+        {
+          m_selectionType = SelectionType::downward;
+        }
+      }
+    }
+
     scrollToSelection();
     break;
   case Qt::Key_Left:
@@ -374,12 +453,39 @@ bool MemViewer::handleNaviguationKey(const int key)
     }
     else
     {
-      m_StartBytesSelectionPosX--;
-      if (m_StartBytesSelectionPosX < 0)
+      if (m_selectionType == SelectionType::downward && shiftIsHeld)
       {
-        m_StartBytesSelectionPosX += m_numColumns;
-        m_StartBytesSelectionPosY--;
+        m_EndBytesSelectionPosX--;
+        if (m_EndBytesSelectionPosX < 0)
+        {
+          m_EndBytesSelectionPosX += m_numColumns;
+          m_EndBytesSelectionPosY--;
+        }
+        int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
+        int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
+        if (indexEnd == indexStart)
+          m_selectionType = SelectionType::single;
       }
+      else
+      {
+        m_StartBytesSelectionPosX--;
+        if (m_StartBytesSelectionPosX < 0)
+        {
+          m_StartBytesSelectionPosX += m_numColumns;
+          m_StartBytesSelectionPosY--;
+        }
+        if (!shiftIsHeld)
+        {
+          m_EndBytesSelectionPosX = m_StartBytesSelectionPosX;
+          m_EndBytesSelectionPosY = m_StartBytesSelectionPosY;
+          m_selectionType = SelectionType::single;
+        }
+        else
+        {
+          m_selectionType = SelectionType::upward;
+        }
+      }
+
       scrollToSelection();
     }
     break;
@@ -392,12 +498,39 @@ bool MemViewer::handleNaviguationKey(const int key)
     }
     else
     {
-      m_StartBytesSelectionPosX++;
-      if (m_StartBytesSelectionPosX >= m_numColumns)
+      if (m_selectionType == SelectionType::upward && shiftIsHeld)
       {
-        m_StartBytesSelectionPosX -= m_numColumns;
-        m_StartBytesSelectionPosY++;
+        m_StartBytesSelectionPosX++;
+        if (m_StartBytesSelectionPosX >= m_numColumns)
+        {
+          m_StartBytesSelectionPosX -= m_numColumns;
+          m_StartBytesSelectionPosY++;
+        }
+        int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
+        int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
+        if (indexEnd == indexStart)
+          m_selectionType = SelectionType::single;
       }
+      else
+      {
+        m_EndBytesSelectionPosX++;
+        if (m_EndBytesSelectionPosX >= m_numColumns)
+        {
+          m_EndBytesSelectionPosX -= m_numColumns;
+          m_EndBytesSelectionPosY++;
+        }
+        if (!shiftIsHeld)
+        {
+          m_StartBytesSelectionPosX = m_EndBytesSelectionPosX;
+          m_StartBytesSelectionPosY = m_EndBytesSelectionPosY;
+          m_selectionType = SelectionType::single;
+        }
+        else
+        {
+          m_selectionType = SelectionType::downward;
+        }
+      }
+
       scrollToSelection();
     }
     break;
@@ -412,12 +545,18 @@ bool MemViewer::handleNaviguationKey(const int key)
     verticalScrollBar()->setValue(0);
     m_StartBytesSelectionPosX = 0;
     m_StartBytesSelectionPosY = 0;
+    m_EndBytesSelectionPosX = 0;
+    m_EndBytesSelectionPosY = 0;
+    m_selectionType = SelectionType::single;
     viewport()->update();
     break;
   case Qt::Key_End:
     verticalScrollBar()->setValue(verticalScrollBar()->maximum());
     m_StartBytesSelectionPosX = m_numColumns - 1;
     m_StartBytesSelectionPosY = m_numRows - 1;
+    m_EndBytesSelectionPosX = m_numColumns - 1;
+    m_EndBytesSelectionPosY = m_numRows - 1;
+    m_selectionType = SelectionType::single;
     viewport()->update();
     break;
   default:
@@ -464,7 +603,7 @@ void MemViewer::keyPressEvent(QKeyEvent* event)
 
   if (text.isEmpty())
   {
-    if (!handleNaviguationKey(event->key()))
+    if (!handleNaviguationKey(event->key(), event->modifiers() & Qt::ShiftModifier))
       event->ignore();
     return;
   }
@@ -499,7 +638,7 @@ void MemViewer::keyPressEvent(QKeyEvent* event)
   }
 
   if (!m_carretBetweenHex || !m_editingHex)
-    handleNaviguationKey(Qt::Key::Key_Right);
+    handleNaviguationKey(Qt::Key::Key_Right, false);
 
   updateMemoryData();
   viewport()->update();

@@ -38,7 +38,8 @@ private:
   enum class SelectionType
   {
     upward,
-    downward
+    downward,
+    single
   };
 
   struct bytePosFromMouse
@@ -54,7 +55,7 @@ private:
   bytePosFromMouse mousePosToBytePos(QPoint pos);
   void scrollToSelection();
   void copySelection();
-  bool handleNaviguationKey(const int key);
+  bool handleNaviguationKey(const int key, bool shiftIsHeld);
   bool writeCharacterToSelectedMemory(char byteToWrite);
   void updateMemoryData();
   void changeMemoryRegion(const bool isMEM2);
@@ -78,7 +79,7 @@ private:
   int m_StartBytesSelectionPosY = 0;
   int m_EndBytesSelectionPosX = 0;
   int m_EndBytesSelectionPosY = 0;
-  SelectionType m_selectionType;
+  SelectionType m_selectionType = SelectionType::single;
   int m_charWidthEm = 0;
   int m_charHeight = 0;
   int m_hexAreaWidth = 0;
