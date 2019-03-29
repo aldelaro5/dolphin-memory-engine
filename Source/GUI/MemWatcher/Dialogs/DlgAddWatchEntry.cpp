@@ -155,8 +155,6 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_lblValuePreview->setText("???");
     m_chkBoundToPointer->setChecked(false);
     m_pointerWidget->hide();
-
-    addPointerOffset();
   }
   else
   {
@@ -200,7 +198,6 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     else
     {
       m_pointerWidget->hide();
-      addPointerOffset();
     }
 
     m_chkBoundToPointer->setChecked(m_entry->isBoundToPointer());
@@ -255,6 +252,32 @@ void DlgAddWatchEntry::removePointerOffset()
     m_btnRemoveOffset->setDisabled(true);
     m_btnAddOffset->setFocus();
   }
+}
+
+void DlgAddWatchEntry::removeAllPointerOffset()
+{
+  int level = static_cast<int>(m_entry->getPointerLevel());
+  while (level != 0)
+  {
+    QLayoutItem* lblLevelItem = m_offsetsLayout->takeAt(
+        m_offsetsLayout->indexOf(m_offsetsLayout->itemAtPosition(level - 1, 0)->widget()));
+    QLayoutItem* txbOffsetItem = m_offsetsLayout->takeAt(
+        m_offsetsLayout->indexOf(m_offsetsLayout->itemAtPosition(level - 1, 1)->widget()));
+    QLayoutItem* lblAddressOfPathItem = m_offsetsLayout->takeAt(
+        m_offsetsLayout->indexOf(m_offsetsLayout->itemAtPosition(level - 1, 2)->widget()));
+
+    delete lblLevelItem->widget();
+    delete txbOffsetItem->widget();
+    delete lblAddressOfPathItem->widget();
+
+    m_offsets.removeLast();
+    m_addressPath.removeLast();
+    m_entry->removeOffset();
+
+    level--;
+  }
+
+  updatePreview();
 }
 
 void DlgAddWatchEntry::onOffsetChanged()
@@ -400,9 +423,16 @@ void DlgAddWatchEntry::onLengthChanged()
 void DlgAddWatchEntry::onIsPointerChanged()
 {
   if (m_chkBoundToPointer->isChecked())
+  {
     m_pointerWidget->show();
+    if (m_entry->getPointerLevel() == 0)
+      addPointerOffset();
+  }
   else
+  {
     m_pointerWidget->hide();
+    removeAllPointerOffset();
+  }
   adjustSize();
   m_entry->setBoundToPointer(m_chkBoundToPointer->isChecked());
   updatePreview();

@@ -35,6 +35,7 @@ private:
   bool validateAndSetOffset(int index);
   void addPointerOffset();
   void removePointerOffset();
+  void removeAllPointerOffset();
 
   MemWatchEntry* m_entry;
   QLineEdit* m_txbAddress;
