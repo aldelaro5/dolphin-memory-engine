@@ -11,6 +11,9 @@ MemViewerWidget::MemViewerWidget(QWidget* parent, u32 consoleAddress) : QWidget(
 {
   initialiseWidgets();
   makeLayouts();
+
+  connect(m_memViewer, &MemViewer::addWatch, this,
+          [=](MemWatchEntry* entry) { emit addWatchRequested(entry); });
 }
 
 MemViewerWidget::~MemViewerWidget()

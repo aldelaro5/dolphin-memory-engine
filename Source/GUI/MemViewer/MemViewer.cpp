@@ -8,13 +8,17 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QInputDialog>
 #include <QMenu>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QRegularExpression>
 #include <QScrollBar>
 
 #include "../../Common/CommonUtils.h"
 #include "../../DolphinProcess/DolphinAccessor.h"
+#include "../MemWatcher/Dialogs/DlgAddWatchEntry.h"
 #include "../Settings/SConfig.h"
 
 MemViewer::MemViewer(QWidget* parent) : QAbstractScrollArea(parent)
@@ -28,7 +32,8 @@ MemViewer::MemViewer(QWidget* parent) : QAbstractScrollArea(parent)
   m_elapsedTimer.start();
 
   m_copyShortcut = new QShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key::Key_C), parent);
-  connect(m_copyShortcut, &QShortcut::activated, this, &MemViewer::copySelection);
+  connect(m_copyShortcut, &QShortcut::activated, this,
+          [=]() { copySelection(Common::MemType::type_byteArray); });
 
   // The viewport is implicitly updated at the constructor's end
 }
@@ -272,16 +277,37 @@ void MemViewer::contextMenuEvent(QContextMenuEvent* event)
     int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
     int indexMouse = bytePos.y * m_numColumns + bytePos.x;
 
-    if (indexMouse < indexStart || indexMouse > indexEnd)
-      return;
+    QMenu* contextMenu = new QMenu(this);
+
+    if (indexMouse >= indexStart && indexMouse <= indexEnd)
+    {
+      QAction* copyBytesAction = new QAction(tr("&Copy selection as bytes"));
+      connect(copyBytesAction, &QAction::triggered, this,
+              [=]() { copySelection(Common::MemType::type_byteArray); });
+      contextMenu->addAction(copyBytesAction);
+
+      QAction* copyStringAction = new QAction(tr("&Copy selection as ASCII string"));
+      connect(copyStringAction, &QAction::triggered, this,
+              [=]() { copySelection(Common::MemType::type_string); });
+      contextMenu->addAction(copyStringAction);
+
+      QAction* editAction = new QAction(tr("&Edit all selection..."));
+      connect(editAction, &QAction::triggered, this, &MemViewer::editSelection);
+      contextMenu->addAction(editAction);
+
+      QAction* addBytesArrayAction = new QAction(tr("&Add selection as array of bytes..."));
+      connect(addBytesArrayAction, &QAction::triggered, this,
+              &MemViewer::addSelectionAsArrayOfBytes);
+      contextMenu->addAction(addBytesArrayAction);
+    }
+
+    QAction* addSingleWatchAction = new QAction(tr("&Add a watch to this address..."));
+    connect(addSingleWatchAction, &QAction::triggered, this,
+            [=]() { addByteIndexAsWatch(indexMouse); });
+    contextMenu->addAction(addSingleWatchAction);
+
+    contextMenu->popup(viewport()->mapToGlobal(event->pos()));
   }
-
-  QMenu* contextMenu = new QMenu(this);
-  QAction* copyAction = new QAction(tr("&Copy"));
-  connect(copyAction, &QAction::triggered, this, &MemViewer::copySelection);
-  contextMenu->addAction(copyAction);
-
-  contextMenu->popup(viewport()->mapToGlobal(event->pos()));
 }
 
 void MemViewer::wheelEvent(QWheelEvent* event)
@@ -340,7 +366,7 @@ void MemViewer::scrollToSelection()
   viewport()->update();
 }
 
-void MemViewer::copySelection()
+void MemViewer::copySelection(Common::MemType type)
 {
   int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
   int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
@@ -351,14 +377,82 @@ void MemViewer::copySelection()
   {
     DolphinComm::DolphinAccessor::copyRawMemoryFromCache(
         selectedMem, m_currentFirstAddress + indexStart, selectionLength);
-    std::string hexBytes =
-        Common::formatMemoryToString(selectedMem, Common::MemType::type_byteArray, selectionLength,
-                                     Common::MemBase::base_none, true);
-
+    std::string bytes = Common::formatMemoryToString(selectedMem, type, selectionLength,
+                                                     Common::MemBase::base_none, true);
     QClipboard* clipboard = QGuiApplication::clipboard();
-    clipboard->setText(QString::fromStdString(hexBytes));
+    clipboard->setText(QString::fromStdString(bytes));
   }
   delete[] selectedMem;
+}
+
+void MemViewer::editSelection()
+{
+  QInputDialog* dlg = new QInputDialog(this);
+
+  int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
+  int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
+  size_t selectionLength = static_cast<size_t>(indexEnd - indexStart + 1);
+
+  QString strByte = dlg->getText(this, "Enter the new byte", "Byte (in hex)");
+  if (!strByte.isEmpty())
+  {
+    QRegularExpression hexMatcher("^[0-9A-F]{1,2}$", QRegularExpression::CaseInsensitiveOption);
+    QRegularExpressionMatch match = hexMatcher.match(strByte);
+    if (!match.hasMatch())
+    {
+      QMessageBox* errorBox =
+          new QMessageBox(QMessageBox::Critical, "Invalid byte",
+                          QString::fromStdString("The byte is an invalid hexadecimal number"),
+                          QMessageBox::Ok, this);
+      errorBox->exec();
+      return;
+    }
+
+    std::stringstream ss(strByte.toStdString());
+    ss >> std::hex;
+    int byte = 0;
+    ss >> byte;
+
+    char* newMem = new char[selectionLength];
+    std::memset(newMem, byte, selectionLength);
+    if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress + indexStart))
+    {
+      if (!DolphinComm::DolphinAccessor::writeToRAM(
+              Common::dolphinAddrToOffset(m_currentFirstAddress + indexStart), newMem,
+              selectionLength, false))
+      {
+        emit memErrorOccured();
+      }
+    }
+    delete[] newMem;
+  }
+}
+
+void MemViewer::addSelectionAsArrayOfBytes()
+{
+  QInputDialog* dlg = new QInputDialog(this);
+
+  int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
+  int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
+  size_t selectionLength = static_cast<size_t>(indexEnd - indexStart + 1);
+
+  QString strLabel = dlg->getText(this, "Enter the label of the new watch", "label");
+  if (!strLabel.isEmpty())
+  {
+    MemWatchEntry* newEntry = new MemWatchEntry(strLabel, m_currentFirstAddress + indexStart,
+                                                Common::MemType::type_byteArray,
+                                                Common::MemBase::base_none, true, selectionLength);
+    emit addWatch(newEntry);
+  }
+}
+
+void MemViewer::addByteIndexAsWatch(int index)
+{
+  MemWatchEntry* entry = new MemWatchEntry();
+  entry->setConsoleAddress(m_currentFirstAddress + index);
+  DlgAddWatchEntry* dlg = new DlgAddWatchEntry(entry);
+  if (dlg->exec() == QDialog::Accepted)
+    emit addWatch(dlg->getEntry());
 }
 
 bool MemViewer::handleNaviguationKey(const int key, bool shiftIsHeld)

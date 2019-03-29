@@ -24,6 +24,7 @@ public:
 
 signals:
   void mustUnhook();
+  void addWatchRequested(MemWatchEntry* entry);
 
 private:
   void initialiseWidgets();

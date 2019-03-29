@@ -10,6 +10,8 @@
 #include <QWidget>
 
 #include "../../Common/CommonTypes.h"
+#include "../../Common/MemoryCommon.h"
+#include "../../MemoryWatch/MemWatchEntry.h"
 
 class MemViewer : public QAbstractScrollArea
 {
@@ -33,6 +35,7 @@ public:
 
 signals:
   void memErrorOccured();
+  void addWatch(MemWatchEntry* entry);
 
 private:
   enum class SelectionType
@@ -54,7 +57,10 @@ private:
   void updateFontSize(int newSize);
   bytePosFromMouse mousePosToBytePos(QPoint pos);
   void scrollToSelection();
-  void copySelection();
+  void copySelection(Common::MemType type);
+  void editSelection();
+  void addSelectionAsArrayOfBytes();
+  void addByteIndexAsWatch(int index);
   bool handleNaviguationKey(const int key, bool shiftIsHeld);
   bool writeCharacterToSelectedMemory(char byteToWrite);
   void updateMemoryData();
