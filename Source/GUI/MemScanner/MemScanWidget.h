@@ -35,6 +35,7 @@ public:
   void onNextScan();
   void onResetScan();
   void onAddSelection();
+  void onRemoveSelection();
   void onAddAll();
   QTimer* getUpdateTimer() const;
 
@@ -62,6 +63,7 @@ private:
   QPushButton* m_btnResetScan;
   QPushButton* m_btnAddSelection;
   QPushButton* m_btnAddAll;
+  QPushButton* m_btnRemoveSelection;
   QLineEdit* m_txbSearchTerm1;
   QLineEdit* m_txbSearchTerm2;
   QWidget* m_searchTerm2Widget;

@@ -41,6 +41,16 @@ QVariant ResultsListModel::data(const QModelIndex& index, int role) const
   return QVariant();
 }
 
+bool ResultsListModel::removeRows(int row, int count, const QModelIndex& parent)
+{
+  beginRemoveRows(parent, row, row + count - 1);
+  for (int i = 0; i < count; i++)
+    m_scanner->removeResultAt(i + row);
+  endRemoveRows();
+
+  return true;
+}
+
 u32 ResultsListModel::getResultAddress(const int row) const
 {
   return m_scanner->getResultsConsoleAddr().at(row);

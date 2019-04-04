@@ -484,6 +484,12 @@ std::string MemScanner::getFormattedCurrentValueAt(const int index) const
   return "";
 }
 
+void MemScanner::removeResultAt(int index)
+{
+  m_resultsConsoleAddr.erase(m_resultsConsoleAddr.begin() + index);
+  m_resultCount--;
+}
+
 std::string MemScanner::addSpacesToBytesArrays(const std::string& bytesArray) const
 {
   std::string result(bytesArray);

@@ -51,6 +51,10 @@ void MemScanWidget::initialiseWidgets()
   connect(m_btnAddSelection, &QPushButton::clicked, this, &MemScanWidget::onAddSelection);
   m_btnAddSelection->setEnabled(false);
 
+  m_btnRemoveSelection = new QPushButton(tr("Remove selection"));
+  connect(m_btnRemoveSelection, &QPushButton::clicked, this, &MemScanWidget::onRemoveSelection);
+  m_btnRemoveSelection->setEnabled(false);
+
   m_btnFirstScan = new QPushButton(tr("First scan"));
   m_btnNextScan = new QPushButton(tr("Next scan"));
   m_btnNextScan->hide();
@@ -120,6 +124,7 @@ void MemScanWidget::makeLayouts()
   QHBoxLayout* multiAddButtons_layout = new QHBoxLayout();
   multiAddButtons_layout->addWidget(m_btnAddSelection);
   multiAddButtons_layout->addWidget(m_btnAddAll);
+  multiAddButtons_layout->addWidget(m_btnRemoveSelection);
 
   QVBoxLayout* results_layout = new QVBoxLayout();
   results_layout->addWidget(m_lblResultCount);
@@ -308,6 +313,7 @@ void MemScanWidget::onFirstScan()
     {
       m_btnAddAll->setEnabled(true);
       m_btnAddSelection->setEnabled(true);
+      m_btnRemoveSelection->setEnabled(true);
     }
     m_btnFirstScan->hide();
     m_btnNextScan->show();
@@ -338,6 +344,7 @@ void MemScanWidget::onNextScan()
     {
       m_btnAddAll->setEnabled(true);
       m_btnAddSelection->setEnabled(true);
+      m_btnRemoveSelection->setEnabled(true);
     }
   }
 }
@@ -348,6 +355,7 @@ void MemScanWidget::onResetScan()
   m_lblResultCount->setText("");
   m_btnAddAll->setEnabled(false);
   m_btnAddSelection->setEnabled(false);
+  m_btnRemoveSelection->setEnabled(false);
   m_btnFirstScan->show();
   m_btnNextScan->hide();
   m_btnResetScan->hide();
@@ -363,6 +371,20 @@ void MemScanWidget::onAddSelection()
 {
   emit requestAddSelectedResultsToWatchList(m_memScanner->getType(), m_memScanner->getLength(),
                                             m_memScanner->getIsUnsigned(), m_memScanner->getBase());
+}
+
+void MemScanWidget::onRemoveSelection()
+{
+  if (!m_tblResulstList->selectionModel()->hasSelection())
+    return;
+
+  while (m_tblResulstList->selectionModel()->hasSelection())
+    m_resultsListModel->removeRow(m_tblResulstList->selectionModel()->selectedRows().at(0).row());
+
+  // The result count is already updated at the backend by this point
+  int resultsFound = static_cast<int>(m_memScanner->getResultCount());
+  m_lblResultCount->setText(
+      tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
 }
 
 void MemScanWidget::onAddAll()
