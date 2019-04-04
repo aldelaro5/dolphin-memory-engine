@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QRadioButton>
 #include <QRegExp>
+#include <QShortcut>
 #include <QVBoxLayout>
 
 #include "../GUICommon.h"
@@ -59,6 +60,14 @@ void MemScanWidget::initialiseWidgets()
   connect(m_btnFirstScan, &QPushButton::clicked, this, &MemScanWidget::onFirstScan);
   connect(m_btnNextScan, &QPushButton::clicked, this, &MemScanWidget::onNextScan);
   connect(m_btnResetScan, &QPushButton::clicked, this, &MemScanWidget::onResetScan);
+
+  QShortcut* scanShortcut = new QShortcut(QKeySequence(Qt::Key::Key_Enter), this);
+  connect(scanShortcut, &QShortcut::activated, this, [=] {
+    if (m_memScanner->hasScanStarted())
+      onNextScan();
+    else
+      onFirstScan();
+  });
 
   m_txbSearchTerm1 = new QLineEdit();
   m_txbSearchTerm2 = new QLineEdit();
