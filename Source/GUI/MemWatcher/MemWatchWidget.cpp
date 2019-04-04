@@ -83,6 +83,11 @@ void MemWatchWidget::initialiseWidgets()
   connect(cutWatchShortcut, &QShortcut::activated, this,
           &MemWatchWidget::cutSelectedWatchesToClipBoard);
 
+  QShortcut* pasteWatchShortcut =
+      new QShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key::Key_V), m_watchView);
+  connect(pasteWatchShortcut, &QShortcut::activated, this,
+          [=] { pasteWatchFromClipBoard(m_watchModel->getRootNode()); });
+
   m_btnAddGroup = new QPushButton(tr("Add group"), this);
   connect(m_btnAddGroup, &QPushButton::clicked, this, &MemWatchWidget::onAddGroup);
 
