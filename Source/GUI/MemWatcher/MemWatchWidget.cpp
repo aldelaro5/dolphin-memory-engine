@@ -70,8 +70,18 @@ void MemWatchWidget::initialiseWidgets()
   m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_TYPE, 130);
   m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_ADDRESS, 120);
 
-  QShortcut* shortcut = new QShortcut(QKeySequence::Delete, m_watchView);
-  connect(shortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteSelection);
+  QShortcut* deleteWatchShortcut = new QShortcut(QKeySequence::Delete, m_watchView);
+  connect(deleteWatchShortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteSelection);
+
+  QShortcut* copyWatchShortcut =
+      new QShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key::Key_C), m_watchView);
+  connect(copyWatchShortcut, &QShortcut::activated, this,
+          &MemWatchWidget::copySelectedWatchesToClipBoard);
+
+  QShortcut* cutWatchShortcut =
+      new QShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key::Key_X), m_watchView);
+  connect(cutWatchShortcut, &QShortcut::activated, this,
+          &MemWatchWidget::cutSelectedWatchesToClipBoard);
 
   m_btnAddGroup = new QPushButton(tr("Add group"), this);
   connect(m_btnAddGroup, &QPushButton::clicked, this, &MemWatchWidget::onAddGroup);
