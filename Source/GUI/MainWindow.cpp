@@ -349,7 +349,7 @@ void MainWindow::onAbout()
 {
   QString title = tr("About Dolphin memory engine");
   QString text =
-      "Beta version 0.4\n\n" +
+      "Beta version 0.5\n\n" +
       tr("A RAM search made to facilitate research and reverse engineering of GameCube and Wii "
          "games using the Dolphin emulator.\n\nThis program is licensed under the MIT license. You "
          "should have received a copy of the MIT license along with this program");
