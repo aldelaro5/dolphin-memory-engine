@@ -26,7 +26,7 @@ public:
   void openWatchFile();
   void copySelectedWatchesToClipBoard();
   void cutSelectedWatchesToClipBoard();
-  void pasteWatchFromClipBoard(MemWatchTreeNode* node);
+  void pasteWatchFromClipBoard(MemWatchTreeNode* node, int row);
   void saveWatchFile();
   void saveAsWatchFile();
   void clearWatchList();
