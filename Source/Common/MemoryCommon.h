@@ -7,20 +7,22 @@
 
 namespace Common
 {
-const u32 MEM1_SIZE = 0x1800000;
-const u32 MEM1_START = 0x80000000;
-const u32 MEM1_END = 0x81800000;
-
-const u32 ARAM_SIZE = 0x1000000;
+u32 GetMEM1SizeReal();
+u32 GetMEM2SizeReal();
+u32 GetMEM1Size();
+u32 GetMEM2Size();
+u32 GetMEM1End();
+u32 GetMEM2End();
+constexpr u32 MEM1_START = 0x80000000;
+constexpr u32 MEM2_START = 0x90000000;
+constexpr u32 ARAM_SIZE = 0x1000000;
 // Dolphin maps 32 mb for the fakeVMem which is what ends up being the speedhack, but in reality
 // the ARAM is actually 16 mb. We need the fake size to do process address calculation
-const u32 ARAM_FAKESIZE = 0x2000000;
-const u32 ARAM_START = 0x7E000000;
-const u32 ARAM_END = 0x7F000000;
+constexpr u32 ARAM_FAKESIZE = 0x2000000;
+constexpr u32 ARAM_START = 0x7E000000;
+constexpr u32 ARAM_END = 0x7F000000;
 
-const u32 MEM2_SIZE = 0x4000000;
-const u32 MEM2_START = 0x90000000;
-const u32 MEM2_END = 0x94000000;
+void UpdateMemoryValues();
 
 enum class MemType
 {

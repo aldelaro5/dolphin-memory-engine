@@ -113,11 +113,12 @@ bool DlgCopy::copyMemory()
 
   if (!hexStringToU32(m_spnWatcherCopyAddress->text().toStdString(), address))
   {
-    QString errorMsg =
-        tr("The address you entered is invalid, make sure it is an "
-           "hexadecimal number between 0x80000000 and 0x817FFFFF");
+    QString errorMsg = tr("The address you entered is invalid, make sure it is an "
+                          "hexadecimal number between 0x%08X and 0x%08X")
+                           .arg(Common::MEM1_START, Common::GetMEM1End() - 1);
     if (DolphinComm::DolphinAccessor::isMEM2Present())
-      errorMsg.append(tr(" or between 0x90000000 and 0x93FFFFFF"));
+      errorMsg.append(
+          tr(" or between 0x%08X and 0x%08X").arg(Common::MEM2_START, Common::GetMEM2End() - 1));
 
     errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid address"), errorMsg,
                                             QMessageBox::Ok, nullptr);

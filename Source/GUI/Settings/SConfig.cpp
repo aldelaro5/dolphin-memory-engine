@@ -63,6 +63,16 @@ int SConfig::getViewerNbrBytesSeparator() const
   return m_settings->value("viewerSettings/nbrBytesSeparator", 1).toInt();
 }
 
+u32 SConfig::getMEM1Size() const
+{
+  return m_settings->value("memorySettings/MEM1Size", 24u * 1024 * 1024).toUInt();
+}
+
+u32 SConfig::getMEM2Size() const
+{
+  return m_settings->value("memorySettings/MEM2Size", 64u * 1024 * 1024).toUInt();
+}
+
 void SConfig::setWatchModel(const QString& json)
 {
   m_settings->setValue("watchModel", json);
@@ -106,4 +116,14 @@ void SConfig::setViewerUpdateTimerMs(const int viewerUpdateTimerMs)
 void SConfig::setViewerNbrBytesSeparator(const int viewerNbrBytesSeparator)
 {
   m_settings->setValue("viewerSettings/nbrBytesSeparator", viewerNbrBytesSeparator);
+}
+
+void SConfig::setMEM1Size(const u32 mem1SizeReal)
+{
+  m_settings->setValue("memorySettings/MEM1Size", mem1SizeReal);
+}
+
+void SConfig::setMEM2Size(const u32 mem2SizeReal)
+{
+  m_settings->setValue("memorySettings/MEM2Size", mem2SizeReal);
 }

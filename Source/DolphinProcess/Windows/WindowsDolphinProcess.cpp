@@ -2,6 +2,7 @@
 
 #include "WindowsDolphinProcess.h"
 #include "../../Common/CommonUtils.h"
+#include "../../Common/MemoryCommon.h"
 
 #include <Psapi.h>
 #include <string>
@@ -52,15 +53,14 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
        VirtualQueryEx(m_hDolphin, p, &info, sizeof(info)) == sizeof(info); p += info.RegionSize)
   {
     // Check region size so that we know it's MEM2
-    if (!m_MEM2Present && info.RegionSize == 0x4000000)
+    if (!m_MEM2Present && info.RegionSize == Common::GetMEM2Size())
     {
       u64 regionBaseAddress = 0;
       std::memcpy(&regionBaseAddress, &(info.BaseAddress), sizeof(info.BaseAddress));
       if (MEM1Found && regionBaseAddress > m_emuRAMAddressStart + 0x10000000)
       {
         // In some cases MEM2 could actually be before MEM1. Once we find MEM1, ignore regions of
-        // this size that are too far away. There apparently are other non-MEM2 regions of size
-        // 0x4000000.
+        // this size that are too far away. There apparently are other non-MEM2 regions of 64 MiB.
         break;
       }
       // View the comment for MEM1.
@@ -75,7 +75,7 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
         }
       }
     }
-    else if (info.RegionSize == 0x2000000 && info.Type == MEM_MAPPED)
+    else if (info.RegionSize == Common::GetMEM1Size() && info.Type == MEM_MAPPED)
     {
       // Here, it's likely the right page, but it can happen that multiple pages with these criteria
       // exists and have nothing to do with the emulated memory. Only the right page has valid
@@ -96,7 +96,7 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
           {
             u64 aramCandidate = 0;
             std::memcpy(&aramCandidate, &(info.BaseAddress), sizeof(info.BaseAddress));
-            if (aramCandidate == m_emuRAMAddressStart + 0x2000000)
+            if (aramCandidate == m_emuRAMAddressStart + Common::GetMEM1Size())
             {
               m_emuARAMAdressStart = aramCandidate;
               m_ARAMAccessible = true;
