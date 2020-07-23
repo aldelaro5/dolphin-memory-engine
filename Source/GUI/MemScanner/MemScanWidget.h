@@ -78,7 +78,12 @@ private:
   QRadioButton* m_rdbBaseHexadecimal;
   QRadioButton* m_rdbBaseOctal;
   QRadioButton* m_rdbBaseBinary;
+  QRadioButton* m_rdbUTF8;
+  QRadioButton* m_rdbUTF16;
+  QRadioButton* m_rdbUTF32;
+  QButtonGroup* m_btnGroupStringWidth;
   QGroupBox* m_groupScanBase;
+  QGroupBox* m_stringWidth;
   QTableView* m_tblResulstList;
   bool m_variableLengthType;
 };

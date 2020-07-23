@@ -106,6 +106,18 @@ void MemScanWidget::initialiseWidgets()
 
   m_groupScanBase = new QGroupBox(tr("Base to use"));
 
+  m_rdbUTF8 = new QRadioButton(tr("UTF-8"));
+  m_rdbUTF16 = new QRadioButton(tr("UTF-16"));
+  m_rdbUTF32 = new QRadioButton(tr("UTF-32"));
+
+  m_btnGroupStringWidth = new QButtonGroup(this);
+  m_btnGroupStringWidth->addButton(m_rdbUTF8, 0);
+  m_btnGroupStringWidth->addButton(m_rdbUTF16, 1);
+  m_btnGroupStringWidth->addButton(m_rdbUTF32, 2);
+  m_rdbUTF8->setChecked(true);
+
+  m_stringWidth = new QGroupBox(tr("String width"));
+
   m_chkSignedScan = new QCheckBox(tr("Signed value scan"));
   m_chkSignedScan->setChecked(false);
 
@@ -154,6 +166,12 @@ void MemScanWidget::makeLayouts()
   layout_buttonsBase->addWidget(m_rdbBaseBinary);
   m_groupScanBase->setLayout(layout_buttonsBase);
 
+  QHBoxLayout* layout_buttonsStringWidth = new QHBoxLayout();
+  layout_buttonsStringWidth->addWidget(m_rdbUTF8);
+  layout_buttonsStringWidth->addWidget(m_rdbUTF16);
+  layout_buttonsStringWidth->addWidget(m_rdbUTF32);
+  m_stringWidth->setLayout(layout_buttonsStringWidth);
+
   QHBoxLayout* layout_extraParams = new QHBoxLayout();
   layout_extraParams->addWidget(m_chkEnforceMemAlignement);
   layout_extraParams->addWidget(m_chkSignedScan);
@@ -164,6 +182,7 @@ void MemScanWidget::makeLayouts()
   scannerParams_layout->addWidget(m_cmbScanFilter);
   scannerParams_layout->addLayout(searchTerms_layout);
   scannerParams_layout->addWidget(m_groupScanBase);
+  scannerParams_layout->addWidget(m_stringWidth);
   scannerParams_layout->addLayout(layout_extraParams);
   scannerParams_layout->addStretch();
   scannerParams_layout->setContentsMargins(0, 0, 0, 0);
