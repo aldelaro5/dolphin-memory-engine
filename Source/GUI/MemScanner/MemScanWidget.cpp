@@ -166,6 +166,7 @@ void MemScanWidget::makeLayouts()
   layout_buttonsBase->addWidget(m_rdbBaseBinary);
   m_groupScanBase->setLayout(layout_buttonsBase);
 
+  m_stringWidth->hide();
   QHBoxLayout* layout_buttonsStringWidth = new QHBoxLayout();
   layout_buttonsStringWidth->addWidget(m_rdbUTF8);
   layout_buttonsStringWidth->addWidget(m_rdbUTF16);
@@ -264,6 +265,17 @@ void MemScanWidget::updateTypeAdditionalOptions()
     m_chkSignedScan->hide();
     m_groupScanBase->hide();
   }
+
+  if(m_memScanner->typeSupportsAdditionalWidths(
+          static_cast<Common::MemType>(m_cmbScanType->currentIndex())))
+  {
+    m_stringWidth->show();
+  }
+  else
+  {
+    m_stringWidth->hide();
+  }
+  
 }
 
 void MemScanWidget::onScanFilterChanged()
@@ -277,6 +289,7 @@ void MemScanWidget::onScanFilterChanged()
     m_searchTerm2Widget->hide();
     m_chkSignedScan->hide();
     m_groupScanBase->hide();
+    m_stringWidth->hide();
     break;
   case 1:
     m_txbSearchTerm1->show();
@@ -341,6 +354,7 @@ void MemScanWidget::onFirstScan()
     m_chkSignedScan->setDisabled(true);
     m_chkEnforceMemAlignement->setDisabled(true);
     m_groupScanBase->setDisabled(true);
+    m_stringWidth->setDisabled(true);
     updateScanFilterChoices();
   }
 }
@@ -382,6 +396,7 @@ void MemScanWidget::onResetScan()
   m_chkSignedScan->setEnabled(true);
   m_chkEnforceMemAlignement->setEnabled(true);
   m_groupScanBase->setEnabled(true);
+  m_stringWidth->setEnabled(true);
   m_resultsListModel->updateAfterScannerReset();
   updateScanFilterChoices();
 }

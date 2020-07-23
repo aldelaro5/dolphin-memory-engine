@@ -139,6 +139,7 @@ public:
   std::string getFormattedCurrentValueAt(int index) const;
   void removeResultAt(int index);
   bool typeSupportsAdditionalOptions(const Common::MemType type) const;
+  bool typeSupportsAdditionalWidths(const Common::MemType type) const;
   bool hasScanStarted() const;
 
 private:

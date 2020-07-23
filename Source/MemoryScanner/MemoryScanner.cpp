@@ -446,6 +446,11 @@ bool MemScanner::typeSupportsAdditionalOptions(const Common::MemType type) const
           type == Common::MemType::type_word);
 }
 
+bool MemScanner::typeSupportsAdditionalWidths(const Common::MemType type) const
+{
+  return (type == Common::MemType::type_string);
+}
+
 std::vector<u32> MemScanner::getResultsConsoleAddr() const
 {
   return m_resultsConsoleAddr;
