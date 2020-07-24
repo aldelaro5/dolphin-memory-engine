@@ -61,7 +61,7 @@ private:
   bool m_lock = false;
   Common::MemType m_type;
   Common::MemBase m_base;
-  Common::StrWidth m_stringWidth;
+  Common::StrWidth m_stringWidth = Common::StrWidth::utf_8;
   bool m_isUnsigned;
   bool m_boundToPointer = false;
   std::vector<int> m_pointerOffsets;

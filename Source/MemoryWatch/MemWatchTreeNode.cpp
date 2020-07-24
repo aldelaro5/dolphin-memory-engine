@@ -164,6 +164,11 @@ void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* p
     m_entry->setTypeAndLength(static_cast<Common::MemType>(json["typeIndex"].toInt()), length);
     m_entry->setSignedUnsigned(json["unsigned"].toBool());
     m_entry->setBase(static_cast<Common::MemBase>(json["baseIndex"].toInt()));
+    if(json["stringWidth"] != QJsonValue::Undefined)
+    {
+      m_entry->setStrWidth(static_cast<Common::StrWidth>(json["stringWidth"].toInt()));
+    }
+
     if (json["pointerOffsets"] != QJsonValue::Undefined)
     {
       m_entry->setBoundToPointer(true);
@@ -217,6 +222,7 @@ void MemWatchTreeNode::writeToJson(QJsonObject& json) const
       ss << std::hex << std::uppercase << m_entry->getConsoleAddress();
       json["address"] = QString::fromStdString(ss.str());
       json["typeIndex"] = static_cast<double>(m_entry->getType());
+      json["stringWidth"] = static_cast<int>(m_entry->getStrWidth());
       json["unsigned"] = m_entry->isUnsigned();
       if (m_entry->getType() == Common::MemType::type_string ||
           m_entry->getType() == Common::MemType::type_byteArray)
