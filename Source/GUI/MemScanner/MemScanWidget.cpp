@@ -406,7 +406,7 @@ void MemScanWidget::onResetScan()
 void MemScanWidget::onAddSelection()
 {
   emit requestAddSelectedResultsToWatchList(m_memScanner->getType(), m_memScanner->getLength(),
-                                            m_memScanner->getIsUnsigned(), m_memScanner->getBase());
+                                            m_memScanner->getIsUnsigned(), m_memScanner->getBase(), m_memScanner->getStrWidth());
 }
 
 void MemScanWidget::onRemoveSelection()
@@ -426,7 +426,7 @@ void MemScanWidget::onRemoveSelection()
 void MemScanWidget::onAddAll()
 {
   emit requestAddAllResultsToWatchList(m_memScanner->getType(), m_memScanner->getLength(),
-                                       m_memScanner->getIsUnsigned(), m_memScanner->getBase());
+                                       m_memScanner->getIsUnsigned(), m_memScanner->getBase(), m_memScanner->getStrWidth());
 }
 
 void MemScanWidget::handleScannerErrors(const Common::MemOperationReturnCode errorCode)
@@ -467,6 +467,6 @@ void MemScanWidget::onResultListDoubleClicked(const QModelIndex& index)
   {
     emit requestAddWatchEntry(m_resultsListModel->getResultAddress(index.row()),
                               m_memScanner->getType(), m_memScanner->getLength(),
-                              m_memScanner->getIsUnsigned(), m_memScanner->getBase());
+                              m_memScanner->getIsUnsigned(), m_memScanner->getBase(), m_memScanner->getStrWidth());
   }
 }

@@ -13,9 +13,9 @@
 MemWatchEntry::MemWatchEntry(const QString label, const u32 consoleAddress,
                              const Common::MemType type, const Common::MemBase base,
                              const bool isUnsigned, const size_t length,
-                             const bool isBoundToPointer)
+                             const bool isBoundToPointer, Common::StrWidth strWidth)
     : m_label(label), m_consoleAddress(consoleAddress), m_type(type), m_isUnsigned(isUnsigned),
-      m_base(base), m_boundToPointer(isBoundToPointer), m_length(length)
+      m_base(base), m_boundToPointer(isBoundToPointer), m_length(length), m_stringWidth(strWidth)
 {
   m_memory = new char[getSizeForType(m_type, m_length)];
 }
@@ -81,6 +81,11 @@ Common::MemBase MemWatchEntry::getBase() const
   return m_base;
 }
 
+Common::StrWidth MemWatchEntry::getStrWidth() const
+{
+  return m_stringWidth;
+}
+
 int MemWatchEntry::getPointerOffset(const int index) const
 {
   return m_pointerOffsets.at(index);
@@ -133,6 +138,11 @@ void MemWatchEntry::setTypeAndLength(const Common::MemType type, const size_t le
 void MemWatchEntry::setBase(const Common::MemBase base)
 {
   m_base = base;
+}
+
+void MemWatchEntry::setStrWidth(const Common::StrWidth width)
+{
+  m_stringWidth = width;
 }
 
 void MemWatchEntry::setLock(const bool doLock)

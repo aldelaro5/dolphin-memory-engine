@@ -15,7 +15,7 @@ public:
   MemWatchEntry(const QString label, const u32 consoleAddress, const Common::MemType type,
                 const Common::MemBase = Common::MemBase::base_decimal,
                 const bool m_isUnsigned = false, const size_t length = 1,
-                const bool isBoundToPointer = false);
+                const bool isBoundToPointer = false, Common::StrWidth strWidth = Common::StrWidth::utf_8);
   MemWatchEntry(MemWatchEntry* entry);
   ~MemWatchEntry();
 
@@ -25,6 +25,7 @@ public:
   bool isLocked() const;
   bool isBoundToPointer() const;
   Common::MemBase getBase() const;
+  Common::StrWidth getStrWidth() const;
   size_t getLength() const;
   char* getMemory() const;
   bool isUnsigned() const;
@@ -35,6 +36,7 @@ public:
   void setConsoleAddress(const u32 address);
   void setTypeAndLength(const Common::MemType type, const size_t length = 1);
   void setBase(const Common::MemBase base);
+  void setStrWidth(Common::StrWidth width);
   void setLock(const bool doLock);
   void setSignedUnsigned(const bool isUnsigned);
   void setBoundToPointer(const bool boundToPointer);
@@ -59,6 +61,7 @@ private:
   bool m_lock = false;
   Common::MemType m_type;
   Common::MemBase m_base;
+  Common::StrWidth m_stringWidth;
   bool m_isUnsigned;
   bool m_boundToPointer = false;
   std::vector<int> m_pointerOffsets;
