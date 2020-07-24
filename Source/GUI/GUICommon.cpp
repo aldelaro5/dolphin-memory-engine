@@ -18,10 +18,6 @@ QStringList g_memBaseNames = QStringList({QCoreApplication::translate("Common", 
                                           QCoreApplication::translate("Common", "Hexadecimal"),
                                           QCoreApplication::translate("Common", "Octal"),
                                           QCoreApplication::translate("Common", "Binary")});
-                                          
-QStringList g_stringWidths = QStringList({QCoreApplication::translate("Common", "UTF-8"),
-                                          QCoreApplication::translate("Common", "UTF-16"),
-                                          QCoreApplication::translate("Common", "UTF-32")});
 
 QStringList g_memScanFilter =
     QStringList({QCoreApplication::translate("Common", "Exact value"),

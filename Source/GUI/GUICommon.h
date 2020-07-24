@@ -8,7 +8,6 @@
 namespace GUICommon
 {
 extern QStringList g_memTypeNames;
-extern QStringList g_stringWidths;
 extern QStringList g_memScanFilter;
 extern QStringList g_memBaseNames;
 
