@@ -332,8 +332,8 @@ void MemScanWidget::onFirstScan()
   m_memScanner->setStrWidth(static_cast<Common::StrWidth>(m_btnGroupStringWidth->checkedId()));
 
   Common::MemOperationReturnCode scannerReturn =
-      m_memScanner->firstScan(getSelectedFilter(), m_txbSearchTerm2->text().toStdString(),
-                              m_txbSearchTerm2->text().toStdString());
+      m_memScanner->firstScan(getSelectedFilter(), m_txbSearchTerm1->text().toStdString(),
+                              m_txbSearchTerm2->text().toStdString(), m_memScanner->getStrWidth());
   if (scannerReturn != Common::MemOperationReturnCode::OK)
   {
     handleScannerErrors(scannerReturn);
@@ -365,7 +365,7 @@ void MemScanWidget::onNextScan()
 {  
   Common::MemOperationReturnCode scannerReturn =
       m_memScanner->nextScan(getSelectedFilter(), m_txbSearchTerm1->text().toStdString(),
-                             m_txbSearchTerm2->text().toStdString());
+                             m_txbSearchTerm2->text().toStdString(), m_memScanner->getStrWidth());
   if (scannerReturn != Common::MemOperationReturnCode::OK)
   {
     handleScannerErrors(scannerReturn);

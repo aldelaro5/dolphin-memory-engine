@@ -12,8 +12,9 @@ MemScanner::~MemScanner()
 }
 
 Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter filter,
-                                                     std::string searchTerm1,
-                                                     const std::string& searchTerm2)
+                                                     const std::string& searchTerm1,
+                                                     const std::string& searchTerm2,
+                                                     Common::StrWidth term1StrWidth)
 {
   m_scanRAMCache = nullptr;
   u32 ramSize = 0;
@@ -61,17 +62,12 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   size_t termActualLength = 0;
   size_t termMaxLength = 0;
   if (m_memType == Common::MemType::type_string)
-  {
-    searchTerm1 = Common::convertFromUTF8(searchTerm1.c_str(), searchTerm1.size(), m_strWidth);
     // This is just to have the string formatted with the appropriate length, byte arrays don't need
     // this because they get copied byte per byte
     termMaxLength = searchTerm1.length();
-  }
   else
-  {
     // Have no restriction on the length for the rest
     termMaxLength = ramSize;
-  }
 
   std::string formattedSearchTerm1;
   if (m_memType == Common::MemType::type_byteArray)
@@ -80,7 +76,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     formattedSearchTerm1 = searchTerm1;
 
   char* memoryToCompare1 = Common::formatStringToMemory(
-      scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength);
+      scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength, term1StrWidth);
   if (scanReturn != Common::MemOperationReturnCode::OK)
   {
     delete[] memoryToCompare1;
@@ -172,8 +168,9 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
 }
 
 Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter filter,
-                                                    std::string searchTerm1,
-                                                    const std::string& searchTerm2)
+                                                    const std::string& searchTerm1,
+                                                    const std::string& searchTerm2,
+                                                    Common::StrWidth term1StrWidth)
 {
   u32 ramSize = 0;
   char* newerRAMCache = nullptr;
@@ -210,17 +207,12 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   size_t termActualLength = 0;
   size_t termMaxLength = 0;
   if (m_memType == Common::MemType::type_string)
-  {
-    searchTerm1 = Common::convertFromUTF8(searchTerm1.c_str(), searchTerm1.size(), m_strWidth);
     // This is just to have the string formatted with the appropriate length, byte arrays don't need
     // this because they get copied byte per byte
     termMaxLength = searchTerm1.length();
-  }
   else
-  {
     // Have no restriction on the length for the rest
     termMaxLength = ramSize;
-  }
 
   char* memoryToCompare1 = nullptr;
   if (filter != ScanFiter::increased && filter != ScanFiter::decreased &&
@@ -233,7 +225,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
       formattedSearchTerm1 = searchTerm1;
 
     memoryToCompare1 = Common::formatStringToMemory(
-        scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength);
+        scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength, term1StrWidth);
     if (scanReturn != Common::MemOperationReturnCode::OK)
       return scanReturn;
   }

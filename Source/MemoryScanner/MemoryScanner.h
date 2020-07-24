@@ -36,10 +36,10 @@ public:
 
   MemScanner();
   ~MemScanner();
-  Common::MemOperationReturnCode firstScan(const ScanFiter filter, std::string searchTerm1,
-                                           const std::string& searchTerm2);
-  Common::MemOperationReturnCode nextScan(const ScanFiter filter, std::string searchTerm1,
-                                          const std::string& searchTerm2);
+  Common::MemOperationReturnCode firstScan(const ScanFiter filter, const std::string& searchTerm1,
+                                           const std::string& searchTerm2, Common::StrWidth term1StrWidth);
+  Common::MemOperationReturnCode nextScan(const ScanFiter filter, const std::string& searchTerm1,
+                                          const std::string& searchTerm2, Common::StrWidth term1StrWidth);
   void reset();
   inline CompareResult compareMemoryAsNumbers(const char* first, const char* second,
                                               const char* offset, bool offsetInvert,

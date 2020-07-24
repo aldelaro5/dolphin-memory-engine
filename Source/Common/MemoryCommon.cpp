@@ -83,7 +83,7 @@ int getNbrBytesAlignementForType(const MemType type)
 
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
                            const std::string inputString, const MemBase base, const MemType type,
-                           const size_t length)
+                           const size_t length, StrWidth stringWidth)
 {
   if (inputString.length() == 0)
   {
@@ -106,7 +106,9 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
   }
 
   size_t size = getSizeForType(type, length);
-  char* buffer = new char[size];
+  char* buffer = nullptr;
+  if(type != Common::MemType::type_string)
+    buffer = new char[size];
 
   switch (type)
   {
@@ -256,15 +258,10 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
 
   case MemType::type_string:
   {
-    if (inputString.length() > length)
-    {
-      delete[] buffer;
-      buffer = nullptr;
-      returnCode = MemOperationReturnCode::inputTooLong;
-      return buffer;
-    }
-    std::memcpy(buffer, inputString.c_str(), length);
-    actualLength = length;
+    std::string newTmpString = convertFromUTF8(inputString.c_str(), inputString.size(), stringWidth);
+    buffer = new char[newTmpString.size()];
+    std::memcpy(buffer, newTmpString.c_str(), newTmpString.size());
+    actualLength = newTmpString.size();
     break;
   }
 
