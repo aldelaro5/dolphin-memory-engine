@@ -329,8 +329,16 @@ void MemScanWidget::onFirstScan()
   m_memScanner->setIsSigned(m_chkSignedScan->isChecked());
   m_memScanner->setEnforceMemAlignement(m_chkEnforceMemAlignement->isChecked());
   m_memScanner->setBase(static_cast<Common::MemBase>(m_btnGroupScanBase->checkedId()));
+  m_memScanner->setStrWidth(static_cast<Common::StrWidth>(m_btnGroupStringWidth->checkedId()));
+
+  std::string searchTerm1;
+  if(m_memScanner->getType() == Common::MemType::type_string)
+    searchTerm1 = stringWidthConvert(m_txbSearchTerm1->text());
+  else
+    searchTerm1 = m_txbSearchTerm1->text().toStdString();
+
   Common::MemOperationReturnCode scannerReturn =
-      m_memScanner->firstScan(getSelectedFilter(), m_txbSearchTerm1->text().toStdString(),
+      m_memScanner->firstScan(getSelectedFilter(), searchTerm1,
                               m_txbSearchTerm2->text().toStdString());
   if (scannerReturn != Common::MemOperationReturnCode::OK)
   {
@@ -361,8 +369,14 @@ void MemScanWidget::onFirstScan()
 
 void MemScanWidget::onNextScan()
 {
+  std::string searchTerm1;
+  if(m_memScanner->getType() == Common::MemType::type_string)
+    searchTerm1 = stringWidthConvert(m_txbSearchTerm1->text());
+  else
+    searchTerm1 = m_txbSearchTerm1->text().toStdString();
+  
   Common::MemOperationReturnCode scannerReturn =
-      m_memScanner->nextScan(getSelectedFilter(), m_txbSearchTerm1->text().toStdString(),
+      m_memScanner->nextScan(getSelectedFilter(), searchTerm1,
                              m_txbSearchTerm2->text().toStdString());
   if (scannerReturn != Common::MemOperationReturnCode::OK)
   {
@@ -466,5 +480,26 @@ void MemScanWidget::onResultListDoubleClicked(const QModelIndex& index)
     emit requestAddWatchEntry(m_resultsListModel->getResultAddress(index.row()),
                               m_memScanner->getType(), m_memScanner->getLength(),
                               m_memScanner->getIsUnsigned(), m_memScanner->getBase());
+  }
+}
+
+std::string MemScanWidget::stringWidthConvert(const QString& input) const
+{
+  switch(m_memScanner->getStrWidth())
+  {
+    case Common::StrWidth::utf_16:
+    {
+      std::u16string tmpStr = input.toStdU16String();
+      return std::string((const char*)(tmpStr.c_str()), tmpStr.size() * sizeof(tmpStr[0]));
+    }
+    case Common::StrWidth::utf_32:
+    {
+      std::u32string tmpStr = input.toStdU32String();
+      return std::string((const char*)(tmpStr.c_str()), tmpStr.size() * sizeof(tmpStr[0]));
+    }
+    default:
+    {
+      return input.toStdString();
+    }
   }
 }

@@ -124,6 +124,7 @@ public:
 
   void setType(const Common::MemType type);
   void setBase(const Common::MemBase base);
+  void setStrWidth(const Common::StrWidth width);
   void setEnforceMemAlignement(const bool enforceAlignement);
   void setIsSigned(const bool isSigned);
 
@@ -132,6 +133,7 @@ public:
   int getTermsNumForFilter(const ScanFiter filter) const;
   Common::MemType getType() const;
   Common::MemBase getBase() const;
+  Common::StrWidth getStrWidth() const;
   size_t getLength() const;
   bool getIsUnsigned() const;
   std::string getFormattedScannedValueAt(const int index) const;
@@ -151,6 +153,7 @@ private:
 
   Common::MemType m_memType = Common::MemType::type_byte;
   Common::MemBase m_memBase = Common::MemBase::base_decimal;
+  Common::StrWidth m_strWidth = Common::StrWidth::utf_8;
   size_t m_memSize;
   bool m_enforceMemAlignement = true;
   bool m_memIsSigned = false;

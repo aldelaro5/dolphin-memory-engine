@@ -2,7 +2,6 @@
 
 #include "../Common/CommonUtils.h"
 #include "../DolphinProcess/DolphinAccessor.h"
-
 MemScanner::MemScanner() : m_resultsConsoleAddr(std::vector<u32>())
 {
 }
@@ -418,6 +417,11 @@ void MemScanner::setBase(const Common::MemBase base)
   m_memBase = base;
 }
 
+void MemScanner::setStrWidth(const Common::StrWidth width)
+{
+  m_strWidth = width;
+}
+
 void MemScanner::setEnforceMemAlignement(const bool enforceAlignement)
 {
   m_enforceMemAlignement = enforceAlignement;
@@ -532,6 +536,11 @@ Common::MemType MemScanner::getType() const
 Common::MemBase MemScanner::getBase() const
 {
   return m_memBase;
+}
+
+Common::StrWidth MemScanner::getStrWidth() const
+{
+  return m_strWidth;
 }
 
 size_t MemScanner::getLength() const

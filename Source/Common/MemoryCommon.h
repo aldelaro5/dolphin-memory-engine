@@ -36,6 +36,13 @@ enum class MemBase
   base_none // Placeholder when the base doesn't matter (ie. string)
 };
 
+enum class StrWidth
+{
+  utf_8 = 0,
+  utf_16,
+  utf_32
+};
+
 enum class MemOperationReturnCode
 {
   invalidInput,
