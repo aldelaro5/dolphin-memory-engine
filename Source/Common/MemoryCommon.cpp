@@ -521,7 +521,10 @@ std::string toUTF8String(const char* buf, int len, StrWidth stringWidth)
       }
     }
     std::wstring_convert<codecvt<char16_t, char, mbstate_t>, char16_t> converter;
-    return converter.to_bytes(reinterpret_cast<const char16_t*>(buf), reinterpret_cast<const char16_t*>(buf + len));
+    std::string converted;
+    try { converted = converter.to_bytes(reinterpret_cast<const char16_t*>(buf), reinterpret_cast<const char16_t*>(buf + len)); }
+    catch(...) {}
+    return converted;
   }
   else if(stringWidth == StrWidth::utf_32)
   {
@@ -535,7 +538,10 @@ std::string toUTF8String(const char* buf, int len, StrWidth stringWidth)
       }
     }
     std::wstring_convert<codecvt<char32_t, char, std::mbstate_t>, char32_t> converter;
-    return converter.to_bytes(reinterpret_cast<const char32_t*>(buf), reinterpret_cast<const char32_t*>(buf + len));
+    std::string converted;
+    try { converted = converter.to_bytes(reinterpret_cast<const char32_t*>(buf), reinterpret_cast<const char32_t*>(buf + len)); }
+    catch(...) {}
+    return converted;
   } 
   else
   {
@@ -556,13 +562,17 @@ std::string convertFromUTF8(const char* buf, int len, StrWidth desiredWidth)
   if(desiredWidth == StrWidth::utf_16)
   {
     std::wstring_convert<codecvt<char16_t, char, mbstate_t>, char16_t> converter;
-    std::u16string tmpString = converter.from_bytes(buf, buf + len);
+    std::u16string tmpString;
+    try { tmpString = converter.from_bytes(buf, buf + len); }
+    catch(...) {}
     return std::string(reinterpret_cast<const char*>(tmpString.c_str()), tmpString.size() * sizeof(std::u16string::value_type));
   }
   else if(desiredWidth == StrWidth::utf_32)
   {
     std::wstring_convert<codecvt<char32_t, char, mbstate_t>, char32_t> converter;
-    std::u32string tmpString = converter.from_bytes(buf, buf + len);
+    std::u32string tmpString;
+    try { tmpString = converter.from_bytes(buf, buf + len); }
+    catch(...) {}
     return std::string(reinterpret_cast<const char*>(tmpString.c_str()), tmpString.size() * sizeof(std::u32string::value_type));
   } 
   else
