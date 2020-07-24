@@ -32,7 +32,7 @@ public:
   static Common::MemOperationReturnCode updateRAMCache();
   static std::string getFormattedValueFromCache(const u32 ramIndex, Common::MemType memType,
                                                 size_t memSize, Common::MemBase memBase,
-                                                bool memIsUnsigned);
+                                                bool memIsUnsigned, Common::StrWidth strWidth = Common::StrWidth::utf_8);
   static void copyRawMemoryFromCache(char* dest, const u32 consoleAddress, const size_t byteCount);
   static bool isValidConsoleAddress(const u32 address);
 

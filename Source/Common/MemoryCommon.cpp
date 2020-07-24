@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <sstream>
 #include <vector>
+#include <locale>
 
 #include "../Common/CommonTypes.h"
 #include "../Common/CommonUtils.h"
@@ -326,7 +327,8 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
 }
 
 std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
-                                 const MemBase base, const bool isUnsigned, const bool withBSwap)
+                                 const MemBase base, const bool isUnsigned, const bool withBSwap,
+                                 const StrWidth stringWidth)
 {
   std::stringstream ss;
   switch (base)
@@ -477,13 +479,7 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
   }
   case Common::MemType::type_string:
   {
-    int actualLength = 0;
-    for (actualLength; actualLength < length; ++actualLength)
-    {
-      if (*(memory + actualLength) == 0x00)
-        break;
-    }
-    return std::string(memory, actualLength);
+    return toUTF8String(memory, length, stringWidth);
   }
   case Common::MemType::type_byteArray:
   {
@@ -505,4 +501,56 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
     break;
   }
 }
+
+// really dumb c++ standard makes ~codecvt protected...
+template<class I, class E, class S>
+struct codecvt : std::codecvt<I, E, S>
+{
+    ~codecvt()
+    { }
+};
+
+std::string toUTF8String(const char* buf, int len, StrWidth stringWidth)
+{
+  if(stringWidth == StrWidth::utf_16)
+  {
+    const char16_t* newBuf = reinterpret_cast<const char16_t*>(buf);
+    for(int i = 0; i < len / sizeof(char16_t); i++)
+    {
+      if(newBuf[i] == 0)
+      {
+        len = i * sizeof(char16_t);
+        break;
+      }
+    }
+    std::wstring_convert<codecvt<char16_t, char, mbstate_t>, char16_t> converter;
+    return converter.to_bytes(reinterpret_cast<const char16_t*>(buf), reinterpret_cast<const char16_t*>(buf + len));
+  }
+  else if(stringWidth == StrWidth::utf_32)
+  {
+    const char32_t* newBuf = reinterpret_cast<const char32_t*>(buf);
+    for(int i = 0; i < len / sizeof(char32_t); i++)
+    {
+      if(newBuf[i] == 0)
+      {
+        len = i * sizeof(char32_t);
+        break;
+      }
+    }
+    std::wstring_convert<codecvt<char32_t, char, std::mbstate_t>, char32_t> converter;
+    return converter.to_bytes(reinterpret_cast<const char32_t*>(buf), reinterpret_cast<const char32_t*>(buf + len));
+  } else
+  {
+    for(int i = 0; i < len; i++)
+    {
+      if(buf[i] == 0)
+      {
+        len = i;
+        break;
+      }
+    }
+    return std::string(buf, len);
+  }
+}
+
 } // namespace Common

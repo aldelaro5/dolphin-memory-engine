@@ -130,10 +130,10 @@ Common::MemOperationReturnCode DolphinAccessor::updateRAMCache()
 
 std::string DolphinAccessor::getFormattedValueFromCache(const u32 ramIndex, Common::MemType memType,
                                                         size_t memSize, Common::MemBase memBase,
-                                                        bool memIsUnsigned)
+                                                        bool memIsUnsigned, Common::StrWidth strWidth)
 {
   return Common::formatMemoryToString(&m_updatedRAMCache[ramIndex], memType, memSize, memBase,
-                                      memIsUnsigned, Common::shouldBeBSwappedForType(memType));
+                                      memIsUnsigned, Common::shouldBeBSwappedForType(memType), strWidth);
 }
 
 void DolphinAccessor::copyRawMemoryFromCache(char* dest, const u32 consoleAddress,

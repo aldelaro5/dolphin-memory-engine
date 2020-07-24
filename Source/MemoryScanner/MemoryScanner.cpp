@@ -469,7 +469,7 @@ std::string MemScanner::getFormattedScannedValueAt(const int index) const
   else
     ramIndex = offset;
   return Common::formatMemoryToString(&m_scanRAMCache[ramIndex], m_memType, m_memSize, m_memBase,
-                                      !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
+                                      !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType), m_strWidth);
 }
 
 Common::MemOperationReturnCode MemScanner::updateCurrentRAMCache()
@@ -488,7 +488,7 @@ std::string MemScanner::getFormattedCurrentValueAt(const int index) const
     else
       ramIndex = offset;
     return DolphinComm::DolphinAccessor::getFormattedValueFromCache(ramIndex, m_memType, m_memSize,
-                                                                    m_memBase, !m_memIsSigned);
+                                                                    m_memBase, !m_memIsSigned, m_strWidth);
   }
   return "";
 }

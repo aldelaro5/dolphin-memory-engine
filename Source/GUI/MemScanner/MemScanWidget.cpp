@@ -490,12 +490,12 @@ std::string MemScanWidget::stringWidthConvert(const QString& input) const
     case Common::StrWidth::utf_16:
     {
       std::u16string tmpStr = input.toStdU16String();
-      return std::string((const char*)(tmpStr.c_str()), tmpStr.size() * sizeof(tmpStr[0]));
+      return std::string(reinterpret_cast<const char*>(tmpStr.c_str()), tmpStr.size() * sizeof(tmpStr[0]));
     }
     case Common::StrWidth::utf_32:
     {
       std::u32string tmpStr = input.toStdU32String();
-      return std::string((const char*)(tmpStr.c_str()), tmpStr.size() * sizeof(tmpStr[0]));
+      return std::string(reinterpret_cast<const char*>(tmpStr.c_str()), tmpStr.size() * sizeof(tmpStr[0]));
     }
     default:
     {
