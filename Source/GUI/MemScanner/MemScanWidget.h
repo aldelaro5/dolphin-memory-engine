@@ -55,7 +55,6 @@ private:
   MemScanner::ScanFiter getSelectedFilter() const;
   void updateScanFilterChoices();
   void updateTypeAdditionalOptions();
-  std::string stringWidthConvert(const QString& input) const;
 
   MemScanner* m_memScanner;
   ResultsListModel* m_resultsListModel;

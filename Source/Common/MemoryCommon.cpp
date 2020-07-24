@@ -223,7 +223,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
   case MemType::type_float:
   {
     float theFloat = 0.0f;
-    // 9 digits is the max number of digits in a flaot that can recover any binary format
+    // 9 digits is the max number of digits in a float that can recover any binary format
     ss >> std::setprecision(9) >> theFloat;
     if (ss.fail())
     {
@@ -539,7 +539,8 @@ std::string toUTF8String(const char* buf, int len, StrWidth stringWidth)
     }
     std::wstring_convert<codecvt<char32_t, char, std::mbstate_t>, char32_t> converter;
     return converter.to_bytes(reinterpret_cast<const char32_t*>(buf), reinterpret_cast<const char32_t*>(buf + len));
-  } else
+  } 
+  else
   {
     for(int i = 0; i < len; i++)
     {
@@ -549,6 +550,26 @@ std::string toUTF8String(const char* buf, int len, StrWidth stringWidth)
         break;
       }
     }
+    return std::string(buf, len);
+  }
+}
+
+std::string convertFromUTF8(const char* buf, int len, StrWidth desiredWidth)
+{
+  if(desiredWidth == StrWidth::utf_16)
+  {
+    std::wstring_convert<codecvt<char16_t, char, mbstate_t>, char16_t> converter;
+    std::u16string tmpString = converter.from_bytes(buf, buf + len);
+    return std::string(reinterpret_cast<const char*>(tmpString.c_str()), tmpString.size() * sizeof(std::u16string::value_type));
+  }
+  else if(desiredWidth == StrWidth::utf_32)
+  {
+    std::wstring_convert<codecvt<char32_t, char, mbstate_t>, char32_t> converter;
+    std::u32string tmpString = converter.from_bytes(buf, buf + len);
+    return std::string(reinterpret_cast<const char*>(tmpString.c_str()), tmpString.size() * sizeof(std::u32string::value_type));
+  } 
+  else
+  {
     return std::string(buf, len);
   }
 }

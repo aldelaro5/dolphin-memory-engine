@@ -12,7 +12,7 @@ MemScanner::~MemScanner()
 }
 
 Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter filter,
-                                                     const std::string& searchTerm1,
+                                                     std::string searchTerm1,
                                                      const std::string& searchTerm2)
 {
   m_scanRAMCache = nullptr;
@@ -61,12 +61,17 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   size_t termActualLength = 0;
   size_t termMaxLength = 0;
   if (m_memType == Common::MemType::type_string)
+  {
+    searchTerm1 = Common::convertFromUTF8(searchTerm1.c_str(), searchTerm1.size(), m_strWidth);
     // This is just to have the string formatted with the appropriate length, byte arrays don't need
     // this because they get copied byte per byte
     termMaxLength = searchTerm1.length();
+  }
   else
+  {
     // Have no restriction on the length for the rest
     termMaxLength = ramSize;
+  }
 
   std::string formattedSearchTerm1;
   if (m_memType == Common::MemType::type_byteArray)
@@ -167,7 +172,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
 }
 
 Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter filter,
-                                                    const std::string& searchTerm1,
+                                                    std::string searchTerm1,
                                                     const std::string& searchTerm2)
 {
   u32 ramSize = 0;
@@ -205,12 +210,17 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   size_t termActualLength = 0;
   size_t termMaxLength = 0;
   if (m_memType == Common::MemType::type_string)
+  {
+    searchTerm1 = Common::convertFromUTF8(searchTerm1.c_str(), searchTerm1.size(), m_strWidth);
     // This is just to have the string formatted with the appropriate length, byte arrays don't need
     // this because they get copied byte per byte
     termMaxLength = searchTerm1.length();
+  }
   else
+  {
     // Have no restriction on the length for the rest
     termMaxLength = ramSize;
+  }
 
   char* memoryToCompare1 = nullptr;
   if (filter != ScanFiter::increased && filter != ScanFiter::decreased &&

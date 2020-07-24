@@ -36,9 +36,9 @@ public:
 
   MemScanner();
   ~MemScanner();
-  Common::MemOperationReturnCode firstScan(const ScanFiter filter, const std::string& searchTerm1,
+  Common::MemOperationReturnCode firstScan(const ScanFiter filter, std::string searchTerm1,
                                            const std::string& searchTerm2);
-  Common::MemOperationReturnCode nextScan(const ScanFiter filter, const std::string& searchTerm1,
+  Common::MemOperationReturnCode nextScan(const ScanFiter filter, std::string searchTerm1,
                                           const std::string& searchTerm2);
   void reset();
   inline CompareResult compareMemoryAsNumbers(const char* first, const char* second,

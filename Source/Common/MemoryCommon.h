@@ -62,4 +62,5 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
                                  const MemBase base, const bool isUnsigned,
                                  const bool withBSwap = false, const StrWidth stringWidth = StrWidth::utf_8);
 std::string toUTF8String(const char* buf, int len, StrWidth stringWidth);
+std::string convertFromUTF8(const char* buf, int len, StrWidth desiredWidth);
 } // namespace Common
