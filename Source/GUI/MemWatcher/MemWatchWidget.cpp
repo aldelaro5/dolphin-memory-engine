@@ -232,6 +232,46 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
           }
         }
       }
+      else // it is a string
+      {
+        contextMenu->addSeparator();
+
+        QAction* viewUTF8 = new QAction(tr("View as UTF-8"), this);
+        QAction* viewUTF16 = new QAction(tr("View as UTF-16"), this);
+        QAction* viewUTF32 = new QAction(tr("View as UTF-32"), this);
+
+        connect(viewUTF8, &QAction::triggered, m_watchModel, [=] {
+          entry->setStrWidth(Common::StrWidth::utf_8);
+          m_hasUnsavedChanges = true;
+        });
+        connect(viewUTF16, &QAction::triggered, m_watchModel, [=] {
+          entry->setStrWidth(Common::StrWidth::utf_16);
+          m_hasUnsavedChanges = true;
+        });
+        connect(viewUTF32, &QAction::triggered, m_watchModel, [=] {
+          entry->setStrWidth(Common::StrWidth::utf_32);
+          m_hasUnsavedChanges = true;
+        });
+
+        switch(entry->getStrWidth())
+        {
+          case Common::StrWidth::utf_8:
+            viewUTF8->setEnabled(false);
+            break;
+          case Common::StrWidth::utf_16:
+            viewUTF16->setEnabled(false);
+            break;
+          case Common::StrWidth::utf_32:
+            viewUTF32->setEnabled(false);
+            break;
+        }
+
+        contextMenu->addAction(viewUTF8);
+        contextMenu->addAction(viewUTF16);
+        contextMenu->addAction(viewUTF32);
+        contextMenu->addSeparator();
+      }
+      
       contextMenu->addSeparator();
       canPasteInto = false;
     }

@@ -316,7 +316,7 @@ std::string MemWatchEntry::getStringFromMemory() const
 {
   if (m_boundToPointer && !m_isValidPointer)
     return "???";
-  return Common::formatMemoryToString(m_memory, m_type, m_length, m_base, m_isUnsigned);
+  return Common::formatMemoryToString(m_memory, m_type, m_length, m_base, m_isUnsigned, false, m_stringWidth);
 }
 
 Common::MemOperationReturnCode MemWatchEntry::writeMemoryFromString(const std::string& inputString)
@@ -324,7 +324,7 @@ Common::MemOperationReturnCode MemWatchEntry::writeMemoryFromString(const std::s
   Common::MemOperationReturnCode writeReturn = Common::MemOperationReturnCode::OK;
   size_t sizeToWrite = 0;
   char* buffer =
-      Common::formatStringToMemory(writeReturn, sizeToWrite, inputString, m_base, m_type, m_length);
+      Common::formatStringToMemory(writeReturn, sizeToWrite, inputString, m_base, m_type, m_length, m_stringWidth);
   if (writeReturn != Common::MemOperationReturnCode::OK)
     return writeReturn;
 
