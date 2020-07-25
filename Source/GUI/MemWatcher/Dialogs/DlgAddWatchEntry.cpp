@@ -18,6 +18,8 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry)
   // These are connected at the end to avoid triggering the events when initialising.
   connect(m_cmbTypes, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
           &DlgAddWatchEntry::onTypeChange);
+  connect(m_encodingTypes, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+          &DlgAddWatchEntry::onEncodingChange);
   connect(m_spnLength, QOverload<int>::of(&QSpinBox::valueChanged), this,
           &DlgAddWatchEntry::onLengthChanged);
 }
@@ -56,7 +58,13 @@ void DlgAddWatchEntry::initialiseWidgets()
   m_cmbTypes = new QComboBox(this);
   m_cmbTypes->addItems(GUICommon::g_memTypeNames);
 
+  m_encodingTypes = new QComboBox(this);
+  m_encodingTypes->addItem("UTF-8");
+  m_encodingTypes->addItem("UTF-16");
+  m_encodingTypes->addItem("UTF-32");
+
   m_lengtWidget = new QWidget;
+  m_encodingWidget = new QWidget;
 
   m_spnLength = new QSpinBox(this);
   m_spnLength->setMinimum(1);
@@ -123,6 +131,12 @@ void DlgAddWatchEntry::makeLayouts()
   layout_length->addWidget(m_spnLength);
   m_lengtWidget->setLayout(layout_length);
 
+  QLabel* lblEncoding = new QLabel(QString("Encoding: "), this);
+  QHBoxLayout* layout_encoding = new QHBoxLayout;
+  layout_encoding->addWidget(lblEncoding);
+  layout_encoding->addWidget(m_encodingTypes);
+  m_encodingWidget->setLayout(layout_encoding);
+
   QDialogButtonBox* buttonBox =
       new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
@@ -135,6 +149,7 @@ void DlgAddWatchEntry::makeLayouts()
   main_layout->addWidget(labelWidget);
   main_layout->addWidget(typeWidget);
   main_layout->addWidget(m_lengtWidget);
+  main_layout->addWidget(m_encodingWidget);
   main_layout->addWidget(buttonBox);
   main_layout->addStretch();
   setLayout(main_layout);
@@ -152,6 +167,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_cmbTypes->setCurrentIndex(0);
     m_spnLength->setValue(1);
     m_lengtWidget->hide();
+    m_encodingWidget->hide();
     m_lblValuePreview->setText("???");
     m_chkBoundToPointer->setChecked(false);
     m_pointerWidget->hide();
@@ -161,12 +177,19 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_entry = entry;
 
     m_spnLength->setValue(static_cast<int>(m_entry->getLength()));
+    m_encodingTypes->setCurrentIndex(static_cast<int>(m_entry->getStrWidth()));
     m_cmbTypes->setCurrentIndex(static_cast<int>(m_entry->getType()));
     if (m_entry->getType() == Common::MemType::type_string ||
         m_entry->getType() == Common::MemType::type_byteArray)
       m_lengtWidget->show();
     else
       m_lengtWidget->hide();
+    
+    if(m_entry->getType() == Common::MemType::type_string)
+      m_encodingWidget->show();
+    else
+      m_encodingWidget->hide();
+
     m_txbLabel->setText(m_entry->getLabel());
     std::stringstream ssAddress;
     ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
@@ -300,6 +323,13 @@ void DlgAddWatchEntry::onTypeChange(int index)
   else
     m_lengtWidget->hide();
   m_entry->setTypeAndLength(theType, m_spnLength->value());
+  if (validateAndSetAddress())
+    updatePreview();
+}
+
+void DlgAddWatchEntry::onEncodingChange(int index)
+{
+  m_entry->setStrWidth(static_cast<Common::StrWidth>(index));
   if (validateAndSetAddress())
     updatePreview();
 }

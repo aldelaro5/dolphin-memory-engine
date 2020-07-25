@@ -34,7 +34,7 @@ MemWatchEntry::MemWatchEntry(MemWatchEntry* entry)
     : m_label(entry->m_label), m_consoleAddress(entry->m_consoleAddress), m_type(entry->m_type),
       m_isUnsigned(entry->m_isUnsigned), m_base(entry->m_base),
       m_boundToPointer(entry->m_boundToPointer), m_pointerOffsets(entry->m_pointerOffsets),
-      m_length(entry->m_length), m_isValidPointer(entry->m_isValidPointer)
+      m_length(entry->m_length), m_isValidPointer(entry->m_isValidPointer), m_stringWidth(entry->m_stringWidth)
 {
   m_memory = new char[getSizeForType(entry->getType(), entry->getLength())];
   std::memcpy(m_memory, entry->getMemory(), getSizeForType(entry->getType(), entry->getLength()));

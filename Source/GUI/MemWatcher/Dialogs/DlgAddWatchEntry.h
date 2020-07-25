@@ -18,6 +18,7 @@ public:
   DlgAddWatchEntry(MemWatchEntry* entry);
   ~DlgAddWatchEntry();
   void onTypeChange(int index);
+  void onEncodingChange(int index);
   void accept();
   void onAddressChanged();
   void onIsPointerChanged();
@@ -46,8 +47,10 @@ private:
   QLabel* m_lblValuePreview;
   QLineEdit* m_txbLabel;
   QComboBox* m_cmbTypes;
+  QComboBox* m_encodingTypes;
   QSpinBox* m_spnLength;
   QWidget* m_lengtWidget;
+  QWidget* m_encodingWidget;
   QWidget* m_pointerWidget;
   QPushButton* m_btnAddOffset;
   QPushButton* m_btnRemoveOffset;
