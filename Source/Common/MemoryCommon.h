@@ -63,4 +63,5 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
                                  const bool withBSwap = false, const StrWidth stringWidth = StrWidth::utf_8);
 std::string toUTF8String(const char* buf, int len, StrWidth stringWidth);
 std::string convertFromUTF8(const char* buf, int len, StrWidth desiredWidth);
+std::string flipEndianness(std::string input, int charWidth);
 } // namespace Common

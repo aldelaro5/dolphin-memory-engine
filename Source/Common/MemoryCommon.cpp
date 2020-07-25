@@ -522,7 +522,9 @@ std::string toUTF8String(const char* buf, int len, StrWidth stringWidth)
     }
     std::wstring_convert<codecvt<char16_t, char, mbstate_t>, char16_t> converter;
     std::string converted;
-    try { converted = converter.to_bytes(reinterpret_cast<const char16_t*>(buf), reinterpret_cast<const char16_t*>(buf + len)); }
+    std::string originalStr = flipEndianness(std::string(buf, len), sizeof(char16_t));
+    const char* loc = originalStr.c_str();
+    try { converted = converter.to_bytes(reinterpret_cast<const char16_t*>(loc), reinterpret_cast<const char16_t*>(loc + len)); }
     catch(...) {}
     return converted;
   }
@@ -539,7 +541,9 @@ std::string toUTF8String(const char* buf, int len, StrWidth stringWidth)
     }
     std::wstring_convert<codecvt<char32_t, char, std::mbstate_t>, char32_t> converter;
     std::string converted;
-    try { converted = converter.to_bytes(reinterpret_cast<const char32_t*>(buf), reinterpret_cast<const char32_t*>(buf + len)); }
+    std::string originalStr = flipEndianness(std::string(buf, len), sizeof(char32_t));
+    const char* loc = originalStr.c_str();
+    try { converted = converter.to_bytes(reinterpret_cast<const char32_t*>(loc), reinterpret_cast<const char32_t*>(loc + len)); }
     catch(...) {}
     return converted;
   } 
@@ -565,7 +569,7 @@ std::string convertFromUTF8(const char* buf, int len, StrWidth desiredWidth)
     std::u16string tmpString;
     try { tmpString = converter.from_bytes(buf, buf + len); }
     catch(...) {}
-    return std::string(reinterpret_cast<const char*>(tmpString.c_str()), tmpString.size() * sizeof(std::u16string::value_type));
+    return flipEndianness(std::string(reinterpret_cast<const char*>(tmpString.c_str()), tmpString.size() * sizeof(std::u16string::value_type)), sizeof(std::u16string::value_type));
   }
   else if(desiredWidth == StrWidth::utf_32)
   {
@@ -573,12 +577,27 @@ std::string convertFromUTF8(const char* buf, int len, StrWidth desiredWidth)
     std::u32string tmpString;
     try { tmpString = converter.from_bytes(buf, buf + len); }
     catch(...) {}
-    return std::string(reinterpret_cast<const char*>(tmpString.c_str()), tmpString.size() * sizeof(std::u32string::value_type));
+    return flipEndianness(std::string(reinterpret_cast<const char*>(tmpString.c_str()), tmpString.size() * sizeof(std::u32string::value_type)), sizeof(std::u32string::value_type));
   } 
   else
   {
     return std::string(buf, len);
   }
+}
+
+std::string flipEndianness(std::string input, int charWidth)
+{
+  for(int i = 0; i < input.size(); i += charWidth)
+  {
+    for(int n = 0; n < charWidth / 2; n++)
+    {
+      char tmp = input[i + n];
+      int idx = (i + charWidth - n) - 1;
+      input[i + n] = input[idx];
+      input[idx] = tmp;
+    }
+  }
+  return input;
 }
 
 } // namespace Common
