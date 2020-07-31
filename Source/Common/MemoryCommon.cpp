@@ -511,6 +511,7 @@ std::string toUTF8String(const char* buf, int len, StrWidth stringWidth)
 {
   if(stringWidth == StrWidth::utf_16)
   {
+    len = roundStringWidth(len, 2);
     const char16_t* newBuf = reinterpret_cast<const char16_t*>(buf);
     for(int i = 0; i < len / sizeof(char16_t); i++)
     {
@@ -530,6 +531,7 @@ std::string toUTF8String(const char* buf, int len, StrWidth stringWidth)
   }
   else if(stringWidth == StrWidth::utf_32)
   {
+    len = roundStringWidth(len, 4);
     const char32_t* newBuf = reinterpret_cast<const char32_t*>(buf);
     for(int i = 0; i < len / sizeof(char32_t); i++)
     {
@@ -539,7 +541,7 @@ std::string toUTF8String(const char* buf, int len, StrWidth stringWidth)
         break;
       }
     }
-    std::wstring_convert<codecvt<char32_t, char, std::mbstate_t>, char32_t> converter;
+    std::wstring_convert<codecvt<char32_t, char, mbstate_t>, char32_t> converter;
     std::string converted;
     std::string originalStr = flipEndianness(std::string(buf, len), sizeof(char32_t));
     const char* loc = originalStr.c_str();
@@ -587,7 +589,8 @@ std::string convertFromUTF8(const char* buf, int len, StrWidth desiredWidth)
 
 std::string flipEndianness(std::string input, int charWidth)
 {
-  for(int i = 0; i < input.size(); i += charWidth)
+  int len = roundStringWidth(input.size(), charWidth);
+  for(int i = 0; i < len; i += charWidth)
   {
     for(int n = 0; n < charWidth / 2; n++)
     {
