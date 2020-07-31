@@ -65,5 +65,5 @@ std::string toUTF8String(const char* buf, int len, StrWidth stringWidth);
 std::string convertFromUTF8(const char* buf, int len, StrWidth desiredWidth);
 std::string flipEndianness(std::string input, int charWidth);
 
-inline int roundStringWidth(size_t size, int bytesPerChar) { return size - (size % bytesPerChar); }
+inline int roundStringWidth(int size, int bytesPerChar) { return size - (size % bytesPerChar); }
 } // namespace Common
