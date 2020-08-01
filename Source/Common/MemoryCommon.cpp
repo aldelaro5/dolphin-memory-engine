@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <sstream>
 #include <vector>
-#include <locale>
 
 #include "../Common/CommonTypes.h"
 #include "../Common/CommonUtils.h"
@@ -258,7 +257,27 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
 
   case MemType::type_string:
   {
-    std::string newTmpString = convertFromUTF8(inputString.c_str(), inputString.size(), stringWidth);
+    std::string newTmpString;
+    try
+    {
+      switch(stringWidth)
+      {
+        case StrWidth::utf_8:
+          newTmpString = convertFromUTF8<StrWidth::utf_8>(inputString.c_str(), inputString.size());
+          break;
+        case StrWidth::utf_16:
+          newTmpString = convertFromUTF8<StrWidth::utf_16>(inputString.c_str(), inputString.size());
+          break;
+        case StrWidth::utf_32:
+          newTmpString = convertFromUTF8<StrWidth::utf_32>(inputString.c_str(), inputString.size());
+          break;
+      }
+    }
+    catch(std::invalid_argument)
+    {
+      returnCode = MemOperationReturnCode::invalidInput;
+      return buffer;
+    }
     buffer = new char[newTmpString.size()];
     std::memcpy(buffer, newTmpString.c_str(), newTmpString.size());
     actualLength = newTmpString.size();
@@ -476,7 +495,15 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
   }
   case Common::MemType::type_string:
   {
-    return toUTF8String(memory, length, stringWidth);
+    switch(stringWidth)
+    {
+      case StrWidth::utf_8:
+        return toUTF8String<StrWidth::utf_8>(memory, length);
+      case StrWidth::utf_16:
+        return toUTF8String<StrWidth::utf_16>(memory, length);
+      case StrWidth::utf_32:
+        return toUTF8String<StrWidth::utf_32>(memory, length);
+    }
   }
   case Common::MemType::type_byteArray:
   {
@@ -499,108 +526,188 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
   }
 }
 
-// really dumb c++ standard makes ~codecvt protected...
-template<class I, class E, class S>
-struct codecvt : std::codecvt<I, E, S>
+std::string toUTF8Char(uint32_t codepoint)
 {
-    ~codecvt()
-    { }
-};
-
-std::string toUTF8String(const char* buf, int len, StrWidth stringWidth)
-{
-  if(stringWidth == StrWidth::utf_16)
+  std::string retVal;
+  if(codepoint < 0x80)
   {
-    len = roundStringWidth(len, 2);
-    const char16_t* newBuf = reinterpret_cast<const char16_t*>(buf);
-    for(int i = 0; i < len / sizeof(char16_t); i++)
-    {
-      if(newBuf[i] == 0)
-      {
-        len = i * sizeof(char16_t);
-        break;
-      }
-    }
-    std::wstring_convert<codecvt<char16_t, char, mbstate_t>, char16_t> converter;
-    std::string converted;
-    std::string originalStr = flipEndianness(std::string(buf, len), sizeof(char16_t));
-    const char* loc = originalStr.c_str();
-    try { converted = converter.to_bytes(reinterpret_cast<const char16_t*>(loc), reinterpret_cast<const char16_t*>(loc + len)); }
-    catch(...) {}
-    return converted;
+    retVal += static_cast<char>(codepoint);
   }
-  else if(stringWidth == StrWidth::utf_32)
+  else if(codepoint < 0x800)
   {
-    len = roundStringWidth(len, 4);
-    const char32_t* newBuf = reinterpret_cast<const char32_t*>(buf);
-    for(int i = 0; i < len / sizeof(char32_t); i++)
-    {
-      if(newBuf[i] == 0)
-      {
-        len = i * sizeof(char32_t);
-        break;
-      }
-    }
-    std::wstring_convert<codecvt<char32_t, char, mbstate_t>, char32_t> converter;
-    std::string converted;
-    std::string originalStr = flipEndianness(std::string(buf, len), sizeof(char32_t));
-    const char* loc = originalStr.c_str();
-    try { converted = converter.to_bytes(reinterpret_cast<const char32_t*>(loc), reinterpret_cast<const char32_t*>(loc + len)); }
-    catch(...) {}
-    return converted;
-  } 
+    retVal += static_cast<char>((codepoint >> 6) | 0b11000000);
+    retVal += static_cast<char>(((codepoint >> 0) & 0b00111111) | 0b10000000);
+  }
+  else if(codepoint < 0x10000)
+  {
+    retVal += static_cast<char>((codepoint >> 12) | 0b11100000);
+    retVal += static_cast<char>(((codepoint >> 6) & 0b00111111) | 0b10000000);
+    retVal += static_cast<char>(((codepoint >> 0) & 0b00111111) | 0b10000000);
+  }
+  else if(codepoint < 0x110000)
+  {
+    retVal += static_cast<char>((codepoint >> 18) | 0b11110000);
+    retVal += static_cast<char>(((codepoint >> 12) & 0b00111111) | 0b10000000);
+    retVal += static_cast<char>(((codepoint >> 6) & 0b00111111) | 0b10000000);
+    retVal += static_cast<char>(((codepoint >> 0) & 0b00111111) | 0b10000000);
+  }
   else
   {
-    for(int i = 0; i < len; i++)
-    {
-      if(buf[i] == 0)
-      {
-        len = i;
-        break;
-      }
-    }
-    return std::string(buf, len);
+    throw std::invalid_argument("Invalid unicode codepoint!");
   }
+  
+  return retVal;
 }
 
-std::string convertFromUTF8(const char* buf, int len, StrWidth desiredWidth)
+uint32_t fromUTF8Char(const char* utf8, int& offset, const int len)
 {
-  if(desiredWidth == StrWidth::utf_16)
+  uint32_t res = 0;
+  if((utf8[offset] & 0b10000000) == 0)
   {
-    std::wstring_convert<codecvt<char16_t, char, mbstate_t>, char16_t> converter;
-    std::u16string tmpString;
-    try { tmpString = converter.from_bytes(buf, buf + len); }
-    catch(...) {}
-    return flipEndianness(std::string(reinterpret_cast<const char*>(tmpString.c_str()), tmpString.size() * sizeof(std::u16string::value_type)), sizeof(std::u16string::value_type));
+    res = utf8[offset];
+    offset += 1;
   }
-  else if(desiredWidth == StrWidth::utf_32)
+  else if((utf8[offset] & 0b11100000) == 0b11000000)
   {
-    std::wstring_convert<codecvt<char32_t, char, mbstate_t>, char32_t> converter;
-    std::u32string tmpString;
-    try { tmpString = converter.from_bytes(buf, buf + len); }
-    catch(...) {}
-    return flipEndianness(std::string(reinterpret_cast<const char*>(tmpString.c_str()), tmpString.size() * sizeof(std::u32string::value_type)), sizeof(std::u32string::value_type));
-  } 
+    if(offset + 1 >= len)
+      throw std::invalid_argument("Invalid UTF-8 codepoint!");
+    res |= static_cast<uint32_t>(utf8[offset] & 0b00011111) << 6;
+    res |= static_cast<uint32_t>(utf8[offset + 1] & 0b00111111) << 0;
+    offset += 2;
+  }
+  else if((utf8[offset] & 0b11110000) == 0b11100000)
+  {
+    if(offset + 2 >= len)
+      throw std::invalid_argument("Invalid UTF-8 codepoint!");
+    res |= static_cast<uint32_t>(utf8[offset] & 0b00001111) << 12;
+    res |= static_cast<uint32_t>(utf8[offset + 1] & 0b00111111) << 6;
+    res |= static_cast<uint32_t>(utf8[offset + 2] & 0b00111111) << 0;
+    offset += 3;
+  }
+  else if((utf8[offset] & 0b11111000) == 0b11110000)
+  {
+    if(offset + 3 >= len)
+      throw std::invalid_argument("Invalid UTF-8 codepoint!");
+    res |= static_cast<uint32_t>(utf8[offset] & 0b00000111) << 18;
+    res |= static_cast<uint32_t>(utf8[offset + 1] & 0b00111111) << 12;
+    res |= static_cast<uint32_t>(utf8[offset + 2] & 0b00111111) << 6;
+    res |= static_cast<uint32_t>(utf8[offset + 3] & 0b00111111) << 0;
+    offset += 4;
+  }
   else
   {
-    return std::string(buf, len);
+    throw std::invalid_argument("Invalid UTF-8 codepoint!");
   }
+
+  return res;
 }
 
-std::string flipEndianness(std::string input, int charWidth)
+template <>
+std::string toUTF8String<StrWidth::utf_8>(const char* buf, int len)
 {
-  int len = roundStringWidth(input.size(), charWidth);
-  for(int i = 0; i < len; i += charWidth)
+  return std::string(buf, len);
+}
+
+template <>
+std::string toUTF8String<StrWidth::utf_16>(const char* buf, int len)
+{
+  len /= sizeof(uint16_t);
+  const uint16_t* newBuf = reinterpret_cast<const uint16_t*>(buf);
+  std::string retVal;
+  for(int i = 0; i < len; i++)
   {
-    for(int n = 0; n < charWidth / 2; n++)
+    uint16_t curr = bSwap16(newBuf[i]);
+    if(curr < 0xD800 || curr > 0xDFFF)
     {
-      char tmp = input[i + n];
-      int idx = (i + charWidth - n) - 1;
-      input[i + n] = input[idx];
-      input[idx] = tmp;
+      retVal += '\0';
+      try { retVal += toUTF8Char(curr); }
+      catch(std::invalid_argument) { return retVal; }
+    }
+    else if(curr > 0xDBFF)
+    {
+      // return early on error
+      return retVal;
+    }
+    else
+    {
+      if(i + 1 >= len)
+        return retVal;
+      uint16_t next = bSwap16(newBuf[i + 1]);
+      try { retVal += toUTF8Char(((static_cast<uint32_t>(curr) & 0x3FF) << 10) | (static_cast<uint32_t>(next) & 0x3FF) + 0x10000); }
+      catch(std::invalid_argument) { return retVal; }
+      i++;
     }
   }
-  return input;
+  return retVal;
+}
+
+template <>
+std::string toUTF8String<StrWidth::utf_32>(const char* buf, int len)
+{
+  len /= sizeof(uint32_t);
+  const uint32_t* newBuf = reinterpret_cast<const uint32_t*>(buf);
+  std::string retVal;
+  for(int i = 0; i < len; i++)
+  {
+    try { retVal += toUTF8Char(bSwap32(newBuf[i])); }
+    catch(std::invalid_argument) { return retVal; }
+  }
+  return retVal;
+}
+
+template <>
+std::string convertFromUTF8<StrWidth::utf_8>(const char* buf, int len)
+{
+  return std::string(buf, len);
+}
+
+template <>
+std::string convertFromUTF8<StrWidth::utf_16>(const char* buf, int len)
+{
+  int offset = 0;
+  std::string retVal;
+  while(offset < len)
+  {
+    uint32_t codepoint = fromUTF8Char(buf, offset, len);
+    if(codepoint < 0x10000)
+    {
+      retVal += (codepoint & 0xFF00) >> 8;
+      retVal += (codepoint & 0xFF) >> 0;
+    }
+    else if(codepoint > 0x10FFFF)
+    {
+      throw std::invalid_argument("Invalid unicode codepoint!");
+    }
+    else
+    {
+      codepoint -= 0x10000;
+      uint16_t first = 0xD800;
+      uint16_t next = 0xDC00;
+      first |= codepoint >> 10;
+      next |= codepoint & 0x3FF;
+      retVal += first >> 8;
+      retVal += first & 0xFF;
+      retVal += next >> 8;
+      retVal += next & 0xFF;
+    }
+  }
+  return retVal;
+}
+
+template <>
+std::string convertFromUTF8<StrWidth::utf_32>(const char* buf, int len)
+{
+  int offset = 0;
+  std::string retVal;
+  while(offset < len)
+  {
+    uint32_t codepoint = fromUTF8Char(buf, offset, len);
+    retVal += codepoint >> 24;
+    retVal += (codepoint >> 16) & 0xFF;
+    retVal += (codepoint >> 8) & 0xFF;
+    retVal += (codepoint >> 0) & 0xFF;
+  }
+  return retVal;
 }
 
 } // namespace Common

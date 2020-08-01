@@ -61,9 +61,21 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
 std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
                                  const MemBase base, const bool isUnsigned,
                                  const bool withBSwap = false, const StrWidth stringWidth = StrWidth::utf_8);
-std::string toUTF8String(const char* buf, int len, StrWidth stringWidth);
-std::string convertFromUTF8(const char* buf, int len, StrWidth desiredWidth);
-std::string flipEndianness(std::string input, int charWidth);
+template <StrWidth Width>
+std::string toUTF8String(const char* buf, int len);
+template <>
+std::string toUTF8String<StrWidth::utf_8>(const char* buf, int len);
+template <>
+std::string toUTF8String<StrWidth::utf_16>(const char* buf, int len);
+template <>
+std::string toUTF8String<StrWidth::utf_32>(const char* buf, int len);
 
-inline int roundStringWidth(int size, int bytesPerChar) { return size - (size % bytesPerChar); }
+template <StrWidth Width>
+std::string convertFromUTF8(const char* buf, int len);
+template <>
+std::string convertFromUTF8<StrWidth::utf_8>(const char* buf, int len);
+template <>
+std::string convertFromUTF8<StrWidth::utf_16>(const char* buf, int len);
+template <>
+std::string convertFromUTF8<StrWidth::utf_32>(const char* buf, int len);
 } // namespace Common
