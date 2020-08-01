@@ -41,7 +41,7 @@ void DlgImportCTFile::initialiseWidgets()
   m_btnGroupImportAddressMethod->addButton(m_rdbUseDolphinPointers, 1);
   m_rdbUseCommonBase->setChecked(true);
 
-  connect(m_btnGroupImportAddressMethod, QOverload<int>::of(&QButtonGroup::idClicked),
+  connect(m_btnGroupImportAddressMethod, QOverload<int>::of(&QButtonGroup::buttonClicked),
           [=](int id) { onAddressImportMethodChanged(); });
 }
 
