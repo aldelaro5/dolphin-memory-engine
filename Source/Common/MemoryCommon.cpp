@@ -619,7 +619,6 @@ std::string toUTF8String<StrWidth::utf_16>(const char* buf, int len)
     uint16_t curr = bSwap16(newBuf[i]);
     if(curr < 0xD800 || curr > 0xDFFF)
     {
-      retVal += '\0';
       try { retVal += toUTF8Char(curr); }
       catch(std::invalid_argument) { return retVal; }
     }
