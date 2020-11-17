@@ -112,7 +112,7 @@ Common::MemOperationReturnCode DolphinAccessor::updateRAMCache()
   {
     m_updatedRAMCache = new char[Common::MEM1_SIZE + Common::MEM2_SIZE];
     // Read Wii extra RAM
-    if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM2_START),
+    if (!DolphinComm::DolphinAccessor::readFromRAM(0x2000000,
                                                    m_updatedRAMCache + Common::MEM1_SIZE,
                                                    Common::MEM2_SIZE, false))
       return Common::MemOperationReturnCode::operationFailed;

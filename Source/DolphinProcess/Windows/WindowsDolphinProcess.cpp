@@ -56,14 +56,15 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
       u64 regionBaseAddress = 0;
       std::memcpy(&regionBaseAddress, &(info.BaseAddress), sizeof(info.BaseAddress));
 
-      if (regionBaseAddress == m_emuRAMAddressStart + 0x2000000)
+      // Check region size so that we know it's MEM2
+      if (regionBaseAddress == m_emuRAMAddressStart + 0x2000000 && info.RegionSize == 0x4000000)
       {
         // View the comment for MEM1.
         PSAPI_WORKING_SET_EX_INFORMATION wsInfo;
         wsInfo.VirtualAddress = info.BaseAddress;
         if (QueryWorkingSetEx(m_hDolphin, &wsInfo, sizeof(PSAPI_WORKING_SET_EX_INFORMATION)))
         {
-          //if (wsInfo.VirtualAttributes.Valid)
+          if (wsInfo.VirtualAttributes.Valid)
             m_MEM2Present = true;
         }
         break;
