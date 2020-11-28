@@ -155,9 +155,6 @@ void DolphinAccessor::copyRawMemoryFromCache(char* dest, const u32 consoleAddres
       ramIndex = offset - (MEM2Distance - Common::MEM1_SIZE);
     else
       ramIndex = offset;
-
-    //u32 asd = sizeof(m_updatedRAMCache) / sizeof(*m_updatedRAMCache);
-
     std::memcpy(dest, m_updatedRAMCache + ramIndex, byteCount);
   }
 }
