@@ -28,7 +28,7 @@ public:
   {
     return m_emuRAMAddressStart;
   };
-  u64 isMEM2Present() const
+  bool isMEM2Present() const
   {
     return m_MEM2Present;
   };
