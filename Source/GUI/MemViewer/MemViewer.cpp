@@ -418,7 +418,8 @@ void MemViewer::editSelection()
     if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress + indexStart))
     {
       if (!DolphinComm::DolphinAccessor::writeToRAM(
-              Common::dolphinAddrToOffset(m_currentFirstAddress + indexStart), newMem,
+              Common::dolphinAddrToOffset(m_currentFirstAddress + indexStart, DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance()),
+              newMem,
               selectionLength, false))
       {
         emit memErrorOccured();
@@ -681,7 +682,8 @@ bool MemViewer::writeCharacterToSelectedMemory(char byteToWrite)
       byteToWrite = selectedMemoryValue & 0x0F | (byteToWrite << 4);
   }
 
-  u32 offsetToWrite = Common::dolphinAddrToOffset(m_currentFirstAddress + (u32)memoryOffset);
+  u32 offsetToWrite =
+      Common::dolphinAddrToOffset(m_currentFirstAddress + (u32)memoryOffset, DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance());
   return DolphinComm::DolphinAccessor::writeToRAM(offsetToWrite, &byteToWrite, 1, false);
 }
 

@@ -195,7 +195,8 @@ u32 MemWatchEntry::getAddressForPointerLevel(const int level)
   char addressBuffer[sizeof(u32)] = {0};
   for (int i = 0; i < level; ++i)
   {
-    if (DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(address),
+    if (DolphinComm::DolphinAccessor::readFromRAM(
+            Common::dolphinAddrToOffset(address, DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance()),
                                                   addressBuffer, sizeof(u32), true))
     {
       std::memcpy(&address, addressBuffer, sizeof(u32));
@@ -235,7 +236,8 @@ Common::MemOperationReturnCode MemWatchEntry::readMemoryFromRAM()
     char realConsoleAddressBuffer[sizeof(u32)] = {0};
     for (int offset : m_pointerOffsets)
     {
-      if (DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(realConsoleAddress),
+      if (DolphinComm::DolphinAccessor::readFromRAM(
+              Common::dolphinAddrToOffset(realConsoleAddress, DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance()),
                                                     realConsoleAddressBuffer, sizeof(u32), true))
       {
         std::memcpy(&realConsoleAddress, realConsoleAddressBuffer, sizeof(u32));
@@ -257,7 +259,8 @@ Common::MemOperationReturnCode MemWatchEntry::readMemoryFromRAM()
     // Resolve sucessful
     m_isValidPointer = true;
   }
-  if (DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(realConsoleAddress),
+  if (DolphinComm::DolphinAccessor::readFromRAM(
+          Common::dolphinAddrToOffset(realConsoleAddress, DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance()),
                                                 m_memory, getSizeForType(m_type, m_length),
                                                 shouldBeBSwappedForType(m_type)))
     return Common::MemOperationReturnCode::OK;
@@ -273,7 +276,8 @@ Common::MemOperationReturnCode MemWatchEntry::writeMemoryToRAM(const char* memor
     char realConsoleAddressBuffer[sizeof(u32)] = {0};
     for (int offset : m_pointerOffsets)
     {
-      if (DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(realConsoleAddress),
+      if (DolphinComm::DolphinAccessor::readFromRAM(
+              Common::dolphinAddrToOffset(realConsoleAddress, DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance()),
                                                     realConsoleAddressBuffer, sizeof(u32), true))
       {
         std::memcpy(&realConsoleAddress, realConsoleAddressBuffer, sizeof(u32));
@@ -296,7 +300,8 @@ Common::MemOperationReturnCode MemWatchEntry::writeMemoryToRAM(const char* memor
     m_isValidPointer = true;
   }
 
-  if (DolphinComm::DolphinAccessor::writeToRAM(Common::dolphinAddrToOffset(realConsoleAddress),
+  if (DolphinComm::DolphinAccessor::writeToRAM(
+          Common::dolphinAddrToOffset(realConsoleAddress, DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance()),
                                                memory, size, shouldBeBSwappedForType(m_type)))
     return Common::MemOperationReturnCode::OK;
   return Common::MemOperationReturnCode::operationFailed;

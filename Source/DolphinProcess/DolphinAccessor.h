@@ -29,6 +29,7 @@ public:
   static u64 getEmuRAMAddressStart();
   static DolphinStatus getStatus();
   static bool isMEM2Present();
+  static u32 getMEM1ToMEM2Distance();
   static Common::MemOperationReturnCode updateRAMCache();
   static std::string getFormattedValueFromCache(const u32 ramIndex, Common::MemType memType,
                                                 size_t memSize, Common::MemBase memBase,

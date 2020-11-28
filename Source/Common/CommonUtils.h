@@ -39,13 +39,25 @@ inline u64 bSwap64(u64 data)
 }
 #endif
 
-inline u32 dolphinAddrToOffset(u32 addr)
+inline u32 dolphinAddrToOffset(u32 addr, u32 mem2_offset)
 {
-  return addr &= 0x7FFFFFFF;
+  addr &= 0x7FFFFFFF;
+  if (addr >= 0x10000000)
+  {
+    // MEM2
+    addr -= 0x10000000;
+    addr += mem2_offset;
+  }
+  return addr;
 }
 
-inline u32 offsetToDolphinAddr(u32 offset)
+inline u32 offsetToDolphinAddr(u32 offset, u32 mem2_offset)
 {
-  return offset |= 0x80000000;
+  if (offset < 0 or offset >= 0x2000000)
+  {
+    offset += 0x10000000;
+    offset -= mem2_offset;
+  }
+  return offset | 0x80000000;
 }
 } // namespace Common
