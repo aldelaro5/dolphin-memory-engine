@@ -93,6 +93,10 @@ bool DolphinAccessor::isMEM2Present()
 
 u32 DolphinAccessor::getMEM1ToMEM2Distance()
 {
+  if (m_instance == nullptr)
+  {
+    return 0;
+  }
   return m_instance->getMEM1ToMEM2Distance();
 }
 
