@@ -18,12 +18,13 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
 {
   m_scanRAMCache = nullptr;
   u32 ramSize = 0;
+  u32 MEM2Distance = DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance();
   if (DolphinComm::DolphinAccessor::isMEM2Present())
   {
     ramSize = Common::MEM1_SIZE + Common::MEM2_SIZE;
     m_scanRAMCache = new char[ramSize];
     if (!DolphinComm::DolphinAccessor::readFromRAM(
-            Common::dolphinAddrToOffset(Common::MEM2_START, DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance()),
+            Common::dolphinAddrToOffset(Common::MEM2_START, MEM2Distance),
                                                    m_scanRAMCache + Common::MEM1_SIZE,
                                                    Common::MEM2_SIZE, false))
     {
@@ -39,7 +40,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   }
 
   if (!DolphinComm::DolphinAccessor::readFromRAM(
-          Common::dolphinAddrToOffset(Common::MEM1_START, DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance()),
+          Common::dolphinAddrToOffset(Common::MEM1_START, MEM2Distance),
                                                  m_scanRAMCache, Common::MEM1_SIZE, false))
   {
     delete[] m_scanRAMCache;
@@ -154,7 +155,6 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     if (isResult)
     {
       u32 consoleOffset = 0;
-      u32 MEM2Distance = DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance();
       if (i >= Common::MEM1_SIZE)
         consoleOffset = i + (MEM2Distance - Common::MEM1_SIZE);
       else
