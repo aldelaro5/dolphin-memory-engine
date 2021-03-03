@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include <sys/uio.h>
+#include <vector>
 
 namespace DolphinComm
 {
@@ -19,43 +20,51 @@ bool LinuxDolphinProcess::obtainEmuRAMInformations()
   bool MEM1Found = false;
   while (getline(theMapsFile, line))
   {
-    if (line.length() > 73)
+    std::vector<std::string> lineData;
+    std::string token;
+    std::stringstream ss(line);
+    while (getline(ss, token, ' '))
     {
-      if (line.substr(73, 19) == "/dev/shm/dolphinmem" ||
-          line.substr(73, 20) == "/dev/shm/dolphin-emu")
+      if (!token.empty())
+        lineData.push_back(token);
+    }
+
+    if (lineData.size() < 3)
+      continue;
+
+    bool foundDevShmDolphin = false;
+    for (auto str : lineData)
+    {
+      if (str.substr(0, 19) == "/dev/shm/dolphinmem" || str.substr(0, 20) == "/dev/shm/dolphin-emu")
       {
-        u64 firstAddress = 0;
-        u64 SecondAddress = 0;
-        std::string firstAddressStr("0x" + line.substr(0, 12));
-        std::string secondAddressStr("0x" + line.substr(13, 12));
-
-        firstAddress = std::stoul(firstAddressStr, nullptr, 16);
-        SecondAddress = std::stoul(secondAddressStr, nullptr, 16);
-
-        if (MEM1Found)
-        {
-          if (firstAddress == m_emuRAMAddressStart + 0x10000000)
-          {
-            m_MEM2Present = true;
-            break;
-          }
-          else if (firstAddress > m_emuRAMAddressStart + 0x10000000)
-          {
-            m_MEM2Present = false;
-            break;
-          }
-          continue;
-        }
-
-        u64 test = SecondAddress - firstAddress;
-
-        if (SecondAddress - firstAddress == 0x2000000)
-        {
-          m_emuRAMAddressStart = firstAddress;
-          MEM1Found = true;
-        }
+        foundDevShmDolphin = true;
+        break;
       }
     }
+
+    if (!foundDevShmDolphin)
+      continue;
+
+    u32 offset = 0;
+    std::string offsetStr("0x" + lineData[2]);
+    offset = std::stoul(offsetStr, nullptr, 16);
+    if (offset != 0 && offset != 0x2040000)
+      continue;
+
+    u64 firstAddress = 0;
+    u64 SecondAddress = 0;
+    int indexDash = lineData[0].find('-');
+    std::string firstAddressStr("0x" + lineData[0].substr(0, indexDash));
+    std::string secondAddressStr("0x" + lineData[0].substr(indexDash + 1));
+
+    firstAddress = std::stoul(firstAddressStr, nullptr, 16);
+    SecondAddress = std::stoul(secondAddressStr, nullptr, 16);
+
+    if (SecondAddress - firstAddress == 0x4000000 && offset == 0x2040000)
+      m_MEM2Present = true;
+
+    if (SecondAddress - firstAddress == 0x2000000 && offset == 0x0)
+      m_emuRAMAddressStart = firstAddress;
   }
 
   if (m_emuRAMAddressStart != 0)
