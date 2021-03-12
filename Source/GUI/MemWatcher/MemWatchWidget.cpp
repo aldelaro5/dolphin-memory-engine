@@ -85,8 +85,11 @@ void MemWatchWidget::initialiseWidgets()
 
   QShortcut* pasteWatchShortcut =
       new QShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key::Key_V), m_watchView);
-  connect(pasteWatchShortcut, &QShortcut::activated, this,
-          [=] { pasteWatchFromClipBoard(m_watchModel->getRootNode()); });
+  connect(pasteWatchShortcut, &QShortcut::activated, this, [=] {
+    pasteWatchFromClipBoard(
+        m_watchModel->getTreeNodeFromIndex(m_watchView->selectionModel()->currentIndex()),
+        m_watchView->selectionModel()->currentIndex().row()+1);
+  });
 
   m_btnAddGroup = new QPushButton(tr("Add group"), this);
   connect(m_btnAddGroup, &QPushButton::clicked, this, &MemWatchWidget::onAddGroup);
@@ -124,7 +127,6 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   QModelIndex index = m_watchView->indexAt(pos);
   QMenu* contextMenu = new QMenu(this);
   MemWatchTreeNode* node = nullptr;
-  bool canPasteInto = true;
   if (index != QModelIndex())
   {
     node = m_watchModel->getTreeNodeFromIndex(index);
@@ -233,7 +235,6 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
         }
       }
       contextMenu->addSeparator();
-      canPasteInto = false;
     }
   }
   else
@@ -248,12 +249,11 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   connect(copy, &QAction::triggered, this, [=] { copySelectedWatchesToClipBoard(); });
   contextMenu->addAction(copy);
 
-  if (canPasteInto)
-  {
-    QAction* paste = new QAction(tr("&Paste"), this);
-    connect(paste, &QAction::triggered, this, [=] { pasteWatchFromClipBoard(node); });
-    contextMenu->addAction(paste);
-  }
+  QAction* paste = new QAction(tr("&Paste"), this);
+  connect(paste, &QAction::triggered, this, [=] {
+    pasteWatchFromClipBoard(node, m_watchView->selectionModel()->currentIndex().row()+1);
+  });
+  contextMenu->addAction(paste);
 
   contextMenu->addSeparator();
   QAction* deleteSelection = new QAction(tr("&Delete"), this);
@@ -310,7 +310,7 @@ void MemWatchWidget::copySelectedWatchesToClipBoard()
   clipboard->setText(nodeJsonStr);
 }
 
-void MemWatchWidget::pasteWatchFromClipBoard(MemWatchTreeNode* node)
+void MemWatchWidget::pasteWatchFromClipBoard(MemWatchTreeNode* node, int row)
 {
   QClipboard* clipboard = QApplication::clipboard();
   QString nodeStr = clipboard->text();
@@ -320,9 +320,18 @@ void MemWatchWidget::pasteWatchFromClipBoard(MemWatchTreeNode* node)
   copiedRootNode->readFromJson(loadDoc.object(), nullptr);
   if (copiedRootNode->hasChildren())
   {
+    int numberIterated = 0;
     for (auto i : copiedRootNode->getChildren())
-      node->appendChild(i);
-
+    {
+      if (node == nullptr)
+        node = m_watchModel->getRootNode();
+      if (node->isGroup() || (node->getParent() == nullptr)) {
+        node->appendChild(i);
+      } else {
+        node->getParent()->insertChild(row + numberIterated, i);
+      }
+      numberIterated++;
+    }
     emit m_watchModel->layoutChanged();
 
     m_hasUnsavedChanges = true;
