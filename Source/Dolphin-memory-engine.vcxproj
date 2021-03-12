@@ -14,7 +14,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{FB0FF455-327C-4FCF-B234-A60D8AA9FDDD}</ProjectGuid>
     <RootNamespace>Dolphinmemoryengine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="Dolphin-memory-engine.default.props" />
@@ -78,7 +78,6 @@
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
-
   <!-- Files and target to copy to the output directory -->
   <PropertyGroup>
     <!--
@@ -100,10 +99,9 @@
   </ItemGroup>
   <Target Name="CopyDlls" AfterTargets="Build">
     <Message Importance="High" Text="Copying required files for $(Configuration)..." />
-    <Message Importance="High" Text="Copying '%(FilesToCopy.FullPath)' -> '$(OutDir)%(FilesToCopy.SubDir)%(Filename)%(Extension)'." />
+    <Message Importance="High" Text="Copying '%(FilesToCopy.FullPath)' -&gt; '$(OutDir)%(FilesToCopy.SubDir)%(Filename)%(Extension)'." />
     <Copy SourceFiles="@(FilesToCopy)" DestinationFiles="$(OutDir)%(FilesToCopy.SubDir)%(Filename)%(Extension)" />
   </Target>
-
   <!-- Files -->
   <ItemGroup>
     <ClCompile Include="**\*.cpp" Exclude="GeneratedFiles\**\*.cpp" />

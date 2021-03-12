@@ -29,7 +29,7 @@ Before proceeding, ensure the Qt submodule is initialized by running `git submod
 Once complete, open the solution file `Dolphin-memory-engine.sln` located in the `Source` directory with Visual Studio. Select the build configuration and build it.
 
 #### Windows SDK
-The Windows SDK version 10.0.16299.0 comes with the C++ Desktop Development Workload of Visual Studio 2017 — other versions may work but are untested. To use a different Windows SDK you'll need to select the it in the project properties window. Please note that this will change the `vcxproj` file, so if you plan to submit a Pull Request, make sure to not stage this change.
+The Windows SDK version 10.0.19041.0 comes with the C++ Desktop Development Workload of Visual Studio 2017 — other versions may work but are untested. To use a different Windows SDK you'll need to select the it in the project properties window. Please note that this will change the `vcxproj` file, so if you plan to submit a Pull Request, make sure to not stage this change.
 
 
 ### Linux
