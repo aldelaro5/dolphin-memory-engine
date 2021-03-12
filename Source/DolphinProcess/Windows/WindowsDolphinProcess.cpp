@@ -58,8 +58,9 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
       std::memcpy(&regionBaseAddress, &(info.BaseAddress), sizeof(info.BaseAddress));
       if (MEM1Found && regionBaseAddress > m_emuRAMAddressStart + 0x10000000)
       {
-        // In some cases MEM2 could actually be before MEM1. Once we find MEM1, ignore regions of this size
-        // that are too far away. There apparently are other non-MEM2 regions of size 0x4000000.
+        // In some cases MEM2 could actually be before MEM1. Once we find MEM1, ignore regions of
+        // this size that are too far away. There apparently are other non-MEM2 regions of size
+        // 0x4000000.
         break;
       }
       // View the comment for MEM1.

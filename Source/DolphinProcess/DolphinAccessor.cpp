@@ -30,8 +30,8 @@ void DolphinAccessor::init()
 
 void DolphinAccessor::free()
 {
-    delete m_instance;
-    delete[] m_updatedRAMCache;
+  delete m_instance;
+  delete[] m_updatedRAMCache;
 }
 
 void DolphinAccessor::hook()
@@ -121,9 +121,9 @@ Common::MemOperationReturnCode DolphinAccessor::updateRAMCache()
   {
     m_updatedRAMCache = new char[Common::MEM1_SIZE + Common::MEM2_SIZE];
     // Read Wii extra RAM
-    if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM2_START, getMEM1ToMEM2Distance()),
-                                                   m_updatedRAMCache + Common::MEM1_SIZE,
-                                                   Common::MEM2_SIZE, false))
+    if (!DolphinComm::DolphinAccessor::readFromRAM(
+            Common::dolphinAddrToOffset(Common::MEM2_START, getMEM1ToMEM2Distance()),
+            m_updatedRAMCache + Common::MEM1_SIZE, Common::MEM2_SIZE, false))
       return Common::MemOperationReturnCode::operationFailed;
   }
   else

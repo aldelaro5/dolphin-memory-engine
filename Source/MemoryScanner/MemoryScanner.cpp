@@ -25,8 +25,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     m_scanRAMCache = new char[ramSize];
     if (!DolphinComm::DolphinAccessor::readFromRAM(
             Common::dolphinAddrToOffset(Common::MEM2_START, MEM2Distance),
-                                                   m_scanRAMCache + Common::MEM1_SIZE,
-                                                   Common::MEM2_SIZE, false))
+            m_scanRAMCache + Common::MEM1_SIZE, Common::MEM2_SIZE, false))
     {
       delete[] m_scanRAMCache;
       m_scanRAMCache = nullptr;
@@ -40,8 +39,8 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   }
 
   if (!DolphinComm::DolphinAccessor::readFromRAM(
-          Common::dolphinAddrToOffset(Common::MEM1_START, MEM2Distance),
-                                                 m_scanRAMCache, Common::MEM1_SIZE, false))
+          Common::dolphinAddrToOffset(Common::MEM1_START, MEM2Distance), m_scanRAMCache,
+          Common::MEM1_SIZE, false))
   {
     delete[] m_scanRAMCache;
     m_scanRAMCache = nullptr;
@@ -183,8 +182,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
     newerRAMCache = new char[ramSize];
     if (!DolphinComm::DolphinAccessor::readFromRAM(
             Common::dolphinAddrToOffset(Common::MEM2_START, MEM2Distance),
-                                                   newerRAMCache + Common::MEM1_SIZE,
-                                                   Common::MEM2_SIZE, false))
+            newerRAMCache + Common::MEM1_SIZE, Common::MEM2_SIZE, false))
     {
       delete[] m_scanRAMCache;
       m_scanRAMCache = nullptr;
@@ -277,10 +275,12 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
     {
       u32 ramIndex = 0;
       if (Common::dolphinAddrToOffset(i, MEM2Distance) >= Common::MEM1_SIZE)
-        ramIndex = Common::dolphinAddrToOffset(i, MEM2Distance) - (MEM2Distance - Common::MEM1_SIZE);
+        ramIndex =
+            Common::dolphinAddrToOffset(i, MEM2Distance) - (MEM2Distance - Common::MEM1_SIZE);
       else
         ramIndex = Common::dolphinAddrToOffset(i, MEM2Distance);
-      if (isHitNextScan(filter, memoryToCompare1, memoryToCompare2, noOffset, newerRAMCache, m_memSize, ramIndex))
+      if (isHitNextScan(filter, memoryToCompare1, memoryToCompare2, noOffset, newerRAMCache,
+                        m_memSize, ramIndex))
       {
         newerResults.push_back(i);
       }
