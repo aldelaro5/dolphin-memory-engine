@@ -61,10 +61,18 @@ bool LinuxDolphinProcess::obtainEmuRAMInformations()
     SecondAddress = std::stoul(secondAddressStr, nullptr, 16);
 
     if (SecondAddress - firstAddress == 0x4000000 && offset == 0x2040000)
+    {
+      m_MEM2AddressStart = firstAddress;
       m_MEM2Present = true;
+      if (MEM1Found)
+        break;
+    }
 
     if (SecondAddress - firstAddress == 0x2000000 && offset == 0x0)
+    {
       m_emuRAMAddressStart = firstAddress;
+      MEM1Found = true;
+    }
   }
 
   if (m_emuRAMAddressStart != 0)
