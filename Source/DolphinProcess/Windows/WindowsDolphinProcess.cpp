@@ -48,7 +48,6 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
 {
   MEMORY_BASIC_INFORMATION info;
   bool MEM1Found = false;
-  bool MEM2Found = false;
   for (unsigned char* p = nullptr;
        VirtualQueryEx(m_hDolphin, p, &info, sizeof(info)) == sizeof(info); p += info.RegionSize)
   {
