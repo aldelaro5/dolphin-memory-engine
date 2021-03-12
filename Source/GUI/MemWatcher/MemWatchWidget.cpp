@@ -88,7 +88,7 @@ void MemWatchWidget::initialiseWidgets()
   connect(pasteWatchShortcut, &QShortcut::activated, this, [=] {
     pasteWatchFromClipBoard(
         m_watchModel->getTreeNodeFromIndex(m_watchView->selectionModel()->currentIndex()),
-        m_watchView->selectionModel()->currentIndex().row()+1);
+        m_watchView->selectionModel()->currentIndex().row() + 1);
   });
 
   m_btnAddGroup = new QPushButton(tr("Add group"), this);
@@ -251,7 +251,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
 
   QAction* paste = new QAction(tr("&Paste"), this);
   connect(paste, &QAction::triggered, this, [=] {
-    pasteWatchFromClipBoard(node, m_watchView->selectionModel()->currentIndex().row()+1);
+    pasteWatchFromClipBoard(node, m_watchView->selectionModel()->currentIndex().row() + 1);
   });
   contextMenu->addAction(paste);
 
@@ -325,9 +325,12 @@ void MemWatchWidget::pasteWatchFromClipBoard(MemWatchTreeNode* node, int row)
     {
       if (node == nullptr)
         node = m_watchModel->getRootNode();
-      if (node->isGroup() || (node->getParent() == nullptr)) {
+      if (node->isGroup() || (node->getParent() == nullptr))
+      {
         node->appendChild(i);
-      } else {
+      }
+      else
+      {
         node->getParent()->insertChild(row + numberIterated, i);
       }
       numberIterated++;
