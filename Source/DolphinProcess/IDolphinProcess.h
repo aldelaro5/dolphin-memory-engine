@@ -28,14 +28,25 @@ public:
   {
     return m_emuRAMAddressStart;
   };
-  u64 isMEM2Present() const
+  bool isMEM2Present() const
   {
     return m_MEM2Present;
+  };
+  u64 getMEM2AddressStart() const
+  {
+    return m_MEM2AddressStart;
+  };
+  u32 getMEM1ToMEM2Distance() const
+  {
+    if (!m_MEM2Present)
+      return 0;
+    return m_MEM2AddressStart - m_emuRAMAddressStart;
   };
 
 protected:
   int m_PID = -1;
   u64 m_emuRAMAddressStart = 0;
+  u64 m_MEM2AddressStart = 0;
   bool m_MEM2Present = false;
 };
 } // namespace DolphinComm

@@ -51,32 +51,31 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
   for (unsigned char* p = nullptr;
        VirtualQueryEx(m_hDolphin, p, &info, sizeof(info)) == sizeof(info); p += info.RegionSize)
   {
-    if (MEM1Found)
+    // Check region size so that we know it's MEM2
+    if (info.RegionSize == 0x4000000)
     {
       u64 regionBaseAddress = 0;
       std::memcpy(&regionBaseAddress, &(info.BaseAddress), sizeof(info.BaseAddress));
-
-      if (regionBaseAddress == m_emuRAMAddressStart + 0x10000000)
+      if (MEM1Found && regionBaseAddress > m_emuRAMAddressStart + 0x10000000)
       {
-        // View the comment for MEM1.
-        PSAPI_WORKING_SET_EX_INFORMATION wsInfo;
-        wsInfo.VirtualAddress = info.BaseAddress;
-        if (QueryWorkingSetEx(m_hDolphin, &wsInfo, sizeof(PSAPI_WORKING_SET_EX_INFORMATION)))
+        // In some cases MEM2 could actually be before MEM1. Once we find MEM1, ignore regions of
+        // this size that are too far away. There apparently are other non-MEM2 regions of size
+        // 0x4000000.
+        break;
+      }
+      // View the comment for MEM1.
+      PSAPI_WORKING_SET_EX_INFORMATION wsInfo;
+      wsInfo.VirtualAddress = info.BaseAddress;
+      if (QueryWorkingSetEx(m_hDolphin, &wsInfo, sizeof(PSAPI_WORKING_SET_EX_INFORMATION)))
+      {
+        if (wsInfo.VirtualAttributes.Valid)
         {
-          if (wsInfo.VirtualAttributes.Valid)
-            m_MEM2Present = true;
+          std::memcpy(&m_MEM2AddressStart, &(regionBaseAddress), sizeof(regionBaseAddress));
+          m_MEM2Present = true;
         }
-        break;
       }
-      else if (regionBaseAddress > m_emuRAMAddressStart + 0x10000000)
-      {
-        m_MEM2Present = false;
-        break;
-      }
-      continue;
     }
-
-    if (info.RegionSize == 0x2000000 && info.Type == MEM_MAPPED)
+    else if (!MEM1Found && info.RegionSize == 0x2000000 && info.Type == MEM_MAPPED)
     {
       // Here, it's likely the right page, but it can happen that multiple pages with these criteria
       // exists and have nothing to do with the emulated memory. Only the right page has valid
@@ -93,6 +92,8 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
         }
       }
     }
+    if (MEM1Found && m_MEM2Present)
+      break;
   }
   if (m_emuRAMAddressStart == 0)
   {
