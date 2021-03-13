@@ -196,7 +196,7 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       {
         Common::MemType type = entry->getType();
         size_t length = entry->getLength();
-        return GUICommon::getStringFromType(type, length);
+        return GUICommon::getStringFromType(type, length, entry->getStrWidth());
       }
       case WATCH_COL_ADDRESS:
       {

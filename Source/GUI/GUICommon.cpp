@@ -34,7 +34,7 @@ QStringList g_memScanFilter =
 
 bool g_valueEditing = false;
 
-QString getStringFromType(const Common::MemType type, const size_t length)
+QString getStringFromType(const Common::MemType type, const size_t length, const Common::StrWidth stringWidth)
 {
   switch (type)
   {
@@ -45,12 +45,16 @@ QString getStringFromType(const Common::MemType type, const size_t length)
   case Common::MemType::type_double:
     return GUICommon::g_memTypeNames.at(static_cast<int>(type));
   case Common::MemType::type_string:
-    return QString::fromStdString("string[" + std::to_string(length) + "]");
+    if(stringWidth == Common::StrWidth::utf_8)
+      return QString::fromStdString("utf8[" + std::to_string(length) + "]");
+    else if(stringWidth == Common::StrWidth::utf_16)
+      return QString::fromStdString("utf16[" + std::to_string(length) + "]");
+    else if(stringWidth == Common::StrWidth::utf_32)
+      return QString::fromStdString("utf32[" + std::to_string(length) + "]");
   case Common::MemType::type_byteArray:
     return QString::fromStdString("array of bytes[" + std::to_string(length) + "]");
-  default:
-    return QString("");
   }
+  return QString("");
 }
 
 QString getNameFromBase(const Common::MemBase base)
