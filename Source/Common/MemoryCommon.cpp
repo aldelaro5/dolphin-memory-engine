@@ -11,7 +11,7 @@
 
 namespace Common
 {
-size_t getSizeForType(const MemType type, const size_t length)
+size_t getSizeForType(const MemType type, const size_t length, const Common::StrWidth stringWidth)
 {
   switch (type)
   {
@@ -26,12 +26,26 @@ size_t getSizeForType(const MemType type, const size_t length)
   case MemType::type_double:
     return sizeof(double);
   case MemType::type_string:
-    return length;
+    return length * getStringCharWidth(stringWidth);
   case MemType::type_byteArray:
     return length;
   default:
     return 0;
   }
+}
+
+size_t getStringCharWidth(const Common::StrWidth stringWidth)
+{
+  switch(stringWidth)
+  {
+  case StrWidth::utf_8:
+    return 1;
+  case StrWidth::utf_16:
+    return 2;
+  case StrWidth::utf_32:
+    return 4;
+  }
+  return 4;
 }
 
 bool shouldBeBSwappedForType(const MemType type)
@@ -104,7 +118,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     break;
   }
 
-  size_t size = getSizeForType(type, length);
+  size_t size = getSizeForType(type, length, stringWidth);
   char* buffer = nullptr;
   if(type != Common::MemType::type_string)
     buffer = new char[size];
@@ -280,7 +294,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     }
     buffer = new char[newTmpString.size()];
     std::memcpy(buffer, newTmpString.c_str(), newTmpString.size());
-    actualLength = newTmpString.size();
+    actualLength = newTmpString.size() / getStringCharWidth(stringWidth);
     break;
   }
 
@@ -498,11 +512,11 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
     switch(stringWidth)
     {
       case StrWidth::utf_8:
-        return toUTF8String<StrWidth::utf_8>(memory, length);
+        return toUTF8String<StrWidth::utf_8>(memory, length * getStringCharWidth(stringWidth));
       case StrWidth::utf_16:
-        return toUTF8String<StrWidth::utf_16>(memory, length);
+        return toUTF8String<StrWidth::utf_16>(memory, length * getStringCharWidth(stringWidth));
       case StrWidth::utf_32:
-        return toUTF8String<StrWidth::utf_32>(memory, length);
+        return toUTF8String<StrWidth::utf_32>(memory, length * getStringCharWidth(stringWidth));
     }
   }
   case Common::MemType::type_byteArray:

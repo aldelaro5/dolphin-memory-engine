@@ -50,7 +50,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     int alignementDivision =
         m_enforceMemAlignement ? Common::getNbrBytesAlignementForType(m_memType) : 1;
     m_resultCount = ((ramSize / alignementDivision) -
-                     Common::getSizeForType(m_memType, static_cast<size_t>(1)));
+                     Common::getSizeForType(m_memType, static_cast<size_t>(1), m_strWidth));
     m_wasUnknownInitialValue = true;
     m_memSize = 1;
     m_scanStarted = true;
@@ -59,7 +59,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
 
   bool m_wasUnknownInitialValue = false;
   Common::MemOperationReturnCode scanReturn = Common::MemOperationReturnCode::OK;
-  size_t termActualLength = 0;
+  // Value is the length of the array, not necessarily the number of bytes
   size_t termMaxLength = 0;
   if (m_memType == Common::MemType::type_string)
     // This is just to have the string formatted with the appropriate length, byte arrays don't need
@@ -76,7 +76,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     formattedSearchTerm1 = searchTerm1;
 
   char* memoryToCompare1 = Common::formatStringToMemory(
-      scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength, term1StrWidth);
+      scanReturn, m_length, formattedSearchTerm1, m_memBase, m_memType, termMaxLength, term1StrWidth);
   if (scanReturn != Common::MemOperationReturnCode::OK)
   {
     delete[] memoryToCompare1;
@@ -88,7 +88,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   char* memoryToCompare2 = nullptr;
   if (filter == ScanFiter::between)
   {
-    memoryToCompare2 = Common::formatStringToMemory(scanReturn, termActualLength, searchTerm2,
+    memoryToCompare2 = Common::formatStringToMemory(scanReturn, m_length, searchTerm2,
                                                     m_memBase, m_memType, ramSize);
     if (scanReturn != Common::MemOperationReturnCode::OK)
     {
@@ -102,7 +102,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
 
   bool withBSwap = Common::shouldBeBSwappedForType(m_memType);
 
-  m_memSize = Common::getSizeForType(m_memType, termActualLength);
+  m_memSize = Common::getSizeForType(m_memType, m_length, term1StrWidth);
 
   char* noOffset = new char[m_memSize];
   std::memset(noOffset, 0, m_memSize);
@@ -204,7 +204,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   }
 
   Common::MemOperationReturnCode scanReturn = Common::MemOperationReturnCode::OK;
-  size_t termActualLength = 0;
+  // Value is the length of the array, not necessarily the number of bytes
   size_t termMaxLength = 0;
   if (m_memType == Common::MemType::type_string)
     // This is just to have the string formatted with the appropriate length, byte arrays don't need
@@ -225,7 +225,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
       formattedSearchTerm1 = searchTerm1;
 
     memoryToCompare1 = Common::formatStringToMemory(
-        scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength, term1StrWidth);
+        scanReturn, m_length, formattedSearchTerm1, m_memBase, m_memType, termMaxLength, term1StrWidth);
     if (scanReturn != Common::MemOperationReturnCode::OK)
       return scanReturn;
   }
@@ -233,7 +233,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   char* memoryToCompare2 = nullptr;
   if (filter == ScanFiter::between)
   {
-    memoryToCompare2 = Common::formatStringToMemory(scanReturn, termActualLength, searchTerm2,
+    memoryToCompare2 = Common::formatStringToMemory(scanReturn, m_length, searchTerm2,
                                                     m_memBase, m_memType, ramSize);
     if (scanReturn != Common::MemOperationReturnCode::OK)
       return scanReturn;
@@ -241,7 +241,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
 
   bool withBSwap = Common::shouldBeBSwappedForType(m_memType);
 
-  m_memSize = Common::getSizeForType(m_memType, termActualLength);
+  m_memSize = Common::getSizeForType(m_memType, m_length, term1StrWidth);
 
   char* noOffset = new char[m_memSize];
   std::memset(noOffset, 0, m_memSize);
@@ -470,7 +470,7 @@ std::string MemScanner::getFormattedScannedValueAt(const int index) const
     ramIndex = offset - (Common::MEM2_START - Common::MEM1_END);
   else
     ramIndex = offset;
-  return Common::formatMemoryToString(&m_scanRAMCache[ramIndex], m_memType, m_memSize, m_memBase,
+  return Common::formatMemoryToString(&m_scanRAMCache[ramIndex], m_memType, m_length, m_memBase,
                                       !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType), m_strWidth);
 }
 
@@ -489,7 +489,7 @@ std::string MemScanner::getFormattedCurrentValueAt(const int index) const
       ramIndex = offset - (Common::MEM2_START - Common::MEM1_END);
     else
       ramIndex = offset;
-    return DolphinComm::DolphinAccessor::getFormattedValueFromCache(ramIndex, m_memType, m_memSize,
+    return DolphinComm::DolphinAccessor::getFormattedValueFromCache(ramIndex, m_memType, m_length,
                                                                     m_memBase, !m_memIsSigned, m_strWidth);
   }
   return "";
@@ -547,7 +547,7 @@ Common::StrWidth MemScanner::getStrWidth() const
 
 size_t MemScanner::getLength() const
 {
-  return m_memSize;
+  return m_length;
 }
 
 bool MemScanner::getIsUnsigned() const

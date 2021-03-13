@@ -155,6 +155,7 @@ private:
   Common::MemBase m_memBase = Common::MemBase::base_decimal;
   Common::StrWidth m_strWidth = Common::StrWidth::utf_8;
   size_t m_memSize;
+  size_t m_length;
   bool m_enforceMemAlignement = true;
   bool m_memIsSigned = false;
   std::vector<u32> m_resultsConsoleAddr;

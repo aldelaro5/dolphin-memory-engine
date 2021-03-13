@@ -17,7 +17,7 @@ MemWatchEntry::MemWatchEntry(const QString label, const u32 consoleAddress,
     : m_label(label), m_consoleAddress(consoleAddress), m_type(type), m_isUnsigned(isUnsigned),
       m_base(base), m_boundToPointer(isBoundToPointer), m_length(length), m_stringWidth(strWidth)
 {
-  m_memory = new char[getSizeForType(m_type, m_length)];
+  m_memory = new char[getSizeForType(m_type, m_length, m_stringWidth)];
 }
 
 MemWatchEntry::MemWatchEntry()
@@ -36,8 +36,8 @@ MemWatchEntry::MemWatchEntry(MemWatchEntry* entry)
       m_boundToPointer(entry->m_boundToPointer), m_pointerOffsets(entry->m_pointerOffsets),
       m_length(entry->m_length), m_isValidPointer(entry->m_isValidPointer), m_stringWidth(entry->m_stringWidth)
 {
-  m_memory = new char[getSizeForType(entry->getType(), entry->getLength())];
-  std::memcpy(m_memory, entry->getMemory(), getSizeForType(entry->getType(), entry->getLength()));
+  m_memory = new char[getSizeForType(entry->getType(), entry->getLength(), entry->getStrWidth())];
+  std::memcpy(m_memory, entry->getMemory(), getSizeForType(entry->getType(), entry->getLength(), entry->getStrWidth()));
 }
 
 MemWatchEntry::~MemWatchEntry()
@@ -123,10 +123,10 @@ void MemWatchEntry::setConsoleAddress(const u32 address)
 
 void MemWatchEntry::setTypeAndLength(const Common::MemType type, const size_t length)
 {
-  size_t oldSize = getSizeForType(m_type, m_length);
+  size_t oldSize = getSizeForType(m_type, m_length, m_stringWidth);
   m_type = type;
   m_length = length;
-  size_t newSize = getSizeForType(m_type, m_length);
+  size_t newSize = getSizeForType(m_type, m_length, m_stringWidth);
   if (oldSize != newSize)
   {
     delete[] m_memory;
@@ -152,7 +152,7 @@ void MemWatchEntry::setLock(const bool doLock)
   {
     if (readMemoryFromRAM() == Common::MemOperationReturnCode::OK)
     {
-      m_freezeMemSize = getSizeForType(m_type, m_length);
+      m_freezeMemSize = getSizeForType(m_type, m_length, m_stringWidth);
       m_freezeMemory = new char[m_freezeMemSize];
       std::memcpy(m_freezeMemory, m_memory, m_freezeMemSize);
     }
@@ -268,7 +268,7 @@ Common::MemOperationReturnCode MemWatchEntry::readMemoryFromRAM()
     m_isValidPointer = true;
   }
   if (DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(realConsoleAddress),
-                                                m_memory, getSizeForType(m_type, m_length),
+                                                m_memory, getSizeForType(m_type, m_length, m_stringWidth),
                                                 shouldBeBSwappedForType(m_type)))
     return Common::MemOperationReturnCode::OK;
   return Common::MemOperationReturnCode::operationFailed;
@@ -328,6 +328,8 @@ Common::MemOperationReturnCode MemWatchEntry::writeMemoryFromString(const std::s
   if (writeReturn != Common::MemOperationReturnCode::OK)
     return writeReturn;
 
+  if (m_type == Common::MemType::type_string)
+    sizeToWrite *= Common::getStringCharWidth(m_stringWidth);
   writeReturn = writeMemoryToRAM(buffer, sizeToWrite);
   if (writeReturn == Common::MemOperationReturnCode::OK)
   {

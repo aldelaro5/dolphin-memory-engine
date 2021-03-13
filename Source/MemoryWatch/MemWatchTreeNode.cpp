@@ -271,7 +271,7 @@ QString MemWatchTreeNode::writeAsCSV() const
     }
     std::string csvLine =
         m_entry->getLabel().toStdString() + ";" + ssAddress.str() + ";" +
-        GUICommon::getStringFromType(m_entry->getType(), m_entry->getLength()).toStdString() + "\n";
+        GUICommon::getStringFromType(m_entry->getType(), m_entry->getLength(), m_entry->getStrWidth()).toStdString() + "\n";
     return QString::fromStdString(csvLine);
   }
 }
