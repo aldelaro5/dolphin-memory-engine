@@ -322,6 +322,12 @@ void DlgAddWatchEntry::onTypeChange(int index)
     m_lengtWidget->show();
   else
     m_lengtWidget->hide();
+
+  if (theType == Common::MemType::type_string)
+    m_encodingWidget->show();
+  else
+    m_encodingWidget->hide();
+
   m_entry->setTypeAndLength(theType, m_spnLength->value());
   if (validateAndSetAddress())
     updatePreview();
