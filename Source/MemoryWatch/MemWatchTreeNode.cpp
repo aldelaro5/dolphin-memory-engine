@@ -164,7 +164,7 @@ void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* p
     m_entry->setTypeAndLength(static_cast<Common::MemType>(json["typeIndex"].toInt()), length);
     m_entry->setSignedUnsigned(json["unsigned"].toBool());
     m_entry->setBase(static_cast<Common::MemBase>(json["baseIndex"].toInt()));
-    if(json["stringWidth"] != QJsonValue::Undefined)
+    if (json["stringWidth"] != QJsonValue::Undefined)
     {
       m_entry->setStrWidth(static_cast<Common::StrWidth>(json["stringWidth"].toInt()));
     }
@@ -269,9 +269,11 @@ QString MemWatchTreeNode::writeAsCSV() const
         ssAddress << "[" << ssOffset.str() << "]";
       }
     }
-    std::string csvLine =
-        m_entry->getLabel().toStdString() + ";" + ssAddress.str() + ";" +
-        GUICommon::getStringFromType(m_entry->getType(), m_entry->getLength(), m_entry->getStrWidth()).toStdString() + "\n";
+    std::string csvLine = m_entry->getLabel().toStdString() + ";" + ssAddress.str() + ";" +
+                          GUICommon::getStringFromType(m_entry->getType(), m_entry->getLength(),
+                                                       m_entry->getStrWidth())
+                              .toStdString() +
+                          "\n";
     return QString::fromStdString(csvLine);
   }
 }

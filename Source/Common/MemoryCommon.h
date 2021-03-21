@@ -61,7 +61,8 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
                            const size_t length, const StrWidth stringWidth = StrWidth::utf_8);
 std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
                                  const MemBase base, const bool isUnsigned,
-                                 const bool withBSwap = false, const StrWidth stringWidth = StrWidth::utf_8);
+                                 const bool withBSwap = false,
+                                 const StrWidth stringWidth = StrWidth::utf_8);
 template <StrWidth Width>
 std::string toUTF8String(const char* buf, int len);
 template <>

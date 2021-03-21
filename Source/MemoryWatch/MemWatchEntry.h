@@ -15,7 +15,8 @@ public:
   MemWatchEntry(const QString label, const u32 consoleAddress, const Common::MemType type,
                 const Common::MemBase = Common::MemBase::base_decimal,
                 const bool m_isUnsigned = false, const size_t length = 1,
-                const bool isBoundToPointer = false, Common::StrWidth strWidth = Common::StrWidth::utf_8);
+                const bool isBoundToPointer = false,
+                Common::StrWidth strWidth = Common::StrWidth::utf_8);
   MemWatchEntry(MemWatchEntry* entry);
   ~MemWatchEntry();
 

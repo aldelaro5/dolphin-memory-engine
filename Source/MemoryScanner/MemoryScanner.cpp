@@ -75,8 +75,9 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   else
     formattedSearchTerm1 = searchTerm1;
 
-  char* memoryToCompare1 = Common::formatStringToMemory(
-      scanReturn, m_length, formattedSearchTerm1, m_memBase, m_memType, termMaxLength, term1StrWidth);
+  char* memoryToCompare1 =
+      Common::formatStringToMemory(scanReturn, m_length, formattedSearchTerm1, m_memBase, m_memType,
+                                   termMaxLength, term1StrWidth);
   if (scanReturn != Common::MemOperationReturnCode::OK)
   {
     delete[] memoryToCompare1;
@@ -88,8 +89,8 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   char* memoryToCompare2 = nullptr;
   if (filter == ScanFiter::between)
   {
-    memoryToCompare2 = Common::formatStringToMemory(scanReturn, m_length, searchTerm2,
-                                                    m_memBase, m_memType, ramSize);
+    memoryToCompare2 = Common::formatStringToMemory(scanReturn, m_length, searchTerm2, m_memBase,
+                                                    m_memType, ramSize);
     if (scanReturn != Common::MemOperationReturnCode::OK)
     {
       delete[] memoryToCompare1;
@@ -224,8 +225,9 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
     else
       formattedSearchTerm1 = searchTerm1;
 
-    memoryToCompare1 = Common::formatStringToMemory(
-        scanReturn, m_length, formattedSearchTerm1, m_memBase, m_memType, termMaxLength, term1StrWidth);
+    memoryToCompare1 =
+        Common::formatStringToMemory(scanReturn, m_length, formattedSearchTerm1, m_memBase,
+                                     m_memType, termMaxLength, term1StrWidth);
     if (scanReturn != Common::MemOperationReturnCode::OK)
       return scanReturn;
   }
@@ -233,8 +235,8 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   char* memoryToCompare2 = nullptr;
   if (filter == ScanFiter::between)
   {
-    memoryToCompare2 = Common::formatStringToMemory(scanReturn, m_length, searchTerm2,
-                                                    m_memBase, m_memType, ramSize);
+    memoryToCompare2 = Common::formatStringToMemory(scanReturn, m_length, searchTerm2, m_memBase,
+                                                    m_memType, ramSize);
     if (scanReturn != Common::MemOperationReturnCode::OK)
       return scanReturn;
   }
@@ -471,7 +473,8 @@ std::string MemScanner::getFormattedScannedValueAt(const int index) const
   else
     ramIndex = offset;
   return Common::formatMemoryToString(&m_scanRAMCache[ramIndex], m_memType, m_length, m_memBase,
-                                      !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType), m_strWidth);
+                                      !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType),
+                                      m_strWidth);
 }
 
 Common::MemOperationReturnCode MemScanner::updateCurrentRAMCache()
@@ -489,8 +492,8 @@ std::string MemScanner::getFormattedCurrentValueAt(const int index) const
       ramIndex = offset - (Common::MEM2_START - Common::MEM1_END);
     else
       ramIndex = offset;
-    return DolphinComm::DolphinAccessor::getFormattedValueFromCache(ramIndex, m_memType, m_length,
-                                                                    m_memBase, !m_memIsSigned, m_strWidth);
+    return DolphinComm::DolphinAccessor::getFormattedValueFromCache(
+        ramIndex, m_memType, m_length, m_memBase, !m_memIsSigned, m_strWidth);
   }
   return "";
 }

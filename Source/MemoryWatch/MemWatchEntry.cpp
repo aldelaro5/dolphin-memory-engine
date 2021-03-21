@@ -34,10 +34,12 @@ MemWatchEntry::MemWatchEntry(MemWatchEntry* entry)
     : m_label(entry->m_label), m_consoleAddress(entry->m_consoleAddress), m_type(entry->m_type),
       m_isUnsigned(entry->m_isUnsigned), m_base(entry->m_base),
       m_boundToPointer(entry->m_boundToPointer), m_pointerOffsets(entry->m_pointerOffsets),
-      m_length(entry->m_length), m_isValidPointer(entry->m_isValidPointer), m_stringWidth(entry->m_stringWidth)
+      m_length(entry->m_length), m_isValidPointer(entry->m_isValidPointer),
+      m_stringWidth(entry->m_stringWidth)
 {
   m_memory = new char[getSizeForType(entry->getType(), entry->getLength(), entry->getStrWidth())];
-  std::memcpy(m_memory, entry->getMemory(), getSizeForType(entry->getType(), entry->getLength(), entry->getStrWidth()));
+  std::memcpy(m_memory, entry->getMemory(),
+              getSizeForType(entry->getType(), entry->getLength(), entry->getStrWidth()));
 }
 
 MemWatchEntry::~MemWatchEntry()
@@ -267,9 +269,9 @@ Common::MemOperationReturnCode MemWatchEntry::readMemoryFromRAM()
     // Resolve sucessful
     m_isValidPointer = true;
   }
-  if (DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(realConsoleAddress),
-                                                m_memory, getSizeForType(m_type, m_length, m_stringWidth),
-                                                shouldBeBSwappedForType(m_type)))
+  if (DolphinComm::DolphinAccessor::readFromRAM(
+          Common::dolphinAddrToOffset(realConsoleAddress), m_memory,
+          getSizeForType(m_type, m_length, m_stringWidth), shouldBeBSwappedForType(m_type)))
     return Common::MemOperationReturnCode::OK;
   return Common::MemOperationReturnCode::operationFailed;
 }
@@ -316,15 +318,16 @@ std::string MemWatchEntry::getStringFromMemory() const
 {
   if (m_boundToPointer && !m_isValidPointer)
     return "???";
-  return Common::formatMemoryToString(m_memory, m_type, m_length, m_base, m_isUnsigned, false, m_stringWidth);
+  return Common::formatMemoryToString(m_memory, m_type, m_length, m_base, m_isUnsigned, false,
+                                      m_stringWidth);
 }
 
 Common::MemOperationReturnCode MemWatchEntry::writeMemoryFromString(const std::string& inputString)
 {
   Common::MemOperationReturnCode writeReturn = Common::MemOperationReturnCode::OK;
   size_t sizeToWrite = 0;
-  char* buffer =
-      Common::formatStringToMemory(writeReturn, sizeToWrite, inputString, m_base, m_type, m_length, m_stringWidth);
+  char* buffer = Common::formatStringToMemory(writeReturn, sizeToWrite, inputString, m_base, m_type,
+                                              m_length, m_stringWidth);
   if (writeReturn != Common::MemOperationReturnCode::OK)
     return writeReturn;
 

@@ -168,8 +168,8 @@ void MainWindow::addSelectedResultsToWatchList(Common::MemType type, size_t leng
   for (int i = 0; i < selection.count(); i++)
   {
     u32 address = m_scanner->getResultListModel()->getResultAddress(selection.at(i).row());
-    MemWatchEntry* newEntry =
-        new MemWatchEntry(tr("No label"), address, type, base, isUnsigned, length, false, stringWidth);
+    MemWatchEntry* newEntry = new MemWatchEntry(tr("No label"), address, type, base, isUnsigned,
+                                                length, false, stringWidth);
     m_watcher->addWatchEntry(newEntry);
   }
 }
@@ -186,10 +186,11 @@ void MainWindow::addAllResultsToWatchList(Common::MemType type, size_t length, b
 }
 
 void MainWindow::addWatchRequested(u32 address, Common::MemType type, size_t length,
-                                   bool isUnsigned, Common::MemBase base, Common::StrWidth stringWidth)
+                                   bool isUnsigned, Common::MemBase base,
+                                   Common::StrWidth stringWidth)
 {
-  MemWatchEntry* newEntry =
-      new MemWatchEntry(tr("No label"), address, type, base, isUnsigned, length, false, stringWidth);
+  MemWatchEntry* newEntry = new MemWatchEntry(tr("No label"), address, type, base, isUnsigned,
+                                              length, false, stringWidth);
   m_watcher->addWatchEntry(newEntry);
 }
 
