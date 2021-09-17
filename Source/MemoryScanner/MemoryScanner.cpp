@@ -27,9 +27,9 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
 
   if (filter == ScanFiter::unknownInitial)
   {
-    int alignementDivision =
-        m_enforceMemAlignement ? Common::getNbrBytesAlignementForType(m_memType) : 1;
-    m_resultCount = ((ramSize / alignementDivision) -
+    int alignmentDivision =
+        m_enforceMemAlignment ? Common::getNbrBytesAlignmentForType(m_memType) : 1;
+    m_resultCount = ((ramSize / alignmentDivision) -
                      Common::getSizeForType(m_memType, static_cast<size_t>(1)));
     m_wasUnknownInitialValue = true;
     m_memSize = 1;
@@ -87,7 +87,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   char* noOffset = new char[m_memSize];
   std::memset(noOffset, 0, m_memSize);
 
-  int increment = m_enforceMemAlignement ? Common::getNbrBytesAlignementForType(m_memType) : 1;
+  int increment = m_enforceMemAlignment ? Common::getNbrBytesAlignmentForType(m_memType) : 1;
   for (u32 i = 0; i < (ramSize - m_memSize); i += increment)
   {
     char* memoryCandidate = &m_scanRAMCache[i];
@@ -207,7 +207,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   {
     m_wasUnknownInitialValue = false;
 
-    int increment = m_enforceMemAlignement ? Common::getNbrBytesAlignementForType(m_memType) : 1;
+    int increment = m_enforceMemAlignment ? Common::getNbrBytesAlignmentForType(m_memType) : 1;
     for (u32 i = 0; i < (ramSize - m_memSize); i += increment)
     {
       if (isHitNextScan(filter, memoryToCompare1, memoryToCompare2, noOffset, newerRAMCache,
@@ -367,9 +367,9 @@ void MemScanner::setBase(const Common::MemBase base)
   m_memBase = base;
 }
 
-void MemScanner::setEnforceMemAlignement(const bool enforceAlignement)
+void MemScanner::setEnforceMemAlignment(const bool enforceAlignment)
 {
-  m_enforceMemAlignement = enforceAlignement;
+  m_enforceMemAlignment = enforceAlignment;
 }
 
 void MemScanner::setIsSigned(const bool isSigned)

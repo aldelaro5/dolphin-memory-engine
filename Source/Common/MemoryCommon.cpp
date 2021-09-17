@@ -57,7 +57,7 @@ bool shouldBeBSwappedForType(const MemType type)
   }
 }
 
-int getNbrBytesAlignementForType(const MemType type)
+int getNbrBytesAlignmentForType(const MemType type)
 {
   switch (type)
   {
