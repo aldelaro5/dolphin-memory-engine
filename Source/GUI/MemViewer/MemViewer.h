@@ -45,6 +45,13 @@ private:
     single
   };
 
+  enum class MemoryRegion
+  {
+    MEM1,
+    MEM2,
+    ARAM
+  };
+
   struct bytePosFromMouse
   {
     int x = 0;
@@ -64,7 +71,7 @@ private:
   bool handleNaviguationKey(const int key, bool shiftIsHeld);
   bool writeCharacterToSelectedMemory(char byteToWrite);
   void updateMemoryData();
-  void changeMemoryRegion(const bool isMEM2);
+  void changeMemoryRegion(const MemoryRegion region);
   void renderColumnsHeaderText(QPainter& painter);
   void renderRowHeaderText(QPainter& painter, const int rowIndex);
   void renderSeparatorLines(QPainter& painter);

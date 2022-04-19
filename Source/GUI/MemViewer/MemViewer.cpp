@@ -26,7 +26,7 @@ MemViewer::MemViewer(QWidget* parent) : QAbstractScrollArea(parent)
   initialise();
 
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  changeMemoryRegion(false);
+  changeMemoryRegion(MemoryRegion::MEM1);
   verticalScrollBar()->setPageStep(m_numRows);
 
   m_elapsedTimer.start();
@@ -105,10 +105,15 @@ void MemViewer::jumpToAddress(const u32 address)
   if (DolphinComm::DolphinAccessor::isValidConsoleAddress(address))
   {
     m_currentFirstAddress = address;
-    if (address < Common::MEM1_END && m_memViewStart != Common::MEM1_START)
-      changeMemoryRegion(false);
-    else if (address >= Common::MEM2_START && m_memViewStart != Common::MEM2_START)
-      changeMemoryRegion(true);
+    if (address >= Common::ARAM_START && address < Common::ARAM_END &&
+        m_memViewStart != Common::ARAM_START)
+      changeMemoryRegion(MemoryRegion::ARAM);
+    else if (address >= Common::MEM1_START && address < Common::MEM1_END &&
+             m_memViewStart != Common::MEM1_START)
+      changeMemoryRegion(MemoryRegion::MEM1);
+    else if (address >= Common::MEM2_START && address < Common::MEM2_END &&
+             m_memViewStart != Common::MEM2_START)
+      changeMemoryRegion(MemoryRegion::MEM2);
 
     if (m_currentFirstAddress > m_memViewEnd - m_numCells)
       m_currentFirstAddress = m_memViewEnd - m_numCells;
@@ -125,10 +130,23 @@ void MemViewer::jumpToAddress(const u32 address)
   }
 }
 
-void MemViewer::changeMemoryRegion(const bool isMEM2)
+void MemViewer::changeMemoryRegion(const MemoryRegion region)
 {
-  m_memViewStart = isMEM2 ? Common::MEM2_START : Common::MEM1_START;
-  m_memViewEnd = isMEM2 ? Common::MEM2_END : Common::MEM1_END;
+  switch (region)
+  {
+  case MemoryRegion::ARAM:
+    m_memViewStart = Common::ARAM_START;
+    m_memViewEnd = Common::ARAM_END;
+    break;
+  case MemoryRegion::MEM1:
+    m_memViewStart = Common::MEM1_START;
+    m_memViewEnd = Common::MEM1_END;
+    break;
+  case MemoryRegion::MEM2:
+    m_memViewStart = Common::MEM2_START;
+    m_memViewEnd = Common::MEM2_END;
+    break;
+  }
   verticalScrollBar()->setRange(0, ((m_memViewEnd - m_memViewStart) / m_numColumns) - m_numRows);
 }
 
@@ -419,7 +437,7 @@ void MemViewer::editSelection()
     {
       if (!DolphinComm::DolphinAccessor::writeToRAM(
               Common::dolphinAddrToOffset(m_currentFirstAddress + indexStart,
-                                          DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance()),
+                                          DolphinComm::DolphinAccessor::isARAMAccessible()),
               newMem, selectionLength, false))
       {
         emit memErrorOccured();
@@ -682,9 +700,8 @@ bool MemViewer::writeCharacterToSelectedMemory(char byteToWrite)
       byteToWrite = selectedMemoryValue & 0x0F | (byteToWrite << 4);
   }
 
-  u32 offsetToWrite =
-      Common::dolphinAddrToOffset(m_currentFirstAddress + (u32)memoryOffset,
-                                  DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance());
+  u32 offsetToWrite = Common::dolphinAddrToOffset(m_currentFirstAddress + (u32)memoryOffset,
+                                                  DolphinComm::DolphinAccessor::isARAMAccessible());
   return DolphinComm::DolphinAccessor::writeToRAM(offsetToWrite, &byteToWrite, 1, false);
 }
 

@@ -61,12 +61,14 @@ void MainWindow::makeMenus()
 
   connect(m_actSettings, &QAction::triggered, this, &MainWindow::onOpenSettings);
 
-  connect(m_actViewScanner, &QAction::toggled, this, [=] {
-    if (m_actViewScanner->isChecked())
-      m_scanner->show();
-    else
-      m_scanner->hide();
-  });
+  connect(m_actViewScanner, &QAction::toggled, this,
+          [=]
+          {
+            if (m_actViewScanner->isChecked())
+              m_scanner->show();
+            else
+              m_scanner->hide();
+          });
 
   connect(m_actQuit, &QAction::triggered, this, &MainWindow::onQuit);
   connect(m_actAbout, &QAction::triggered, this, &MainWindow::onAbout);
@@ -207,10 +209,22 @@ void MainWindow::onOpenMemViewerWithAddress(u32 address)
 
 void MainWindow::updateMem2Status()
 {
-  if (DolphinComm::DolphinAccessor::isMEM2Present())
-    m_lblMem2Status->setText(tr("The extended Wii-only memory is present"));
+  QString strMem2 = QString();
+  bool mem2 = DolphinComm::DolphinAccessor::isMEM2Present();
+  if (mem2)
+    strMem2 = tr("The extended Wii-only memory is present");
   else
-    m_lblMem2Status->setText(tr("The extended Wii-only memory is absent"));
+    strMem2 = tr("The extended Wii-only memory is absent");
+
+  QString strAram = QString();
+  if (!mem2)
+  {
+    if (DolphinComm::DolphinAccessor::isARAMAccessible())
+      strAram = tr(", the ARAM is accessible");
+    else
+      strAram = tr(", the ARAM is inaccessible, turn off MMU to use it");
+  }
+  m_lblMem2Status->setText(strMem2 + strAram);
   m_viewer->onMEM2StatusChanged(DolphinComm::DolphinAccessor::isMEM2Present());
 }
 

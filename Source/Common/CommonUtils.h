@@ -7,6 +7,7 @@
 #endif
 
 #include "CommonTypes.h"
+#include "MemoryCommon.h"
 
 namespace Common
 {
@@ -39,26 +40,93 @@ inline u64 bSwap64(u64 data)
 }
 #endif
 
-inline u32 dolphinAddrToOffset(u32 addr, u32 mem2_offset)
+inline u32 dolphinAddrToOffset(u32 addr, bool considerAram)
 {
-  addr &= 0x7FFFFFFF;
-  if (addr >= 0x10000000)
+  // ARAM address
+  if (addr >= ARAM_START && addr < ARAM_END)
   {
-    // MEM2, calculate correct address from MEM2 offset
-    addr -= 0x10000000;
-    addr += mem2_offset;
+    addr -= ARAM_START;
+  }
+  // MEM1 address
+  else if (addr >= MEM1_START && addr < MEM1_END)
+  {
+    addr -= MEM1_START;
+    if (considerAram)
+      addr += ARAM_FAKESIZE;
+  }
+  // MEM2 address
+  else if (addr >= MEM2_START && addr < MEM2_END)
+  {
+    addr -= MEM2_START;
+    addr += (MEM2_START - MEM1_START);
   }
   return addr;
 }
 
-inline u32 offsetToDolphinAddr(u32 offset, u32 mem2_offset)
+inline u32 offsetToDolphinAddr(u32 offset, bool considerAram)
 {
-  if (offset < 0 or offset >= 0x2000000)
+  if (considerAram)
   {
-    // MEM2, calculate correct address from MEM2 offset
-    offset += 0x10000000;
-    offset -= mem2_offset;
+    if (offset < ARAM_SIZE)
+    {
+      offset += ARAM_START;
+    }
+    else if (offset >= ARAM_FAKESIZE && offset < ARAM_FAKESIZE + MEM1_SIZE)
+    {
+      offset += MEM1_START;
+      offset -= ARAM_FAKESIZE;
+    }
   }
-  return offset | 0x80000000;
+  else
+  {
+    if (offset < MEM1_SIZE)
+    {
+      offset += MEM1_START;
+    }
+    else if (offset >= MEM2_START - MEM1_START && offset < MEM2_START - MEM1_START + MEM2_SIZE)
+    {
+      offset += MEM2_START;
+      offset -= (MEM2_START - MEM1_START);
+    }
+  }
+  return offset;
+}
+
+inline u32 offsetToCacheIndex(u32 offset, bool considerAram)
+{
+  if (considerAram)
+  {
+    if (offset >= ARAM_FAKESIZE && offset < MEM1_SIZE + ARAM_FAKESIZE)
+    {
+      offset -= (ARAM_FAKESIZE - ARAM_SIZE);
+    }
+  }
+  else
+  {
+    if (offset >= MEM2_START - MEM1_START && offset < MEM2_START - MEM1_START + MEM2_SIZE)
+    {
+      offset -= (MEM2_START - MEM1_END);
+    }
+  }
+  return offset;
+}
+
+inline u32 cacheIndexToOffset(u32 cacheIndex, bool considerAram)
+{
+  if (considerAram)
+  {
+    if (cacheIndex >= ARAM_SIZE && cacheIndex < MEM1_SIZE + ARAM_SIZE)
+    {
+      cacheIndex += (ARAM_FAKESIZE - ARAM_SIZE);
+    }
+  }
+  else
+  {
+    if (cacheIndex >= MEM1_SIZE && cacheIndex < MEM1_SIZE + MEM2_SIZE)
+    {
+      cacheIndex += (MEM2_START - MEM1_END);
+    }
+  }
+  return cacheIndex;
 }
 } // namespace Common

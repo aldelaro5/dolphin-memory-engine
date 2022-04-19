@@ -26,10 +26,11 @@ void MemViewerWidget::initialiseWidgets()
   m_txtJumpAddress = new QLineEdit(this);
   connect(m_txtJumpAddress, &QLineEdit::textChanged, this,
           &MemViewerWidget::onJumpToAddressTextChanged);
-  m_btnGoToMEM1Start = new QPushButton(tr("Go to the common RAM"));
+  m_btnGoToMEM1Start = new QPushButton(tr("Go to MEM1"));
   connect(m_btnGoToMEM1Start, &QPushButton::clicked, this, &MemViewerWidget::onGoToMEM1Start);
-  m_btnGoToMEM2Start = new QPushButton(tr("Go to the Wii-only RAM"));
-  connect(m_btnGoToMEM2Start, &QPushButton::clicked, this, &MemViewerWidget::onGoToMEM2Start);
+  m_btnGoToSecondaryRAMStart = new QPushButton(tr("Go to ARAM"));
+  connect(m_btnGoToSecondaryRAMStart, &QPushButton::clicked, this,
+          &MemViewerWidget::onGoToSecondaryRAMStart);
   m_memViewer = new MemViewer(this);
   connect(m_memViewer, &MemViewer::memErrorOccured, this, &MemViewerWidget::mustUnhook);
   m_updateMemoryTimer = new QTimer(this);
@@ -44,7 +45,7 @@ void MemViewerWidget::makeLayouts()
   controls_layout->addWidget(lblJumpToAddress);
   controls_layout->addWidget(m_txtJumpAddress);
   controls_layout->addWidget(m_btnGoToMEM1Start);
-  controls_layout->addWidget(m_btnGoToMEM2Start);
+  controls_layout->addWidget(m_btnGoToSecondaryRAMStart);
 
   QVBoxLayout* main_layout = new QVBoxLayout();
   main_layout->addLayout(controls_layout);
@@ -72,24 +73,31 @@ void MemViewerWidget::onGoToMEM1Start()
   m_memViewer->jumpToAddress(Common::MEM1_START);
 }
 
-void MemViewerWidget::onGoToMEM2Start()
+void MemViewerWidget::onGoToSecondaryRAMStart()
 {
-  m_memViewer->jumpToAddress(Common::MEM2_START);
+  if (DolphinComm::DolphinAccessor::isARAMAccessible())
+    m_memViewer->jumpToAddress(Common::ARAM_START);
+  else
+    m_memViewer->jumpToAddress(Common::MEM2_START);
 }
 
 void MemViewerWidget::hookStatusChanged(bool hook)
 {
   m_txtJumpAddress->setEnabled(hook);
   m_btnGoToMEM1Start->setEnabled(hook);
-  m_btnGoToMEM2Start->setEnabled(hook);
+  m_btnGoToSecondaryRAMStart->setEnabled(hook);
   m_memViewer->memoryValidityChanged(hook);
 }
 
 void MemViewerWidget::onMEM2StatusChanged(bool enabled)
 {
-  m_btnGoToMEM2Start->setEnabled(enabled);
-  if (!enabled && m_memViewer->getCurrentFirstAddress() >= Common::MEM2_START)
+  m_btnGoToSecondaryRAMStart->setText(enabled ? tr("Go to MEM2") : tr("Go to ARAM"));
+  if ((!enabled && m_memViewer->getCurrentFirstAddress() >= Common::MEM2_START) ||
+      (enabled && m_memViewer->getCurrentFirstAddress() < Common::MEM1_START))
     m_memViewer->jumpToAddress(Common::MEM1_START);
+
+  if (!enabled)
+    m_btnGoToSecondaryRAMStart->setEnabled(DolphinComm::DolphinAccessor::isARAMAccessible());
 }
 
 void MemViewerWidget::goToAddress(u32 address)

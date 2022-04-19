@@ -16,7 +16,7 @@ public:
 
   void onJumpToAddressTextChanged();
   void onGoToMEM1Start();
-  void onGoToMEM2Start();
+  void onGoToSecondaryRAMStart();
   QTimer* getUpdateTimer() const;
   void hookStatusChanged(bool hook);
   void onMEM2StatusChanged(bool enabled);
@@ -32,7 +32,7 @@ private:
 
   QLineEdit* m_txtJumpAddress;
   QPushButton* m_btnGoToMEM1Start;
-  QPushButton* m_btnGoToMEM2Start;
+  QPushButton* m_btnGoToSecondaryRAMStart;
   QTimer* m_updateMemoryTimer;
   MemViewer* m_memViewer;
 };

@@ -86,18 +86,19 @@ u64 DolphinAccessor::getEmuRAMAddressStart()
   return m_instance->getEmuRAMAddressStart();
 }
 
+bool DolphinAccessor::isARAMAccessible()
+{
+  return m_instance->isARAMAccessible();
+}
+
+u64 DolphinAccessor::getARAMAddressStart()
+{
+  return m_instance->getARAMAddressStart();
+}
+
 bool DolphinAccessor::isMEM2Present()
 {
   return m_instance->isMEM2Present();
-}
-
-u32 DolphinAccessor::getMEM1ToMEM2Distance()
-{
-  if (m_instance == nullptr)
-  {
-    return 0;
-  }
-  return m_instance->getMEM1ToMEM2Distance();
 }
 
 bool DolphinAccessor::isValidConsoleAddress(const u32 address)
@@ -105,10 +106,37 @@ bool DolphinAccessor::isValidConsoleAddress(const u32 address)
   if (getStatus() != DolphinStatus::hooked)
     return false;
 
-  bool isMem1Address = address >= Common::MEM1_START && address < Common::MEM1_END;
+  if (address >= Common::MEM1_START && address < Common::MEM1_END)
+    return true;
+
+  if (isMEM2Present() && (address >= Common::MEM2_START && address < Common::MEM2_END))
+    return true;
+
+  if (isARAMAccessible && (address >= Common::ARAM_START && address < Common::ARAM_END))
+    return true;
+
+  return false;
+}
+
+char* DolphinAccessor::getRAMCache()
+{
+  return m_updatedRAMCache;
+}
+
+size_t DolphinAccessor::getRAMCacheSize()
+{
   if (isMEM2Present())
-    return isMem1Address || (address >= Common::MEM2_START && address < Common::MEM2_END);
-  return isMem1Address;
+  {
+    return Common::MEM1_SIZE + Common::MEM2_SIZE;
+  }
+  else if (isARAMAccessible())
+  {
+    return Common::MEM1_SIZE + Common::ARAM_SIZE;
+  }
+  else
+  {
+    return Common::MEM1_SIZE;
+  }
 }
 
 Common::MemOperationReturnCode DolphinAccessor::updateRAMCache()
@@ -120,20 +148,42 @@ Common::MemOperationReturnCode DolphinAccessor::updateRAMCache()
   if (isMEM2Present())
   {
     m_updatedRAMCache = new char[Common::MEM1_SIZE + Common::MEM2_SIZE];
+
+    if (!DolphinComm::DolphinAccessor::readFromRAM(
+            Common::dolphinAddrToOffset(Common::MEM1_START, false), m_updatedRAMCache,
+            Common::MEM1_SIZE, false))
+      return Common::MemOperationReturnCode::operationFailed;
+
     // Read Wii extra RAM
     if (!DolphinComm::DolphinAccessor::readFromRAM(
-            Common::dolphinAddrToOffset(Common::MEM2_START, getMEM1ToMEM2Distance()),
+            Common::dolphinAddrToOffset(Common::MEM2_START, false),
             m_updatedRAMCache + Common::MEM1_SIZE, Common::MEM2_SIZE, false))
+      return Common::MemOperationReturnCode::operationFailed;
+  }
+  else if (isARAMAccessible())
+  {
+    m_updatedRAMCache = new char[Common::ARAM_SIZE + Common::MEM1_SIZE];
+    // read ARAM
+    if (!DolphinComm::DolphinAccessor::readFromRAM(
+            Common::dolphinAddrToOffset(Common::ARAM_START, true), m_updatedRAMCache,
+            Common::ARAM_SIZE, false))
+      return Common::MemOperationReturnCode::operationFailed;
+
+    // Read GameCube and Wii basic RAM
+    if (!DolphinComm::DolphinAccessor::readFromRAM(
+            Common::dolphinAddrToOffset(Common::MEM1_START, true),
+            m_updatedRAMCache + Common::ARAM_SIZE, Common::MEM1_SIZE, false))
       return Common::MemOperationReturnCode::operationFailed;
   }
   else
   {
     m_updatedRAMCache = new char[Common::MEM1_SIZE];
+    if (!DolphinComm::DolphinAccessor::readFromRAM(
+            Common::dolphinAddrToOffset(Common::MEM1_START, false), m_updatedRAMCache,
+            Common::MEM1_SIZE, false))
+      return Common::MemOperationReturnCode::operationFailed;
   }
 
-  // Read GameCube and Wii basic RAM
-  if (!DolphinComm::DolphinAccessor::readFromRAM(0, m_updatedRAMCache, Common::MEM1_SIZE, false))
-    return Common::MemOperationReturnCode::operationFailed;
   return Common::MemOperationReturnCode::OK;
 }
 
@@ -151,15 +201,10 @@ void DolphinAccessor::copyRawMemoryFromCache(char* dest, const u32 consoleAddres
   if (isValidConsoleAddress(consoleAddress) &&
       isValidConsoleAddress((consoleAddress + static_cast<u32>(byteCount)) - 1))
   {
-    u32 MEM2Distance = getMEM1ToMEM2Distance();
-    u32 offset = Common::dolphinAddrToOffset(consoleAddress, MEM2Distance);
-    u32 ramIndex = 0;
-    if (offset >= Common::MEM1_SIZE)
-      // Need to account for the distance between the end of MEM1 and the start of MEM2
-      ramIndex = offset - (MEM2Distance - Common::MEM1_SIZE);
-    else
-      ramIndex = offset;
-    std::memcpy(dest, m_updatedRAMCache + ramIndex, byteCount);
+    bool aramAccessible = isARAMAccessible();
+    u32 offset = Common::dolphinAddrToOffset(consoleAddress, isARAMAccessible());
+    u32 cacheIndex = Common::offsetToCacheIndex(offset, aramAccessible);
+    std::memcpy(dest, m_updatedRAMCache + cacheIndex, byteCount);
   }
 }
 } // namespace DolphinComm

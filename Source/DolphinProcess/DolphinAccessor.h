@@ -28,8 +28,11 @@ public:
   static int getPID();
   static u64 getEmuRAMAddressStart();
   static DolphinStatus getStatus();
+  static bool isARAMAccessible();
+  static u64 getARAMAddressStart();
   static bool isMEM2Present();
-  static u32 getMEM1ToMEM2Distance();
+  static char* getRAMCache();
+  static size_t getRAMCacheSize();
   static Common::MemOperationReturnCode updateRAMCache();
   static std::string getFormattedValueFromCache(const u32 ramIndex, Common::MemType memType,
                                                 size_t memSize, Common::MemBase memBase,

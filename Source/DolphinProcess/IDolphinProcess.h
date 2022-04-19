@@ -32,6 +32,14 @@ public:
   {
     return m_MEM2Present;
   };
+  bool isARAMAccessible() const
+  {
+    return m_ARAMAccessible;
+  };
+  u64 getARAMAddressStart() const
+  {
+    return m_emuARAMAdressStart;
+  };
   u64 getMEM2AddressStart() const
   {
     return m_MEM2AddressStart;
@@ -46,7 +54,9 @@ public:
 protected:
   int m_PID = -1;
   u64 m_emuRAMAddressStart = 0;
+  u64 m_emuARAMAdressStart = 0;
   u64 m_MEM2AddressStart = 0;
+  bool m_ARAMAccessible = false;
   bool m_MEM2Present = false;
 };
 } // namespace DolphinComm

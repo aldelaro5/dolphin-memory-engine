@@ -6,6 +6,7 @@
 #include <cstring>
 #include <dirent.h>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <sys/uio.h>
@@ -68,11 +69,26 @@ bool LinuxDolphinProcess::obtainEmuRAMInformations()
         break;
     }
 
-    if (SecondAddress - firstAddress == 0x2000000 && offset == 0x0)
+    if (SecondAddress - firstAddress == 0x2000000)
     {
-      m_emuRAMAddressStart = firstAddress;
-      MEM1Found = true;
+      if (offset == 0x0)
+      {
+        m_emuRAMAddressStart = firstAddress;
+        MEM1Found = true;
+      }
+      else if (offset == 0x2040000)
+      {
+        m_emuARAMAdressStart = firstAddress;
+        m_ARAMAccessible = true;
+      }
     }
+  }
+
+  // On Wii, there is no concept of speedhack so act as if we couldn't find it
+  if (m_MEM2Present)
+  {
+    m_emuARAMAdressStart = 0;
+    m_ARAMAccessible = false;
   }
 
   if (m_emuRAMAddressStart != 0)
@@ -118,7 +134,18 @@ bool LinuxDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size
   struct iovec local;
   struct iovec remote;
   size_t nread;
-  u64 RAMAddress = m_emuRAMAddressStart + offset;
+  u64 RAMAddress = 0;
+  if (m_ARAMAccessible)
+  {
+    if (offset >= Common::ARAM_FAKESIZE)
+      RAMAddress = m_emuRAMAddressStart + offset - Common::ARAM_FAKESIZE;
+    else
+      RAMAddress = m_emuARAMAdressStart + offset;
+  }
+  else
+  {
+    RAMAddress = m_emuRAMAddressStart + offset;
+  }
 
   local.iov_base = buffer;
   local.iov_len = size;
@@ -169,7 +196,19 @@ bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const
   struct iovec local;
   struct iovec remote;
   size_t nwrote;
-  u64 RAMAddress = m_emuRAMAddressStart + offset;
+  u64 RAMAddress = 0;
+  if (m_ARAMAccessible)
+  {
+    if (offset >= Common::ARAM_FAKESIZE)
+      RAMAddress = m_emuRAMAddressStart + offset - Common::ARAM_FAKESIZE;
+    else
+      RAMAddress = m_emuARAMAdressStart + offset;
+  }
+  else
+  {
+    RAMAddress = m_emuRAMAddressStart + offset;
+  }
+
   char* bufferCopy = new char[size];
   std::memcpy(bufferCopy, buffer, size);
 
