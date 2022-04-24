@@ -24,6 +24,7 @@ void DlgChangeType::initialiseWidgets()
 
   m_spnLength = new QSpinBox(this);
   m_spnLength->setMinimum(1);
+  m_spnLength->setMaximum(9999);
   m_spnLength->setValue(static_cast<int>(m_length));
 
   connect(m_cmbTypes, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
