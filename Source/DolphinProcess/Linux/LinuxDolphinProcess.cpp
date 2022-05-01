@@ -142,6 +142,10 @@ bool LinuxDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size
     else
       RAMAddress = m_emuARAMAdressStart + offset;
   }
+  else if (offset >= (Common::MEM2_START - Common::MEM1_START))
+  {
+    RAMAddress = m_MEM2AddressStart + offset - (Common::MEM2_START - Common::MEM1_START);
+  }
   else
   {
     RAMAddress = m_emuRAMAddressStart + offset;
@@ -203,6 +207,10 @@ bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const
       RAMAddress = m_emuRAMAddressStart + offset - Common::ARAM_FAKESIZE;
     else
       RAMAddress = m_emuARAMAdressStart + offset;
+  }
+  else if (offset >= (Common::MEM2_START - Common::MEM1_START))
+  {
+    RAMAddress = m_MEM2AddressStart + offset - (Common::MEM2_START - Common::MEM1_START);
   }
   else
   {
