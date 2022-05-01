@@ -52,7 +52,7 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
        VirtualQueryEx(m_hDolphin, p, &info, sizeof(info)) == sizeof(info); p += info.RegionSize)
   {
     // Check region size so that we know it's MEM2
-    if (info.RegionSize == 0x4000000)
+    if (!m_MEM2Present && info.RegionSize == 0x4000000)
     {
       u64 regionBaseAddress = 0;
       std::memcpy(&regionBaseAddress, &(info.BaseAddress), sizeof(info.BaseAddress));
@@ -75,7 +75,7 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
         }
       }
     }
-    else if (!MEM1Found && info.RegionSize == 0x2000000 && info.Type == MEM_MAPPED)
+    else if (info.RegionSize == 0x2000000 && info.Type == MEM_MAPPED)
     {
       // Here, it's likely the right page, but it can happen that multiple pages with these criteria
       // exists and have nothing to do with the emulated memory. Only the right page has valid
@@ -87,14 +87,32 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
       {
         if (wsInfo.VirtualAttributes.Valid)
         {
-          std::memcpy(&m_emuRAMAddressStart, &(info.BaseAddress), sizeof(info.BaseAddress));
-          MEM1Found = true;
+          if (!MEM1Found)
+          {
+            std::memcpy(&m_emuRAMAddressStart, &(info.BaseAddress), sizeof(info.BaseAddress));
+            MEM1Found = true;
+          }
+          else
+          {
+            u64 aramCandidate = 0;
+            std::memcpy(&aramCandidate, &(info.BaseAddress), sizeof(info.BaseAddress));
+            if (aramCandidate == m_emuRAMAddressStart + 0x2000000)
+            {
+              m_emuARAMAdressStart = aramCandidate;
+              m_ARAMAccessible = true;
+            }
+          }
         }
       }
     }
-    if (MEM1Found && m_MEM2Present)
-      break;
   }
+
+  if (m_MEM2Present)
+  {
+    m_emuARAMAdressStart = 0;
+    m_ARAMAccessible = false;
+  }
+
   if (m_emuRAMAddressStart == 0)
   {
     // Here, Dolphin is running, but the emulation hasn't started
@@ -106,7 +124,23 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
 bool WindowsDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size_t size,
                                         const bool withBSwap)
 {
-  u64 RAMAddress = m_emuRAMAddressStart + offset;
+  u64 RAMAddress = 0;
+  if (m_ARAMAccessible)
+  {
+    if (offset >= Common::ARAM_FAKESIZE)
+      RAMAddress = m_emuRAMAddressStart + offset - Common::ARAM_FAKESIZE;
+    else
+      RAMAddress = m_emuARAMAdressStart + offset;
+  }
+  else if (offset >= (Common::MEM2_START - Common::MEM1_START))
+  {
+    RAMAddress = m_MEM2AddressStart + offset - (Common::MEM2_START - Common::MEM1_START);
+  }
+  else
+  {
+    RAMAddress = m_emuRAMAddressStart + offset;
+  }
+
   SIZE_T nread = 0;
   bool bResult = ReadProcessMemory(m_hDolphin, (void*)RAMAddress, buffer, size, &nread);
   if (bResult && nread == size)
@@ -149,7 +183,23 @@ bool WindowsDolphinProcess::readFromRAM(const u32 offset, char* buffer, const si
 bool WindowsDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const size_t size,
                                        const bool withBSwap)
 {
-  u64 RAMAddress = m_emuRAMAddressStart + offset;
+  u64 RAMAddress = 0;
+  if (m_ARAMAccessible)
+  {
+    if (offset >= Common::ARAM_FAKESIZE)
+      RAMAddress = m_emuRAMAddressStart + offset - Common::ARAM_FAKESIZE;
+    else
+      RAMAddress = m_emuARAMAdressStart + offset;
+  }
+  else if (offset >= (Common::MEM2_START - Common::MEM1_START))
+  {
+    RAMAddress = m_MEM2AddressStart + offset - (Common::MEM2_START - Common::MEM1_START);
+  }
+  else
+  {
+    RAMAddress = m_emuRAMAddressStart + offset;
+  }
+
   SIZE_T nread = 0;
   char* bufferCopy = new char[size];
   std::memcpy(bufferCopy, buffer, size);
