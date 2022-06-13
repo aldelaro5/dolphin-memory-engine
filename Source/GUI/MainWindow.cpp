@@ -4,6 +4,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QSplitter>
 #include <QString>
 #include <QVBoxLayout>
 #include <string>
@@ -134,16 +135,24 @@ void MainWindow::makeLayouts()
   QFrame* separatorline = new QFrame();
   separatorline->setFrameShape(QFrame::HLine);
 
+  QSplitter* splitter = new QSplitter(Qt::Vertical);
+  splitter->addWidget(m_scanner);
+  splitter->addWidget(m_watcher);
+
+  if (SConfig::getInstance().getSplitterState().size())
+    splitter->restoreState(SConfig::getInstance().getSplitterState());
+
+  connect(splitter, &QSplitter::splitterMoved,
+          [splitter = splitter]()
+          { SConfig::getInstance().setSplitterState(splitter->saveState()); });
+
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_lblDolphinStatus);
   mainLayout->addLayout(dolphinHookButtons_layout);
+  mainLayout->addWidget(m_btnOpenMemViewer);
   mainLayout->addWidget(m_lblMem2Status);
   mainLayout->addWidget(separatorline);
-  mainLayout->addWidget(m_scanner);
-  mainLayout->addSpacing(5);
-  mainLayout->addWidget(m_btnOpenMemViewer);
-  mainLayout->addSpacing(5);
-  mainLayout->addWidget(m_watcher);
+  mainLayout->addWidget(splitter);
 
   QWidget* mainWidget = new QWidget();
   mainWidget->setLayout(mainLayout);

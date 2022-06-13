@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QByteArray>
 #include <QSettings>
 
 class SConfig
@@ -9,12 +10,16 @@ public:
   SConfig(SConfig const&) = delete;
   void operator=(SConfig const&) = delete;
 
+  QByteArray getSplitterState() const;
+
   int getWatcherUpdateTimerMs() const;
   int getFreezeTimerMs() const;
   int getScannerUpdateTimerMs() const;
   int getViewerUpdateTimerMs() const;
 
   int getViewerNbrBytesSeparator() const;
+
+  void setSplitterState(QByteArray const&);
 
   void setWatcherUpdateTimerMs(const int watcherUpdateTimerMs);
   void setFreezeTimerMs(const int freezeTimerMs);

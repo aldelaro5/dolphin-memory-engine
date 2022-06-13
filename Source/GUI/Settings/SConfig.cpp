@@ -16,6 +16,11 @@ SConfig& SConfig::getInstance()
   return instance;
 }
 
+QByteArray SConfig::getSplitterState() const
+{
+  return m_settings->value("mainWindowSettings/splitterState", QByteArray{}).toByteArray();
+}
+
 int SConfig::getWatcherUpdateTimerMs() const
 {
   return m_settings->value("timerSettings/watcherUpdateTimerMs", 100).toInt();
@@ -39,6 +44,11 @@ int SConfig::getViewerUpdateTimerMs() const
 int SConfig::getViewerNbrBytesSeparator() const
 {
   return m_settings->value("viewerSettings/nbrBytesSeparator", 1).toInt();
+}
+
+void SConfig::setSplitterState(QByteArray const& state)
+{
+  m_settings->setValue("mainWindowSettings/splitterState", state);
 }
 
 void SConfig::setWatcherUpdateTimerMs(const int updateTimerMs)
