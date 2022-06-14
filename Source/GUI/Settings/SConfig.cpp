@@ -2,7 +2,9 @@
 
 SConfig::SConfig()
 {
-  m_settings = new QSettings("settings.ini", QSettings::IniFormat);
+  const QString organization{"dolphin-memory-engine"};
+  const QString application{"dolphin-memory-engine"};
+  m_settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application);
 }
 
 SConfig::~SConfig()
