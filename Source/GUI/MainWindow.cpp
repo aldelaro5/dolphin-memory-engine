@@ -23,6 +23,11 @@ MainWindow::MainWindow()
   DolphinComm::DolphinAccessor::init();
   makeMemViewer();
   firstHookAttempt();
+
+  if (SConfig::getInstance().getMainWindowGeometry().size())
+    restoreGeometry(SConfig::getInstance().getMainWindowGeometry());
+  if (SConfig::getInstance().getMainWindowState().size())
+    restoreState(SConfig::getInstance().getMainWindowState());
 }
 
 MainWindow::~MainWindow()
@@ -399,6 +404,8 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
   if (m_watcher->warnIfUnsavedChanges())
   {
+    SConfig::getInstance().setMainWindowGeometry(saveGeometry());
+    SConfig::getInstance().setMainWindowState(saveState());
     m_viewer->close();
     event->accept();
   }

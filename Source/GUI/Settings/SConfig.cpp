@@ -16,6 +16,16 @@ SConfig& SConfig::getInstance()
   return instance;
 }
 
+QByteArray SConfig::getMainWindowGeometry() const
+{
+  return m_settings->value("mainWindowSettings/mainWindowGeometry", QByteArray{}).toByteArray();
+}
+
+QByteArray SConfig::getMainWindowState() const
+{
+  return m_settings->value("mainWindowSettings/mainWindowState", QByteArray{}).toByteArray();
+}
+
 QByteArray SConfig::getSplitterState() const
 {
   return m_settings->value("mainWindowSettings/splitterState", QByteArray{}).toByteArray();
@@ -44,6 +54,16 @@ int SConfig::getViewerUpdateTimerMs() const
 int SConfig::getViewerNbrBytesSeparator() const
 {
   return m_settings->value("viewerSettings/nbrBytesSeparator", 1).toInt();
+}
+
+void SConfig::setMainWindowGeometry(QByteArray const& geometry)
+{
+  m_settings->setValue("mainWindowSettings/mainWindowGeometry", geometry);
+}
+
+void SConfig::setMainWindowState(QByteArray const& state)
+{
+  m_settings->setValue("mainWindowSettings/mainWindowState", state);
 }
 
 void SConfig::setSplitterState(QByteArray const& state)

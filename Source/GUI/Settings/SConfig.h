@@ -10,6 +10,8 @@ public:
   SConfig(SConfig const&) = delete;
   void operator=(SConfig const&) = delete;
 
+  QByteArray getMainWindowGeometry() const;
+  QByteArray getMainWindowState() const;
   QByteArray getSplitterState() const;
 
   int getWatcherUpdateTimerMs() const;
@@ -19,6 +21,8 @@ public:
 
   int getViewerNbrBytesSeparator() const;
 
+  void setMainWindowGeometry(QByteArray const&);
+  void setMainWindowState(QByteArray const&);
   void setSplitterState(QByteArray const&);
 
   void setWatcherUpdateTimerMs(const int watcherUpdateTimerMs);
