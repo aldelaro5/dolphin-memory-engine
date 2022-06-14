@@ -4,6 +4,7 @@
 #include <QComboBox>
 #include <QDialog>
 #include <QGridLayout>
+#include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -43,12 +44,11 @@ private:
   QVector<QLabel*> m_addressPath;
   QGridLayout* m_offsetsLayout;
   QCheckBox* m_chkBoundToPointer;
-  QLabel* m_lblValuePreview;
+  QLineEdit* m_lblValuePreview;
   QLineEdit* m_txbLabel;
   QComboBox* m_cmbTypes;
   QSpinBox* m_spnLength;
-  QWidget* m_lengtWidget;
-  QWidget* m_pointerWidget;
+  QGroupBox* m_pointerWidget;
   QPushButton* m_btnAddOffset;
   QPushButton* m_btnRemoveOffset;
 };
