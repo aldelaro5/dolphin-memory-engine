@@ -9,6 +9,7 @@
 
 MemViewerWidget::MemViewerWidget(QWidget* parent, u32 consoleAddress) : QWidget(parent)
 {
+  setWindowTitle("Memory Viewer");
   initialiseWidgets();
   makeLayouts();
 

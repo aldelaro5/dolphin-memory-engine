@@ -10,8 +10,11 @@
 #include "../../../DolphinProcess/DolphinAccessor.h"
 #include "../../GUICommon.h"
 
-DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry)
+DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const entry,
+                                   QWidget* const parent)
+    : QDialog(parent)
 {
+  setWindowTitle(newEntry ? "Add Watch" : "Edit Watch");
   initialiseWidgets();
   makeLayouts();
   fillFields(entry);

@@ -11,6 +11,7 @@
 DlgChangeType::DlgChangeType(QWidget* parent, const int typeIndex, const size_t length)
     : QDialog(parent), m_typeIndex(typeIndex), m_length(length)
 {
+  setWindowTitle("Change Type");
   initialiseWidgets();
   makeLayouts();
 }

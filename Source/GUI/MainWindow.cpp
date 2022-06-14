@@ -17,6 +17,7 @@
 
 MainWindow::MainWindow()
 {
+  setWindowTitle("Dolphin Memory Engine");
   initialiseWidgets();
   makeLayouts();
   makeMenus();
@@ -372,7 +373,7 @@ void MainWindow::onOpenSettings()
 
 void MainWindow::onAbout()
 {
-  QString title = tr("About Dolphin memory engine");
+  QString title = tr("About Dolphin Memory Engine");
   QString text =
       "Beta version 0.6.0\n\n" +
       tr("A RAM search made to facilitate research and reverse engineering of GameCube and Wii "

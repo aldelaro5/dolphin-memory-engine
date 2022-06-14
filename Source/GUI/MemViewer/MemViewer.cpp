@@ -469,7 +469,7 @@ void MemViewer::addByteIndexAsWatch(int index)
 {
   MemWatchEntry* entry = new MemWatchEntry();
   entry->setConsoleAddress(m_currentFirstAddress + index);
-  DlgAddWatchEntry* dlg = new DlgAddWatchEntry(entry);
+  DlgAddWatchEntry* dlg = new DlgAddWatchEntry(true, entry, this);
   if (dlg->exec() == QDialog::Accepted)
     emit addWatch(dlg->getEntry());
 }
