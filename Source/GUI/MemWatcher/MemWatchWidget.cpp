@@ -469,7 +469,7 @@ void MemWatchWidget::onAddWatchEntry()
 {
   DlgAddWatchEntry* dlg = new DlgAddWatchEntry(true, nullptr, this);
   if (dlg->exec() == QDialog::Accepted)
-    addWatchEntry(dlg->getEntry());
+    addWatchEntry(dlg->stealEntry());
 }
 
 void MemWatchWidget::addWatchEntry(MemWatchEntry* entry)

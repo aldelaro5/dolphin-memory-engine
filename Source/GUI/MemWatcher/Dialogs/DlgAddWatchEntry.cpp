@@ -413,7 +413,9 @@ void DlgAddWatchEntry::onIsPointerChanged()
   updatePreview();
 }
 
-MemWatchEntry* DlgAddWatchEntry::getEntry() const
+MemWatchEntry* DlgAddWatchEntry::stealEntry()
 {
-  return m_entry;
+  MemWatchEntry* entry{m_entry};
+  m_entry = nullptr;
+  return entry;
 }

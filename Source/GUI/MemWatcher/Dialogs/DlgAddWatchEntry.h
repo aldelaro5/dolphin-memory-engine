@@ -24,7 +24,7 @@ public:
   void onIsPointerChanged();
   void onLengthChanged();
   void onOffsetChanged();
-  MemWatchEntry* getEntry() const;
+  MemWatchEntry* stealEntry();
 
 private:
   void initialiseWidgets();
