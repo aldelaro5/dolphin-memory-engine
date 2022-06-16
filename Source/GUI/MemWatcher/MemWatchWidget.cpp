@@ -786,7 +786,7 @@ bool MemWatchWidget::warnIfUnsavedChanges()
     QMessageBox* questionBox = new QMessageBox(
         QMessageBox::Question, "Unsaved changes",
         "You have unsaved changes in the current watch list, do you want to save them?",
-        QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes);
+        QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, this);
     switch (questionBox->exec())
     {
     case QMessageBox::Cancel:
