@@ -233,8 +233,12 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   }
 
   delete[] noOffset;
+  m_UndoStack.push(m_resultsConsoleAddr);
+  m_undoCount = m_UndoStack.size();
+
   m_resultsConsoleAddr.clear();
   std::swap(m_resultsConsoleAddr, newerResults);
+
   delete[] m_scanRAMCache;
   m_scanRAMCache = nullptr;
   m_scanRAMCache = newerRAMCache;
@@ -250,6 +254,11 @@ void MemScanner::reset()
   m_scanRAMCache = nullptr;
   m_resultCount = 0;
   m_scanStarted = false;
+  while (!m_UndoStack.empty())
+  {
+    m_UndoStack.pop();
+  }
+  m_undoCount = 0;
 }
 
 inline bool MemScanner::isHitNextScan(const MemScanner::ScanFiter filter,
@@ -452,9 +461,28 @@ std::string MemScanner::addSpacesToBytesArrays(const std::string& bytesArray) co
   return result;
 }
 
+bool MemScanner::undoScan()
+{
+  if (m_undoCount > 0)
+  {
+    m_resultsConsoleAddr = m_UndoStack.top();
+    m_resultCount = m_resultsConsoleAddr.size();
+    
+    m_UndoStack.pop();
+    m_undoCount = m_UndoStack.size();
+    return true;
+  }
+  return false;
+}
+
 size_t MemScanner::getResultCount() const
 {
   return m_resultCount;
+}
+
+size_t MemScanner::getUndoCount() const
+{
+  return m_undoCount;
 }
 
 bool MemScanner::hasScanStarted() const

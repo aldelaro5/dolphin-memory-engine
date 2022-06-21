@@ -58,12 +58,15 @@ void MemScanWidget::initialiseWidgets()
   m_btnFirstScan = new QPushButton(tr("First scan"));
   m_btnNextScan = new QPushButton(tr("Next scan"));
   m_btnNextScan->hide();
+  m_btnUndoScan = new QPushButton(tr("Undo scan"));
+  m_btnUndoScan->hide();
   m_btnResetScan = new QPushButton(tr("Reset scan"));
   m_btnResetScan->hide();
 
   connect(m_btnFirstScan, &QPushButton::clicked, this, &MemScanWidget::onFirstScan);
   connect(m_btnNextScan, &QPushButton::clicked, this, &MemScanWidget::onNextScan);
   connect(m_btnResetScan, &QPushButton::clicked, this, &MemScanWidget::onResetScan);
+  connect(m_btnUndoScan, &QPushButton::clicked, this, &MemScanWidget::onUndoScan);
 
   QShortcut* scanShortcut = new QShortcut(QKeySequence(Qt::Key::Key_Enter), this);
   connect(scanShortcut, &QShortcut::activated, this, [=] {
@@ -134,6 +137,7 @@ void MemScanWidget::makeLayouts()
   QHBoxLayout* buttons_layout = new QHBoxLayout();
   buttons_layout->addWidget(m_btnFirstScan);
   buttons_layout->addWidget(m_btnNextScan);
+  buttons_layout->addWidget(m_btnUndoScan);
   buttons_layout->addWidget(m_btnResetScan);
 
   QHBoxLayout* searchTerm2_layout = new QHBoxLayout();
@@ -318,6 +322,7 @@ void MemScanWidget::onFirstScan()
     m_btnFirstScan->hide();
     m_btnNextScan->show();
     m_btnResetScan->show();
+    m_btnUndoScan->show();
     m_cmbScanType->setDisabled(true);
     m_chkSignedScan->setDisabled(true);
     m_chkEnforceMemAlignment->setDisabled(true);
@@ -349,6 +354,35 @@ void MemScanWidget::onNextScan()
   }
 }
 
+void MemScanWidget::onUndoScan()
+{
+  if (m_memScanner->getUndoCount() > 0)
+  {
+    m_memScanner->undoScan();
+    
+    int resultsFound = static_cast<int>(m_memScanner->getResultCount());
+    m_lblResultCount->setText(
+        tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
+    if (resultsFound <= 1000 && resultsFound != 0)
+    {
+      m_btnAddAll->setEnabled(true);
+      m_btnAddSelection->setEnabled(true);
+      m_btnRemoveSelection->setEnabled(true);
+    }
+    else
+    {
+      m_btnAddAll->setEnabled(false);
+      m_btnAddSelection->setEnabled(false);
+      m_btnRemoveSelection->setEnabled(false);
+      m_resultsListModel->updateAfterScannerReset(); 
+    }
+  }
+  else
+  {
+    onResetScan();
+  }
+}
+
 void MemScanWidget::onResetScan()
 {
   m_memScanner->reset();
@@ -359,6 +393,7 @@ void MemScanWidget::onResetScan()
   m_btnFirstScan->show();
   m_btnNextScan->hide();
   m_btnResetScan->hide();
+  m_btnUndoScan->hide();
   m_cmbScanType->setEnabled(true);
   m_chkSignedScan->setEnabled(true);
   m_chkEnforceMemAlignment->setEnabled(true);

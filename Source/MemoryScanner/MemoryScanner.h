@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <stack>
 
 #include "../Common/CommonTypes.h"
 #include "../Common/CommonUtils.h"
@@ -40,6 +41,7 @@ public:
                                            const std::string& searchTerm2);
   Common::MemOperationReturnCode nextScan(const ScanFiter filter, const std::string& searchTerm1,
                                           const std::string& searchTerm2);
+  bool undoScan();
   void reset();
   inline CompareResult compareMemoryAsNumbers(const char* first, const char* second,
                                               const char* offset, bool offsetInvert,
@@ -129,6 +131,7 @@ public:
 
   std::vector<u32> getResultsConsoleAddr() const;
   size_t getResultCount() const;
+  size_t getUndoCount() const;
   int getTermsNumForFilter(const ScanFiter filter) const;
   Common::MemType getType() const;
   Common::MemBase getBase() const;
@@ -154,8 +157,10 @@ private:
   bool m_enforceMemAlignment = true;
   bool m_memIsSigned = false;
   std::vector<u32> m_resultsConsoleAddr;
-  bool m_wasUnknownInitialValue = false;
   size_t m_resultCount = 0;
+  std::stack<std::vector<u32>> m_UndoStack;
+  size_t m_undoCount = 0;
+  bool m_wasUnknownInitialValue = false;
   char* m_scanRAMCache = nullptr;
   bool m_scanStarted = false;
 };
