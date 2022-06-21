@@ -59,6 +59,8 @@ private:
 
   MemScanner* m_memScanner;
   ResultsListModel* m_resultsListModel;
+  QLineEdit* m_txbSearchRange1;
+  QLineEdit* m_txbSearchRange2;
   QPushButton* m_btnFirstScan;
   QPushButton* m_btnNextScan;
   QPushButton* m_btnResetScan;

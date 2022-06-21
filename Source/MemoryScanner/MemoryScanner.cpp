@@ -21,19 +21,51 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   {
     return Common::MemOperationReturnCode::operationFailed;
   }
-  u32 ramSize = DolphinComm::DolphinAccessor::getRAMCacheSize();
+  u32 ramSize = static_cast<u32>(DolphinComm::DolphinAccessor::getRAMCacheSize());
   m_scanRAMCache = new char[ramSize];
   std::memcpy(m_scanRAMCache, DolphinComm::DolphinAccessor::getRAMCache(), ramSize);
 
+  u32 beginA = m_searchInRangeBegin ? m_beginSearchRange : 0;
+  u32 endA = m_searchInRangeEnd ? m_endSearchRange : ramSize;
+ 
+  if (m_searchInRangeBegin || m_searchInRangeEnd)
+  {
+    ramSize = endA - beginA;
+  }
+
   if (filter == ScanFiter::unknownInitial)
   {
-    int alignmentDivision =
-        m_enforceMemAlignment ? Common::getNbrBytesAlignmentForType(m_memType) : 1;
-    m_resultCount = ((ramSize / alignmentDivision) -
-                     Common::getSizeForType(m_memType, static_cast<size_t>(1)));
-    m_wasUnknownInitialValue = true;
-    m_memSize = 1;
-    m_scanStarted = true;
+    if (m_searchInRangeBegin || m_searchInRangeEnd)
+    {
+      int alignmentDivision =
+          m_enforceMemAlignment ? Common::getNbrBytesAlignmentForType(m_memType) : 1;
+      m_wasUnknownInitialValue = false;
+      m_memSize = Common::getSizeForType(m_memType, static_cast<size_t>(1));
+      m_scanStarted = true;
+
+      bool aram = DolphinComm::DolphinAccessor::isARAMAccessible();
+
+      u32 alignedBeginA =
+          beginA + ((alignmentDivision - (beginA % alignmentDivision)) % alignmentDivision);
+
+      for (u32 i = alignedBeginA; i < endA - m_memSize; i += alignmentDivision)
+      {
+        m_resultsConsoleAddr.push_back(Common::offsetToDolphinAddr(i, aram));
+      }
+
+      m_resultCount = m_resultsConsoleAddr.size();
+    }
+    else
+    {
+      int alignementDivision =
+          m_enforceMemAlignment ? Common::getNbrBytesAlignmentForType(m_memType) : 1;
+      m_resultCount = ((ramSize / alignementDivision) -
+                       Common::getSizeForType(m_memType, static_cast<size_t>(1)));
+      m_wasUnknownInitialValue = true;
+      m_memSize = 1;
+      m_scanStarted = true;
+    }
+
     return Common::MemOperationReturnCode::OK;
   }
 
@@ -88,7 +120,11 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   std::memset(noOffset, 0, m_memSize);
 
   int increment = m_enforceMemAlignment ? Common::getNbrBytesAlignmentForType(m_memType) : 1;
-  for (u32 i = 0; i < (ramSize - m_memSize); i += increment)
+
+  u32 beginSearch = beginA;
+  u32 endSearch = endA - static_cast<u32>(m_memSize);
+
+  for (u32 i = beginSearch; i < endSearch; i += increment)
   {
     char* memoryCandidate = &m_scanRAMCache[i];
     bool isResult = false;
@@ -153,7 +189,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   {
     return Common::MemOperationReturnCode::operationFailed;
   }
-  u32 ramSize = DolphinComm::DolphinAccessor::getRAMCacheSize();
+  u32 ramSize = static_cast<u32>(DolphinComm::DolphinAccessor::getRAMCacheSize());
   newerRAMCache = new char[ramSize];
   std::memcpy(newerRAMCache, DolphinComm::DolphinAccessor::getRAMCache(), ramSize);
 
@@ -233,7 +269,10 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   }
 
   delete[] noOffset;
-  m_UndoStack.push(m_resultsConsoleAddr);
+
+  bool wasUninitialized = m_resultsConsoleAddr.size() < newerResults.size();
+
+  m_UndoStack.push({m_resultsConsoleAddr, wasUninitialized});
   m_undoCount = m_UndoStack.size();
 
   m_resultsConsoleAddr.clear();
@@ -386,6 +425,59 @@ void MemScanner::setIsSigned(const bool isSigned)
   m_memIsSigned = isSigned;
 }
 
+void MemScanner::resetSearchRange()
+{
+  m_searchInRangeBegin = false;
+  m_searchInRangeEnd = false;
+  m_beginSearchRange = 0;
+  m_endSearchRange = 0;
+}
+
+bool MemScanner::setSearchRange(u32 beginRange, u32 endRange)
+{
+  if (!DolphinComm::DolphinAccessor::isValidConsoleAddress(beginRange) ||
+      !DolphinComm::DolphinAccessor::isValidConsoleAddress(endRange))
+  {
+    return false;
+  }
+
+  m_searchInRangeBegin = true;
+  m_searchInRangeEnd = true;
+  bool aram = DolphinComm::DolphinAccessor::isARAMAccessible();
+  m_beginSearchRange = Common::offsetToCacheIndex(Common::dolphinAddrToOffset(beginRange, aram), aram);
+  m_endSearchRange = Common::offsetToCacheIndex(Common::dolphinAddrToOffset(endRange, aram), aram);
+    
+  return true;
+}
+
+bool MemScanner::setSearchRangeBegin(u32 beginRange)
+{
+  if (!DolphinComm::DolphinAccessor::isValidConsoleAddress(beginRange))
+  {
+    return false;
+  }
+
+  m_searchInRangeBegin = true;
+  bool aram = DolphinComm::DolphinAccessor::isARAMAccessible();
+  m_beginSearchRange = Common::offsetToCacheIndex(Common::dolphinAddrToOffset(beginRange, aram), aram);
+
+  return true;
+}
+
+bool MemScanner::setSearchRangeEnd(u32 endRange)
+{
+  if (!DolphinComm::DolphinAccessor::isValidConsoleAddress(endRange))
+  {
+    return false;
+  }
+
+  m_searchInRangeEnd = true;
+  bool aram = DolphinComm::DolphinAccessor::isARAMAccessible();
+  m_endSearchRange = Common::offsetToCacheIndex(Common::dolphinAddrToOffset(endRange, aram), aram) + 1;
+
+  return true;
+}
+
 int MemScanner::getTermsNumForFilter(const MemScanner::ScanFiter filter) const
 {
   if (filter == MemScanner::ScanFiter::between)
@@ -465,11 +557,24 @@ bool MemScanner::undoScan()
 {
   if (m_undoCount > 0)
   {
-    m_resultsConsoleAddr = m_UndoStack.top();
+    m_resultsConsoleAddr = m_UndoStack.top().data;
     m_resultCount = m_resultsConsoleAddr.size();
-    
+    bool wasUninitialzed = m_UndoStack.top().wasUnknownInitialState;
+
     m_UndoStack.pop();
     m_undoCount = m_UndoStack.size();
+
+    if (wasUninitialzed)
+    {
+      u32 ramSize = static_cast<u32>(DolphinComm::DolphinAccessor::getRAMCacheSize());
+      int alignementDivision =
+          m_enforceMemAlignment ? Common::getNbrBytesAlignmentForType(m_memType) : 1;
+      m_resultCount = ((ramSize / alignementDivision) -
+                       Common::getSizeForType(m_memType, static_cast<size_t>(1)));
+      m_wasUnknownInitialValue = true;
+      m_memSize = 1;
+    }
+
     return true;
   }
   return false;
@@ -478,6 +583,11 @@ bool MemScanner::undoScan()
 size_t MemScanner::getResultCount() const
 {
   return m_resultCount;
+}
+
+bool MemScanner::hasUndo() const
+{
+  return m_undoCount > 0;
 }
 
 size_t MemScanner::getUndoCount() const
