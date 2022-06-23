@@ -238,6 +238,8 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
 
   std::vector<u32> newerResults = std::vector<u32>();
   bool aramAccessible = DolphinComm::DolphinAccessor::isARAMAccessible();
+  
+  bool wasUninitialized = m_wasUnknownInitialValue;
 
   if (m_wasUnknownInitialValue)
   {
@@ -269,8 +271,6 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   }
 
   delete[] noOffset;
-
-  bool wasUninitialized = m_resultsConsoleAddr.size() < newerResults.size();
 
   m_UndoStack.push({m_resultsConsoleAddr, wasUninitialized});
   m_undoCount = m_UndoStack.size();
