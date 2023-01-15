@@ -29,6 +29,8 @@ MainWindow::MainWindow()
     restoreGeometry(SConfig::getInstance().getMainWindowGeometry());
   if (SConfig::getInstance().getMainWindowState().size())
     restoreState(SConfig::getInstance().getMainWindowState());
+
+  m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
 }
 
 MainWindow::~MainWindow()
@@ -391,6 +393,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
   if (m_watcher->warnIfUnsavedChanges())
   {
+    SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
     SConfig::getInstance().setMainWindowGeometry(saveGeometry());
     SConfig::getInstance().setMainWindowState(saveState());
     m_viewer->close();

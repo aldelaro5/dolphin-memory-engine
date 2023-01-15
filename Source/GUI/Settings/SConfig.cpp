@@ -18,6 +18,11 @@ SConfig& SConfig::getInstance()
   return instance;
 }
 
+QString SConfig::getWatchModel() const
+{
+  return m_settings->value("watchModel", QString{}).toString();
+}
+
 QByteArray SConfig::getMainWindowGeometry() const
 {
   return m_settings->value("mainWindowSettings/mainWindowGeometry", QByteArray{}).toByteArray();
@@ -56,6 +61,11 @@ int SConfig::getViewerUpdateTimerMs() const
 int SConfig::getViewerNbrBytesSeparator() const
 {
   return m_settings->value("viewerSettings/nbrBytesSeparator", 1).toInt();
+}
+
+void SConfig::setWatchModel(const QString& json)
+{
+  m_settings->setValue("watchModel", json);
 }
 
 void SConfig::setMainWindowGeometry(QByteArray const& geometry)

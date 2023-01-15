@@ -14,6 +14,8 @@ public:
   QByteArray getMainWindowState() const;
   QByteArray getSplitterState() const;
 
+  QString getWatchModel() const;
+
   int getWatcherUpdateTimerMs() const;
   int getFreezeTimerMs() const;
   int getScannerUpdateTimerMs() const;
@@ -24,6 +26,8 @@ public:
   void setMainWindowGeometry(QByteArray const&);
   void setMainWindowState(QByteArray const&);
   void setSplitterState(QByteArray const&);
+
+  void setWatchModel(const QString& json);
 
   void setWatcherUpdateTimerMs(const int watcherUpdateTimerMs);
   void setFreezeTimerMs(const int freezeTimerMs);

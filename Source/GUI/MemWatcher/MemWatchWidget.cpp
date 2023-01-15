@@ -800,3 +800,17 @@ bool MemWatchWidget::warnIfUnsavedChanges()
   }
   return true;
 }
+
+void MemWatchWidget::restoreWatchModel(const QString& json)
+{
+  const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));
+  m_watchModel->loadRootFromJsonRecursive(loadDoc.object());
+}
+
+QString MemWatchWidget::saveWatchModel()
+{
+  QJsonObject root;
+  m_watchModel->writeRootToJsonRecursive(root);
+  QJsonDocument saveDoc(root);
+  return saveDoc.toJson();
+}
