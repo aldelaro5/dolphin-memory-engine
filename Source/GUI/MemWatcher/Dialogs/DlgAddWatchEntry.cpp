@@ -41,7 +41,7 @@ void DlgAddWatchEntry::initialiseWidgets()
   m_lblValuePreview->setReadOnly(true);
 
   m_txbAddress = new QLineEdit(this);
-  m_txbAddress->setMaxLength(8);
+  m_txbAddress->setMaxLength(10);
   connect(m_txbAddress, &QLineEdit::textEdited, this, &DlgAddWatchEntry::onAddressChanged);
 
   m_offsetsLayout = new QGridLayout;
