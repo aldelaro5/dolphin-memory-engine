@@ -21,6 +21,7 @@ public:
   void onAddGroup();
   void onAddWatchEntry();
   void addWatchEntry(MemWatchEntry* entry);
+  void onLockSelection(bool lockStatus);
   void onDeleteSelection();
   void onDropSucceeded();
   void openWatchFile();

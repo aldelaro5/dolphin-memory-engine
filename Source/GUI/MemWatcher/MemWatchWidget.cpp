@@ -268,6 +268,14 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
     deleteSelection->setEnabled(false);
   }
 
+  contextMenu->addSeparator();
+  QAction* lockSelection = new QAction(tr("Lock"), this);
+  connect(lockSelection, &QAction::triggered, this, [=] { onLockSelection(true); });
+  contextMenu->addAction(lockSelection);
+  QAction* unlockSelection = new QAction(tr("Unlock"), this);
+  connect(unlockSelection, &QAction::triggered, this, [=] { onLockSelection(false); });
+  contextMenu->addAction(unlockSelection);
+
   contextMenu->popup(m_watchView->viewport()->mapToGlobal(pos));
 }
 
@@ -479,6 +487,19 @@ bool MemWatchWidget::isAnyAncestorSelected(const QModelIndex index) const
     return true;
   else
     return isAnyAncestorSelected(index.parent());
+}
+
+void MemWatchWidget::onLockSelection(bool lockStatus)
+{
+  QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
+  if (selection.count() == 0)
+    return;
+
+  for (int i = 0; i < selection.count(); i++)
+  {
+    MemWatchEntry* entry = m_watchModel->getEntryFromIndex(selection.at(i));
+    entry->setLock(lockStatus);
+  }
 }
 
 void MemWatchWidget::onDeleteSelection()
