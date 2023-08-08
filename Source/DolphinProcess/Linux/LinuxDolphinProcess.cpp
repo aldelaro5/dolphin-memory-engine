@@ -115,7 +115,8 @@ bool LinuxDolphinProcess::findPID()
     std::string line;
     aCmdLineFile.open("/proc/" + std::string(directoryEntry->d_name) + "/comm");
     getline(aCmdLineFile, line);
-    if (line == "dolphin-emu" || line == "dolphin-emu-qt2" || line == "dolphin-emu-wx")
+    if (line == "dolphin-emu" || line == "dolphin-emu-qt2" || line == "dolphin-emu-wx" ||
+        line == "dolphin-emu-nog")
       m_PID = aPID;
 
     aCmdLineFile.close();
