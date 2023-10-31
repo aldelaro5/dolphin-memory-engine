@@ -2,9 +2,6 @@
 
 ![Screenshot](https://raw.githubusercontent.com/aldelaro5/Dolphin-memory-engine/master/Docs/screenshot.png)
 
-[![Travis CI Build Status](https://travis-ci.org/aldelaro5/Dolphin-memory-engine.svg?branch=master)](https://travis-ci.org/aldelaro5/Dolphin-memory-engine)
-[![AppVeyor CI Build Status](https://ci.appveyor.com/api/projects/status/sdf1o4kh3g1e68m9?svg=true)](https://ci.appveyor.com/project/aldelaro5/dolphin-memory-engine)
-
 A RAM search program designed to search, track, and edit the emulated memory of [the Dolphin emulator](https://github.com/dolphin-emu/dolphin) during runtime. The primary goal is to make research, tool-assisted speedruns, and reverse engineering of GameCube & Wii games more convenient and easier than with the alternative solution, Cheat Engine. The program's name is derived from Cheat Engine as a symbol for its goal.
 
 The GUI is aimed for convenience, without disrupting the performance of the emulation. Qt 5 is used to help accomplish this.
@@ -22,14 +19,14 @@ On Linux, installation of the Qt 5 package(s) is required.
 
 ## How to Build
 ### Microsoft Windows
-This repository provides a solution file for Visual Studio 2019 and later. The Windows SDK Version 10.0.19041.0 is required*.
+This repository provides a solution file for Visual Studio 2019 and later. The Windows SDK Version 10.0.22621.0 is required*.
 
 Before proceeding, ensure the Qt submodule is initialized by running `git submodule update --init` at the repository's root. The files should appear at the `Externals\Qt` directory.
 
 Once complete, open the solution file `Dolphin-memory-engine.sln` located in the `Source` directory with Visual Studio. Select the build configuration and build it.
 
 #### Windows SDK
-The Windows SDK version 10.0.19041.0 comes with the C++ Desktop Development Workload of Visual Studio 2019 — other versions may work but are untested. To use a different Windows SDK you'll need to select the it in the project properties window. Please note that this will change the `vcxproj` file, so if you plan to submit a Pull Request, make sure to not stage this change.
+The Windows SDK version 10.0.22621.0 comes with the C++ Desktop Development Workload of Visual Studio 2022 — other versions may work but are untested. To use a different Windows SDK you'll need to select the it in the project properties window. Please note that this will change the `vcxproj` file, so if you plan to submit a Pull Request, make sure to not stage this change.
 
 
 ### Linux
