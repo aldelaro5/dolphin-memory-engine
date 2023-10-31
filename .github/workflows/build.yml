@@ -1,0 +1,100 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        configuration: [Release] # [Debug, Release]; No need to build Debug, but leaving here if we want it later
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Initialize submodules
+        run: git submodule update --init
+        shell: powershell
+
+      - name: Build
+        run: |
+          msbuild Source\Dolphin-memory-engine.sln /p:Configuration=${{ matrix.configuration }} /p:Platform=x64 /p:Verbosity=normal
+        shell: powershell
+        
+      - name: Copy LICENSE, README
+        run: |
+          copy .\LICENSE .\Source\bin\${{ matrix.configuration }}
+          copy .\README.md .\Source\bin\${{ matrix.configuration }}
+        shell: powershell
+
+      - name: Set Artifact Name
+        id: set-artifact-name
+        run: echo "artifact_name=$(echo "windows-${{ matrix.configuration }}-build" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.set-artifact-name.outputs.artifact_name }}
+          path: Source\bin\${{ matrix.configuration }}
+
+  build-linux:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up CMake
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake
+        shell: bash
+
+      - name: Install Qt 5
+        run: |
+          sudo apt-get update
+           sudo apt install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools qtbase5-private-dev
+        shell: bash
+
+      - name: Install GCC 10 and G++ 10
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+          sudo apt-get update
+          sudo apt-get install g++-10 gcc-10 -y
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 90
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90
+
+      - name: Build
+        run: |
+          cd Source
+          mkdir build
+          cd build
+          cmake ..
+          make
+        shell: bash
+        
+      - name: Copy LICENSE, README, Prepare Artifacts
+        run: |
+          mkdir Source/build/artifacts
+          cp ./README.md ./Source/build/artifacts/
+          cp ./LICENSE ./Source/build/artifacts/
+          cp ./Source/build/Dolphin-memory-engine ./Source/build/artifacts/
+          chmod +x ./Source/build/artifacts/Dolphin-memory-engine
+        shell: bash
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-ubuntu-22.04-build
+          path: Source/build/artifacts
