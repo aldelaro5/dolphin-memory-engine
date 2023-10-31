@@ -177,20 +177,16 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
         QAction* viewBin = new QAction(tr("View as &Binary"), this);
 
         connect(viewDec, &QAction::triggered, m_watchModel, [=] {
-          entry->setBase(Common::MemBase::base_decimal);
-          m_hasUnsavedChanges = true;
+          setSelectedWatchesBase(entry, Common::MemBase::base_decimal);
         });
         connect(viewHex, &QAction::triggered, m_watchModel, [=] {
-          entry->setBase(Common::MemBase::base_hexadecimal);
-          m_hasUnsavedChanges = true;
+          setSelectedWatchesBase(entry, Common::MemBase::base_hexadecimal);
         });
         connect(viewOct, &QAction::triggered, m_watchModel, [=] {
-          entry->setBase(Common::MemBase::base_octal);
-          m_hasUnsavedChanges = true;
+          setSelectedWatchesBase(entry, Common::MemBase::base_octal);
         });
         connect(viewBin, &QAction::triggered, m_watchModel, [=] {
-          entry->setBase(Common::MemBase::base_binary);
-          m_hasUnsavedChanges = true;
+          setSelectedWatchesBase(entry, Common::MemBase::base_binary);
         });
 
         contextMenu->addAction(viewDec);
@@ -269,6 +265,25 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   }
 
   contextMenu->popup(m_watchView->viewport()->mapToGlobal(pos));
+}
+
+void MemWatchWidget::setSelectedWatchesBase(MemWatchEntry* entry, Common::MemBase base)
+{
+  QModelIndexList selectedItems = m_watchView->selectionModel()->selectedRows();
+  if (selectedItems.count() == 1)
+  {
+    entry->setBase(base);
+  }
+  else
+  {
+    for (int x = 0; x < selectedItems.count(); x++)
+    {
+      MemWatchEntry* selectedEntry = m_watchModel->getEntryFromIndex(selectedItems.at(x));
+      if (selectedEntry != nullptr && selectedEntry->getType() != Common::MemType::type_string)
+        selectedEntry->setBase(base);
+    }
+  }
+  m_hasUnsavedChanges = true;
 }
 
 void MemWatchWidget::cutSelectedWatchesToClipBoard()

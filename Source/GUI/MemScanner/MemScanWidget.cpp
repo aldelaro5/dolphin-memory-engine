@@ -109,8 +109,8 @@ void MemScanWidget::initialiseWidgets()
   m_chkSignedScan = new QCheckBox(tr("Signed value scan"));
   m_chkSignedScan->setChecked(false);
 
-  m_chkEnforceMemAlignement = new QCheckBox(tr("Enforce alignement"));
-  m_chkEnforceMemAlignement->setChecked(true);
+  m_chkEnforceMemAlignment = new QCheckBox(tr("Enforce alignment"));
+  m_chkEnforceMemAlignment->setChecked(true);
 
   m_currentValuesUpdateTimer = new QTimer(this);
   connect(m_currentValuesUpdateTimer, &QTimer::timeout, this,
@@ -155,7 +155,7 @@ void MemScanWidget::makeLayouts()
   m_groupScanBase->setLayout(layout_buttonsBase);
 
   QHBoxLayout* layout_extraParams = new QHBoxLayout();
-  layout_extraParams->addWidget(m_chkEnforceMemAlignement);
+  layout_extraParams->addWidget(m_chkEnforceMemAlignment);
   layout_extraParams->addWidget(m_chkSignedScan);
 
   QVBoxLayout* scannerParams_layout = new QVBoxLayout();
@@ -295,7 +295,7 @@ void MemScanWidget::onFirstScan()
 {
   m_memScanner->setType(static_cast<Common::MemType>(m_cmbScanType->currentIndex()));
   m_memScanner->setIsSigned(m_chkSignedScan->isChecked());
-  m_memScanner->setEnforceMemAlignement(m_chkEnforceMemAlignement->isChecked());
+  m_memScanner->setEnforceMemAlignment(m_chkEnforceMemAlignment->isChecked());
   m_memScanner->setBase(static_cast<Common::MemBase>(m_btnGroupScanBase->checkedId()));
   Common::MemOperationReturnCode scannerReturn =
       m_memScanner->firstScan(getSelectedFilter(), m_txbSearchTerm1->text().toStdString(),
@@ -320,7 +320,7 @@ void MemScanWidget::onFirstScan()
     m_btnResetScan->show();
     m_cmbScanType->setDisabled(true);
     m_chkSignedScan->setDisabled(true);
-    m_chkEnforceMemAlignement->setDisabled(true);
+    m_chkEnforceMemAlignment->setDisabled(true);
     m_groupScanBase->setDisabled(true);
     updateScanFilterChoices();
   }
@@ -361,7 +361,7 @@ void MemScanWidget::onResetScan()
   m_btnResetScan->hide();
   m_cmbScanType->setEnabled(true);
   m_chkSignedScan->setEnabled(true);
-  m_chkEnforceMemAlignement->setEnabled(true);
+  m_chkEnforceMemAlignment->setEnabled(true);
   m_groupScanBase->setEnabled(true);
   m_resultsListModel->updateAfterScannerReset();
   updateScanFilterChoices();

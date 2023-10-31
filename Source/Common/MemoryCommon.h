@@ -54,7 +54,7 @@ enum class MemOperationReturnCode
 
 size_t getSizeForType(const MemType type, const size_t length);
 bool shouldBeBSwappedForType(const MemType type);
-int getNbrBytesAlignementForType(const MemType type);
+int getNbrBytesAlignmentForType(const MemType type);
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
                            const std::string inputString, const MemBase base, const MemType type,
                            const size_t length);

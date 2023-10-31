@@ -24,6 +24,7 @@ public:
   void onDeleteSelection();
   void onDropSucceeded();
   void openWatchFile();
+  void setSelectedWatchesBase(MemWatchEntry* entry, Common::MemBase base);
   void copySelectedWatchesToClipBoard();
   void cutSelectedWatchesToClipBoard();
   void pasteWatchFromClipBoard(MemWatchTreeNode* node, int row);
