@@ -231,6 +231,13 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
         }
       }
       contextMenu->addSeparator();
+      QAction* lockSelection = new QAction(tr("Lock"), this);
+      connect(lockSelection, &QAction::triggered, this, [=] { onLockSelection(true); });
+      contextMenu->addAction(lockSelection);
+      QAction* unlockSelection = new QAction(tr("Unlock"), this);
+      connect(unlockSelection, &QAction::triggered, this, [=] { onLockSelection(false); });
+      contextMenu->addAction(unlockSelection);
+      contextMenu->addSeparator();
     }
   }
   else
@@ -263,14 +270,6 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
     cut->setEnabled(false);
     deleteSelection->setEnabled(false);
   }
-
-  contextMenu->addSeparator();
-  QAction* lockSelection = new QAction(tr("Lock"), this);
-  connect(lockSelection, &QAction::triggered, this, [=] { onLockSelection(true); });
-  contextMenu->addAction(lockSelection);
-  QAction* unlockSelection = new QAction(tr("Unlock"), this);
-  connect(unlockSelection, &QAction::triggered, this, [=] { onLockSelection(false); });
-  contextMenu->addAction(unlockSelection);
 
   contextMenu->popup(m_watchView->viewport()->mapToGlobal(pos));
 }
@@ -512,8 +511,12 @@ void MemWatchWidget::onLockSelection(bool lockStatus)
 
   for (int i = 0; i < selection.count(); i++)
   {
-    MemWatchEntry* entry = m_watchModel->getEntryFromIndex(selection.at(i));
-    entry->setLock(lockStatus);
+    MemWatchTreeNode* node = m_watchModel->getTreeNodeFromIndex(selection.at(i));
+    if (!node->isGroup())
+    {
+      MemWatchEntry* entry = node->getEntry();
+      entry->setLock(lockStatus);
+    }
   }
 }
 
