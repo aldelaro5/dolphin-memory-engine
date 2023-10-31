@@ -8,6 +8,16 @@ The GUI is aimed for convenience, without disrupting the performance of the emul
 
 For binary releases of this program, refer to [the "releases" page](https://github.com/aldelaro5/Dolphin-memory-engine/releases) on [the Github repository](https://github.com/aldelaro5/Dolphin-memory-engine).
 
+## Build Status
+### Linux:
+[![Build](https://github.com/aldelaro5/Dolphin-memory-engine/actions/workflows/build.yml/badge.svg)](https://github.com/aldelaro5/Dolphin-memory-engine/actions/workflows/build.yml)
+
+### MacOS:
+Not Supported (yet)
+
+### Windows:
+[![Build](https://github.com/aldelaro5/Dolphin-memory-engine/actions/workflows/build.yml/badge.svg)](https://github.com/aldelaro5/Dolphin-memory-engine/actions/workflows/build.yml)
+
 
 ## System requirements
 Any x86_64 based system should work, however, Mac OS is _not_ supported. Additionally, 32-bit x86 based systems are unsupported since Dolphin dropped their support.
