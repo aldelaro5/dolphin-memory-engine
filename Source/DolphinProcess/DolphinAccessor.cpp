@@ -112,7 +112,7 @@ bool DolphinAccessor::isValidConsoleAddress(const u32 address)
   if (isMEM2Present() && (address >= Common::MEM2_START && address < Common::MEM2_END))
     return true;
 
-  if (isARAMAccessible && (address >= Common::ARAM_START && address < Common::ARAM_END))
+  if (isARAMAccessible() && (address >= Common::ARAM_START && address < Common::ARAM_END))
     return true;
 
   return false;
