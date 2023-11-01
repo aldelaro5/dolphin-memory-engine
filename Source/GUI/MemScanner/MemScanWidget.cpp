@@ -4,7 +4,7 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QRadioButton>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QShortcut>
 #include <QVBoxLayout>
 #include <sstream>
@@ -216,8 +216,8 @@ QModelIndexList MemScanWidget::getSelectedResults() const
 
 MemScanner::ScanFiter MemScanWidget::getSelectedFilter() const
 {
-  int index =
-      GUICommon::g_memScanFilter.indexOf(QRegExp("^" + m_cmbScanFilter->currentText() + "$"));
+  int index = GUICommon::g_memScanFilter.indexOf(
+      QRegularExpression("^" + m_cmbScanFilter->currentText() + "$"));
   return static_cast<MemScanner::ScanFiter>(index);
 }
 

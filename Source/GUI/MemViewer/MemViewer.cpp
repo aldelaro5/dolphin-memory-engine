@@ -31,7 +31,7 @@ MemViewer::MemViewer(QWidget* parent) : QAbstractScrollArea(parent)
 
   m_elapsedTimer.start();
 
-  m_copyShortcut = new QShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key::Key_C), parent);
+  m_copyShortcut = new QShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key::Key_C), parent);
   connect(m_copyShortcut, &QShortcut::activated, this,
           [=]() { copySelection(Common::MemType::type_byteArray); });
 
@@ -351,9 +351,9 @@ void MemViewer::wheelEvent(QWheelEvent* event)
 {
   if (event->modifiers().testFlag(Qt::ControlModifier))
   {
-    if (event->delta() < 0 && m_memoryFontSize > 5)
+    if (event->angleDelta().y() < 0 && m_memoryFontSize > 5)
       updateFontSize(m_memoryFontSize - 1);
-    else if (event->delta() > 0)
+    else if (event->angleDelta().y() > 0)
       updateFontSize(m_memoryFontSize + 1);
 
     viewport()->update();
@@ -374,7 +374,7 @@ void MemViewer::updateFontSize(int newSize)
   setFont(QFont("Courier New", m_memoryFontSize));
 #endif
 
-  m_charWidthEm = fontMetrics().width(QLatin1Char('M'));
+  m_charWidthEm = fontMetrics().horizontalAdvance(QLatin1Char('M'));
   m_charHeight = fontMetrics().height();
   m_hexAreaWidth = m_numColumns * (m_charWidthEm * 2 + m_charWidthEm / 2);
   m_hexAreaHeight = m_numRows * m_charHeight;

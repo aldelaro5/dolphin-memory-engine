@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.5.0)
+set(CMAKE_CXX_STANDARD 17)
 project(Dolphin-memory-engine)
 
 if(WIN32)
@@ -35,9 +36,9 @@ set(SRCS ${DolphinProcessSrc}
 
 set(CMAKE_INCLUE_CURRENT_DIR ON)
 
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Gui REQUIRED)
+find_package(Qt6Widgets REQUIRED)
+find_package(Qt6Core REQUIRED)
+find_package(Qt6Gui REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -47,32 +48,32 @@ ENDIF(WIN32)
 
 add_executable(Dolphin-memory-engine ${GUI_TYPE} ${SRCS})
 
-target_link_libraries(Dolphin-memory-engine Qt5::Widgets)
-target_link_libraries(Dolphin-memory-engine Qt5::Gui)
-target_link_libraries(Dolphin-memory-engine Qt5::Core)
+target_link_libraries(Dolphin-memory-engine Qt6::Widgets)
+target_link_libraries(Dolphin-memory-engine Qt6::Gui)
+target_link_libraries(Dolphin-memory-engine Qt6::Core)
 
 if(WIN32)
     if($<CONFIG:Debug>)
-        get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_DEBUG)
-		get_target_property(COREDLL Qt5::Widgets IMPORTED_LOCATION_DEBUG)
-		get_target_property(GUIDLL Qt5::Widgets IMPORTED_LOCATION_DEBUG)
+        get_target_property(WIDGETDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
+		get_target_property(COREDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
+		get_target_property(GUIDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
     else($<CONFIG:Debug>)
-        get_target_property(WIDGETDLL Qt5::Widgets IMPORTED_LOCATION_RELEASE)
-		get_target_property(COREDLL Qt5::Widgets IMPORTED_LOCATION_RELEASE)
-		get_target_property(GUIDLL Qt5::Widgets IMPORTED_LOCATION_RELEASE)
+        get_target_property(WIDGETDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
+		get_target_property(COREDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
+		get_target_property(GUIDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
     endif($<CONFIG:Debug>)
     add_custom_command(
 		TARGET Dolphin-memory-engine POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<TARGET_FILE:Qt5::Widgets>
+			$<TARGET_FILE:Qt6::Widgets>
 			$<TARGET_FILE_DIR:Dolphin-memory-engine>
 		TARGET Dolphin-memory-engine POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<TARGET_FILE:Qt5::Core>
+			$<TARGET_FILE:Qt6::Core>
 			$<TARGET_FILE_DIR:Dolphin-memory-engine>
 		TARGET Dolphin-memory-engine POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<TARGET_FILE:Qt5::Gui>
+			$<TARGET_FILE:Qt6::Gui>
 			$<TARGET_FILE_DIR:Dolphin-memory-engine>
 	)
 endif(WIN32)

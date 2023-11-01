@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        configuration: [Release] # [Debug, Release]; No need to build Debug, but leaving here if we want it later
+        configuration: [Debug, Release]
 
     steps:
       - name: Checkout code
@@ -55,16 +55,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up CMake
+      - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake
-        shell: bash
-
-      - name: Install Qt 5
-        run: |
-          sudo apt-get update
-           sudo apt install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools qtbase5-private-dev
+          sudo apt install build-essential git cmake ffmpeg libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libevdev-dev libusb-1.0-0-dev libxrandr-dev libxi-dev libpangocairo-1.0-0 qt6-base-private-dev libqt6svg6-dev libbluetooth-dev libasound2-dev libpulse-dev libgl1-mesa-dev libcurl4-openssl-dev
         shell: bash
 
       - name: Install GCC 10 and G++ 10
@@ -90,7 +84,6 @@ jobs:
           cp ./README.md ./Source/build/artifacts/
           cp ./LICENSE ./Source/build/artifacts/
           cp ./Source/build/Dolphin-memory-engine ./Source/build/artifacts/
-          chmod +x ./Source/build/artifacts/Dolphin-memory-engine
         shell: bash
 
       - name: Publish Artifacts
