@@ -38,6 +38,11 @@ QByteArray SConfig::getSplitterState() const
   return m_settings->value("mainWindowSettings/splitterState", QByteArray{}).toByteArray();
 }
 
+int SConfig::getTheme() const
+{
+  return m_settings->value("coreSettings/theme", 0).toInt();
+}
+
 int SConfig::getWatcherUpdateTimerMs() const
 {
   return m_settings->value("timerSettings/watcherUpdateTimerMs", 100).toInt();
@@ -91,6 +96,11 @@ void SConfig::setMainWindowState(QByteArray const& state)
 void SConfig::setSplitterState(QByteArray const& state)
 {
   m_settings->setValue("mainWindowSettings/splitterState", state);
+}
+
+void SConfig::setTheme(const int theme)
+{
+  m_settings->setValue("coreSettings/theme", theme);
 }
 
 void SConfig::setWatcherUpdateTimerMs(const int updateTimerMs)

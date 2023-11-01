@@ -18,6 +18,8 @@ public:
 
   QString getWatchModel() const;
 
+  int getTheme() const;
+
   int getWatcherUpdateTimerMs() const;
   int getFreezeTimerMs() const;
   int getScannerUpdateTimerMs() const;
@@ -32,6 +34,8 @@ public:
   void setSplitterState(QByteArray const&);
 
   void setWatchModel(const QString& json);
+
+  void setTheme(const int theme);
 
   void setWatcherUpdateTimerMs(const int watcherUpdateTimerMs);
   void setFreezeTimerMs(const int freezeTimerMs);
