@@ -70,7 +70,6 @@ private:
   QAction* m_actClearWatchList;
   QAction* m_actImportFromCT;
   QAction* m_actExportAsCSV;
-  QAction* m_actViewScanner;
   QAction* m_actSettings;
   QAction* m_actQuit;
   QAction* m_actAbout;
