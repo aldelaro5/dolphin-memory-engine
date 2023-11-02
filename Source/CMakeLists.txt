@@ -19,6 +19,7 @@ set(SRCS ${DolphinProcessSrc}
          GUI/GUICommon.cpp
          GUI/Settings/SConfig.cpp
          GUI/Settings/DlgSettings.cpp
+         GUI/MemCopy/DlgCopy.cpp
          GUI/MemWatcher/MemWatchDelegate.cpp
          GUI/MemWatcher/MemWatchModel.cpp    
          GUI/MemWatcher/Dialogs/DlgChangeType.cpp 

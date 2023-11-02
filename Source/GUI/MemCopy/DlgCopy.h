@@ -4,9 +4,10 @@
 #include <QDialog>
 #include <QSpinBox>
 #include <qlineedit.h>
-#include "..\GUICommon.h"
 #include <QDialogButtonBox>
 #include <qtextedit.h>
+
+#include "../GUICommon.h"
 
 class DlgCopy : public QDialog
 {
