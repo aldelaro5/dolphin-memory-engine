@@ -67,38 +67,38 @@ DolphinAccessor::DolphinStatus DolphinAccessor::getStatus()
 bool DolphinAccessor::readFromRAM(const u32 offset, char* buffer, const size_t size,
                                   const bool withBSwap)
 {
-  return m_instance->readFromRAM(offset, buffer, size, withBSwap);
+  return m_instance ? m_instance->readFromRAM(offset, buffer, size, withBSwap) : false;
 }
 
 bool DolphinAccessor::writeToRAM(const u32 offset, const char* buffer, const size_t size,
                                  const bool withBSwap)
 {
-  return m_instance->writeToRAM(offset, buffer, size, withBSwap);
+  return m_instance ? m_instance->writeToRAM(offset, buffer, size, withBSwap) : false;
 }
 
 int DolphinAccessor::getPID()
 {
-  return m_instance->getPID();
+  return m_instance ? m_instance->getPID() : -1;
 }
 
 u64 DolphinAccessor::getEmuRAMAddressStart()
 {
-  return m_instance->getEmuRAMAddressStart();
+  return m_instance ? m_instance->getEmuRAMAddressStart() : 0;
 }
 
 bool DolphinAccessor::isARAMAccessible()
 {
-  return m_instance->isARAMAccessible();
+  return m_instance ? m_instance->isARAMAccessible() : false;
 }
 
 u64 DolphinAccessor::getARAMAddressStart()
 {
-  return m_instance->getARAMAddressStart();
+  return m_instance ? m_instance->getARAMAddressStart() : 0;
 }
 
 bool DolphinAccessor::isMEM2Present()
 {
-  return m_instance->isMEM2Present();
+  return m_instance ? m_instance->isMEM2Present() : false;
 }
 
 bool DolphinAccessor::isValidConsoleAddress(const u32 address)
