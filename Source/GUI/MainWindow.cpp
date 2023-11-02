@@ -391,16 +391,9 @@ void MainWindow::onQuit()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-  if (m_watcher->warnIfUnsavedChanges())
-  {
-    SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
-    SConfig::getInstance().setMainWindowGeometry(saveGeometry());
-    SConfig::getInstance().setMainWindowState(saveState());
-    m_viewer->close();
-    event->accept();
-  }
-  else
-  {
-    event->ignore();
-  }
+  SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
+  SConfig::getInstance().setMainWindowGeometry(saveGeometry());
+  SConfig::getInstance().setMainWindowState(saveState());
+  m_viewer->close();
+  event->accept();
 }
