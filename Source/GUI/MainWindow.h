@@ -39,6 +39,7 @@ public:
   void onOpenSettings();
   void onImportFromCT();
   void onExportAsCSV();
+  void onCopyMemory();
   void onAbout();
   void onQuit();
 
@@ -73,4 +74,5 @@ private:
   QAction* m_actSettings;
   QAction* m_actQuit;
   QAction* m_actAbout;
+  QAction* m_actCopyMemory;
 };

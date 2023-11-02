@@ -33,6 +33,7 @@ public:
   void handleScannerErrors(const Common::MemOperationReturnCode errorCode);
   void onFirstScan();
   void onNextScan();
+  void onUndoScan();
   void onResetScan();
   void onAddSelection();
   void onRemoveSelection();
@@ -58,9 +59,12 @@ private:
 
   MemScanner* m_memScanner;
   ResultsListModel* m_resultsListModel;
+  QLineEdit* m_txbSearchRange1;
+  QLineEdit* m_txbSearchRange2;
   QPushButton* m_btnFirstScan;
   QPushButton* m_btnNextScan;
   QPushButton* m_btnResetScan;
+  QPushButton* m_btnUndoScan;
   QPushButton* m_btnAddSelection;
   QPushButton* m_btnAddAll;
   QPushButton* m_btnRemoveSelection;

@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <stack>
 
 #include "../Common/CommonTypes.h"
 #include "../Common/CommonUtils.h"
@@ -40,6 +41,7 @@ public:
                                            const std::string& searchTerm2);
   Common::MemOperationReturnCode nextScan(const ScanFiter filter, const std::string& searchTerm1,
                                           const std::string& searchTerm2);
+  bool undoScan();
   void reset();
   inline CompareResult compareMemoryAsNumbers(const char* first, const char* second,
                                               const char* offset, bool offsetInvert,
@@ -126,9 +128,15 @@ public:
   void setBase(const Common::MemBase base);
   void setEnforceMemAlignment(const bool enforceAlignment);
   void setIsSigned(const bool isSigned);
+  void resetSearchRange();
+  bool setSearchRangeBegin(u32 beginIndex);
+  bool setSearchRangeEnd(u32 endIndex);
+  bool setSearchRange(u32 beginIndex, u32 endIndex);
 
   std::vector<u32> getResultsConsoleAddr() const;
   size_t getResultCount() const;
+  bool hasUndo() const;
+  size_t getUndoCount() const;
   int getTermsNumForFilter(const ScanFiter filter) const;
   Common::MemType getType() const;
   Common::MemBase getBase() const;
@@ -148,14 +156,28 @@ private:
                             const u32 consoleOffset) const;
   std::string addSpacesToBytesArrays(const std::string& bytesArray) const;
 
+  bool m_searchInRangeBegin = false;
+  bool m_searchInRangeEnd = false;
+  u32 m_beginSearchRange = 0;
+  u32 m_endSearchRange = 0;
+
   Common::MemType m_memType = Common::MemType::type_byte;
   Common::MemBase m_memBase = Common::MemBase::base_decimal;
   size_t m_memSize;
   bool m_enforceMemAlignment = true;
   bool m_memIsSigned = false;
-  std::vector<u32> m_resultsConsoleAddr;
-  bool m_wasUnknownInitialValue = false;
+
   size_t m_resultCount = 0;
+  size_t m_undoCount = 0;
+  bool m_wasUnknownInitialValue = false;
   char* m_scanRAMCache = nullptr;
   bool m_scanStarted = false;
+  
+  struct MemScannerUndoAction
+  {
+    std::vector<u32> data;
+    bool wasUnknownInitialState = false;
+  };
+  std::stack<MemScannerUndoAction> m_UndoStack;
+  std::vector<u32> m_resultsConsoleAddr;
 };

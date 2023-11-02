@@ -10,6 +10,7 @@
 
 #include "../DolphinProcess/DolphinAccessor.h"
 #include "../MemoryWatch/MemWatchEntry.h"
+#include "MemCopy/DlgCopy.h"
 #include "Settings/DlgSettings.h"
 #include "Settings/SConfig.h"
 
@@ -45,6 +46,7 @@ void MainWindow::makeMenus()
   m_actImportFromCT->setShortcut(Qt::Modifier::CTRL + Qt::Key::Key_I);
 
   m_actSettings = new QAction(tr("&Settings"), this);
+  m_actCopyMemory = new QAction(tr("&Copy Memory Range"), this);
 
   m_actViewScanner = new QAction(tr("&Scanner"), this);
   m_actViewScanner->setCheckable(true);
@@ -60,6 +62,7 @@ void MainWindow::makeMenus()
   connect(m_actExportAsCSV, &QAction::triggered, this, &MainWindow::onExportAsCSV);
 
   connect(m_actSettings, &QAction::triggered, this, &MainWindow::onOpenSettings);
+  connect(m_actCopyMemory, &QAction::triggered, this, &MainWindow::onCopyMemory);
 
   connect(m_actViewScanner, &QAction::toggled, this,
           [=]
@@ -87,6 +90,7 @@ void MainWindow::makeMenus()
 
   m_menuView = menuBar()->addMenu(tr("&View"));
   m_menuView->addAction(m_actViewScanner);
+  m_menuView->addAction(m_actCopyMemory);
 
   m_menuHelp = menuBar()->addMenu(tr("&Help"));
   m_menuHelp->addAction(m_actAbout);
@@ -335,6 +339,13 @@ void MainWindow::onImportFromCT()
 void MainWindow::onExportAsCSV()
 {
   m_watcher->exportWatchListAsCSV();
+}
+
+void MainWindow::onCopyMemory()
+{
+  DlgCopy* dlg = new DlgCopy(this);
+  int dlgResult = dlg->exec();
+  delete dlg;
 }
 
 void MainWindow::onOpenSettings()

@@ -7,7 +7,7 @@
 #include <QRegExp>
 #include <QShortcut>
 #include <QVBoxLayout>
-
+#include <sstream>
 #include "../GUICommon.h"
 
 MemScanWidget::MemScanWidget()
@@ -58,12 +58,15 @@ void MemScanWidget::initialiseWidgets()
   m_btnFirstScan = new QPushButton(tr("First scan"));
   m_btnNextScan = new QPushButton(tr("Next scan"));
   m_btnNextScan->hide();
+  m_btnUndoScan = new QPushButton(tr("Undo scan"));
+  m_btnUndoScan->hide();
   m_btnResetScan = new QPushButton(tr("Reset scan"));
   m_btnResetScan->hide();
 
   connect(m_btnFirstScan, &QPushButton::clicked, this, &MemScanWidget::onFirstScan);
   connect(m_btnNextScan, &QPushButton::clicked, this, &MemScanWidget::onNextScan);
   connect(m_btnResetScan, &QPushButton::clicked, this, &MemScanWidget::onResetScan);
+  connect(m_btnUndoScan, &QPushButton::clicked, this, &MemScanWidget::onUndoScan);
 
   QShortcut* scanShortcut = new QShortcut(QKeySequence(Qt::Key::Key_Enter), this);
   connect(scanShortcut, &QShortcut::activated, this, [=] {
@@ -75,6 +78,16 @@ void MemScanWidget::initialiseWidgets()
 
   m_txbSearchTerm1 = new QLineEdit();
   m_txbSearchTerm2 = new QLineEdit();
+
+  m_txbSearchRange1 = new QLineEdit();
+  m_txbSearchRange1->setMaxLength(8);
+  m_txbSearchRange1->setPlaceholderText("Search Begin (Optional)");
+  m_txbSearchRange1->setToolTip("Search Range Begin (Optional)");
+
+  m_txbSearchRange2 = new QLineEdit();
+  m_txbSearchRange2->setMaxLength(8);
+  m_txbSearchRange2->setPlaceholderText("Search End (Optional)");
+  m_txbSearchRange2->setToolTip("Search Range End (Optional)");
 
   m_searchTerm2Widget = new QWidget();
 
@@ -131,9 +144,14 @@ void MemScanWidget::makeLayouts()
   results_layout->addWidget(m_tblResulstList);
   results_layout->addLayout(multiAddButtons_layout);
 
+  QHBoxLayout* range_layout = new QHBoxLayout();
+  range_layout->addWidget(m_txbSearchRange1);
+  range_layout->addWidget(m_txbSearchRange2);
+
   QHBoxLayout* buttons_layout = new QHBoxLayout();
   buttons_layout->addWidget(m_btnFirstScan);
   buttons_layout->addWidget(m_btnNextScan);
+  buttons_layout->addWidget(m_btnUndoScan);
   buttons_layout->addWidget(m_btnResetScan);
 
   QHBoxLayout* searchTerm2_layout = new QHBoxLayout();
@@ -159,6 +177,7 @@ void MemScanWidget::makeLayouts()
   layout_extraParams->addWidget(m_chkSignedScan);
 
   QVBoxLayout* scannerParams_layout = new QVBoxLayout();
+  scannerParams_layout->addLayout(range_layout);
   scannerParams_layout->addLayout(buttons_layout);
   scannerParams_layout->addWidget(m_cmbScanType);
   scannerParams_layout->addWidget(m_cmbScanFilter);
@@ -293,6 +312,83 @@ void MemScanWidget::onScanMemTypeChanged()
 
 void MemScanWidget::onFirstScan()
 {
+  m_memScanner->resetSearchRange();
+  
+  bool usedCustomBeginning = false;
+  bool usedCustomEnding = false;
+  u32 endAddress;
+  u32 beginAddress;
+
+  if (m_txbSearchRange1->text().size() > 0)
+  {
+    usedCustomBeginning = true;
+    std::stringstream ss;
+    ss << m_txbSearchRange1->text().toStdString();
+    ss >> std::hex;
+    ss >> beginAddress;
+    if (ss.fail())
+    {
+      QMessageBox* errorBox =
+          new QMessageBox(QMessageBox::Critical, tr("Invalid term(s)"),
+                          tr("The term you entered for the Search Range Begin (%1) is invalid")
+                              .arg(m_txbSearchRange1->text()),
+                          QMessageBox::Ok, this);
+      errorBox->exec();
+      return;
+    }
+
+    if (!m_memScanner->setSearchRangeBegin(beginAddress))
+    {
+      QMessageBox* errorBox = new QMessageBox(
+          QMessageBox::Critical, tr("Invalid term(s)"),
+          tr("The term you entered for the Search Range Begin (%1) is an invalid address")
+              .arg(m_txbSearchRange1->text()),
+          QMessageBox::Ok, this);
+      errorBox->exec();
+      return;
+    }
+  }
+
+  if (m_txbSearchRange2->text().size() > 0)
+  {
+    usedCustomEnding = true;
+    std::stringstream ss;
+    ss << m_txbSearchRange2->text().toStdString();
+    ss >> std::hex;
+    ss >> endAddress;
+    if (ss.fail())
+    {
+      QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid term(s)"),
+                          tr("The term you entered for the Search Range End (%1) is invalid")
+                              .arg(m_txbSearchRange2->text()),
+                          QMessageBox::Ok, this);
+      errorBox->exec();
+      return;
+    }
+
+    if (!m_memScanner->setSearchRangeEnd(endAddress))
+    {
+      QMessageBox* errorBox = new QMessageBox(
+          QMessageBox::Critical, tr("Invalid term(s)"),
+          tr("The term you entered for the Search Range End (%1) is an invalid address")
+              .arg(m_txbSearchRange2->text()),
+          QMessageBox::Ok, this);
+      errorBox->exec();
+      return;
+    }
+  }
+
+  if (usedCustomBeginning && usedCustomEnding && endAddress < beginAddress)
+  {
+    QMessageBox* errorBox = new QMessageBox(
+        QMessageBox::Critical, tr("Invalid term(s)"),
+        tr("The search range you specified (%1 - %2) is negative")
+                            .arg(m_txbSearchRange1->text(), m_txbSearchRange2->text()),
+        QMessageBox::Ok, this);
+    errorBox->exec();
+    return;
+  }
+
   m_memScanner->setType(static_cast<Common::MemType>(m_cmbScanType->currentIndex()));
   m_memScanner->setIsSigned(m_chkSignedScan->isChecked());
   m_memScanner->setEnforceMemAlignment(m_chkEnforceMemAlignment->isChecked());
@@ -318,6 +414,10 @@ void MemScanWidget::onFirstScan()
     m_btnFirstScan->hide();
     m_btnNextScan->show();
     m_btnResetScan->show();
+    m_btnUndoScan->show();
+    m_btnUndoScan->setEnabled(m_memScanner->hasUndo());
+    m_txbSearchRange1->hide();
+    m_txbSearchRange2->hide();
     m_cmbScanType->setDisabled(true);
     m_chkSignedScan->setDisabled(true);
     m_chkEnforceMemAlignment->setDisabled(true);
@@ -346,6 +446,39 @@ void MemScanWidget::onNextScan()
       m_btnAddSelection->setEnabled(true);
       m_btnRemoveSelection->setEnabled(true);
     }
+
+    m_btnUndoScan->setEnabled(m_memScanner->hasUndo());
+  }
+}
+
+void MemScanWidget::onUndoScan()
+{
+  if (m_memScanner->hasUndo())
+  {
+    m_memScanner->undoScan();
+    
+    int resultsFound = static_cast<int>(m_memScanner->getResultCount());
+    m_lblResultCount->setText(
+        tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
+    if (resultsFound <= 1000 && resultsFound != 0)
+    {
+      m_btnAddAll->setEnabled(true);
+      m_btnAddSelection->setEnabled(true);
+      m_btnRemoveSelection->setEnabled(true);
+    }
+    else
+    {
+      m_btnAddAll->setEnabled(false);
+      m_btnAddSelection->setEnabled(false);
+      m_btnRemoveSelection->setEnabled(false);
+      m_resultsListModel->updateAfterScannerReset(); 
+    }
+
+    m_btnUndoScan->setEnabled(m_memScanner->hasUndo());
+  }
+  else
+  {
+    onResetScan();
   }
 }
 
@@ -359,6 +492,9 @@ void MemScanWidget::onResetScan()
   m_btnFirstScan->show();
   m_btnNextScan->hide();
   m_btnResetScan->hide();
+  m_btnUndoScan->hide();
+  m_txbSearchRange1->show();
+  m_txbSearchRange2->show();
   m_cmbScanType->setEnabled(true);
   m_chkSignedScan->setEnabled(true);
   m_chkEnforceMemAlignment->setEnabled(true);
