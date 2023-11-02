@@ -62,7 +62,6 @@ void MemWatchWidget::initialiseWidgets()
   connect(m_watchView, &QAbstractItemView::doubleClicked, this,
           &MemWatchWidget::onWatchDoubleClicked);
   m_watchView->setItemDelegate(m_watchDelegate);
-  m_watchView->setSortingEnabled(true);
   m_watchView->setModel(m_watchModel);
 
   m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LOCK, 50);
@@ -383,7 +382,7 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
     else if (index.column() == MemWatchModel::WATCH_COL_ADDRESS && !node->isGroup())
     {
       MemWatchEntry* entryCopy = new MemWatchEntry(node->getEntry());
-      DlgAddWatchEntry* dlg = new DlgAddWatchEntry(entryCopy);
+      DlgAddWatchEntry* dlg = new DlgAddWatchEntry(false, entryCopy, this);
       if (dlg->exec() == QDialog::Accepted)
       {
         m_watchModel->editEntry(entryCopy, index);
@@ -467,9 +466,9 @@ void MemWatchWidget::onAddGroup()
 
 void MemWatchWidget::onAddWatchEntry()
 {
-  DlgAddWatchEntry* dlg = new DlgAddWatchEntry(nullptr);
+  DlgAddWatchEntry* dlg = new DlgAddWatchEntry(true, nullptr, this);
   if (dlg->exec() == QDialog::Accepted)
-    addWatchEntry(dlg->getEntry());
+    addWatchEntry(dlg->stealEntry());
 }
 
 void MemWatchWidget::addWatchEntry(MemWatchEntry* entry)
@@ -786,7 +785,7 @@ bool MemWatchWidget::warnIfUnsavedChanges()
     QMessageBox* questionBox = new QMessageBox(
         QMessageBox::Question, "Unsaved changes",
         "You have unsaved changes in the current watch list, do you want to save them?",
-        QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes);
+        QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, this);
     switch (questionBox->exec())
     {
     case QMessageBox::Cancel:
@@ -799,4 +798,18 @@ bool MemWatchWidget::warnIfUnsavedChanges()
     }
   }
   return true;
+}
+
+void MemWatchWidget::restoreWatchModel(const QString& json)
+{
+  const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));
+  m_watchModel->loadRootFromJsonRecursive(loadDoc.object());
+}
+
+QString MemWatchWidget::saveWatchModel()
+{
+  QJsonObject root;
+  m_watchModel->writeRootToJsonRecursive(root);
+  QJsonDocument saveDoc(root);
+  return saveDoc.toJson();
 }

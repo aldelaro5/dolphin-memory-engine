@@ -37,6 +37,8 @@ public:
   QTimer* getUpdateTimer() const;
   QTimer* getFreezeTimer() const;
   bool warnIfUnsavedChanges();
+  void restoreWatchModel(const QString& json);
+  QString saveWatchModel();
 
 signals:
   void mustUnhook();

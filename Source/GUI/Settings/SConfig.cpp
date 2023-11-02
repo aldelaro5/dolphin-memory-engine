@@ -2,7 +2,9 @@
 
 SConfig::SConfig()
 {
-  m_settings = new QSettings("settings.ini", QSettings::IniFormat);
+  const QString organization{"dolphin-memory-engine"};
+  const QString application{"dolphin-memory-engine"};
+  m_settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application);
 }
 
 SConfig::~SConfig()
@@ -14,6 +16,26 @@ SConfig& SConfig::getInstance()
 {
   static SConfig instance;
   return instance;
+}
+
+QString SConfig::getWatchModel() const
+{
+  return m_settings->value("watchModel", QString{}).toString();
+}
+
+QByteArray SConfig::getMainWindowGeometry() const
+{
+  return m_settings->value("mainWindowSettings/mainWindowGeometry", QByteArray{}).toByteArray();
+}
+
+QByteArray SConfig::getMainWindowState() const
+{
+  return m_settings->value("mainWindowSettings/mainWindowState", QByteArray{}).toByteArray();
+}
+
+QByteArray SConfig::getSplitterState() const
+{
+  return m_settings->value("mainWindowSettings/splitterState", QByteArray{}).toByteArray();
 }
 
 int SConfig::getWatcherUpdateTimerMs() const
@@ -39,6 +61,26 @@ int SConfig::getViewerUpdateTimerMs() const
 int SConfig::getViewerNbrBytesSeparator() const
 {
   return m_settings->value("viewerSettings/nbrBytesSeparator", 1).toInt();
+}
+
+void SConfig::setWatchModel(const QString& json)
+{
+  m_settings->setValue("watchModel", json);
+}
+
+void SConfig::setMainWindowGeometry(QByteArray const& geometry)
+{
+  m_settings->setValue("mainWindowSettings/mainWindowGeometry", geometry);
+}
+
+void SConfig::setMainWindowState(QByteArray const& state)
+{
+  m_settings->setValue("mainWindowSettings/mainWindowState", state);
+}
+
+void SConfig::setSplitterState(QByteArray const& state)
+{
+  m_settings->setValue("mainWindowSettings/splitterState", state);
 }
 
 void SConfig::setWatcherUpdateTimerMs(const int updateTimerMs)

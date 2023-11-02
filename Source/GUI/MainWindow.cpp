@@ -4,6 +4,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QSplitter>
 #include <QString>
 #include <QVBoxLayout>
 #include <string>
@@ -16,12 +17,20 @@
 
 MainWindow::MainWindow()
 {
+  setWindowTitle("Dolphin Memory Engine");
   initialiseWidgets();
   makeLayouts();
   makeMenus();
   DolphinComm::DolphinAccessor::init();
   makeMemViewer();
   firstHookAttempt();
+
+  if (SConfig::getInstance().getMainWindowGeometry().size())
+    restoreGeometry(SConfig::getInstance().getMainWindowGeometry());
+  if (SConfig::getInstance().getMainWindowState().size())
+    restoreState(SConfig::getInstance().getMainWindowState());
+
+  m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
 }
 
 MainWindow::~MainWindow()
@@ -48,10 +57,6 @@ void MainWindow::makeMenus()
   m_actSettings = new QAction(tr("&Settings"), this);
   m_actCopyMemory = new QAction(tr("&Copy Memory Range"), this);
 
-  m_actViewScanner = new QAction(tr("&Scanner"), this);
-  m_actViewScanner->setCheckable(true);
-  m_actViewScanner->setChecked(true);
-
   m_actQuit = new QAction(tr("&Quit"), this);
   m_actAbout = new QAction(tr("&About"), this);
   connect(m_actOpenWatchList, &QAction::triggered, this, &MainWindow::onOpenWatchFile);
@@ -63,15 +68,6 @@ void MainWindow::makeMenus()
 
   connect(m_actSettings, &QAction::triggered, this, &MainWindow::onOpenSettings);
   connect(m_actCopyMemory, &QAction::triggered, this, &MainWindow::onCopyMemory);
-
-  connect(m_actViewScanner, &QAction::toggled, this,
-          [=]
-          {
-            if (m_actViewScanner->isChecked())
-              m_scanner->show();
-            else
-              m_scanner->hide();
-          });
 
   connect(m_actQuit, &QAction::triggered, this, &MainWindow::onQuit);
   connect(m_actAbout, &QAction::triggered, this, &MainWindow::onAbout);
@@ -89,7 +85,6 @@ void MainWindow::makeMenus()
   m_menuEdit->addAction(m_actSettings);
 
   m_menuView = menuBar()->addMenu(tr("&View"));
-  m_menuView->addAction(m_actViewScanner);
   m_menuView->addAction(m_actCopyMemory);
 
   m_menuHelp = menuBar()->addMenu(tr("&Help"));
@@ -134,16 +129,24 @@ void MainWindow::makeLayouts()
   QFrame* separatorline = new QFrame();
   separatorline->setFrameShape(QFrame::HLine);
 
+  QSplitter* splitter = new QSplitter(Qt::Vertical);
+  splitter->addWidget(m_scanner);
+  splitter->addWidget(m_watcher);
+
+  if (SConfig::getInstance().getSplitterState().size())
+    splitter->restoreState(SConfig::getInstance().getSplitterState());
+
+  connect(splitter, &QSplitter::splitterMoved,
+          [splitter = splitter]()
+          { SConfig::getInstance().setSplitterState(splitter->saveState()); });
+
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_lblDolphinStatus);
   mainLayout->addLayout(dolphinHookButtons_layout);
+  mainLayout->addWidget(m_btnOpenMemViewer);
   mainLayout->addWidget(m_lblMem2Status);
   mainLayout->addWidget(separatorline);
-  mainLayout->addWidget(m_scanner);
-  mainLayout->addSpacing(5);
-  mainLayout->addWidget(m_btnOpenMemViewer);
-  mainLayout->addSpacing(5);
-  mainLayout->addWidget(m_watcher);
+  mainLayout->addWidget(splitter);
 
   QWidget* mainWidget = new QWidget();
   mainWidget->setLayout(mainLayout);
@@ -372,7 +375,7 @@ void MainWindow::onOpenSettings()
 
 void MainWindow::onAbout()
 {
-  QString title = tr("About Dolphin memory engine");
+  QString title = tr("About Dolphin Memory Engine");
   QString text =
       "Beta version 0.6.0\n\n" +
       tr("A RAM search made to facilitate research and reverse engineering of GameCube and Wii "
@@ -388,13 +391,9 @@ void MainWindow::onQuit()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-  if (m_watcher->warnIfUnsavedChanges())
-  {
-    m_viewer->close();
-    event->accept();
-  }
-  else
-  {
-    event->ignore();
-  }
+  SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
+  SConfig::getInstance().setMainWindowGeometry(saveGeometry());
+  SConfig::getInstance().setMainWindowState(saveState());
+  m_viewer->close();
+  event->accept();
 }
