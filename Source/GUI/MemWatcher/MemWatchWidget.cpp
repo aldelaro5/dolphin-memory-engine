@@ -62,7 +62,6 @@ void MemWatchWidget::initialiseWidgets()
   connect(m_watchView, &QAbstractItemView::doubleClicked, this,
           &MemWatchWidget::onWatchDoubleClicked);
   m_watchView->setItemDelegate(m_watchDelegate);
-  m_watchView->setSortingEnabled(true);
   m_watchView->setModel(m_watchModel);
 
   m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LOCK, 50);
