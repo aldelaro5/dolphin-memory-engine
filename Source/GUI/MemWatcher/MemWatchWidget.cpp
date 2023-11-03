@@ -73,17 +73,17 @@ void MemWatchWidget::initialiseWidgets()
   connect(deleteWatchShortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteSelection);
 
   QShortcut* copyWatchShortcut =
-      new QShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key::Key_C), m_watchView);
+      new QShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key::Key_C), m_watchView);
   connect(copyWatchShortcut, &QShortcut::activated, this,
           &MemWatchWidget::copySelectedWatchesToClipBoard);
 
   QShortcut* cutWatchShortcut =
-      new QShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key::Key_X), m_watchView);
+      new QShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key::Key_X), m_watchView);
   connect(cutWatchShortcut, &QShortcut::activated, this,
           &MemWatchWidget::cutSelectedWatchesToClipBoard);
 
   QShortcut* pasteWatchShortcut =
-      new QShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key::Key_V), m_watchView);
+      new QShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key::Key_V), m_watchView);
   connect(pasteWatchShortcut, &QShortcut::activated, this, [=] {
     pasteWatchFromClipBoard(
         m_watchModel->getTreeNodeFromIndex(m_watchView->selectionModel()->currentIndex()),

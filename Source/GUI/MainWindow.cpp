@@ -49,10 +49,10 @@ void MainWindow::makeMenus()
   m_actImportFromCT = new QAction(tr("&Import from Cheat Engine's CT file..."), this);
   m_actExportAsCSV = new QAction(tr("&Export as CSV..."), this);
 
-  m_actOpenWatchList->setShortcut(Qt::Modifier::CTRL + Qt::Key::Key_O);
-  m_actSaveWatchList->setShortcut(Qt::Modifier::CTRL + Qt::Key::Key_S);
-  m_actSaveAsWatchList->setShortcut(Qt::Modifier::CTRL + Qt::Modifier::SHIFT + Qt::Key::Key_S);
-  m_actImportFromCT->setShortcut(Qt::Modifier::CTRL + Qt::Key::Key_I);
+  m_actOpenWatchList->setShortcut(Qt::Modifier::CTRL | Qt::Key::Key_O);
+  m_actSaveWatchList->setShortcut(Qt::Modifier::CTRL | Qt::Key::Key_S);
+  m_actSaveAsWatchList->setShortcut(Qt::Modifier::CTRL | Qt::Modifier::SHIFT | Qt::Key::Key_S);
+  m_actImportFromCT->setShortcut(Qt::Modifier::CTRL | Qt::Key::Key_I);
 
   m_actSettings = new QAction(tr("&Settings"), this);
   m_actCopyMemory = new QAction(tr("&Copy Memory Range"), this);
