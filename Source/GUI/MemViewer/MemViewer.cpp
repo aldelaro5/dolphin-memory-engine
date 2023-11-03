@@ -54,7 +54,7 @@ void MemViewer::initialise()
   m_lastRawMemoryData = new char[m_numCells];
   m_memoryMsElapsedLastChange = new int[m_numCells];
   m_memViewStart = Common::MEM1_START;
-  m_memViewEnd = Common::MEM1_END;
+  m_memViewEnd = Common::GetMEM1End();
   m_currentFirstAddress = m_memViewStart;
 
   std::fill(m_memoryMsElapsedLastChange, m_memoryMsElapsedLastChange + m_numCells, 0);
@@ -72,6 +72,25 @@ QSize MemViewer::sizeHint() const
 void MemViewer::memoryValidityChanged(const bool valid)
 {
   m_validMemory = valid;
+  if (valid)
+  {
+    if (m_memViewStart >= Common::MEM2_START)
+    {
+      m_memViewStart = Common::MEM2_START;
+      m_memViewEnd = Common::GetMEM2End();
+    }
+    else if (m_memViewStart >= Common::MEM1_START)
+    {
+      m_memViewStart = Common::MEM1_START;
+      m_memViewEnd = Common::GetMEM1End();
+    }
+    else if (m_memViewStart >= Common::ARAM_START)
+    {
+      m_memViewStart = Common::ARAM_START;
+      m_memViewEnd = Common::ARAM_END;
+    }
+    verticalScrollBar()->setRange(0, ((m_memViewEnd - m_memViewStart) / m_numColumns) - m_numRows);
+  }
   viewport()->update();
 }
 
@@ -108,10 +127,10 @@ void MemViewer::jumpToAddress(const u32 address)
     if (address >= Common::ARAM_START && address < Common::ARAM_END &&
         m_memViewStart != Common::ARAM_START)
       changeMemoryRegion(MemoryRegion::ARAM);
-    else if (address >= Common::MEM1_START && address < Common::MEM1_END &&
+    else if (address >= Common::MEM1_START && address < Common::GetMEM1End() &&
              m_memViewStart != Common::MEM1_START)
       changeMemoryRegion(MemoryRegion::MEM1);
-    else if (address >= Common::MEM2_START && address < Common::MEM2_END &&
+    else if (address >= Common::MEM2_START && address < Common::GetMEM2End() &&
              m_memViewStart != Common::MEM2_START)
       changeMemoryRegion(MemoryRegion::MEM2);
 
@@ -140,11 +159,11 @@ void MemViewer::changeMemoryRegion(const MemoryRegion region)
     break;
   case MemoryRegion::MEM1:
     m_memViewStart = Common::MEM1_START;
-    m_memViewEnd = Common::MEM1_END;
+    m_memViewEnd = Common::GetMEM1End();
     break;
   case MemoryRegion::MEM2:
     m_memViewStart = Common::MEM2_START;
-    m_memViewEnd = Common::MEM2_END;
+    m_memViewEnd = Common::GetMEM2End();
     break;
   }
   verticalScrollBar()->setRange(0, ((m_memViewEnd - m_memViewStart) / m_numColumns) - m_numRows);

@@ -18,6 +18,7 @@ char* DolphinAccessor::m_updatedRAMCache = nullptr;
 
 void DolphinAccessor::init()
 {
+  Common::UpdateMemoryValues();
   if (m_instance == nullptr)
   {
 #ifdef __linux__
@@ -106,10 +107,10 @@ bool DolphinAccessor::isValidConsoleAddress(const u32 address)
   if (getStatus() != DolphinStatus::hooked)
     return false;
 
-  if (address >= Common::MEM1_START && address < Common::MEM1_END)
+  if (address >= Common::MEM1_START && address < Common::GetMEM1End())
     return true;
 
-  if (isMEM2Present() && (address >= Common::MEM2_START && address < Common::MEM2_END))
+  if (isMEM2Present() && (address >= Common::MEM2_START && address < Common::GetMEM2End()))
     return true;
 
   if (isARAMAccessible() && (address >= Common::ARAM_START && address < Common::ARAM_END))
@@ -127,15 +128,15 @@ size_t DolphinAccessor::getRAMCacheSize()
 {
   if (isMEM2Present())
   {
-    return Common::MEM1_SIZE + Common::MEM2_SIZE;
+    return Common::GetMEM1SizeReal() + Common::GetMEM2SizeReal();
   }
   else if (isARAMAccessible())
   {
-    return Common::MEM1_SIZE + Common::ARAM_SIZE;
+    return Common::GetMEM1SizeReal() + Common::ARAM_SIZE;
   }
   else
   {
-    return Common::MEM1_SIZE;
+    return Common::GetMEM1SizeReal();
   }
 }
 
@@ -147,22 +148,22 @@ Common::MemOperationReturnCode DolphinAccessor::updateRAMCache()
   // MEM2, if enabled, is read right after MEM1 in the cache so both regions are contigous
   if (isMEM2Present())
   {
-    m_updatedRAMCache = new char[Common::MEM1_SIZE + Common::MEM2_SIZE];
+    m_updatedRAMCache = new char[Common::GetMEM1SizeReal() + Common::GetMEM2SizeReal()];
 
     if (!DolphinComm::DolphinAccessor::readFromRAM(
             Common::dolphinAddrToOffset(Common::MEM1_START, false), m_updatedRAMCache,
-            Common::MEM1_SIZE, false))
+            Common::GetMEM1SizeReal(), false))
       return Common::MemOperationReturnCode::operationFailed;
 
     // Read Wii extra RAM
     if (!DolphinComm::DolphinAccessor::readFromRAM(
             Common::dolphinAddrToOffset(Common::MEM2_START, false),
-            m_updatedRAMCache + Common::MEM1_SIZE, Common::MEM2_SIZE, false))
+            m_updatedRAMCache + Common::GetMEM1SizeReal(), Common::GetMEM2SizeReal(), false))
       return Common::MemOperationReturnCode::operationFailed;
   }
   else if (isARAMAccessible())
   {
-    m_updatedRAMCache = new char[Common::ARAM_SIZE + Common::MEM1_SIZE];
+    m_updatedRAMCache = new char[Common::ARAM_SIZE + Common::GetMEM1SizeReal()];
     // read ARAM
     if (!DolphinComm::DolphinAccessor::readFromRAM(
             Common::dolphinAddrToOffset(Common::ARAM_START, true), m_updatedRAMCache,
@@ -172,15 +173,15 @@ Common::MemOperationReturnCode DolphinAccessor::updateRAMCache()
     // Read GameCube and Wii basic RAM
     if (!DolphinComm::DolphinAccessor::readFromRAM(
             Common::dolphinAddrToOffset(Common::MEM1_START, true),
-            m_updatedRAMCache + Common::ARAM_SIZE, Common::MEM1_SIZE, false))
+            m_updatedRAMCache + Common::ARAM_SIZE, Common::GetMEM1SizeReal(), false))
       return Common::MemOperationReturnCode::operationFailed;
   }
   else
   {
-    m_updatedRAMCache = new char[Common::MEM1_SIZE];
+    m_updatedRAMCache = new char[Common::GetMEM1SizeReal()];
     if (!DolphinComm::DolphinAccessor::readFromRAM(
             Common::dolphinAddrToOffset(Common::MEM1_START, false), m_updatedRAMCache,
-            Common::MEM1_SIZE, false))
+            Common::GetMEM1SizeReal(), false))
       return Common::MemOperationReturnCode::operationFailed;
   }
 

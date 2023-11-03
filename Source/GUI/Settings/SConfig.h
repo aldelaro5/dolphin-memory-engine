@@ -3,6 +3,8 @@
 #include <QByteArray>
 #include <QSettings>
 
+#include "../../Common/CommonTypes.h"
+
 class SConfig
 {
 public:
@@ -20,6 +22,8 @@ public:
   int getFreezeTimerMs() const;
   int getScannerUpdateTimerMs() const;
   int getViewerUpdateTimerMs() const;
+  u32 getMEM1Size() const;
+  u32 getMEM2Size() const;
 
   int getViewerNbrBytesSeparator() const;
 
@@ -33,6 +37,8 @@ public:
   void setFreezeTimerMs(const int freezeTimerMs);
   void setScannerUpdateTimerMs(const int scannerUpdateTimerMs);
   void setViewerUpdateTimerMs(const int viewerUpdateTimerMs);
+  void setMEM1Size(const u32 mem1SizeReal);
+  void setMEM2Size(const u32 mem2SizeReal);
 
   void setViewerNbrBytesSeparator(const int viewerNbrBytesSeparator);
 
