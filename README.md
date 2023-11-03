@@ -20,16 +20,17 @@ Not Supported (yet)
 
 
 ## System requirements
-Any x86_64 based system should work, however, Mac OS is _not_ supported. Additionally, 32-bit x86 based systems are unsupported since Dolphin dropped their support.
+Any x86_64 based system should work, however, Mac OS is _not_ supported.
 
-You need to have Dolphin running ***and*** _have the emulation started_ for this program to be useful. As such, the system must meet Dolphin's [system requirements](https://github.com/dolphin-emu/dolphin#system-requirements). Additionally, at least 250 MB of free memory is required.
+At least 250 MB of free memory is required.
+
+You need to have Dolphin running ***and*** _have the emulation started_ for this program to be useful. As such, the system must meet Dolphin's [system requirements](https://github.com/dolphin-emu/dolphin#system-requirements).
 
 On Linux, installation of the Qt 5 package(s) is required.
 
-
 ## How to Build
 ### Microsoft Windows
-This repository provides a solution file for Visual Studio 2019 and later. The Windows SDK Version 10.0.22621.0 is required*.
+This repository provides a solution file for Visual Studio 2022 and later. The Windows SDK Version 10.0.22621.0 is required*.
 
 Before proceeding, ensure the Qt submodule is initialized by running `git submodule update --init` at the repository's root. The files should appear at the `Externals\Qt` directory.
 
