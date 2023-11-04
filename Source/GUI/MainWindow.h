@@ -7,6 +7,7 @@
 
 #include "../Common/CommonTypes.h"
 #include "../Common/MemoryCommon.h"
+#include "MemCopy/DlgCopy.h"
 #include "MemScanner/MemScanWidget.h"
 #include "MemViewer/MemViewerWidget.h"
 #include "MemWatcher/MemWatchWidget.h"
@@ -53,6 +54,7 @@ private:
   MemWatchWidget* m_watcher;
   MemScanWidget* m_scanner;
   MemViewerWidget* m_viewer;
+  DlgCopy* m_copier;
 
   QLabel* m_lblDolphinStatus;
   QLabel* m_lblMem2Status;

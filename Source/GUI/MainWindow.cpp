@@ -12,7 +12,6 @@
 #include "GUICommon.h"
 #include "../DolphinProcess/DolphinAccessor.h"
 #include "../MemoryWatch/MemWatchEntry.h"
-#include "MemCopy/DlgCopy.h"
 #include "Settings/DlgSettings.h"
 #include "Settings/SConfig.h"
 
@@ -39,6 +38,7 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
+  delete m_copier;
   delete m_viewer;
   delete m_watcher;
   DolphinComm::DolphinAccessor::free();
@@ -120,6 +120,8 @@ void MainWindow::initialiseWidgets()
 
   connect(m_scanner, &MemScanWidget::mustUnhook, this, &MainWindow::onUnhook);
   connect(m_watcher, &MemWatchWidget::mustUnhook, this, &MainWindow::onUnhook);
+
+  m_copier = new DlgCopy(this);
 
   m_lblDolphinStatus = new QLabel("");
   m_lblDolphinStatus->setAlignment(Qt::AlignHCenter);
@@ -252,7 +254,9 @@ void MainWindow::updateDolphinHookingStatus()
         QString::number(DolphinComm::DolphinAccessor::getEmuRAMAddressStart(), 16).toUpper());
     m_scanner->setEnabled(true);
     m_watcher->setEnabled(true);
+    m_copier->setEnabled(true);
     m_btnOpenMemViewer->setEnabled(true);
+    m_actCopyMemory->setEnabled(true);
     m_actHook->setEnabled(false);
     m_actUnhook->setEnabled(true);
     break;
@@ -262,7 +266,9 @@ void MainWindow::updateDolphinHookingStatus()
     m_lblDolphinStatus->setText(tr("Cannot hook to Dolphin, the process is not running"));
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
+    m_copier->setDisabled(true);
     m_btnOpenMemViewer->setDisabled(true);
+    m_actCopyMemory->setDisabled(true);
     m_actHook->setEnabled(true);
     m_actUnhook->setEnabled(false);
     break;
@@ -273,7 +279,9 @@ void MainWindow::updateDolphinHookingStatus()
         tr("Cannot hook to Dolphin, the process is running, but no emulation has been started"));
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
+    m_copier->setDisabled(true);
     m_btnOpenMemViewer->setDisabled(true);
+    m_actCopyMemory->setDisabled(true);
     m_actHook->setEnabled(true);
     m_actUnhook->setEnabled(false);
     break;
@@ -283,7 +291,9 @@ void MainWindow::updateDolphinHookingStatus()
     m_lblDolphinStatus->setText(tr("Unhooked, press \"Hook\" to hook to Dolphin again"));
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
+    m_copier->setDisabled(true);
     m_btnOpenMemViewer->setDisabled(true);
+    m_actCopyMemory->setDisabled(true);
     m_actHook->setEnabled(true);
     m_actUnhook->setEnabled(false);
     break;
@@ -352,9 +362,8 @@ void MainWindow::onExportAsCSV()
 
 void MainWindow::onCopyMemory()
 {
-  DlgCopy* dlg = new DlgCopy(this);
-  int dlgResult = dlg->exec();
-  delete dlg;
+  m_copier->show();
+  m_copier->raise();
 }
 
 void MainWindow::onOpenSettings()
