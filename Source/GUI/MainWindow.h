@@ -55,13 +55,12 @@ private:
   MemViewerWidget* m_viewer;
 
   QLabel* m_lblDolphinStatus;
-  QPushButton* m_btnAttempHook;
-  QPushButton* m_btnUnhook;
   QLabel* m_lblMem2Status;
   QPushButton* m_btnOpenMemViewer;
 
   QMenu* m_menuFile;
   QMenu* m_menuEdit;
+  QMenu* m_menuDolphin;
   QMenu* m_menuView;
   QMenu* m_menuHelp;
   QAction* m_actOpenWatchList;
@@ -71,6 +70,8 @@ private:
   QAction* m_actImportFromCT;
   QAction* m_actExportAsCSV;
   QAction* m_actSettings;
+  QAction* m_actHook;
+  QAction* m_actUnhook;
   QAction* m_actQuit;
   QAction* m_actAbout;
   QAction* m_actCopyMemory;

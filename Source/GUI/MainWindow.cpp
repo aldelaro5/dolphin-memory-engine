@@ -59,6 +59,10 @@ void MainWindow::makeMenus()
   m_actImportFromCT->setShortcut(Qt::Modifier::CTRL | Qt::Key::Key_I);
 
   m_actSettings = new QAction(tr("&Settings"), this);
+
+  m_actHook = new QAction(tr("&Hook"), this);
+  m_actUnhook = new QAction(tr("&Unhook"), this);
+
   m_actCopyMemory = new QAction(tr("&Copy Memory Range"), this);
 
   m_actQuit = new QAction(tr("&Quit"), this);
@@ -71,6 +75,10 @@ void MainWindow::makeMenus()
   connect(m_actExportAsCSV, &QAction::triggered, this, &MainWindow::onExportAsCSV);
 
   connect(m_actSettings, &QAction::triggered, this, &MainWindow::onOpenSettings);
+
+  connect(m_actHook, &QAction::triggered, this, &MainWindow::onHookAttempt);
+  connect(m_actUnhook, &QAction::triggered, this, &MainWindow::onUnhook);
+
   connect(m_actCopyMemory, &QAction::triggered, this, &MainWindow::onCopyMemory);
 
   connect(m_actQuit, &QAction::triggered, this, &MainWindow::onQuit);
@@ -87,6 +95,10 @@ void MainWindow::makeMenus()
 
   m_menuEdit = menuBar()->addMenu(tr("&Edit"));
   m_menuEdit->addAction(m_actSettings);
+
+  m_menuDolphin = menuBar()->addMenu(tr("&Dolphin"));
+  m_menuDolphin->addAction(m_actHook);
+  m_menuDolphin->addAction(m_actUnhook);
 
   m_menuView = menuBar()->addMenu(tr("&View"));
   m_menuView->addAction(m_actCopyMemory);
@@ -109,11 +121,6 @@ void MainWindow::initialiseWidgets()
   connect(m_scanner, &MemScanWidget::mustUnhook, this, &MainWindow::onUnhook);
   connect(m_watcher, &MemWatchWidget::mustUnhook, this, &MainWindow::onUnhook);
 
-  m_btnAttempHook = new QPushButton(tr("Hook"));
-  m_btnUnhook = new QPushButton(tr("Unhook"));
-  connect(m_btnAttempHook, &QPushButton::clicked, this, &MainWindow::onHookAttempt);
-  connect(m_btnUnhook, &QPushButton::clicked, this, &MainWindow::onUnhook);
-
   m_lblDolphinStatus = new QLabel("");
   m_lblDolphinStatus->setAlignment(Qt::AlignHCenter);
 
@@ -126,10 +133,6 @@ void MainWindow::initialiseWidgets()
 
 void MainWindow::makeLayouts()
 {
-  QHBoxLayout* dolphinHookButtons_layout = new QHBoxLayout();
-  dolphinHookButtons_layout->addWidget(m_btnAttempHook);
-  dolphinHookButtons_layout->addWidget(m_btnUnhook);
-
   QFrame* separatorline = new QFrame();
   separatorline->setFrameShape(QFrame::HLine);
 
@@ -146,7 +149,6 @@ void MainWindow::makeLayouts()
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_lblDolphinStatus);
-  mainLayout->addLayout(dolphinHookButtons_layout);
   mainLayout->addWidget(m_btnOpenMemViewer);
   mainLayout->addWidget(m_lblMem2Status);
   mainLayout->addWidget(separatorline);
@@ -251,8 +253,8 @@ void MainWindow::updateDolphinHookingStatus()
     m_scanner->setEnabled(true);
     m_watcher->setEnabled(true);
     m_btnOpenMemViewer->setEnabled(true);
-    m_btnAttempHook->hide();
-    m_btnUnhook->show();
+    m_actHook->setEnabled(false);
+    m_actUnhook->setEnabled(true);
     break;
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::notRunning:
@@ -261,8 +263,8 @@ void MainWindow::updateDolphinHookingStatus()
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
     m_btnOpenMemViewer->setDisabled(true);
-    m_btnAttempHook->show();
-    m_btnUnhook->hide();
+    m_actHook->setEnabled(true);
+    m_actUnhook->setEnabled(false);
     break;
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::noEmu:
@@ -272,8 +274,8 @@ void MainWindow::updateDolphinHookingStatus()
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
     m_btnOpenMemViewer->setDisabled(true);
-    m_btnAttempHook->show();
-    m_btnUnhook->hide();
+    m_actHook->setEnabled(true);
+    m_actUnhook->setEnabled(false);
     break;
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::unHooked:
@@ -282,8 +284,8 @@ void MainWindow::updateDolphinHookingStatus()
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
     m_btnOpenMemViewer->setDisabled(true);
-    m_btnAttempHook->show();
-    m_btnUnhook->hide();
+    m_actHook->setEnabled(true);
+    m_actUnhook->setEnabled(false);
     break;
   }
   }
