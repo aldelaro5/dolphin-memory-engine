@@ -36,6 +36,7 @@ MainWindow::MainWindow()
 #endif
 
   m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
+  m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
   onHookAttempt();
 }
@@ -438,6 +439,7 @@ void MainWindow::onQuit()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
+  SConfig::getInstance().setAutoHook(m_actAutoHook->isChecked());
   SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
   SConfig::getInstance().setMainWindowGeometry(saveGeometry());
   SConfig::getInstance().setMainWindowState(saveState());

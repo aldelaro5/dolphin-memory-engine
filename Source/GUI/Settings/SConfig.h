@@ -17,6 +17,7 @@ public:
   QByteArray getSplitterState() const;
 
   QString getWatchModel() const;
+  bool getAutoHook() const;
 
   int getTheme() const;
 
@@ -34,6 +35,7 @@ public:
   void setSplitterState(QByteArray const&);
 
   void setWatchModel(const QString& json);
+  void setAutoHook(bool enabled);
 
   void setTheme(const int theme);
 
