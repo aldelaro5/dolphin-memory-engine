@@ -4,6 +4,7 @@ project(Dolphin-memory-engine)
 
 if(WIN32)
     set(DolphinProcessSrc DolphinProcess/Windows/WindowsDolphinProcess.cpp)
+    set(ExeIconSrc Resources/exeicon.rc)
 endif(WIN32)
 
 if(UNIX)
@@ -32,6 +33,8 @@ set(SRCS ${DolphinProcessSrc}
          GUI/MemViewer/MemViewer.cpp
          GUI/MemViewer/MemViewerWidget.cpp
          GUI/MainWindow.cpp
+         Resources/resource.qrc
+         ${ExeIconSrc}
          main.cpp)
 
 set(CMAKE_INCLUE_CURRENT_DIR ON)
@@ -41,6 +44,7 @@ find_package(Qt6Core REQUIRED)
 find_package(Qt6Gui REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 IF(WIN32)
 SET(GUI_TYPE WIN32)
