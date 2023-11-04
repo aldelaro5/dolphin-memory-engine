@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 
 #include <QHBoxLayout>
+#include <QIcon>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
@@ -19,6 +20,7 @@
 MainWindow::MainWindow()
 {
   setWindowTitle("Dolphin Memory Engine 0.8.0");
+  setWindowIcon(QIcon(":/logo.svg"));
   initialiseWidgets();
   makeLayouts();
   makeMenus();
