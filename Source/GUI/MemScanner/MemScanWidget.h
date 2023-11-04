@@ -39,6 +39,7 @@ public:
   void onRemoveSelection();
   void onAddAll();
   QTimer* getUpdateTimer() const;
+  void setShowThreshold(size_t showThreshold);
 
 signals:
   void requestAddWatchEntry(u32 address, Common::MemType type, size_t length, bool isUnsigned,
@@ -85,4 +86,5 @@ private:
   QGroupBox* m_groupScanBase;
   QTableView* m_tblResulstList;
   bool m_variableLengthType;
+  size_t m_showThreshold{};
 };

@@ -23,6 +23,7 @@ private:
   QSpinBox* m_spnScannerUpdateTimerMs;
   QSpinBox* m_spnViewerUpdateTimerMs;
   QSpinBox* m_spnFreezeTimerMs;
+  QSpinBox* m_spnScannerShowThreshold;
   QComboBox* m_cmbViewerBytesSeparator;
   QDialogButtonBox* m_buttonsDlg;
   QSlider* m_sldMEM1Size;

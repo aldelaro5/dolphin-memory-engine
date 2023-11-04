@@ -100,6 +100,8 @@ void MainWindow::makeMenus()
 void MainWindow::initialiseWidgets()
 {
   m_scanner = new MemScanWidget();
+  m_scanner->setShowThreshold(
+      static_cast<size_t>(SConfig::getInstance().getScannerShowThreshold()));
   connect(m_scanner, &MemScanWidget::requestAddWatchEntry, this, &MainWindow::addWatchRequested);
   connect(m_scanner, &MemScanWidget::requestAddAllResultsToWatchList, this,
           &MainWindow::addAllResultsToWatchList);
@@ -376,6 +378,8 @@ void MainWindow::onOpenSettings()
       m_watcher->getFreezeTimer()->start(SConfig::getInstance().getFreezeTimerMs());
       m_viewer->getUpdateTimer()->start(SConfig::getInstance().getViewerUpdateTimerMs());
     }
+    m_scanner->setShowThreshold(
+        static_cast<size_t>(SConfig::getInstance().getScannerShowThreshold()));
   }
 }
 

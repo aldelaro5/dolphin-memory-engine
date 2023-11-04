@@ -16,7 +16,7 @@ int ResultsListModel::columnCount(const QModelIndex& parent) const
 
 int ResultsListModel::rowCount(const QModelIndex& parent) const
 {
-  if (m_scanner->getResultCount() > 1000)
+  if (m_scanner->getResultCount() > m_showThreshold)
     return 0;
   return static_cast<int>(m_scanner->getResultCount());
 }
@@ -84,4 +84,13 @@ Common::MemOperationReturnCode ResultsListModel::updateScannerCurrentCache()
 void ResultsListModel::updateAfterScannerReset()
 {
   emit layoutChanged();
+}
+
+void ResultsListModel::setShowThreshold(const size_t showThreshold)
+{
+  m_showThreshold = showThreshold;
+  if (showThreshold < m_scanner->getResultCount())
+  {
+    emit layoutChanged();
+  }
 }

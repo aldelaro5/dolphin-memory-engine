@@ -30,7 +30,9 @@ public:
   u32 getResultAddress(const int row) const;
   Common::MemOperationReturnCode updateScannerCurrentCache();
   void updateAfterScannerReset();
+  void setShowThreshold(size_t showThreshold);
 
 private:
   MemScanner* m_scanner;
+  size_t m_showThreshold{};
 };
