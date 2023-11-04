@@ -23,7 +23,9 @@ MainWindow::MainWindow()
   makeMenus();
   DolphinComm::DolphinAccessor::init();
   makeMemViewer();
-  firstHookAttempt();
+
+  m_autoHookTimer.setInterval(1000);
+  connect(&m_autoHookTimer, &QTimer::timeout, this, &MainWindow::onHookIfNotHooked);
 
   if (SConfig::getInstance().getMainWindowGeometry().size())
     restoreGeometry(SConfig::getInstance().getMainWindowGeometry());
@@ -34,6 +36,8 @@ MainWindow::MainWindow()
 #endif
 
   m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
+
+  onHookAttempt();
 }
 
 MainWindow::~MainWindow()
@@ -60,6 +64,8 @@ void MainWindow::makeMenus()
 
   m_actSettings = new QAction(tr("&Settings"), this);
 
+  m_actAutoHook = new QAction(tr("&Auto-hook"), this);
+  m_actAutoHook->setCheckable(true);
   m_actHook = new QAction(tr("&Hook"), this);
   m_actUnhook = new QAction(tr("&Unhook"), this);
 
@@ -77,6 +83,7 @@ void MainWindow::makeMenus()
 
   connect(m_actSettings, &QAction::triggered, this, &MainWindow::onOpenSettings);
 
+  connect(m_actAutoHook, &QAction::toggled, this, &MainWindow::onAutoHookToggled);
   connect(m_actHook, &QAction::triggered, this, &MainWindow::onHookAttempt);
   connect(m_actUnhook, &QAction::triggered, this, &MainWindow::onUnhook);
 
@@ -99,6 +106,8 @@ void MainWindow::makeMenus()
   m_menuEdit->addAction(m_actSettings);
 
   m_menuDolphin = menuBar()->addMenu(tr("&Dolphin"));
+  m_menuDolphin->addAction(m_actAutoHook);
+  m_menuDolphin->addSeparator();
   m_menuDolphin->addAction(m_actHook);
   m_menuDolphin->addAction(m_actUnhook);
 
@@ -167,14 +176,6 @@ void MainWindow::makeMemViewer()
   connect(m_viewer, &MemViewerWidget::addWatchRequested, m_watcher, &MemWatchWidget::addWatchEntry);
   connect(m_watcher, &MemWatchWidget::goToAddressInViewer, this,
           &MainWindow::onOpenMemViewerWithAddress);
-}
-
-void MainWindow::firstHookAttempt()
-{
-  onHookAttempt();
-  if (DolphinComm::DolphinAccessor::getStatus() ==
-      DolphinComm::DolphinAccessor::DolphinStatus::hooked)
-    updateMem2Status();
 }
 
 void MainWindow::addSelectedResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
@@ -257,7 +258,7 @@ void MainWindow::updateDolphinHookingStatus()
     m_actMemoryViewer->setEnabled(true);
     m_actCopyMemory->setEnabled(true);
     m_actHook->setEnabled(false);
-    m_actUnhook->setEnabled(true);
+    m_actUnhook->setEnabled(!m_actAutoHook->isChecked());
     break;
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::notRunning:
@@ -268,7 +269,7 @@ void MainWindow::updateDolphinHookingStatus()
     m_copier->setDisabled(true);
     m_actMemoryViewer->setDisabled(true);
     m_actCopyMemory->setDisabled(true);
-    m_actHook->setEnabled(true);
+    m_actHook->setEnabled(!m_actAutoHook->isChecked());
     m_actUnhook->setEnabled(false);
     break;
   }
@@ -281,7 +282,7 @@ void MainWindow::updateDolphinHookingStatus()
     m_copier->setDisabled(true);
     m_actMemoryViewer->setDisabled(true);
     m_actCopyMemory->setDisabled(true);
-    m_actHook->setEnabled(true);
+    m_actHook->setEnabled(!m_actAutoHook->isChecked());
     m_actUnhook->setEnabled(false);
     break;
   }
@@ -293,7 +294,7 @@ void MainWindow::updateDolphinHookingStatus()
     m_copier->setDisabled(true);
     m_actMemoryViewer->setDisabled(true);
     m_actCopyMemory->setDisabled(true);
-    m_actHook->setEnabled(true);
+    m_actHook->setEnabled(!m_actAutoHook->isChecked());
     m_actUnhook->setEnabled(false);
     break;
   }
@@ -326,6 +327,30 @@ void MainWindow::onUnhook()
   m_lblMem2Status->setText(QString(""));
   DolphinComm::DolphinAccessor::unHook();
   updateDolphinHookingStatus();
+}
+
+void MainWindow::onAutoHookToggled(const bool checked)
+{
+  if (checked)
+  {
+    m_autoHookTimer.start();
+    onHookAttempt();
+  }
+  else
+  {
+    m_autoHookTimer.stop();
+  }
+
+  updateDolphinHookingStatus();
+}
+
+void MainWindow::onHookIfNotHooked()
+{
+  if (DolphinComm::DolphinAccessor::getStatus() !=
+      DolphinComm::DolphinAccessor::DolphinStatus::hooked)
+  {
+    onHookAttempt();
+  }
 }
 
 void MainWindow::onOpenWatchFile()

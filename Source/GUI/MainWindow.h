@@ -4,6 +4,7 @@
 #include <QCloseEvent>
 #include <QMainWindow>
 #include <QMenu>
+#include <QTimer>
 
 #include "../Common/CommonTypes.h"
 #include "../Common/MemoryCommon.h"
@@ -29,6 +30,8 @@ public:
   void updateDolphinHookingStatus();
   void onHookAttempt();
   void onUnhook();
+  void onAutoHookToggled(bool checked);
+  void onHookIfNotHooked();
   void onOpenMenViewer();
   void onOpenMemViewerWithAddress(u32 address);
   void updateMem2Status();
@@ -49,12 +52,13 @@ private:
   void initialiseWidgets();
   void makeLayouts();
   void makeMemViewer();
-  void firstHookAttempt();
 
   MemWatchWidget* m_watcher;
   MemScanWidget* m_scanner;
   MemViewerWidget* m_viewer;
   DlgCopy* m_copier;
+
+  QTimer m_autoHookTimer;
 
   QLabel* m_lblDolphinStatus;
   QLabel* m_lblMem2Status;
@@ -71,6 +75,7 @@ private:
   QAction* m_actImportFromCT;
   QAction* m_actExportAsCSV;
   QAction* m_actSettings;
+  QAction* m_actAutoHook;
   QAction* m_actHook;
   QAction* m_actUnhook;
   QAction* m_actMemoryViewer;
