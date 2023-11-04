@@ -58,7 +58,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt install cmake libevdev-dev qt6-base-private-dev libgl1-mesa-dev
+          sudo apt install cmake libevdev-dev qt6-base-private-dev libgl1-mesa-dev libfuse2
         shell: bash
 
       - name: Install GCC 10 and G++ 10
@@ -86,8 +86,19 @@ jobs:
           cp ./Source/build/Dolphin-memory-engine ./Source/build/artifacts/
         shell: bash
 
+      - name: Package AppImage
+        run: |
+          .github/assets/appimage.sh
+        shell: bash
+        
       - name: Publish Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: linux-ubuntu-22.04-build
+          name: linux-ubuntu-22.04-binary
           path: Source/build/artifacts
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-ubuntu-22.04-appimage
+          path: Dolphin-memory-engine.AppImage
