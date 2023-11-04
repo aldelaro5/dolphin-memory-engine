@@ -23,6 +23,11 @@ QString SConfig::getWatchModel() const
   return m_settings->value("watchModel", QString{}).toString();
 }
 
+bool SConfig::getAutoHook() const
+{
+  return m_settings->value("autoHook", true).toBool();
+}
+
 QByteArray SConfig::getMainWindowGeometry() const
 {
   return m_settings->value("mainWindowSettings/mainWindowGeometry", QByteArray{}).toByteArray();
@@ -86,6 +91,11 @@ u32 SConfig::getMEM2Size() const
 void SConfig::setWatchModel(const QString& json)
 {
   m_settings->setValue("watchModel", json);
+}
+
+void SConfig::setAutoHook(const bool enabled)
+{
+  m_settings->setValue("autoHook", enabled);
 }
 
 void SConfig::setMainWindowGeometry(QByteArray const& geometry)

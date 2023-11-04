@@ -13,7 +13,6 @@
 #include "GUICommon.h"
 #include "../DolphinProcess/DolphinAccessor.h"
 #include "../MemoryWatch/MemWatchEntry.h"
-#include "MemCopy/DlgCopy.h"
 #include "Settings/DlgSettings.h"
 #include "Settings/SConfig.h"
 
@@ -26,7 +25,9 @@ MainWindow::MainWindow()
   makeMenus();
   DolphinComm::DolphinAccessor::init();
   makeMemViewer();
-  firstHookAttempt();
+
+  m_autoHookTimer.setInterval(1000);
+  connect(&m_autoHookTimer, &QTimer::timeout, this, &MainWindow::onHookIfNotHooked);
 
   if (SConfig::getInstance().getMainWindowGeometry().size())
     restoreGeometry(SConfig::getInstance().getMainWindowGeometry());
@@ -37,10 +38,14 @@ MainWindow::MainWindow()
 #endif
 
   m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
+  m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
+
+  onHookAttempt();
 }
 
 MainWindow::~MainWindow()
 {
+  delete m_copier;
   delete m_viewer;
   delete m_watcher;
   DolphinComm::DolphinAccessor::free();
@@ -61,6 +66,13 @@ void MainWindow::makeMenus()
   m_actImportFromCT->setShortcut(Qt::Modifier::CTRL | Qt::Key::Key_I);
 
   m_actSettings = new QAction(tr("&Settings"), this);
+
+  m_actAutoHook = new QAction(tr("&Auto-hook"), this);
+  m_actAutoHook->setCheckable(true);
+  m_actHook = new QAction(tr("&Hook"), this);
+  m_actUnhook = new QAction(tr("&Unhook"), this);
+
+  m_actMemoryViewer = new QAction(tr("&Memory Viewer"), this);
   m_actCopyMemory = new QAction(tr("&Copy Memory Range"), this);
 
   m_actQuit = new QAction(tr("&Quit"), this);
@@ -73,6 +85,12 @@ void MainWindow::makeMenus()
   connect(m_actExportAsCSV, &QAction::triggered, this, &MainWindow::onExportAsCSV);
 
   connect(m_actSettings, &QAction::triggered, this, &MainWindow::onOpenSettings);
+
+  connect(m_actAutoHook, &QAction::toggled, this, &MainWindow::onAutoHookToggled);
+  connect(m_actHook, &QAction::triggered, this, &MainWindow::onHookAttempt);
+  connect(m_actUnhook, &QAction::triggered, this, &MainWindow::onUnhook);
+
+  connect(m_actMemoryViewer, &QAction::triggered, this, &MainWindow::onOpenMenViewer);
   connect(m_actCopyMemory, &QAction::triggered, this, &MainWindow::onCopyMemory);
 
   connect(m_actQuit, &QAction::triggered, this, &MainWindow::onQuit);
@@ -90,7 +108,14 @@ void MainWindow::makeMenus()
   m_menuEdit = menuBar()->addMenu(tr("&Edit"));
   m_menuEdit->addAction(m_actSettings);
 
+  m_menuDolphin = menuBar()->addMenu(tr("&Dolphin"));
+  m_menuDolphin->addAction(m_actAutoHook);
+  m_menuDolphin->addSeparator();
+  m_menuDolphin->addAction(m_actHook);
+  m_menuDolphin->addAction(m_actUnhook);
+
   m_menuView = menuBar()->addMenu(tr("&View"));
+  m_menuView->addAction(m_actMemoryViewer);
   m_menuView->addAction(m_actCopyMemory);
 
   m_menuHelp = menuBar()->addMenu(tr("&Help"));
@@ -113,27 +138,17 @@ void MainWindow::initialiseWidgets()
   connect(m_scanner, &MemScanWidget::mustUnhook, this, &MainWindow::onUnhook);
   connect(m_watcher, &MemWatchWidget::mustUnhook, this, &MainWindow::onUnhook);
 
-  m_btnAttempHook = new QPushButton(tr("Hook"));
-  m_btnUnhook = new QPushButton(tr("Unhook"));
-  connect(m_btnAttempHook, &QPushButton::clicked, this, &MainWindow::onHookAttempt);
-  connect(m_btnUnhook, &QPushButton::clicked, this, &MainWindow::onUnhook);
+  m_copier = new DlgCopy(this);
 
   m_lblDolphinStatus = new QLabel("");
   m_lblDolphinStatus->setAlignment(Qt::AlignHCenter);
 
   m_lblMem2Status = new QLabel("");
   m_lblMem2Status->setAlignment(Qt::AlignHCenter);
-
-  m_btnOpenMemViewer = new QPushButton(tr("Open memory viewer"));
-  connect(m_btnOpenMemViewer, &QPushButton::clicked, this, &MainWindow::onOpenMenViewer);
 }
 
 void MainWindow::makeLayouts()
 {
-  QHBoxLayout* dolphinHookButtons_layout = new QHBoxLayout();
-  dolphinHookButtons_layout->addWidget(m_btnAttempHook);
-  dolphinHookButtons_layout->addWidget(m_btnUnhook);
-
   QFrame* separatorline = new QFrame();
   separatorline->setFrameShape(QFrame::HLine);
 
@@ -150,8 +165,6 @@ void MainWindow::makeLayouts()
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_lblDolphinStatus);
-  mainLayout->addLayout(dolphinHookButtons_layout);
-  mainLayout->addWidget(m_btnOpenMemViewer);
   mainLayout->addWidget(m_lblMem2Status);
   mainLayout->addWidget(separatorline);
   mainLayout->addWidget(splitter);
@@ -168,14 +181,6 @@ void MainWindow::makeMemViewer()
   connect(m_viewer, &MemViewerWidget::addWatchRequested, m_watcher, &MemWatchWidget::addWatchEntry);
   connect(m_watcher, &MemWatchWidget::goToAddressInViewer, this,
           &MainWindow::onOpenMemViewerWithAddress);
-}
-
-void MainWindow::firstHookAttempt()
-{
-  onHookAttempt();
-  if (DolphinComm::DolphinAccessor::getStatus() ==
-      DolphinComm::DolphinAccessor::DolphinStatus::hooked)
-    updateMem2Status();
 }
 
 void MainWindow::addSelectedResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
@@ -254,9 +259,11 @@ void MainWindow::updateDolphinHookingStatus()
         QString::number(DolphinComm::DolphinAccessor::getEmuRAMAddressStart(), 16).toUpper());
     m_scanner->setEnabled(true);
     m_watcher->setEnabled(true);
-    m_btnOpenMemViewer->setEnabled(true);
-    m_btnAttempHook->hide();
-    m_btnUnhook->show();
+    m_copier->setEnabled(true);
+    m_actMemoryViewer->setEnabled(true);
+    m_actCopyMemory->setEnabled(true);
+    m_actHook->setEnabled(false);
+    m_actUnhook->setEnabled(!m_actAutoHook->isChecked());
     break;
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::notRunning:
@@ -264,9 +271,11 @@ void MainWindow::updateDolphinHookingStatus()
     m_lblDolphinStatus->setText(tr("Cannot hook to Dolphin, the process is not running"));
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
-    m_btnOpenMemViewer->setDisabled(true);
-    m_btnAttempHook->show();
-    m_btnUnhook->hide();
+    m_copier->setDisabled(true);
+    m_actMemoryViewer->setDisabled(true);
+    m_actCopyMemory->setDisabled(true);
+    m_actHook->setEnabled(!m_actAutoHook->isChecked());
+    m_actUnhook->setEnabled(false);
     break;
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::noEmu:
@@ -275,9 +284,11 @@ void MainWindow::updateDolphinHookingStatus()
         tr("Cannot hook to Dolphin, the process is running, but no emulation has been started"));
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
-    m_btnOpenMemViewer->setDisabled(true);
-    m_btnAttempHook->show();
-    m_btnUnhook->hide();
+    m_copier->setDisabled(true);
+    m_actMemoryViewer->setDisabled(true);
+    m_actCopyMemory->setDisabled(true);
+    m_actHook->setEnabled(!m_actAutoHook->isChecked());
+    m_actUnhook->setEnabled(false);
     break;
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::unHooked:
@@ -285,9 +296,11 @@ void MainWindow::updateDolphinHookingStatus()
     m_lblDolphinStatus->setText(tr("Unhooked, press \"Hook\" to hook to Dolphin again"));
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
-    m_btnOpenMemViewer->setDisabled(true);
-    m_btnAttempHook->show();
-    m_btnUnhook->hide();
+    m_copier->setDisabled(true);
+    m_actMemoryViewer->setDisabled(true);
+    m_actCopyMemory->setDisabled(true);
+    m_actHook->setEnabled(!m_actAutoHook->isChecked());
+    m_actUnhook->setEnabled(false);
     break;
   }
   }
@@ -319,6 +332,30 @@ void MainWindow::onUnhook()
   m_lblMem2Status->setText(QString(""));
   DolphinComm::DolphinAccessor::unHook();
   updateDolphinHookingStatus();
+}
+
+void MainWindow::onAutoHookToggled(const bool checked)
+{
+  if (checked)
+  {
+    m_autoHookTimer.start();
+    onHookAttempt();
+  }
+  else
+  {
+    m_autoHookTimer.stop();
+  }
+
+  updateDolphinHookingStatus();
+}
+
+void MainWindow::onHookIfNotHooked()
+{
+  if (DolphinComm::DolphinAccessor::getStatus() !=
+      DolphinComm::DolphinAccessor::DolphinStatus::hooked)
+  {
+    onHookAttempt();
+  }
 }
 
 void MainWindow::onOpenWatchFile()
@@ -354,9 +391,8 @@ void MainWindow::onExportAsCSV()
 
 void MainWindow::onCopyMemory()
 {
-  DlgCopy* dlg = new DlgCopy(this);
-  int dlgResult = dlg->exec();
-  delete dlg;
+  m_copier->show();
+  m_copier->raise();
 }
 
 void MainWindow::onOpenSettings()
@@ -409,6 +445,7 @@ void MainWindow::onQuit()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
+  SConfig::getInstance().setAutoHook(m_actAutoHook->isChecked());
   SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
   SConfig::getInstance().setMainWindowGeometry(saveGeometry());
   SConfig::getInstance().setMainWindowState(saveState());

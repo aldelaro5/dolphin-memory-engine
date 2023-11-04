@@ -45,25 +45,17 @@ DlgCopy::DlgCopy(QWidget* parent) : QDialog(parent)
   m_buttonsDlg->setStyleSheet("* { button-layout: 2 }");
 
   connect(m_buttonsDlg, &QDialogButtonBox::rejected, this, &QDialog::reject);
-  connect(m_buttonsDlg, &QDialogButtonBox::clicked, this,
-          [=](QAbstractButton* button)
-          {
-            auto role = m_buttonsDlg->buttonRole(button);
-            if (role == QDialogButtonBox::ApplyRole)
-            {
-              if (DolphinComm::DolphinAccessor::getStatus() !=
-                  DolphinComm::DolphinAccessor::DolphinStatus::hooked)
-              {
-                enablePage(false);
-                return;
-              }
-              copyMemory();
-            }
-            else if (role == QDialogButtonBox::Close)
-            {
-              QDialog::close();
-            }
-          });
+  connect(m_buttonsDlg, &QDialogButtonBox::clicked, this, [this](QAbstractButton* const button) {
+    const auto role = m_buttonsDlg->buttonRole(button);
+    if (role == QDialogButtonBox::ApplyRole)
+    {
+      copyMemory();
+    }
+    else if (role == QDialogButtonBox::RejectRole)
+    {
+      hide();
+    }
+  });
 
   connect(m_cmbViewerBytesSeparator, &QComboBox::currentTextChanged, this,
       [=](const QString& string)
@@ -74,9 +66,6 @@ DlgCopy::DlgCopy(QWidget* parent) : QDialog(parent)
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(grbCopySettings);
   mainLayout->addWidget(m_buttonsDlg);
-
-  enablePage(DolphinComm::DolphinAccessor::getStatus() ==
-             DolphinComm::DolphinAccessor::DolphinStatus::hooked);
 
   setLayout(mainLayout);
 
@@ -95,15 +84,6 @@ void DlgCopy::setDefaults()
   m_spnWatcherCopyAddress->setText("");
   m_spnWatcherCopySize->setText("");
   m_cmbViewerBytesSeparator->setCurrentIndex(ByteStringFormats::ByteString);
-}
-
-void DlgCopy::enablePage(bool enable)
-{
-  m_cmbViewerBytesSeparator->setEnabled(enable);
-  m_spnWatcherCopyAddress->setEnabled(enable);
-  m_spnWatcherCopySize->setEnabled(enable);
-  m_spnWatcherCopyOutput->setEnabled(enable);
-  m_buttonsDlg->setEnabled(enable);
 }
 
 bool DlgCopy::copyMemory()
