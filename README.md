@@ -4,7 +4,7 @@
 
 A RAM search program designed to search, track, and edit the emulated memory of [the Dolphin emulator](https://github.com/dolphin-emu/dolphin) during runtime. The primary goal is to make research, tool-assisted speedruns, and reverse engineering of GameCube & Wii games more convenient and easier than with the alternative solution, Cheat Engine. The program's name is derived from Cheat Engine as a symbol for its goal.
 
-The GUI is aimed for convenience, without disrupting the performance of the emulation. Qt 5 is used to help accomplish this.
+The GUI is aimed for convenience, without disrupting the performance of the emulation. Qt 6 is used to help accomplish this.
 
 For binary releases of this program, refer to [the "releases" page](https://github.com/aldelaro5/Dolphin-memory-engine/releases) on [the Github repository](https://github.com/aldelaro5/Dolphin-memory-engine).
 
@@ -26,7 +26,7 @@ At least 250 MB of free memory is required.
 
 You need to have Dolphin running ***and*** _have the emulation started_ for this program to be useful. As such, the system must meet Dolphin's [system requirements](https://github.com/dolphin-emu/dolphin#system-requirements).
 
-On Linux, installation of the Qt 5 package(s) is required.
+On Linux, installation of the Qt 6 package(s) is required.
 
 ## How to Build
 ### Microsoft Windows
@@ -41,7 +41,7 @@ The Windows SDK version 10.0.22621.0 comes with the C++ Desktop Development Work
 
 
 ### Linux
-> _CMake and Qt 5 are required. Please refer to your distribution's documentation for specific instructions on how to install them._
+> _CMake and Qt 6 are required. Please refer to your distribution's documentation for specific instructions on how to install them._
 
 To build, simply run the following commands from the `Source` directory:
 
