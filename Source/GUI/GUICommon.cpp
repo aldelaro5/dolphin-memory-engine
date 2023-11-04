@@ -1,5 +1,6 @@
 #include "GUICommon.h"
 
+#include <QApplication>
 #include <QCoreApplication>
 #include <QStringList>
 
@@ -69,4 +70,17 @@ QString getNameFromBase(const Common::MemBase base)
     return QString("");
   }
 }
+
+void changeApplicationStyle(int index)
+{
+  if (index == 0)
+  {
+    QApplication::setStyle(QStringLiteral("fusion"));
+  }
+  else if (index == 1)
+  {
+    QApplication::setStyle(QStringLiteral("windowsvista"));
+  }
+}
+
 } // namespace GUICommon

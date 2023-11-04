@@ -14,5 +14,7 @@ extern QStringList g_memBaseNames;
 QString getStringFromType(const Common::MemType type, const size_t length = 0);
 QString getNameFromBase(const Common::MemBase base);
 
+void changeApplicationStyle(int);
+
 extern bool g_valueEditing;
 } // namespace GUICommon

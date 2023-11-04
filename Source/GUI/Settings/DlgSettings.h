@@ -18,6 +18,7 @@ private:
   void loadSettings();
   void saveSettings() const;
 
+  QComboBox* m_cmbTheme;
   QSpinBox* m_spnWatcherUpdateTimerMs;
   QSpinBox* m_spnScannerUpdateTimerMs;
   QSpinBox* m_spnViewerUpdateTimerMs;
