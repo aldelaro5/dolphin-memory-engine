@@ -1,19 +1,22 @@
 #include "DlgSettings.h"
 
+#include <QApplication>
 #include <QAbstractButton>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
 #include <QVBoxLayout>
 
+#include "../GUICommon.h"
 #include "SConfig.h"
 
 DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
 {
   QGroupBox* grbCoreSettings = new QGroupBox("Core settings");
   m_cmbTheme = new QComboBox();
-  m_cmbTheme->addItem("Dark Mode", 0);
-  m_cmbTheme->addItem("Light Mode", 1);
+  m_cmbTheme->addItem("Dark", 0);
+  m_cmbTheme->addItem("Light", 1);
+  connect(m_cmbTheme, QOverload<int>::of(&QComboBox::currentIndexChanged), this, GUICommon::changeApplicationStyle);
 
   QFormLayout* coreSettingsInputLayout = new QFormLayout();
   coreSettingsInputLayout->addRow("Theme", m_cmbTheme);
@@ -113,7 +116,9 @@ DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
   grbMemorySizeSettings->setLayout(memorySettingsInputLayout);
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(grbCoreSettings);
+  #ifdef _WIN32
+    mainLayout->addWidget(grbCoreSettings);
+  #endif
   mainLayout->addWidget(grbTimerSettings);
   mainLayout->addWidget(grbViewerSettings);
   mainLayout->addWidget(grbMemorySizeSettings);

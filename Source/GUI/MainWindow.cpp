@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <string>
 
+#include "GUICommon.h"
 #include "../DolphinProcess/DolphinAccessor.h"
 #include "../MemoryWatch/MemWatchEntry.h"
 #include "MemCopy/DlgCopy.h"
@@ -29,6 +30,9 @@ MainWindow::MainWindow()
     restoreGeometry(SConfig::getInstance().getMainWindowGeometry());
   if (SConfig::getInstance().getMainWindowState().size())
     restoreState(SConfig::getInstance().getMainWindowState());
+#ifdef _WIN32
+  GUICommon::changeApplicationStyle(SConfig::getInstance().getTheme());
+#endif
 
   m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
 }
