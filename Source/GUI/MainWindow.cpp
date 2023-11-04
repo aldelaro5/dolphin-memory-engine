@@ -18,7 +18,7 @@
 
 MainWindow::MainWindow()
 {
-  setWindowTitle("Dolphin Memory Engine");
+  setWindowTitle("Dolphin Memory Engine 0.8.0");
   initialiseWidgets();
   makeLayouts();
   makeMenus();
@@ -381,11 +381,19 @@ void MainWindow::onAbout()
 {
   QString title = tr("About Dolphin Memory Engine");
   QString text =
-      "Version 0.7.0\n\n" +
+      "Version 0.8.0<br></br>" +
       tr("A RAM search made to facilitate research and reverse engineering of GameCube and Wii "
-         "games using the Dolphin emulator.\n\nThis program is licensed under the MIT license. You "
-         "should have received a copy of the MIT license along with this program.");
-  QMessageBox::about(this, title, text);
+         "games using the Dolphin emulator.") +
+      "<br>" +
+      tr("<a href=\"https://github.com/aldelaro5/Dolphin-memory-engine\">Visit the project page</a> to learn more and check for updates.") + 
+      "<br><br>" +
+      tr("This program is licensed under the MIT license. You should have received a copy of the MIT license along with this program.");
+
+  QMessageBox aboutBox;
+  aboutBox.setWindowTitle(title);
+  aboutBox.setTextFormat(Qt::RichText);
+  aboutBox.setText(text);
+  aboutBox.exec();
 }
 
 void MainWindow::onQuit()
