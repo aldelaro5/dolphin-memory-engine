@@ -63,6 +63,7 @@ void MainWindow::makeMenus()
   m_actHook = new QAction(tr("&Hook"), this);
   m_actUnhook = new QAction(tr("&Unhook"), this);
 
+  m_actMemoryViewer = new QAction(tr("&Memory Viewer"), this);
   m_actCopyMemory = new QAction(tr("&Copy Memory Range"), this);
 
   m_actQuit = new QAction(tr("&Quit"), this);
@@ -79,6 +80,7 @@ void MainWindow::makeMenus()
   connect(m_actHook, &QAction::triggered, this, &MainWindow::onHookAttempt);
   connect(m_actUnhook, &QAction::triggered, this, &MainWindow::onUnhook);
 
+  connect(m_actMemoryViewer, &QAction::triggered, this, &MainWindow::onOpenMenViewer);
   connect(m_actCopyMemory, &QAction::triggered, this, &MainWindow::onCopyMemory);
 
   connect(m_actQuit, &QAction::triggered, this, &MainWindow::onQuit);
@@ -101,6 +103,7 @@ void MainWindow::makeMenus()
   m_menuDolphin->addAction(m_actUnhook);
 
   m_menuView = menuBar()->addMenu(tr("&View"));
+  m_menuView->addAction(m_actMemoryViewer);
   m_menuView->addAction(m_actCopyMemory);
 
   m_menuHelp = menuBar()->addMenu(tr("&Help"));
@@ -128,9 +131,6 @@ void MainWindow::initialiseWidgets()
 
   m_lblMem2Status = new QLabel("");
   m_lblMem2Status->setAlignment(Qt::AlignHCenter);
-
-  m_btnOpenMemViewer = new QPushButton(tr("Open memory viewer"));
-  connect(m_btnOpenMemViewer, &QPushButton::clicked, this, &MainWindow::onOpenMenViewer);
 }
 
 void MainWindow::makeLayouts()
@@ -151,7 +151,6 @@ void MainWindow::makeLayouts()
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_lblDolphinStatus);
-  mainLayout->addWidget(m_btnOpenMemViewer);
   mainLayout->addWidget(m_lblMem2Status);
   mainLayout->addWidget(separatorline);
   mainLayout->addWidget(splitter);
@@ -255,7 +254,7 @@ void MainWindow::updateDolphinHookingStatus()
     m_scanner->setEnabled(true);
     m_watcher->setEnabled(true);
     m_copier->setEnabled(true);
-    m_btnOpenMemViewer->setEnabled(true);
+    m_actMemoryViewer->setEnabled(true);
     m_actCopyMemory->setEnabled(true);
     m_actHook->setEnabled(false);
     m_actUnhook->setEnabled(true);
@@ -267,7 +266,7 @@ void MainWindow::updateDolphinHookingStatus()
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
     m_copier->setDisabled(true);
-    m_btnOpenMemViewer->setDisabled(true);
+    m_actMemoryViewer->setDisabled(true);
     m_actCopyMemory->setDisabled(true);
     m_actHook->setEnabled(true);
     m_actUnhook->setEnabled(false);
@@ -280,7 +279,7 @@ void MainWindow::updateDolphinHookingStatus()
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
     m_copier->setDisabled(true);
-    m_btnOpenMemViewer->setDisabled(true);
+    m_actMemoryViewer->setDisabled(true);
     m_actCopyMemory->setDisabled(true);
     m_actHook->setEnabled(true);
     m_actUnhook->setEnabled(false);
@@ -292,7 +291,7 @@ void MainWindow::updateDolphinHookingStatus()
     m_scanner->setDisabled(true);
     m_watcher->setDisabled(true);
     m_copier->setDisabled(true);
-    m_btnOpenMemViewer->setDisabled(true);
+    m_actMemoryViewer->setDisabled(true);
     m_actCopyMemory->setDisabled(true);
     m_actHook->setEnabled(true);
     m_actUnhook->setEnabled(false);

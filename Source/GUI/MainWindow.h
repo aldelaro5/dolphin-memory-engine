@@ -58,7 +58,6 @@ private:
 
   QLabel* m_lblDolphinStatus;
   QLabel* m_lblMem2Status;
-  QPushButton* m_btnOpenMemViewer;
 
   QMenu* m_menuFile;
   QMenu* m_menuEdit;
@@ -74,7 +73,8 @@ private:
   QAction* m_actSettings;
   QAction* m_actHook;
   QAction* m_actUnhook;
+  QAction* m_actMemoryViewer;
+  QAction* m_actCopyMemory;
   QAction* m_actQuit;
   QAction* m_actAbout;
-  QAction* m_actCopyMemory;
 };
