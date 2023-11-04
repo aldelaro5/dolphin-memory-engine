@@ -24,6 +24,7 @@ public:
   int getFreezeTimerMs() const;
   int getScannerUpdateTimerMs() const;
   int getViewerUpdateTimerMs() const;
+  int getScannerShowThreshold() const;
   u32 getMEM1Size() const;
   u32 getMEM2Size() const;
 
@@ -41,6 +42,7 @@ public:
   void setFreezeTimerMs(const int freezeTimerMs);
   void setScannerUpdateTimerMs(const int scannerUpdateTimerMs);
   void setViewerUpdateTimerMs(const int viewerUpdateTimerMs);
+  void setScannerShowThreshold(int scannerShowThreshold);
   void setMEM1Size(const u32 mem1SizeReal);
   void setMEM2Size(const u32 mem2SizeReal);
 

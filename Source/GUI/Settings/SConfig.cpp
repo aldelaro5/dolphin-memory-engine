@@ -63,6 +63,11 @@ int SConfig::getViewerUpdateTimerMs() const
   return m_settings->value("timerSettings/viewerUpdateTimerMs", 100).toInt();
 }
 
+int SConfig::getScannerShowThreshold() const
+{
+  return m_settings->value("scannerSettings/scannerShowThreshold", 1000).toInt();
+}
+
 int SConfig::getViewerNbrBytesSeparator() const
 {
   return m_settings->value("viewerSettings/nbrBytesSeparator", 1).toInt();
@@ -121,6 +126,11 @@ void SConfig::setScannerUpdateTimerMs(const int scannerUpdateTimerMs)
 void SConfig::setViewerUpdateTimerMs(const int viewerUpdateTimerMs)
 {
   m_settings->setValue("timerSettings/viewerUpdateTimerMs", viewerUpdateTimerMs);
+}
+
+void SConfig::setScannerShowThreshold(const int scannerShowThreshold)
+{
+  m_settings->setValue("scannerSettings/scannerShowThreshold", scannerShowThreshold);
 }
 
 void SConfig::setViewerNbrBytesSeparator(const int viewerNbrBytesSeparator)

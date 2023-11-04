@@ -59,6 +59,15 @@ DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
 
   grbTimerSettings->setLayout(timerSettingsLayout);
 
+  QGroupBox* grbScannerSettings = new QGroupBox("Scanner settings");
+
+  m_spnScannerShowThreshold = new QSpinBox(this);
+  m_spnScannerShowThreshold->setMinimum(1);
+  m_spnScannerShowThreshold->setMaximum(100000);
+
+  QFormLayout* scannerSettingsInputLayout = new QFormLayout(grbScannerSettings);
+  scannerSettingsInputLayout->addRow("Show Threshold", m_spnScannerShowThreshold);
+
   QGroupBox* grbViewerSettings = new QGroupBox("Viewer settings");
 
   m_cmbViewerBytesSeparator = new QComboBox();
@@ -120,6 +129,7 @@ DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
     mainLayout->addWidget(grbCoreSettings);
   #endif
   mainLayout->addWidget(grbTimerSettings);
+  mainLayout->addWidget(grbScannerSettings);
   mainLayout->addWidget(grbViewerSettings);
   mainLayout->addWidget(grbMemorySizeSettings);
   mainLayout->addWidget(m_buttonsDlg);
@@ -141,6 +151,7 @@ void DlgSettings::loadSettings()
   m_spnScannerUpdateTimerMs->setValue(SConfig::getInstance().getScannerUpdateTimerMs());
   m_spnViewerUpdateTimerMs->setValue(SConfig::getInstance().getViewerUpdateTimerMs());
   m_spnFreezeTimerMs->setValue(SConfig::getInstance().getFreezeTimerMs());
+  m_spnScannerShowThreshold->setValue(SConfig::getInstance().getScannerShowThreshold());
   m_cmbViewerBytesSeparator->setCurrentIndex(
       m_cmbViewerBytesSeparator->findData(SConfig::getInstance().getViewerNbrBytesSeparator()));
   m_cmbTheme->setCurrentIndex(
@@ -156,6 +167,7 @@ void DlgSettings::saveSettings() const
   SConfig::getInstance().setScannerUpdateTimerMs(m_spnScannerUpdateTimerMs->value());
   SConfig::getInstance().setViewerUpdateTimerMs(m_spnViewerUpdateTimerMs->value());
   SConfig::getInstance().setFreezeTimerMs(m_spnFreezeTimerMs->value());
+  SConfig::getInstance().setScannerShowThreshold(m_spnScannerShowThreshold->value());
   SConfig::getInstance().setViewerNbrBytesSeparator(
       m_cmbViewerBytesSeparator->currentData().toInt());
   SConfig::getInstance().setTheme(m_cmbTheme->currentData().toInt());

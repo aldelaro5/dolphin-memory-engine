@@ -405,7 +405,7 @@ void MemScanWidget::onFirstScan()
     int resultsFound = static_cast<int>(m_memScanner->getResultCount());
     m_lblResultCount->setText(
         tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
-    if (resultsFound <= 1000 && resultsFound != 0)
+    if (resultsFound <= m_showThreshold && resultsFound != 0)
     {
       m_btnAddAll->setEnabled(true);
       m_btnAddSelection->setEnabled(true);
@@ -440,7 +440,7 @@ void MemScanWidget::onNextScan()
     int resultsFound = static_cast<int>(m_memScanner->getResultCount());
     m_lblResultCount->setText(
         tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
-    if (resultsFound <= 1000 && resultsFound != 0)
+    if (resultsFound <= m_showThreshold && resultsFound != 0)
     {
       m_btnAddAll->setEnabled(true);
       m_btnAddSelection->setEnabled(true);
@@ -548,7 +548,7 @@ void MemScanWidget::handleScannerErrors(const Common::MemOperationReturnCode err
 
 void MemScanWidget::onCurrentValuesUpdateTimer()
 {
-  if (m_memScanner->getResultCount() > 0 && m_memScanner->getResultCount() <= 1000)
+  if (m_memScanner->getResultCount() > 0 && m_memScanner->getResultCount() <= m_showThreshold)
   {
     Common::MemOperationReturnCode updateReturn = m_resultsListModel->updateScannerCurrentCache();
     if (updateReturn != Common::MemOperationReturnCode::OK)
@@ -559,6 +559,15 @@ void MemScanWidget::onCurrentValuesUpdateTimer()
 QTimer* MemScanWidget::getUpdateTimer() const
 {
   return m_currentValuesUpdateTimer;
+}
+
+void MemScanWidget::setShowThreshold(const size_t showThreshold)
+{
+  m_showThreshold = showThreshold;
+  if (m_resultsListModel)
+  {
+    m_resultsListModel->setShowThreshold(showThreshold);
+  }
 }
 
 void MemScanWidget::onResultListDoubleClicked(const QModelIndex& index)
