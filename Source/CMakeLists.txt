@@ -79,5 +79,18 @@ if(WIN32)
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			$<TARGET_FILE:Qt6::Gui>
 			$<TARGET_FILE_DIR:Dolphin-memory-engine>
+        TARGET Dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            $<TARGET_FILE_DIR:Dolphin-memory-engine>/platforms
+        TARGET Dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:Qt6::QWindowsIntegrationPlugin>
+            $<TARGET_FILE_DIR:Dolphin-memory-engine>/platforms
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            $<TARGET_FILE_DIR:Dolphin-memory-engine>/styles
+        TARGET Dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:Qt6::QWindowsVistaStylePlugin>
+            $<TARGET_FILE_DIR:Dolphin-memory-engine>/styles
 	)
 endif(WIN32)

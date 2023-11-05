@@ -44,7 +44,7 @@ public:
   {
     return m_MEM2AddressStart;
   };
-  u32 getMEM1ToMEM2Distance() const
+  u64 getMEM1ToMEM2Distance() const
   {
     if (!m_MEM2Present)
       return 0;

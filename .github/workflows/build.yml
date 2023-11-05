@@ -28,7 +28,8 @@ jobs:
 
       - name: Build
         run: |
-          msbuild Source\Dolphin-memory-engine.sln /p:Configuration=${{ matrix.configuration }} /p:Platform=x64 /p:Verbosity=normal
+          cmake Source -B .\Source\bin -A x64 "-DCMAKE_PREFIX_PATH=..\Externals\Qt\Qt6.5.1\x64"
+          cmake --build .\Source\bin --config ${{ matrix.configuration }} --parallel
         shell: powershell
         
       - name: Copy LICENSE, README
