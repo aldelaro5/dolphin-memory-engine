@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Dolphin memory engine
+Name=Dolphin Memory Engine
 GenericName=Dolphin emulator memory searcher
 Comment=A RAM search program designed to search, track, and edit the emulated memory of the Dolphin emulator during runtime
 Icon=Dolphin-memory-engine

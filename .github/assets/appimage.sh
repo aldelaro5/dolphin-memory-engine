@@ -12,11 +12,11 @@ chmod +x AppDir/AppRun
 chmod a+x appimagetool linuxdeploy linuxdeployqt
 ARCH=x86_64 ./linuxdeploy --appdir=AppDir
 
-cp .github/assets/"${BINNAME}".png AppDir/
+cp Source/Resources/logo.svg AppDir/"${BINNAME}".svg
 cp .github/assets/"${BINNAME}".desktop AppDir/
 mkdir -p AppDir/usr/share/applications && cp ./AppDir/"${BINNAME}".desktop ./AppDir/usr/share/applications
-mkdir -p AppDir/usr/share/icons && cp ./AppDir/"${BINNAME}".png ./AppDir/usr/share/icons
-mkdir -p AppDir/usr/share/icons/hicolor/512x512/apps && cp ./AppDir/"${BINNAME}".png ./AppDir/usr/share/icons/hicolor/512x512/apps
+mkdir -p AppDir/usr/share/icons && cp ./AppDir/"${BINNAME}".svg ./AppDir/usr/share/icons
+mkdir -p AppDir/usr/share/icons/hicolor/scalable/apps && cp ./AppDir/"${BINNAME}".svg ./AppDir/usr/share/icons/hicolor/scalable/apps
 
 QMAKE=/usr/lib/qt6/bin/qmake ARCH=x86_64 ./linuxdeployqt --appdir AppDir/
 ARCH=x86_64 ./appimagetool AppDir/ "${BINNAME}".AppImage
