@@ -18,7 +18,7 @@
 
 MainWindow::MainWindow()
 {
-  setWindowTitle("Dolphin Memory Engine 0.9.0-dev");
+  setWindowTitle("Dolphin Memory Engine 0.9.0");
   setWindowIcon(QIcon(":/logo.svg"));
   initialiseWidgets();
   makeLayouts();
@@ -423,7 +423,7 @@ void MainWindow::onAbout()
 {
   QString title = tr("About Dolphin Memory Engine");
   QString text =
-      "Version 0.9.0-dev<br></br>" +
+      "Version 0.9.0<br></br>" +
       tr("A RAM search made to facilitate research and reverse engineering of GameCube and Wii "
          "games using the Dolphin emulator.") +
       "<br>" +
