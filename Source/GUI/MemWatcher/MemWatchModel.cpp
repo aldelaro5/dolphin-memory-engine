@@ -425,7 +425,7 @@ QMimeData* MemWatchModel::mimeData(const QModelIndexList& indexes) const
   MemWatchTreeNode* leastDeepNode = getLeastDeepNodeFromList(nodes);
   std::memcpy(&leastDeepPointer, &leastDeepNode, sizeof(MemWatchTreeNode*));
   stream << leastDeepPointer;
-  stream << nodes.count();
+  stream << static_cast<int>(nodes.count());
   foreach (MemWatchTreeNode* node, nodes)
   {
     qulonglong pointer = 0;
