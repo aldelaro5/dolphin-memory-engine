@@ -40,7 +40,7 @@ jobs:
 
       - name: Set Artifact Name
         id: set-artifact-name
-        run: echo "artifact_name=$(echo "windows-${{ matrix.configuration }}-build" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+        run: echo "artifact_name=$(echo "windows-${{ matrix.configuration }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Publish Artifacts
@@ -81,7 +81,7 @@ jobs:
           mkdir Source/build/artifacts
           cp ./README.md ./Source/build/artifacts/
           cp ./LICENSE ./Source/build/artifacts/
-          cp ./Source/build/Dolphin-memory-engine ./Source/build/artifacts/
+          cp ./Source/build/dolphin-memory-engine ./Source/build/artifacts/
         shell: bash
 
       - name: Package AppImage
@@ -99,4 +99,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: linux-ubuntu-22.04-appimage
-          path: Dolphin-memory-engine.AppImage
+          path: dolphin-memory-engine.AppImage
