@@ -1,10 +1,23 @@
 #include "SConfig.h"
+#include <qcoreapplication.h>
+#include <qfile.h>
 
 SConfig::SConfig()
 {
-  const QString organization{"dolphin-memory-engine"};
-  const QString application{"dolphin-memory-engine"};
-  m_settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application);
+  const QString exeDir = QCoreApplication::applicationDirPath();
+  const QString portableFilePath = exeDir + "/portable.txt";
+  QFile file(portableFilePath);
+  if (file.exists())
+  {
+    m_settings = new QSettings(exeDir + "/settings.ini", QSettings::IniFormat);
+  }
+  else
+  {
+    const QString organization{"dolphin-memory-engine"};
+    const QString application{"dolphin-memory-engine"};
+    m_settings =
+        new QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application);
+  }
 }
 
 SConfig::~SConfig()
