@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5.0)
 set(CMAKE_CXX_STANDARD 17)
-project(Dolphin-memory-engine)
+project(dolphin-memory-engine)
 
 if(WIN32)
     set(DolphinProcessSrc DolphinProcess/Windows/WindowsDolphinProcess.cpp)
@@ -50,13 +50,14 @@ IF(WIN32)
 SET(GUI_TYPE WIN32)
 ENDIF(WIN32)
 
-add_executable(Dolphin-memory-engine ${GUI_TYPE} ${SRCS})
+add_executable(dolphin-memory-engine ${GUI_TYPE} ${SRCS})
 
-target_link_libraries(Dolphin-memory-engine Qt6::Widgets)
-target_link_libraries(Dolphin-memory-engine Qt6::Gui)
-target_link_libraries(Dolphin-memory-engine Qt6::Core)
+target_link_libraries(dolphin-memory-engine Qt6::Widgets)
+target_link_libraries(dolphin-memory-engine Qt6::Gui)
+target_link_libraries(dolphin-memory-engine Qt6::Core)
 
 if(WIN32)
+    set_target_properties(dolphin-memory-engine PROPERTIES OUTPUT_NAME DolphinMemoryEngine)
     if($<CONFIG:Debug>)
         get_target_property(WIDGETDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
 		get_target_property(COREDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
@@ -67,30 +68,30 @@ if(WIN32)
 		get_target_property(GUIDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
     endif($<CONFIG:Debug>)
     add_custom_command(
-		TARGET Dolphin-memory-engine POST_BUILD
+		TARGET dolphin-memory-engine POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			$<TARGET_FILE:Qt6::Widgets>
-			$<TARGET_FILE_DIR:Dolphin-memory-engine>
-		TARGET Dolphin-memory-engine POST_BUILD
+			$<TARGET_FILE_DIR:dolphin-memory-engine>
+		TARGET dolphin-memory-engine POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			$<TARGET_FILE:Qt6::Core>
-			$<TARGET_FILE_DIR:Dolphin-memory-engine>
-		TARGET Dolphin-memory-engine POST_BUILD
+			$<TARGET_FILE_DIR:dolphin-memory-engine>
+		TARGET dolphin-memory-engine POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 			$<TARGET_FILE:Qt6::Gui>
-			$<TARGET_FILE_DIR:Dolphin-memory-engine>
-        TARGET Dolphin-memory-engine POST_BUILD
+			$<TARGET_FILE_DIR:dolphin-memory-engine>
+        TARGET dolphin-memory-engine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
-            $<TARGET_FILE_DIR:Dolphin-memory-engine>/platforms
-        TARGET Dolphin-memory-engine POST_BUILD
+            $<TARGET_FILE_DIR:dolphin-memory-engine>/platforms
+        TARGET dolphin-memory-engine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:Qt6::QWindowsIntegrationPlugin>
-            $<TARGET_FILE_DIR:Dolphin-memory-engine>/platforms
+            $<TARGET_FILE_DIR:dolphin-memory-engine>/platforms
         COMMAND ${CMAKE_COMMAND} -E make_directory
-            $<TARGET_FILE_DIR:Dolphin-memory-engine>/styles
-        TARGET Dolphin-memory-engine POST_BUILD
+            $<TARGET_FILE_DIR:dolphin-memory-engine>/styles
+        TARGET dolphin-memory-engine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:Qt6::QWindowsVistaStylePlugin>
-            $<TARGET_FILE_DIR:Dolphin-memory-engine>/styles
+            $<TARGET_FILE_DIR:dolphin-memory-engine>/styles
 	)
 endif(WIN32)
