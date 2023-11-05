@@ -28,6 +28,15 @@ You need to have Dolphin running ***and*** _have the emulation started_ for this
 
 On Linux, installation of the Qt 6 package(s) is required.
 
+## Portable Configuration
+By default, the program will store configuration in your User Configuration folder.
+
+Windows: `%AppData%\dolphin-memory-engine`
+
+Linux: `~/.config/dolphin-memory-engine`
+
+Create a empty file `portable.txt` in the same directory as Dolphin Memory Engine and the configuration will instead be saved in the same folder as the program.
+
 ## How to Build
 ### Microsoft Windows
 This repository provides a solution file for Visual Studio 2022 and later. The Windows SDK Version 10.0.22621.0 is required*.
