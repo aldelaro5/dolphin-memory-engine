@@ -72,11 +72,8 @@ jobs:
 
       - name: Build
         run: |
-          cd Source
-          mkdir build
-          cd build
-          cmake ..
-          make
+          cmake Source -B Source/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build Source/build --parallel
         shell: bash
         
       - name: Copy LICENSE, README, Prepare Artifacts
