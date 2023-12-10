@@ -3,52 +3,9 @@ name: Build
 on:
   push:
     branches:
-      - master
-  pull_request:
-    branches:
-      - master
+      - appimage-fixes
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        configuration: [Release]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up MSBuild
-        uses: microsoft/setup-msbuild@v1
-
-      - name: Initialize submodules
-        run: git submodule update --init
-        shell: powershell
-
-      - name: Build
-        run: |
-          cmake Source -B .\Source\bin -A x64 "-DCMAKE_PREFIX_PATH=..\Externals\Qt\Qt6.5.1\x64"
-          cmake --build .\Source\bin --config ${{ matrix.configuration }} --parallel
-        shell: powershell
-        
-      - name: Copy LICENSE, README
-        run: |
-          copy .\LICENSE .\Source\bin\${{ matrix.configuration }}
-          copy .\README.md .\Source\bin\${{ matrix.configuration }}
-        shell: powershell
-
-      - name: Set Artifact Name
-        id: set-artifact-name
-        run: echo "artifact_name=$(echo "windows-${{ matrix.configuration }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
-        shell: bash
-
-      - name: Publish Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ steps.set-artifact-name.outputs.artifact_name }}
-          path: Source\bin\${{ matrix.configuration }}
-
   build-linux:
     runs-on: ubuntu-22.04
 
