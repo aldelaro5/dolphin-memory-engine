@@ -4,6 +4,8 @@
 #include <byteswap.h>
 #elif _WIN32
 #include <stdlib.h>
+#elif defined(__APPLE__)
+#include <libkern/OSByteOrder.h>
 #endif
 
 #include "CommonTypes.h"
@@ -37,6 +39,20 @@ inline u32 bSwap32(u32 data)
 inline u64 bSwap64(u64 data)
 {
   return bswap_64(data);
+}
+
+#elif defined(__APPLE__)
+inline u16 bSwap16(u16 data)
+{
+  return OSSwapInt16(data);
+}
+inline u32 bSwap32(u32 data)
+{
+  return OSSwapInt32(data);
+}
+inline u64 bSwap64(u64 data)
+{
+  return OSSwapInt64(data);
 }
 #endif
 
