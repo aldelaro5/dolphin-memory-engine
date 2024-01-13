@@ -12,21 +12,25 @@ For binary releases of this program, refer to [the "releases" page](https://gith
 ### Linux:
 [![Build](https://github.com/aldelaro5/dolphin-memory-engine/actions/workflows/build.yml/badge.svg)](https://github.com/aldelaro5/dolphin-memory-engine/actions/workflows/build.yml)
 
-### MacOS:
-Not Supported (yet)
+### macOS:
+[![Build](https://github.com/aldelaro5/dolphin-memory-engine/actions/workflows/build.yml/badge.svg)](https://github.com/aldelaro5/dolphin-memory-engine/actions/workflows/build.yml)
 
 ### Windows:
 [![Build](https://github.com/aldelaro5/dolphin-memory-engine/actions/workflows/build.yml/badge.svg)](https://github.com/aldelaro5/dolphin-memory-engine/actions/workflows/build.yml)
 
 
 ## System requirements
-Any x86_64 based system should work, however, Mac OS is _not_ supported.
+Any x86_64 based system should work
+
+M1 macs can run under rosetta.
 
 At least 250 MB of free memory is required.
 
 You need to have Dolphin running ***and*** _have the emulation started_ for this program to be useful. As such, the system must meet Dolphin's [system requirements](https://github.com/dolphin-emu/dolphin#system-requirements).
 
 On Linux, installation of the Qt 6 package(s) is required.
+
+On macOS, Dolphin needs to be a debug copy.
 
 ## Portable Configuration
 By default, the program will store configuration in your User Configuration folder.
@@ -83,6 +87,8 @@ On Linux, the program may require additional kernel permissions to be able to re
 Where `DME` is the path of the Dolphin Memory Engine executable.  This should fix the permission problem for future executions.
 
 If it doesn't work, verify that you do not have the `nosuid` mount flag on your `/etc/fstab` as it can cause this command to silently fail.
+
+On macOS, if the program wont hook, odds are your Dolphin is not compiled as a Debug binary. [**Here**](https://drive.google.com/file/d/1MzDu6WHw6OJkX7vVIM5DEDEs98lVG6y7/view?usp=sharing) is a precompiled debug mode enabled build of Dolphin. It is compiled from 5.0-20923.
 
 ## License
 This program is licensed under the MIT license which grants you the permission to do  anything you wish to with the software, as long as you preserve all copyright notices. (See the file LICENSE for the legal text.)
