@@ -41,7 +41,7 @@ jobs:
 
       - name: Set Artifact Name
         id: set-artifact-name
-        run: echo "artifact_name=$(echo "windows-${{ matrix.configuration }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        run: echo "artifact_name=$(echo "windows-${{ matrix.configuration }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
       - name: Publish Artifacts
         uses: actions/upload-artifact@v3
