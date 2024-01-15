@@ -16,3 +16,4 @@ Source/*.VC.db
 Source/.vs/
 Source/.vscode/
 .idea/*
+.DS_Store
