@@ -313,7 +313,7 @@ void MemScanWidget::onScanMemTypeChanged()
 void MemScanWidget::onFirstScan()
 {
   m_memScanner->resetSearchRange();
-  
+
   bool usedCustomBeginning = false;
   bool usedCustomEnding = false;
   u32 endAddress;
@@ -358,7 +358,8 @@ void MemScanWidget::onFirstScan()
     ss >> endAddress;
     if (ss.fail())
     {
-      QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid term(s)"),
+      QMessageBox* errorBox =
+          new QMessageBox(QMessageBox::Critical, tr("Invalid term(s)"),
                           tr("The term you entered for the Search Range End (%1) is invalid")
                               .arg(m_txbSearchRange2->text()),
                           QMessageBox::Ok, this);
@@ -380,11 +381,11 @@ void MemScanWidget::onFirstScan()
 
   if (usedCustomBeginning && usedCustomEnding && endAddress < beginAddress)
   {
-    QMessageBox* errorBox = new QMessageBox(
-        QMessageBox::Critical, tr("Invalid term(s)"),
-        tr("The search range you specified (%1 - %2) is negative")
+    QMessageBox* errorBox =
+        new QMessageBox(QMessageBox::Critical, tr("Invalid term(s)"),
+                        tr("The search range you specified (%1 - %2) is negative")
                             .arg(m_txbSearchRange1->text(), m_txbSearchRange2->text()),
-        QMessageBox::Ok, this);
+                        QMessageBox::Ok, this);
     errorBox->exec();
     return;
   }
@@ -456,7 +457,7 @@ void MemScanWidget::onUndoScan()
   if (m_memScanner->hasUndo())
   {
     m_memScanner->undoScan();
-    
+
     int resultsFound = static_cast<int>(m_memScanner->getResultCount());
     m_lblResultCount->setText(
         tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
@@ -471,7 +472,7 @@ void MemScanWidget::onUndoScan()
       m_btnAddAll->setEnabled(false);
       m_btnAddSelection->setEnabled(false);
       m_btnRemoveSelection->setEnabled(false);
-      m_resultsListModel->updateAfterScannerReset(); 
+      m_resultsListModel->updateAfterScannerReset();
     }
 
     m_btnUndoScan->setEnabled(m_memScanner->hasUndo());
@@ -550,9 +551,7 @@ void MemScanWidget::onCurrentValuesUpdateTimer()
 {
   if (m_memScanner->getResultCount() > 0 && m_memScanner->getResultCount() <= m_showThreshold)
   {
-    Common::MemOperationReturnCode updateReturn = m_resultsListModel->updateScannerCurrentCache();
-    if (updateReturn != Common::MemOperationReturnCode::OK)
-      handleScannerErrors(updateReturn);
+    m_resultsListModel->updateScanner();
   }
 }
 

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstring>
+#include <stack>
 #include <string>
 #include <vector>
-#include <stack>
 
 #include "../Common/CommonTypes.h"
 #include "../Common/CommonUtils.h"
@@ -143,7 +143,6 @@ public:
   size_t getLength() const;
   bool getIsUnsigned() const;
   std::string getFormattedScannedValueAt(const int index) const;
-  Common::MemOperationReturnCode updateCurrentRAMCache();
   std::string getFormattedCurrentValueAt(int index) const;
   void removeResultAt(int index);
   bool typeSupportsAdditionalOptions(const Common::MemType type) const;
@@ -172,7 +171,7 @@ private:
   bool m_wasUnknownInitialValue = false;
   char* m_scanRAMCache = nullptr;
   bool m_scanStarted = false;
-  
+
   struct MemScannerUndoAction
   {
     std::vector<u32> data;

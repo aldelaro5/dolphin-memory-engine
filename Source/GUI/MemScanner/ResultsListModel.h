@@ -28,7 +28,7 @@ public:
   bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
 
   u32 getResultAddress(const int row) const;
-  Common::MemOperationReturnCode updateScannerCurrentCache();
+  void updateScanner();
   void updateAfterScannerReset();
   void setShowThreshold(size_t showThreshold);
 

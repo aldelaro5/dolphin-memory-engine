@@ -17,17 +17,13 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
                                                      const std::string& searchTerm2)
 {
   m_scanRAMCache = nullptr;
-  if (DolphinComm::DolphinAccessor::updateRAMCache() != Common::MemOperationReturnCode::OK)
-  {
-    return Common::MemOperationReturnCode::operationFailed;
-  }
-  u32 ramSize = static_cast<u32>(DolphinComm::DolphinAccessor::getRAMCacheSize());
+  u32 ramSize = static_cast<u32>(DolphinComm::DolphinAccessor::getRAMTotalSize());
   m_scanRAMCache = new char[ramSize];
-  std::memcpy(m_scanRAMCache, DolphinComm::DolphinAccessor::getRAMCache(), ramSize);
+  DolphinComm::DolphinAccessor::readEntireRAM(m_scanRAMCache);
 
   u32 beginA = m_searchInRangeBegin ? m_beginSearchRange : 0;
   u32 endA = m_searchInRangeEnd ? m_endSearchRange : ramSize;
- 
+
   if (m_searchInRangeBegin || m_searchInRangeEnd)
   {
     ramSize = endA - beginA;
@@ -185,13 +181,9 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
                                                     const std::string& searchTerm2)
 {
   char* newerRAMCache = nullptr;
-  if (DolphinComm::DolphinAccessor::updateRAMCache() != Common::MemOperationReturnCode::OK)
-  {
-    return Common::MemOperationReturnCode::operationFailed;
-  }
-  u32 ramSize = static_cast<u32>(DolphinComm::DolphinAccessor::getRAMCacheSize());
+  u32 ramSize = static_cast<u32>(DolphinComm::DolphinAccessor::getRAMTotalSize());
   newerRAMCache = new char[ramSize];
-  std::memcpy(newerRAMCache, DolphinComm::DolphinAccessor::getRAMCache(), ramSize);
+  DolphinComm::DolphinAccessor::readEntireRAM(newerRAMCache);
 
   Common::MemOperationReturnCode scanReturn = Common::MemOperationReturnCode::OK;
   size_t termActualLength = 0;
@@ -238,7 +230,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
 
   std::vector<u32> newerResults = std::vector<u32>();
   bool aramAccessible = DolphinComm::DolphinAccessor::isARAMAccessible();
-  
+
   bool wasUninitialized = m_wasUnknownInitialValue;
 
   if (m_wasUnknownInitialValue)
@@ -444,9 +436,10 @@ bool MemScanner::setSearchRange(u32 beginRange, u32 endRange)
   m_searchInRangeBegin = true;
   m_searchInRangeEnd = true;
   bool aram = DolphinComm::DolphinAccessor::isARAMAccessible();
-  m_beginSearchRange = Common::offsetToCacheIndex(Common::dolphinAddrToOffset(beginRange, aram), aram);
+  m_beginSearchRange =
+      Common::offsetToCacheIndex(Common::dolphinAddrToOffset(beginRange, aram), aram);
   m_endSearchRange = Common::offsetToCacheIndex(Common::dolphinAddrToOffset(endRange, aram), aram);
-    
+
   return true;
 }
 
@@ -459,7 +452,8 @@ bool MemScanner::setSearchRangeBegin(u32 beginRange)
 
   m_searchInRangeBegin = true;
   bool aram = DolphinComm::DolphinAccessor::isARAMAccessible();
-  m_beginSearchRange = Common::offsetToCacheIndex(Common::dolphinAddrToOffset(beginRange, aram), aram);
+  m_beginSearchRange =
+      Common::offsetToCacheIndex(Common::dolphinAddrToOffset(beginRange, aram), aram);
 
   return true;
 }
@@ -473,7 +467,8 @@ bool MemScanner::setSearchRangeEnd(u32 endRange)
 
   m_searchInRangeEnd = true;
   bool aram = DolphinComm::DolphinAccessor::isARAMAccessible();
-  m_endSearchRange = Common::offsetToCacheIndex(Common::dolphinAddrToOffset(endRange, aram), aram) + 1;
+  m_endSearchRange =
+      Common::offsetToCacheIndex(Common::dolphinAddrToOffset(endRange, aram), aram) + 1;
 
   return true;
 }
@@ -510,20 +505,14 @@ std::string MemScanner::getFormattedScannedValueAt(const int index) const
                                       !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
 }
 
-Common::MemOperationReturnCode MemScanner::updateCurrentRAMCache()
-{
-  return DolphinComm::DolphinAccessor::updateRAMCache();
-}
-
 std::string MemScanner::getFormattedCurrentValueAt(const int index) const
 {
   if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_resultsConsoleAddr.at(index)))
   {
     bool aramAccessible = DolphinComm::DolphinAccessor::isARAMAccessible();
     u32 offset = Common::dolphinAddrToOffset(m_resultsConsoleAddr.at(index), aramAccessible);
-    u32 ramIndex = Common::offsetToCacheIndex(offset, aramAccessible);
-    return DolphinComm::DolphinAccessor::getFormattedValueFromCache(ramIndex, m_memType, m_memSize,
-                                                                    m_memBase, !m_memIsSigned);
+    return DolphinComm::DolphinAccessor::getFormattedValueFromMemory(offset, m_memType, m_memSize,
+                                                                     m_memBase, !m_memIsSigned);
   }
   return "";
 }
@@ -566,7 +555,7 @@ bool MemScanner::undoScan()
 
     if (wasUninitialzed)
     {
-      u32 ramSize = static_cast<u32>(DolphinComm::DolphinAccessor::getRAMCacheSize());
+      u32 ramSize = static_cast<u32>(DolphinComm::DolphinAccessor::getRAMTotalSize());
       int alignementDivision =
           m_enforceMemAlignment ? Common::getNbrBytesAlignmentForType(m_memType) : 1;
       m_resultCount = ((ramSize / alignementDivision) -

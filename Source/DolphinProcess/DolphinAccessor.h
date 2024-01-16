@@ -31,18 +31,15 @@ public:
   static bool isARAMAccessible();
   static u64 getARAMAddressStart();
   static bool isMEM2Present();
-  static char* getRAMCache();
-  static size_t getRAMCacheSize();
-  static Common::MemOperationReturnCode updateRAMCache();
-  static std::string getFormattedValueFromCache(const u32 ramIndex, Common::MemType memType,
-                                                size_t memSize, Common::MemBase memBase,
-                                                bool memIsUnsigned);
-  static void copyRawMemoryFromCache(char* dest, const u32 consoleAddress, const size_t byteCount);
+  static size_t getRAMTotalSize();
+  static Common::MemOperationReturnCode readEntireRAM(char* buffer);
+  static std::string getFormattedValueFromMemory(const u32 ramIndex, Common::MemType memType,
+                                                 size_t memSize, Common::MemBase memBase,
+                                                 bool memIsUnsigned);
   static bool isValidConsoleAddress(const u32 address);
 
 private:
   static IDolphinProcess* m_instance;
   static DolphinStatus m_status;
-  static char* m_updatedRAMCache;
 };
-} // namespace DolphinComm
+}  // namespace DolphinComm
