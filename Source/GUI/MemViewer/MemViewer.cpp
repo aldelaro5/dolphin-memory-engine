@@ -15,6 +15,7 @@
 #include <QPainter>
 #include <QRegularExpression>
 #include <QScrollBar>
+#include <QFontDatabase>
 
 #include "../../Common/CommonUtils.h"
 #include "../../DolphinProcess/DolphinAccessor.h"
@@ -372,6 +373,10 @@ void MemViewer::updateFontSize(int newSize)
   setFont(QFont("Monospace", m_memoryFontSize));
 #elif _WIN32
   setFont(QFont("Courier New", m_memoryFontSize));
+#elif __APPLE__
+  QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+  fixedFont.setPointSize(m_memoryFontSize);
+  setFont(fixedFont);
 #endif
 
   m_charWidthEm = fontMetrics().horizontalAdvance(QLatin1Char('M'));
