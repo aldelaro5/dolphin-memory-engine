@@ -106,6 +106,7 @@ bool LinuxDolphinProcess::findPID()
   if (directoryPointer == nullptr)
     return false;
 
+  m_PID = -1;
   struct dirent* directoryEntry = nullptr;
   while (m_PID == -1 && (directoryEntry = readdir(directoryPointer)))
   {

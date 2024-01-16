@@ -18,6 +18,7 @@ bool WindowsDolphinProcess::findPID()
 
   HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
 
+  m_PID = -1;
   if (Process32First(snapshot, &entry) == TRUE)
   {
     do
