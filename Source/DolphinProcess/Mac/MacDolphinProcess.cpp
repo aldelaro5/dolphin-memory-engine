@@ -83,7 +83,6 @@ bool MacDolphinProcess::obtainEmuRAMInformations()
         m_ARAMAccessible = true;
       }
 
-      m_emuRAMAddressStart = regionAddr;
       MEM1Found = true;
       MEM1Obj = topInfo.obj_id;
     }
