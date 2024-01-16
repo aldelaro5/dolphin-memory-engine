@@ -242,5 +242,5 @@ bool WindowsDolphinProcess::writeToRAM(const u32 offset, const char* buffer, con
   delete[] bufferCopy;
   return (bResult && nread == size);
 }
-} // namespace DolphinComm
+}  // namespace DolphinComm
 #endif

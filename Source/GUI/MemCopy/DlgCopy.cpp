@@ -1,15 +1,15 @@
 #include "DlgCopy.h"
 
-#include "../../DolphinProcess/DolphinAccessor.h"
 #include <QAbstractButton>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <qmessagebox.h>
 #include <sstream>
 #include <utility>
-#include <qmessagebox.h>
 #include "../../Common/CommonUtils.h"
+#include "../../DolphinProcess/DolphinAccessor.h"
 
 DlgCopy::DlgCopy(QWidget* parent) : QDialog(parent)
 {
@@ -29,7 +29,8 @@ DlgCopy::DlgCopy(QWidget* parent) : QDialog(parent)
 
   m_cmbViewerBytesSeparator = new QComboBox();
   m_cmbViewerBytesSeparator->addItem("Byte String", ByteStringFormats::ByteString);
-  m_cmbViewerBytesSeparator->addItem("Byte String (No Spaces)", ByteStringFormats::ByteStringNoSpaces);
+  m_cmbViewerBytesSeparator->addItem("Byte String (No Spaces)",
+                                     ByteStringFormats::ByteStringNoSpaces);
   m_cmbViewerBytesSeparator->addItem("Python Byte String", ByteStringFormats::PythonByteString);
   m_cmbViewerBytesSeparator->addItem("Python List", ByteStringFormats::PythonList);
   m_cmbViewerBytesSeparator->addItem("C Array", ByteStringFormats::CArray);
@@ -38,7 +39,7 @@ DlgCopy::DlgCopy(QWidget* parent) : QDialog(parent)
   m_spnWatcherCopyOutput = new QTextEdit();
   m_spnWatcherCopyOutput->setWordWrapMode(QTextOption::WrapMode::WrapAnywhere);
   copySettingsLayout->addRow("Output", m_spnWatcherCopyOutput);
-  
+
   grbCopySettings->setLayout(entireCopyLayout);
 
   m_buttonsDlg = new QDialogButtonBox(QDialogButtonBox::Apply | QDialogButtonBox::Close);
@@ -58,10 +59,7 @@ DlgCopy::DlgCopy(QWidget* parent) : QDialog(parent)
   });
 
   connect(m_cmbViewerBytesSeparator, &QComboBox::currentTextChanged, this,
-      [=](const QString& string)
-      {
-          updateMemoryText();
-      });
+          [=](const QString& string) { updateMemoryText(); });
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(grbCopySettings);
@@ -101,7 +99,7 @@ bool DlgCopy::copyMemory()
           tr(" or between 0x%08X and 0x%08X").arg(Common::MEM2_START, Common::GetMEM2End() - 1));
 
     errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid address"), errorMsg,
-                                            QMessageBox::Ok, nullptr);
+                               QMessageBox::Ok, nullptr);
     errorBox->exec();
 
     return false;
@@ -132,9 +130,9 @@ bool DlgCopy::copyMemory()
 
     return false;
   }
-    
+
   std::vector<char> newData(count);
-  
+
   if (!DolphinComm::DolphinAccessor::readFromRAM(
           Common::dolphinAddrToOffset(address, DolphinComm::DolphinAccessor::isARAMAccessible()),
           newData.data(), newData.size(), false))
@@ -146,7 +144,7 @@ bool DlgCopy::copyMemory()
 
     return false;
   }
-  
+
   m_Data = newData;
 
   updateMemoryText();
@@ -156,7 +154,8 @@ bool DlgCopy::copyMemory()
 
 void DlgCopy::updateMemoryText()
 {
-  m_spnWatcherCopyOutput->setText(QString::fromStdString(charToHexString(m_Data.data(), m_Data.size(),
+  m_spnWatcherCopyOutput->setText(QString::fromStdString(
+      charToHexString(m_Data.data(), m_Data.size(),
                       (DlgCopy::ByteStringFormats)m_cmbViewerBytesSeparator->currentIndex())));
 }
 
@@ -197,7 +196,7 @@ bool DlgCopy::hexStringToU32(std::string str, u32& output)
 
 bool DlgCopy::isUnsignedIntegerString(std::string str)
 {
-  for (char c: str)
+  for (char c : str)
   {
     if (c >= '0' && c <= '9')
     {
@@ -231,7 +230,7 @@ std::string DlgCopy::charToHexString(char* input, size_t count, DlgCopy::ByteStr
   std::string beforeByte = "";
   std::string betweenBytes = "";
   std::string afterAll = "";
-  
+
   switch (format)
   {
   case ByteString:
@@ -267,13 +266,13 @@ std::string DlgCopy::charToHexString(char* input, size_t count, DlgCopy::ByteStr
   default:
     return "";
   }
-  
+
   ss << beforeAll;
 
   for (int i = 0; i < count; i++)
   {
     ss << beforeByte << convert[(input[i] >> 4) & 0xf] << convert[input[i] & 0xf];
-    
+
     if (i != count - 1)
     {
       ss << betweenBytes;

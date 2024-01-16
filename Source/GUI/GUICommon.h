@@ -17,4 +17,4 @@ QString getNameFromBase(const Common::MemBase base);
 void changeApplicationStyle(int);
 
 extern bool g_valueEditing;
-} // namespace GUICommon
+}  // namespace GUICommon

@@ -10,9 +10,9 @@
 #include <QVBoxLayout>
 #include <string>
 
-#include "GUICommon.h"
 #include "../DolphinProcess/DolphinAccessor.h"
 #include "../MemoryWatch/MemWatchEntry.h"
+#include "GUICommon.h"
 #include "Settings/DlgSettings.h"
 #include "Settings/SConfig.h"
 
@@ -159,9 +159,9 @@ void MainWindow::makeLayouts()
   if (SConfig::getInstance().getSplitterState().size())
     splitter->restoreState(SConfig::getInstance().getSplitterState());
 
-  connect(splitter, &QSplitter::splitterMoved,
-          [splitter = splitter]()
-          { SConfig::getInstance().setSplitterState(splitter->saveState()); });
+  connect(splitter, &QSplitter::splitterMoved, [splitter = splitter]() {
+    SConfig::getInstance().setSplitterState(splitter->saveState());
+  });
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_lblDolphinStatus);
@@ -427,9 +427,11 @@ void MainWindow::onAbout()
       tr("A RAM search made to facilitate research and reverse engineering of GameCube and Wii "
          "games using the Dolphin emulator.") +
       "<br>" +
-      tr("<a href=\"https://github.com/aldelaro5/dolphin-memory-engine\">Visit the project page</a> to learn more and check for updates.") +
+      tr("<a href=\"https://github.com/aldelaro5/dolphin-memory-engine\">Visit the project "
+         "page</a> to learn more and check for updates.") +
       "<br><br>" +
-      tr("This program is licensed under the MIT license. You should have received a copy of the MIT license along with this program.");
+      tr("This program is licensed under the MIT license. You should have received a copy of the "
+         "MIT license along with this program.");
 
   QMessageBox aboutBox;
   aboutBox.setWindowTitle(title);

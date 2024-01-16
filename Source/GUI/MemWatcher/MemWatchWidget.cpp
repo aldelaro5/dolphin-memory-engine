@@ -175,18 +175,14 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
         QAction* viewOct = new QAction(tr("View as &Octal"), this);
         QAction* viewBin = new QAction(tr("View as &Binary"), this);
 
-        connect(viewDec, &QAction::triggered, m_watchModel, [=] {
-          setSelectedWatchesBase(entry, Common::MemBase::base_decimal);
-        });
-        connect(viewHex, &QAction::triggered, m_watchModel, [=] {
-          setSelectedWatchesBase(entry, Common::MemBase::base_hexadecimal);
-        });
-        connect(viewOct, &QAction::triggered, m_watchModel, [=] {
-          setSelectedWatchesBase(entry, Common::MemBase::base_octal);
-        });
-        connect(viewBin, &QAction::triggered, m_watchModel, [=] {
-          setSelectedWatchesBase(entry, Common::MemBase::base_binary);
-        });
+        connect(viewDec, &QAction::triggered, m_watchModel,
+                [=] { setSelectedWatchesBase(entry, Common::MemBase::base_decimal); });
+        connect(viewHex, &QAction::triggered, m_watchModel,
+                [=] { setSelectedWatchesBase(entry, Common::MemBase::base_hexadecimal); });
+        connect(viewOct, &QAction::triggered, m_watchModel,
+                [=] { setSelectedWatchesBase(entry, Common::MemBase::base_octal); });
+        connect(viewBin, &QAction::triggered, m_watchModel,
+                [=] { setSelectedWatchesBase(entry, Common::MemBase::base_binary); });
 
         contextMenu->addAction(viewDec);
         contextMenu->addAction(viewHex);

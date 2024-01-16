@@ -143,4 +143,4 @@ inline u32 cacheIndexToOffset(u32 cacheIndex, bool considerAram)
   }
   return cacheIndex;
 }
-} // namespace Common
+}  // namespace Common
