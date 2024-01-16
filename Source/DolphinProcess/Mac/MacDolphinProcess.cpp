@@ -22,6 +22,7 @@ bool MacDolphinProcess::findPID()
   if(sysctl((int*) mib, 4, procs.get(), &procSize, NULL, 0) == -1)
     return false;
 
+  m_PID = -1;
   for(int i = 0; i < procSize / sizeof(kinfo_proc); i++)
   {
     if(std::strcmp(procs[i].kp_proc.p_comm, "Dolphin") == 0 ||
