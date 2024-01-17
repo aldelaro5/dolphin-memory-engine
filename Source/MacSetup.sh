@@ -4,37 +4,10 @@ dme="./build/Dolphin-memory-engine"
 entitlements="./entitlements.xml"
 emphasis='\033[0;31m'
 
-function dme_sign
-{
-    echo "(1) Signing Dolphin-memory-engine"
-    printf "Skip? [y/N] "
-    read -r skip
-    case "$skip" in
-        n|N|"") ;;
-        *) return ;;
-    esac
-
-    printf "Enter location of executable (default=$dme): "
-    read -r dme_
-    if [ ! -z "$dme_" ]; then dme="$dme_"; fi
-
-    printf "Enter location of entitlements (default=$entitlements): "
-    read -r entitlements_
-    if [ ! -z "$entitlements_" ]; then entitlements="$entitlements_"; fi
-
-    codesign -s "$certificate" --entitlements "$entitlements" "$dme"
-    if [ $? -ne 0 ]; then
-        echo "Dolphin-memory-engine could not be signed!"
-        exit 1
-    fi
-    echo "Success!"
-
-}
-
 function dolphin_sign
 {
 
-    echo "(2) Re-signing Dolphin Emulator (usually necessary for new installs)"
+    echo "Signing Dolphin Emulator (usually necessary for new installs)"
     printf "Skip? [y/N] "
     read -r skip
     case "$skip" in
@@ -52,14 +25,14 @@ function dolphin_sign
     fi
 
     new_ent="$(mktemp)"
-    codesign -d --entitlements :- "$dolphin" 2> /dev/null | sed 's:</dict>:<key>com.apple.security.get-task-allow</key><true/></dict>:' > "$new_ent"
-    codesign --remove-signature "$dolphin"
+    sudo codesign -d --entitlements :- "$dolphin" 2> /dev/null | sed 's:</dict>:<key>com.apple.security.get-task-allow</key><true/></dict>:' > "$new_ent"
+    sudo codesign --remove-signature "$dolphin"
     if [ $? -ne 0 ]; then
         echo "Dolphin signature could not be removed!"
         exit 1
     fi
 
-    codesign -s "$certificate" --entitlements "$new_ent" --deep "$dolphin"
+    sudo codesign -s "$certificate" --entitlements "$new_ent" --deep "$dolphin"
     if [ $? -ne 0 ]; then
         echo "Dolphin could not be re-signed!"
         exit 1
@@ -76,6 +49,7 @@ if [ -z "$(security find-certificate -c "$certificate" | grep System)" ]; then
     exit 1
 fi
 
-dme_sign
-echo
 dolphin_sign
+
+echo
+echo "\033[1mIf macOS initially prevents Dolphin from starting, go to System Settings > Privacy & Security > Open Anyway (scroll to the bottom).\033[0m"

@@ -64,7 +64,7 @@ To build, simply run the following commands from the `Source` directory:
 The compiled binaries should be appear in the directory named `build`.
 
 ## MacOS code signing
-Due to security hardening on recent versions of macOS, the final executable must be signed with a valid certificate and entitlements to have access to Dolphin's memory. Additionally, Dolphin Emulator itself must be re-signed with new entitlements in some cases. First, [create a code signing certificate](https://sourceware.org/gdb/wiki/PermissionsDarwin):
+Due to security hardening on recent versions of macOS, the Dolphin Emulator executable must be signed with a valid certificate and entitlements so that it can be debugged. First, [create a code signing certificate](https://sourceware.org/gdb/wiki/PermissionsDarwin):
 
 > Start Keychain Access application (/Applications/Utilities/Keychain Access.app)
 >
@@ -72,7 +72,7 @@ Due to security hardening on recent versions of macOS, the final executable must
 >
 > Choose a name (gdb-cert in the example), set Identity Type to Self Signed Root, set Certificate Type to Code Signing and select the Let me override defaults. Click several times on Continue until you get to the Specify a Location For The Certificate screen, then set Keychain to System.
 
-Then, run the interactive `MacSetup.sh` script inside the `Source` directory to re-sign Dolphin Emulator and Dolphin-memory-engine:
+Then, run the interactive `MacSetup.sh` script inside the `Source` directory to re-sign Dolphin Emulator:
 
     ./MacSetup.sh
 
@@ -101,7 +101,7 @@ Where `DME` is the path of the Dolphin Memory Engine executable.  This should fi
 
 If it doesn't work, verify that you do not have the `nosuid` mount flag on your `/etc/fstab` as it can cause this command to silently fail.
 
-On macOS, the DME executable and Dolphin itself (upon install or after an update) must be signed with specific entitlements to permit memory access. Follow the instructions [above](#macos-code-signing).
+On macOS, Dolphin (upon install or after an update) must be signed with specific entitlements to permit memory access. Follow the instructions [above](#macos-code-signing).
 
 ## License
 This program is licensed under the MIT license which grants you the permission to do  anything you wish to with the software, as long as you preserve all copyright notices. (See the file LICENSE for the legal text.)
