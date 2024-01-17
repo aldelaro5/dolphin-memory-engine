@@ -18,6 +18,7 @@ bool WindowsDolphinProcess::findPID()
 
   HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
 
+  m_PID = -1;
   if (Process32First(snapshot, &entry) == TRUE)
   {
     do
@@ -242,5 +243,5 @@ bool WindowsDolphinProcess::writeToRAM(const u32 offset, const char* buffer, con
   delete[] bufferCopy;
   return (bResult && nread == size);
 }
-} // namespace DolphinComm
+}  // namespace DolphinComm
 #endif

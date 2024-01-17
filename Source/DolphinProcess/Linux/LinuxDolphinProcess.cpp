@@ -106,6 +106,7 @@ bool LinuxDolphinProcess::findPID()
   if (directoryPointer == nullptr)
     return false;
 
+  m_PID = -1;
   struct dirent* directoryEntry = nullptr;
   while (m_PID == -1 && (directoryEntry = readdir(directoryPointer)))
   {
@@ -265,5 +266,5 @@ bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const
 
   return true;
 }
-} // namespace DolphinComm
+}  // namespace DolphinComm
 #endif

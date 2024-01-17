@@ -73,12 +73,9 @@ QVariant ResultsListModel::headerData(int section, Qt::Orientation orientation, 
   return QVariant();
 }
 
-Common::MemOperationReturnCode ResultsListModel::updateScannerCurrentCache()
+void ResultsListModel::updateScanner()
 {
-  Common::MemOperationReturnCode updateReturn = m_scanner->updateCurrentRAMCache();
-  if (updateReturn == Common::MemOperationReturnCode::OK)
-    emit layoutChanged();
-  return updateReturn;
+  emit layoutChanged();
 }
 
 void ResultsListModel::updateAfterScannerReset()

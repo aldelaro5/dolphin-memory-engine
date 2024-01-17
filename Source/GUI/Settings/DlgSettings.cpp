@@ -1,7 +1,7 @@
 #include "DlgSettings.h"
 
-#include <QApplication>
 #include <QAbstractButton>
+#include <QApplication>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
@@ -16,7 +16,8 @@ DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
   m_cmbTheme = new QComboBox();
   m_cmbTheme->addItem("Dark", 0);
   m_cmbTheme->addItem("Light", 1);
-  connect(m_cmbTheme, QOverload<int>::of(&QComboBox::currentIndexChanged), this, GUICommon::changeApplicationStyle);
+  connect(m_cmbTheme, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+          GUICommon::changeApplicationStyle);
 
   QFormLayout* coreSettingsInputLayout = new QFormLayout();
   coreSettingsInputLayout->addRow("Theme", m_cmbTheme);
@@ -102,12 +103,12 @@ DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
   m_lblMEM2Size = new QLabel();
   m_sldMEM1Size = new QSlider(Qt::Horizontal);
   m_sldMEM2Size = new QSlider(Qt::Horizontal);
-  connect(m_sldMEM1Size, &QSlider::valueChanged,
-          [this](int slider_value)
-          { m_lblMEM1Size->setText(tr("%1 MB (MEM1)").arg(QString::number(slider_value))); });
-  connect(m_sldMEM2Size, &QSlider::valueChanged,
-          [this](int slider_value)
-          { m_lblMEM2Size->setText(tr("%1 MB (MEM2)").arg(QString::number(slider_value))); });
+  connect(m_sldMEM1Size, &QSlider::valueChanged, [this](int slider_value) {
+    m_lblMEM1Size->setText(tr("%1 MB (MEM1)").arg(QString::number(slider_value)));
+  });
+  connect(m_sldMEM2Size, &QSlider::valueChanged, [this](int slider_value) {
+    m_lblMEM2Size->setText(tr("%1 MB (MEM2)").arg(QString::number(slider_value)));
+  });
   m_sldMEM1Size->setRange(24, 64);
   m_sldMEM2Size->setRange(64, 128);
 
@@ -125,9 +126,9 @@ DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
   grbMemorySizeSettings->setLayout(memorySettingsInputLayout);
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
-  #ifdef _WIN32
-    mainLayout->addWidget(grbCoreSettings);
-  #endif
+#ifdef _WIN32
+  mainLayout->addWidget(grbCoreSettings);
+#endif
   mainLayout->addWidget(grbTimerSettings);
   mainLayout->addWidget(grbScannerSettings);
   mainLayout->addWidget(grbViewerSettings);
@@ -154,8 +155,7 @@ void DlgSettings::loadSettings()
   m_spnScannerShowThreshold->setValue(SConfig::getInstance().getScannerShowThreshold());
   m_cmbViewerBytesSeparator->setCurrentIndex(
       m_cmbViewerBytesSeparator->findData(SConfig::getInstance().getViewerNbrBytesSeparator()));
-  m_cmbTheme->setCurrentIndex(
-      m_cmbTheme->findData(SConfig::getInstance().getTheme()));
+  m_cmbTheme->setCurrentIndex(m_cmbTheme->findData(SConfig::getInstance().getTheme()));
   // This erases fractional mebibyte sizes, but nobody should be using those anyway.
   m_sldMEM1Size->setValue(SConfig::getInstance().getMEM1Size() / 1024 / 1024);
   m_sldMEM2Size->setValue(SConfig::getInstance().getMEM2Size() / 1024 / 1024);

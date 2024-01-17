@@ -83,4 +83,4 @@ void changeApplicationStyle(int index)
   }
 }
 
-} // namespace GUICommon
+}  // namespace GUICommon

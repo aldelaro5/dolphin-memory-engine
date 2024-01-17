@@ -2,9 +2,9 @@
 
 #include <QComboBox>
 #include <QDialog>
+#include <QDialogButtonBox>
 #include <QSpinBox>
 #include <qlineedit.h>
-#include <QDialogButtonBox>
 #include <qtextedit.h>
 
 #include "../GUICommon.h"
@@ -29,7 +29,7 @@ private:
   void enablePage(bool enable);
   bool copyMemory();
   void updateMemoryText();
-  
+
   static bool hexStringToU32(std::string str, u32& output);
   static bool isHexString(std::string str);
   static bool isUnsignedIntegerString(std::string str);

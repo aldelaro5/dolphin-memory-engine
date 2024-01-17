@@ -97,11 +97,12 @@ void MemViewer::memoryValidityChanged(const bool valid)
 void MemViewer::updateMemoryData()
 {
   std::swap(m_updatedRawMemoryData, m_lastRawMemoryData);
-  m_validMemory =
-      (DolphinComm::DolphinAccessor::updateRAMCache() == Common::MemOperationReturnCode::OK);
+  m_validMemory = false;
   if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress))
-    DolphinComm::DolphinAccessor::copyRawMemoryFromCache(m_updatedRawMemoryData,
-                                                         m_currentFirstAddress, m_numCells);
+    m_validMemory = DolphinComm::DolphinAccessor::readFromRAM(
+        Common::dolphinAddrToOffset(m_currentFirstAddress,
+                                    DolphinComm::DolphinAccessor::isARAMAccessible()),
+        m_updatedRawMemoryData, m_numCells, false);
   if (!m_validMemory)
     emit memErrorOccured();
 }
@@ -412,12 +413,17 @@ void MemViewer::copySelection(Common::MemType type)
   char* selectedMem = new char[selectionLength];
   if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress))
   {
-    DolphinComm::DolphinAccessor::copyRawMemoryFromCache(
-        selectedMem, m_currentFirstAddress + indexStart, selectionLength);
-    std::string bytes = Common::formatMemoryToString(selectedMem, type, selectionLength,
-                                                     Common::MemBase::base_none, true);
-    QClipboard* clipboard = QGuiApplication::clipboard();
-    clipboard->setText(QString::fromStdString(bytes));
+    bool valid = DolphinComm::DolphinAccessor::readFromRAM(
+        Common::dolphinAddrToOffset(m_currentFirstAddress + indexStart,
+                                    DolphinComm::DolphinAccessor::isARAMAccessible()),
+        selectedMem, selectionLength, false);
+    if (valid)
+    {
+      std::string bytes = Common::formatMemoryToString(selectedMem, type, selectionLength,
+                                                       Common::MemBase::base_none, true);
+      QClipboard* clipboard = QGuiApplication::clipboard();
+      clipboard->setText(QString::fromStdString(bytes));
+    }
   }
   delete[] selectedMem;
 }
