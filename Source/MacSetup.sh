@@ -1,6 +1,5 @@
 #!/bin/sh
 dolphin="/Applications/Dolphin.app/Contents/MacOS/Dolphin"
-dme="./build/Dolphin-memory-engine"
 entitlements="./entitlements.xml"
 emphasis='\033[0;31m'
 
