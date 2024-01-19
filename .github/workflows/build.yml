@@ -1,4 +1,4 @@
-name: Build
+name: 🔨 Build
 
 on:
   push:
@@ -11,6 +11,7 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    name: 🪟 Windows x86_64
     strategy:
       matrix:
         configuration: [Release]
@@ -51,6 +52,7 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-22.04
+    name: 🐧 Linux x86_64
 
     steps:
       - name: Checkout code
@@ -100,3 +102,39 @@ jobs:
         with:
           name: linux-ubuntu-22.04-appimage
           path: dolphin-memory-engine.AppImage
+
+  build-macos-intel:
+    runs-on: macos-13
+    name: 🍎 macOS Intel
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          brew install qt@6 cmake
+          export PATH="$(brew --prefix qt@6):$PATH"
+        shell: bash
+
+      - name: Build
+        run: |
+          mkdir Source/build
+          cd Source/build
+          cmake ..
+          make
+        shell: bash
+
+      - name: Copy LICENSE, README, Prepare Artifacts
+        run: |
+          mkdir Source/build/artifacts
+          cp ./README.md ./Source/build/artifacts/
+          cp ./LICENSE ./Source/build/artifacts/
+          cp -r ./Source/build/dolphin-memory-engine ./Source/build/artifacts/
+        shell: bash
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: macOS-intel
+          path: Source/build/artifacts
