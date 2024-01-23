@@ -130,7 +130,7 @@ jobs:
           mkdir Source/build/artifacts
           cp ./README.md ./Source/build/artifacts/
           cp ./LICENSE ./Source/build/artifacts/
-          cp -r ./Source/build/dolphin-memory-engine ./Source/build/artifacts/
+          cp -r ./Source/build/dolphin-memory-engine.app ./Source/build/artifacts/
         shell: bash
 
       - name: Publish Artifacts

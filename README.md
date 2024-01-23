@@ -53,7 +53,7 @@ The Windows SDK version 10.0.22621.0 comes with the C++ Desktop Development Work
 > _CMake and Qt 6 are required. Please refer to your distribution's documentation for specific instructions on how to install them._
 
 ### MacOS
-Xcode, Qt 5, and CMake are required. These can be installed through `xcode-select --install`, `brew install qt`, and `brew install cmake` (you may need to install [brew](https://brew.sh) first). Ensure that Qt is symlinked into a place that CMake can find it or added to `$PATH`. With brew, you can run `export PATH="$(brew --prefix qt):$PATH"` before compiling. **After compilation, continue to [macOS code signing](#macos-code-signing).**
+Xcode, Qt 6, and CMake are required. These can be installed through `xcode-select --install`, `brew install qt@6`, and `brew install cmake` (you may need to install [brew](https://brew.sh) first). Ensure that Qt is symlinked into a place that CMake can find it or added to `$PATH`. With brew, you can run `export PATH="$(brew --prefix qt@6):$PATH"` before compiling. **After compilation, continue to [macOS code signing](#macos-code-signing).**
 
 To build, simply run the following commands from the `Source` directory:
 

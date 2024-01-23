@@ -24,14 +24,14 @@ function dolphin_sign
     fi
 
     new_ent="$(mktemp)"
-    sudo codesign -d --entitlements :- "$dolphin" 2> /dev/null | sed 's:</dict>:<key>com.apple.security.get-task-allow</key><true/></dict>:' > "$new_ent"
-    sudo codesign --remove-signature "$dolphin"
+    codesign -d --entitlements :- "$dolphin" 2> /dev/null | sed 's:</dict>:<key>com.apple.security.get-task-allow</key><true/></dict>:' > "$new_ent"
+    codesign --remove-signature "$dolphin"
     if [ $? -ne 0 ]; then
-        echo "Dolphin signature could not be removed!"
+        echo "${emphasis}Dolphin signature could not be removed!\033[0m \n\033[1m** You may need to go to System Settings > Privacy & Security > App Management and enable the slider for 'Terminal'. **\033[0m"
         exit 1
     fi
 
-    sudo codesign -s "$certificate" --entitlements "$new_ent" --deep "$dolphin"
+    codesign -s "$certificate" --entitlements "$new_ent" --deep "$dolphin"
     if [ $? -ne 0 ]; then
         echo "Dolphin could not be re-signed!"
         exit 1

@@ -101,3 +101,17 @@ if(WIN32)
             $<TARGET_FILE_DIR:dolphin-memory-engine>/styles
 	)
 endif(WIN32)
+
+if(APPLE)
+    set_target_properties(dolphin-memory-engine PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_BUNDLE_NAME "Dolphin Memory Engine"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.aldelaro5.dolphin-memory-engine"
+    )
+
+    set(MACOSX_BUNDLE_ICON_FILE "logo.icns")
+    set(app_icon_macos "Resources/logo.icns")
+    set_source_files_properties(${app_icon_macos} PROPERTIES
+           MACOSX_PACKAGE_LOCATION "Resources")
+    configure_file(${app_icon_macos} ${CMAKE_BINARY_DIR}/dolphin-memory-engine.app/Contents/Resources/${MACOSX_BUNDLE_ICON_FILE} COPYONLY)
+endif(APPLE)
