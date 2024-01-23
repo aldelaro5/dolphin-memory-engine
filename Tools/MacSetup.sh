@@ -1,6 +1,5 @@
 #!/bin/sh
 dolphin="/Applications/Dolphin.app/Contents/MacOS/Dolphin"
-entitlements="./entitlements.xml"
 emphasis='\033[0;31m'
 
 function dolphin_sign
