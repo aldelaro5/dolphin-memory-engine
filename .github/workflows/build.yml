@@ -110,19 +110,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+      
       - name: Install Dependencies
         run: |
-          brew install qt@6 cmake
-          export PATH="$(brew --prefix qt@6):$PATH"
+          brew install cmake
         shell: bash
+      
+      - name: Initialize submodules
+        run: git submodule update --init
 
       - name: Build
         run: |
           mkdir Source/build
           cd Source/build
-          cmake ..
+          cmake .. -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)"
           make
+          echo -e "\n" | ../../Tools/MacDeploy.sh
         shell: bash
 
       - name: Copy LICENSE, README, Prepare Artifacts
@@ -130,7 +133,7 @@ jobs:
           mkdir Source/build/artifacts
           cp ./README.md ./Source/build/artifacts/
           cp ./LICENSE ./Source/build/artifacts/
-          cp -r ./Source/build/dolphin-memory-engine.app ./Source/build/artifacts/
+          cp ./Source/build/dolphin-memory-engine.dmg ./Source/build/artifacts/
         shell: bash
 
       - name: Publish Artifacts
