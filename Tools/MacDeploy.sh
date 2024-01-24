@@ -7,4 +7,4 @@ read -r package_
 if [ ! -z "$package_" ]; then package="$package_"; fi
 
 cd "$package/.."
-"$project_root/Externals/Qt-macOS/bin/macdeployqt" "$(basename "$package")" -dmg
+"$project_root/Externals/Qt-macOS/bin/macdeployqt" "$(basename "$package")" -dmg -codesign=-
