@@ -6,4 +6,3 @@
 [submodule "Externals/Qt-macOS"]
 	path = Externals/Qt-macOS
 	url = https://github.com/campital/ext-macos-qt-dme
-	branch = master
