@@ -37,6 +37,7 @@ public:
   void onOpenMemViewerWithAddress(u32 address);
   void updateMem2Status();
 
+  void onSplitterMoved(int pos, int index);
   void onOpenWatchFile();
   void onSaveWatchFile();
   void onSaveAsWatchFile();

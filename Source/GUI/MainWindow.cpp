@@ -158,9 +158,7 @@ void MainWindow::makeLayouts()
   if (SConfig::getInstance().getSplitterState().size())
     m_splitter->restoreState(SConfig::getInstance().getSplitterState());
 
-  connect(m_splitter, &QSplitter::splitterMoved, [splitter = m_splitter]() {
-    SConfig::getInstance().setSplitterState(splitter->saveState());
-  });
+  connect(m_splitter, &QSplitter::splitterMoved, this, &MainWindow::onSplitterMoved);
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_lblDolphinStatus);
@@ -355,6 +353,11 @@ void MainWindow::onHookIfNotHooked()
   {
     onHookAttempt();
   }
+}
+
+void MainWindow::onSplitterMoved(const int pos, const int index)
+{
+  SConfig::getInstance().setSplitterState(m_splitter->saveState());
 }
 
 void MainWindow::onOpenWatchFile()
