@@ -3,6 +3,8 @@
 #include "Linux/LinuxDolphinProcess.h"
 #elif _WIN32
 #include "Windows/WindowsDolphinProcess.h"
+#elif __APPLE__
+#include "Mac/MacDolphinProcess.h"
 #endif
 
 #include <cstring>
@@ -25,6 +27,8 @@ void DolphinAccessor::init()
     m_instance = new LinuxDolphinProcess();
 #elif _WIN32
     m_instance = new WindowsDolphinProcess();
+#elif __APPLE__
+    m_instance = new MacDolphinProcess();
 #endif
   }
 }
