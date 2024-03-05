@@ -4,6 +4,7 @@
 #include <QCloseEvent>
 #include <QMainWindow>
 #include <QMenu>
+#include <QSplitter>
 #include <QTimer>
 
 #include "../Common/CommonTypes.h"
@@ -36,6 +37,7 @@ public:
   void onOpenMemViewerWithAddress(u32 address);
   void updateMem2Status();
 
+  void onSplitterMoved(int pos, int index);
   void onOpenWatchFile();
   void onSaveWatchFile();
   void onSaveAsWatchFile();
@@ -44,6 +46,7 @@ public:
   void onImportFromCT();
   void onExportAsCSV();
   void onCopyMemory();
+  void onScannerActionToggled(bool checked);
   void onAbout();
   void onQuit();
 
@@ -52,6 +55,8 @@ private:
   void initialiseWidgets();
   void makeLayouts();
   void makeMemViewer();
+
+  QSplitter* m_splitter{};
 
   MemWatchWidget* m_watcher;
   MemScanWidget* m_scanner;
@@ -80,6 +85,7 @@ private:
   QAction* m_actUnhook;
   QAction* m_actMemoryViewer;
   QAction* m_actCopyMemory;
+  QAction* m_actScanner{};
   QAction* m_actQuit;
   QAction* m_actAbout;
 };

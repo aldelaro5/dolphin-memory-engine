@@ -5,7 +5,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
-#include <QSplitter>
 #include <QString>
 #include <QVBoxLayout>
 #include <string>
@@ -74,6 +73,10 @@ void MainWindow::makeMenus()
 
   m_actMemoryViewer = new QAction(tr("&Memory Viewer"), this);
   m_actCopyMemory = new QAction(tr("&Copy Memory Range"), this);
+  m_actScanner = new QAction(tr("&Scanner"), this);
+  m_actScanner->setShortcut(QKeySequence("F3"));
+  m_actScanner->setCheckable(true);
+  m_actScanner->setChecked(m_splitter->sizes()[0] > 0);
 
   m_actQuit = new QAction(tr("&Quit"), this);
   m_actAbout = new QAction(tr("&About"), this);
@@ -92,6 +95,7 @@ void MainWindow::makeMenus()
 
   connect(m_actMemoryViewer, &QAction::triggered, this, &MainWindow::onOpenMenViewer);
   connect(m_actCopyMemory, &QAction::triggered, this, &MainWindow::onCopyMemory);
+  connect(m_actScanner, &QAction::toggled, this, &MainWindow::onScannerActionToggled);
 
   connect(m_actQuit, &QAction::triggered, this, &MainWindow::onQuit);
   connect(m_actAbout, &QAction::triggered, this, &MainWindow::onAbout);
@@ -117,6 +121,7 @@ void MainWindow::makeMenus()
   m_menuView = menuBar()->addMenu(tr("&View"));
   m_menuView->addAction(m_actMemoryViewer);
   m_menuView->addAction(m_actCopyMemory);
+  m_menuView->addAction(m_actScanner);
 
   m_menuHelp = menuBar()->addMenu(tr("&Help"));
   m_menuHelp->addAction(m_actAbout);
@@ -152,22 +157,20 @@ void MainWindow::makeLayouts()
   QFrame* separatorline = new QFrame();
   separatorline->setFrameShape(QFrame::HLine);
 
-  QSplitter* splitter = new QSplitter(Qt::Vertical);
-  splitter->addWidget(m_scanner);
-  splitter->addWidget(m_watcher);
+  m_splitter = new QSplitter(Qt::Vertical);
+  m_splitter->addWidget(m_scanner);
+  m_splitter->addWidget(m_watcher);
 
   if (SConfig::getInstance().getSplitterState().size())
-    splitter->restoreState(SConfig::getInstance().getSplitterState());
+    m_splitter->restoreState(SConfig::getInstance().getSplitterState());
 
-  connect(splitter, &QSplitter::splitterMoved, [splitter = splitter]() {
-    SConfig::getInstance().setSplitterState(splitter->saveState());
-  });
+  connect(m_splitter, &QSplitter::splitterMoved, this, &MainWindow::onSplitterMoved);
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(m_lblDolphinStatus);
   mainLayout->addWidget(m_lblMem2Status);
   mainLayout->addWidget(separatorline);
-  mainLayout->addWidget(splitter);
+  mainLayout->addWidget(m_splitter);
 
   QWidget* mainWidget = new QWidget();
   mainWidget->setLayout(mainLayout);
@@ -358,6 +361,26 @@ void MainWindow::onHookIfNotHooked()
   }
 }
 
+void MainWindow::onSplitterMoved(const int pos, const int index)
+{
+  SConfig::getInstance().setSplitterState(m_splitter->saveState());
+
+  const QList<int> currentSizes{m_splitter->sizes()};
+  const int totalSize{std::accumulate(currentSizes.begin(), currentSizes.end(), 0)};
+  const double scannerSize{static_cast<double>(currentSizes[0])};
+  const bool scannerVisible{scannerSize > 0};
+  if (scannerVisible)
+  {
+    const double scannerFactor{scannerSize / static_cast<double>(totalSize)};
+    m_splitter->setProperty("previous_scanner_factor", scannerFactor);
+  }
+
+  {
+    QSignalBlocker signalBlocker(m_actScanner);
+    m_actScanner->setChecked(scannerVisible);
+  }
+}
+
 void MainWindow::onOpenWatchFile()
 {
   if (m_watcher->warnIfUnsavedChanges())
@@ -393,6 +416,33 @@ void MainWindow::onCopyMemory()
 {
   m_copier->show();
   m_copier->raise();
+}
+
+void MainWindow::onScannerActionToggled(const bool checked)
+{
+  const QList<int> currentSizes{m_splitter->sizes()};
+  const int totalSize{std::accumulate(currentSizes.begin(), currentSizes.end(), 0)};
+
+  QList<int> sizes;
+  if (!checked)
+  {
+    const double scannerSize{static_cast<double>(currentSizes[0])};
+    const double scannerFactor{scannerSize / static_cast<double>(totalSize)};
+    m_splitter->setProperty("previous_scanner_factor", scannerFactor);
+
+    sizes << 0 << totalSize;
+  }
+  else
+  {
+    const QVariant scannerFactorVariant{m_splitter->property("previous_scanner_factor")};
+    const double scannerFactor{scannerFactorVariant.isValid() ? scannerFactorVariant.toDouble() :
+                                                                0.5};
+    const double scannerSize{std::round(scannerFactor * totalSize)};
+
+    sizes << scannerSize << totalSize - scannerSize;
+  }
+
+  m_splitter->setSizes(sizes);
 }
 
 void MainWindow::onOpenSettings()
