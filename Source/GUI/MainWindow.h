@@ -4,6 +4,7 @@
 #include <QCloseEvent>
 #include <QMainWindow>
 #include <QMenu>
+#include <QSplitter>
 #include <QTimer>
 
 #include "../Common/CommonTypes.h"
@@ -52,6 +53,8 @@ private:
   void initialiseWidgets();
   void makeLayouts();
   void makeMemViewer();
+
+  QSplitter* m_splitter{};
 
   MemWatchWidget* m_watcher;
   MemScanWidget* m_scanner;
