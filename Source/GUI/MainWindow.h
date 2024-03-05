@@ -46,6 +46,7 @@ public:
   void onImportFromCT();
   void onExportAsCSV();
   void onCopyMemory();
+  void onScannerActionToggled(bool checked);
   void onAbout();
   void onQuit();
 
@@ -84,6 +85,7 @@ private:
   QAction* m_actUnhook;
   QAction* m_actMemoryViewer;
   QAction* m_actCopyMemory;
+  QAction* m_actScanner{};
   QAction* m_actQuit;
   QAction* m_actAbout;
 };
