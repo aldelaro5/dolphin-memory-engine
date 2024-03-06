@@ -446,6 +446,8 @@ void MainWindow::onScannerActionToggled(const bool checked)
   }
 
   m_splitter->setSizes(sizes);
+
+  SConfig::getInstance().setSplitterState(m_splitter->saveState());
 }
 
 void MainWindow::onOpenSettings()
