@@ -5,8 +5,23 @@
 #include "../../Common/MemoryCommon.h"
 
 #include <Psapi.h>
+#ifdef UNICODE
+#include <codecvt>
+#endif
+#include <cstdlib>
 #include <string>
 #include <tlhelp32.h>
+
+namespace
+{
+#ifdef UNICODE
+std::wstring utf8_to_wstring(const std::string& str)
+{
+  std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
+  return myconv.from_bytes(str);
+}
+#endif
+}  // namespace
 
 namespace DolphinComm
 {
@@ -15,6 +30,8 @@ bool WindowsDolphinProcess::findPID()
 {
   PROCESSENTRY32 entry;
   entry.dwSize = sizeof(PROCESSENTRY32);
+
+  static const char* const s_dolphinProcessName{std::getenv("DME_DOLPHIN_PROCESS_NAME")};
 
   HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
 
@@ -25,11 +42,20 @@ bool WindowsDolphinProcess::findPID()
     {
 #ifdef UNICODE
       const std::wstring exeFile{entry.szExeFile};
-      if (exeFile == L"Dolphin.exe" || exeFile == L"DolphinQt2.exe" || exeFile == L"DolphinWx.exe")
+      const bool match{s_dolphinProcessName ?
+                           (exeFile == utf8_to_wstring(s_dolphinProcessName) ||
+                            exeFile == utf8_to_wstring(s_dolphinProcessName) + L".exe") :
+                           (exeFile == L"Dolphin.exe" || exeFile == L"DolphinQt2.exe" ||
+                            exeFile == L"DolphinWx.exe")};
 #else
       const std::string exeFile{entry.szExeFile};
-      if (exeFile == "Dolphin.exe" || exeFile == "DolphinQt2.exe" || exeFile == "DolphinWx.exe")
+      const bool match{s_dolphinProcessName ?
+                           (exeFile == s_dolphinProcessName ||
+                            exeFile == std::string(s_dolphinProcessName) + ".exe") :
+                           (exeFile == "Dolphin.exe" || exeFile == "DolphinQt2.exe" ||
+                            exeFile == "DolphinWx.exe")};
 #endif
+      if (match)
       {
         m_PID = entry.th32ProcessID;
         break;

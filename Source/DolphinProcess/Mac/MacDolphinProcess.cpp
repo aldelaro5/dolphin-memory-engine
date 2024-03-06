@@ -4,7 +4,9 @@
 #include "../../Common/CommonUtils.h"
 #include "../../Common/MemoryCommon.h"
 
+#include <cstdlib>
 #include <memory>
+#include <string_view>
 #include <sys/sysctl.h>
 #include <mach/mach_vm.h>
 
@@ -22,11 +24,15 @@ bool MacDolphinProcess::findPID()
   if(sysctl((int*) mib, 4, procs.get(), &procSize, NULL, 0) == -1)
     return false;
 
+  static const char* const s_dolphinProcessName{std::getenv("DME_DOLPHIN_PROCESS_NAME")};
+
   m_PID = -1;
   for(int i = 0; i < procSize / sizeof(kinfo_proc); i++)
   {
-    if(std::strcmp(procs[i].kp_proc.p_comm, "Dolphin") == 0 ||
-       std::strcmp(procs[i].kp_proc.p_comm, "dolphin-emu") == 0)
+    const std::string_view name{procs[i].kp_proc.p_comm};
+    const bool match{s_dolphinProcessName ? name == s_dolphinProcessName :
+                                            (name == "Dolphin" || name == "dolphin-emu")};
+    if (match)
     {
       m_PID = procs[i].kp_proc.p_pid;
     }
