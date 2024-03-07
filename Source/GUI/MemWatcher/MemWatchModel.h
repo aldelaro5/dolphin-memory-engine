@@ -66,7 +66,10 @@ public:
   bool hasAnyNodes() const;
   MemWatchTreeNode* getRootNode() const;
   MemWatchTreeNode* getTreeNodeFromIndex(const QModelIndex& index) const;
+  bool editData(const QModelIndex& index, const QVariant& value, int role, bool emitEdit = false);
+
 signals:
+  void dataEdited(const QModelIndex& index, const QVariant& value, int role);
   void writeFailed(const QModelIndex& index, Common::MemOperationReturnCode writeReturn);
   void readFailed();
   void dropSucceeded();

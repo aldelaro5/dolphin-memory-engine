@@ -16,6 +16,7 @@ public:
   ~MemWatchWidget();
 
   void onMemWatchContextMenuRequested(const QPoint& pos);
+  void onDataEdited(const QModelIndex& index, const QVariant& value, int role);
   void onValueWriteError(const QModelIndex& index, Common::MemOperationReturnCode writeReturn);
   void onWatchDoubleClicked(const QModelIndex& index);
   void onAddGroup();

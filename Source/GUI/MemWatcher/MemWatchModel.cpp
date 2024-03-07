@@ -227,6 +227,12 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
 
 bool MemWatchModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
+  return editData(index, value, role, true);
+}
+
+bool MemWatchModel::editData(const QModelIndex& index, const QVariant& value, const int role,
+                             const bool emitEdit)
+{
   if (!index.isValid())
     return false;
 
@@ -257,6 +263,8 @@ bool MemWatchModel::setData(const QModelIndex& index, const QVariant& value, int
           return false;
         }
         emit dataChanged(index, index);
+        if (emitEdit)
+          emit dataEdited(index, value, role);
         return true;
       }
       default:

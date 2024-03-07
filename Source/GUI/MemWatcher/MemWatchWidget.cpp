@@ -43,6 +43,7 @@ MemWatchWidget::~MemWatchWidget()
 void MemWatchWidget::initialiseWidgets()
 {
   m_watchModel = new MemWatchModel(this);
+  connect(m_watchModel, &MemWatchModel::dataEdited, this, &MemWatchWidget::onDataEdited);
   connect(m_watchModel, &MemWatchModel::writeFailed, this, &MemWatchWidget::onValueWriteError);
   connect(m_watchModel, &MemWatchModel::dropSucceeded, this, &MemWatchWidget::onDropSucceeded);
   connect(m_watchModel, &MemWatchModel::readFailed, this, &MemWatchWidget::mustUnhook);
@@ -384,6 +385,36 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
         m_watchModel->editEntry(entryCopy, index);
         m_hasUnsavedChanges = true;
       }
+    }
+  }
+}
+
+void MemWatchWidget::onDataEdited(const QModelIndex& index, const QVariant& value, const int role)
+{
+  MemWatchTreeNode* const node{static_cast<MemWatchTreeNode*>(index.internalPointer())};
+  if (node->isGroup())
+    return;
+
+  if (role == Qt::EditRole && index.column() == MemWatchModel::WATCH_COL_VALUE)
+  {
+    MemWatchEntry* const entry{node->getEntry()};
+    const Common::MemType entryType{entry->getType()};
+
+    for (const auto& selectedIndex : m_watchView->selectionModel()->selectedIndexes())
+    {
+      if (selectedIndex == index)
+        continue;
+      if (selectedIndex.column() != MemWatchModel::WATCH_COL_VALUE)
+        continue;
+
+      MemWatchTreeNode* const selectedNode{static_cast<MemWatchTreeNode*>(selectedIndex.internalPointer())};
+      if (selectedNode->isGroup())
+        continue;
+      MemWatchEntry* const selectedEntry{selectedNode->getEntry()};
+      if (selectedEntry->getType() != entryType)
+        continue;
+
+      m_watchModel->editData(selectedIndex, value, role);
     }
   }
 }
