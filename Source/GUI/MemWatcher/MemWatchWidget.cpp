@@ -234,6 +234,10 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       connect(unlockSelection, &QAction::triggered, this, [=] { onLockSelection(false); });
       contextMenu->addAction(unlockSelection);
       contextMenu->addSeparator();
+      QAction* const editValue{new QAction(tr("Edit Value"), this)};
+      connect(editValue, &QAction::triggered, this, [=]() { m_watchView->edit(index); });
+      contextMenu->addAction(editValue);
+      contextMenu->addSeparator();
     }
   }
   else
