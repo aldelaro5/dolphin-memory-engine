@@ -18,9 +18,9 @@ if(APPLE)
 endif(APPLE)
 
 set(SRCS ${DolphinProcessSrc}
-         DolphinProcess/DolphinAccessor.cpp  
+         DolphinProcess/DolphinAccessor.cpp
          Common/MemoryCommon.cpp
-         MemoryWatch/MemWatchEntry.cpp   
+         MemoryWatch/MemWatchEntry.cpp
          MemoryWatch/MemWatchTreeNode.cpp
          CheatEngineParser/CheatEngineParser.cpp
          MemoryScanner/MemoryScanner.cpp
@@ -29,12 +29,12 @@ set(SRCS ${DolphinProcessSrc}
          GUI/Settings/DlgSettings.cpp
          GUI/MemCopy/DlgCopy.cpp
          GUI/MemWatcher/MemWatchDelegate.cpp
-         GUI/MemWatcher/MemWatchModel.cpp    
-         GUI/MemWatcher/Dialogs/DlgChangeType.cpp 
-         GUI/MemWatcher/Dialogs/DlgAddWatchEntry.cpp 
-         GUI/MemWatcher/MemWatchWidget.cpp  
+         GUI/MemWatcher/MemWatchModel.cpp
+         GUI/MemWatcher/Dialogs/DlgChangeType.cpp
+         GUI/MemWatcher/Dialogs/DlgAddWatchEntry.cpp
+         GUI/MemWatcher/MemWatchWidget.cpp
          GUI/MemWatcher/Dialogs/DlgImportCTFile.cpp
-         GUI/MemScanner/ResultsListModel.cpp 
+         GUI/MemScanner/ResultsListModel.cpp
          GUI/MemScanner/MemScanWidget.cpp
          GUI/MemViewer/MemViewer.cpp
          GUI/MemViewer/MemViewerWidget.cpp

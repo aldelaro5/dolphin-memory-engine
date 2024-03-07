@@ -32,7 +32,7 @@ jobs:
           cmake Source -B .\Source\bin -A x64 "-DCMAKE_PREFIX_PATH=..\Externals\Qt\Qt6.5.1\x64"
           cmake --build .\Source\bin --config ${{ matrix.configuration }} --parallel
         shell: powershell
-        
+
       - name: Copy LICENSE, README
         run: |
           copy .\LICENSE .\Source\bin\${{ matrix.configuration }}
@@ -77,7 +77,7 @@ jobs:
           cmake Source -B Source/build -DCMAKE_BUILD_TYPE=Release
           cmake --build Source/build --parallel
         shell: bash
-        
+
       - name: Copy LICENSE, README, Prepare Artifacts
         run: |
           mkdir Source/build/artifacts
@@ -90,7 +90,7 @@ jobs:
         run: |
           .github/assets/appimage.sh
         shell: bash
-        
+
       - name: Publish Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -110,12 +110,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Install Dependencies
         run: |
           brew install cmake
         shell: bash
-      
+
       - name: Initialize submodules
         run: git submodule update --init
 

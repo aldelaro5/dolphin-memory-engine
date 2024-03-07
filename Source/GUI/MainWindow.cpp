@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 
+#include <QApplication>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QMenuBar>
@@ -17,7 +18,7 @@
 
 MainWindow::MainWindow()
 {
-  setWindowTitle("Dolphin Memory Engine 0.9.0");
+  setWindowTitle(QApplication::applicationName() + " " + QApplication::applicationVersion());
   setWindowIcon(QIcon(":/logo.svg"));
   initialiseWidgets();
   makeLayouts();
@@ -476,9 +477,9 @@ void MainWindow::onOpenSettings()
 
 void MainWindow::onAbout()
 {
-  QString title = tr("About Dolphin Memory Engine");
+  QString title = tr("About %1").arg(QApplication::applicationName());
   QString text =
-      "Version 0.9.0<br></br>" +
+      tr("Version %1").arg(QApplication::applicationVersion()) + "<br></br>" +
       tr("A RAM search made to facilitate research and reverse engineering of GameCube and Wii "
          "games using the Dolphin emulator.") +
       "<br>" +

@@ -91,6 +91,30 @@ If the program unhooks itself from Dolphin, a read/write operation has failed. T
 
 Finally, the program includes a memory viewer which shows a hexadecimal view and an ASCII view of the memory. Click on the corresponding button or right click on a watch to browse the memory using the memory viewer.
 
+### Command-line Arguments
+
+A number of options can be provided as command-line arguments:
+
+```
+Usage: dolphin-memory-engine [options]
+A RAM search made specifically to search, monitor and edit the Dolphin Emulator's emulated memory.
+
+Options:
+  -h, --help                                         Displays help on
+                                                     commandline options.
+  --help-all                                         Displays help including Qt
+                                                     specific options.
+  -v, --version                                      Displays version
+                                                     information.
+  -d, --dolphin-process-name <dolphin_process_name>  Specify custom name for
+                                                     the Dolphin Emulator
+                                                     process. By default,
+                                                     platform-specific names are
+                                                     used (e.g. "Dolphin.exe" on
+                                                     Windows, or "dolphin-emu"
+                                                     on Linux or macOS).
+```
+
 ## Troubleshouting
 
 On Linux, the program may require additional kernel permissions to be able to read and write memory to external processes (which is required to read and write the memory of Dolphin).  If nothing happens to Dolphin, but the program frequently unhooks itself, the program is missing the required permissions.  Grant these permissions by running the following command as root:

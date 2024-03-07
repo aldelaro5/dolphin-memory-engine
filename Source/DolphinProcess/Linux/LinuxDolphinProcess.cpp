@@ -4,6 +4,7 @@
 #include "../../Common/CommonUtils.h"
 #include "../../Common/MemoryCommon.h"
 
+#include <cstdlib>
 #include <cstring>
 #include <dirent.h>
 #include <fstream>
@@ -106,6 +107,8 @@ bool LinuxDolphinProcess::findPID()
   if (directoryPointer == nullptr)
     return false;
 
+  static const char* const s_dolphinProcessName{std::getenv("DME_DOLPHIN_PROCESS_NAME")};
+
   m_PID = -1;
   struct dirent* directoryEntry = nullptr;
   while (m_PID == -1 && (directoryEntry = readdir(directoryPointer)))
@@ -118,7 +121,11 @@ bool LinuxDolphinProcess::findPID()
     std::string line;
     aCmdLineFile.open("/proc/" + std::string(directoryEntry->d_name) + "/comm");
     getline(aCmdLineFile, line);
-    if (line == "dolphin-emu" || line == "dolphin-emu-qt2" || line == "dolphin-emu-wx")
+
+    const bool match{s_dolphinProcessName ? line == s_dolphinProcessName :
+                                            (line == "dolphin-emu" || line == "dolphin-emu-qt2" ||
+                                             line == "dolphin-emu-wx")};
+    if (match)
       m_PID = aPID;
 
     aCmdLineFile.close();
