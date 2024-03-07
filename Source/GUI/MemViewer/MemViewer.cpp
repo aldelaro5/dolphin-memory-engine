@@ -8,6 +8,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QFontDatabase>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
@@ -15,7 +16,6 @@
 #include <QPainter>
 #include <QRegularExpression>
 #include <QScrollBar>
-#include <QFontDatabase>
 
 #include "../../Common/CommonUtils.h"
 #include "../../DolphinProcess/DolphinAccessor.h"
