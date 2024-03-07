@@ -1,0 +1,14 @@
+name: 🔦 Lint
+
+on: [push, pull_request]
+
+jobs:
+  clang-format-check:
+    runs-on: ubuntu-22.04
+    name: Clang-Format Check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: RafikFarhad/clang-format-github-action@v4
+        with:
+          style: "file"
+          sources: "Source/**/*.h,Source/**/*.cpp"
