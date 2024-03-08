@@ -72,9 +72,9 @@ Due to security hardening on recent versions of macOS, the Dolphin Emulator exec
 >
 > Choose a name (gdb-cert in the example), set Identity Type to Self Signed Root, set Certificate Type to Code Signing and select the Let me override defaults. Click several times on Continue until you get to the Specify a Location For The Certificate screen, then set Keychain to System.
 
-Then, run the interactive `MacSetup.sh` script inside the `Tools` directory to re-sign Dolphin Emulator:
+Then, run the interactive `MacSetup.sh` script inside the `Tools` directory (if built from source) or included in the build archive to re-sign Dolphin Emulator:
 
-    ./MacSetup.sh
+    sh ./MacSetup.sh
 
 **Note that Dolphin must also be re-signed using this script after an update.**
 
