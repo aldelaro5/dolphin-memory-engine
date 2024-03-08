@@ -133,6 +133,7 @@ jobs:
           mkdir Source/build/artifacts
           cp ./README.md ./Source/build/artifacts/
           cp ./LICENSE ./Source/build/artifacts/
+          cp ./Tools/MacSetup.sh ./Source/build/artifacts/
           cp ./Source/build/dolphin-memory-engine.dmg ./Source/build/artifacts/
         shell: bash
 
