@@ -5,29 +5,29 @@
 #include "../../Common/MemoryCommon.h"
 
 #include <cstdlib>
+#include <mach/mach_vm.h>
 #include <memory>
 #include <string_view>
 #include <sys/sysctl.h>
-#include <mach/mach_vm.h>
 
 namespace DolphinComm
 {
 bool MacDolphinProcess::findPID()
 {
-  static const int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0 };
+  static const int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0};
 
   size_t procSize = 0;
-  if(sysctl((int*) mib, 4, NULL, &procSize, NULL, 0) == -1)
+  if (sysctl((int*)mib, 4, NULL, &procSize, NULL, 0) == -1)
     return false;
 
   auto procs = std::make_unique<kinfo_proc[]>(procSize / sizeof(kinfo_proc));
-  if(sysctl((int*) mib, 4, procs.get(), &procSize, NULL, 0) == -1)
+  if (sysctl((int*)mib, 4, procs.get(), &procSize, NULL, 0) == -1)
     return false;
 
   static const char* const s_dolphinProcessName{std::getenv("DME_DOLPHIN_PROCESS_NAME")};
 
   m_PID = -1;
-  for(int i = 0; i < procSize / sizeof(kinfo_proc); i++)
+  for (int i = 0; i < procSize / sizeof(kinfo_proc); i++)
   {
     const std::string_view name{procs[i].kp_proc.p_comm};
     const bool match{s_dolphinProcessName ? name == s_dolphinProcessName :
@@ -47,7 +47,7 @@ bool MacDolphinProcess::obtainEmuRAMInformations()
 {
   m_currentTask = current_task();
   kern_return_t error = task_for_pid(m_currentTask, m_PID, &m_task);
-  if(error != KERN_SUCCESS)
+  if (error != KERN_SUCCESS)
     return false;
 
   mach_vm_address_t regionAddr = 0;
@@ -59,24 +59,29 @@ bool MacDolphinProcess::obtainEmuRAMInformations()
   mach_port_t obj;
   bool MEM1Found = false;
   unsigned int MEM1Obj = 0;
-  while(mach_vm_region(m_task, &regionAddr, &size, VM_REGION_EXTENDED_INFO, (int*)&regInfo, &cnt, &obj) == KERN_SUCCESS)
+  while (mach_vm_region(m_task, &regionAddr, &size, VM_REGION_EXTENDED_INFO, (int*)&regInfo, &cnt,
+                        &obj) == KERN_SUCCESS)
   {
     cnt = VM_REGION_BASIC_INFO_COUNT_64;
-    if(mach_vm_region(m_task, &regionAddr, &size, VM_REGION_BASIC_INFO_64, (int*)&basInfo, &cnt, &obj) != KERN_SUCCESS)
-        break;
+    if (mach_vm_region(m_task, &regionAddr, &size, VM_REGION_BASIC_INFO_64, (int*)&basInfo, &cnt,
+                       &obj) != KERN_SUCCESS)
+      break;
     cnt = VM_REGION_TOP_INFO_COUNT;
-    if(mach_vm_region(m_task, &regionAddr, &size, VM_REGION_TOP_INFO, (int*)&topInfo, &cnt, &obj) != 0)
-        break;
+    if (mach_vm_region(m_task, &regionAddr, &size, VM_REGION_TOP_INFO, (int*)&topInfo, &cnt,
+                       &obj) != 0)
+      break;
 
-    if (!m_MEM2Present && size == Common::GetMEM2Size() && basInfo.offset == Common::GetMEM1Size() + 0x40000)
+    if (!m_MEM2Present && size == Common::GetMEM2Size() &&
+        basInfo.offset == Common::GetMEM1Size() + 0x40000)
     {
       m_MEM2Present = true;
       m_MEM2AddressStart = regionAddr;
     }
 
     // if these are true, then it is very likely the correct region, but we cannot guarantee
-    if((!MEM1Found || (MEM1Found && MEM1Obj == topInfo.obj_id)) && size == Common::GetMEM1Size() && regInfo.share_mode == SM_TRUESHARED &&
-       basInfo.max_protection == (VM_PROT_READ | VM_PROT_WRITE))
+    if ((!MEM1Found || (MEM1Found && MEM1Obj == topInfo.obj_id)) && size == Common::GetMEM1Size() &&
+        regInfo.share_mode == SM_TRUESHARED &&
+        basInfo.max_protection == (VM_PROT_READ | VM_PROT_WRITE))
     {
       if (basInfo.offset == 0x0)
       {
@@ -110,7 +115,8 @@ bool MacDolphinProcess::obtainEmuRAMInformations()
   return false;
 }
 
-bool MacDolphinProcess::readFromRAM(const u32 offset, char* buffer, size_t size, const bool withBSwap)
+bool MacDolphinProcess::readFromRAM(const u32 offset, char* buffer, size_t size,
+                                    const bool withBSwap)
 {
   vm_size_t nread;
   u64 RAMAddress = 0;
@@ -130,7 +136,8 @@ bool MacDolphinProcess::readFromRAM(const u32 offset, char* buffer, size_t size,
     RAMAddress = m_emuRAMAddressStart + offset;
   }
 
-  if(vm_read_overwrite(m_task, RAMAddress, size, reinterpret_cast<vm_address_t>(buffer), &nread) != KERN_SUCCESS)
+  if (vm_read_overwrite(m_task, RAMAddress, size, reinterpret_cast<vm_address_t>(buffer), &nread) !=
+      KERN_SUCCESS)
     return false;
   if (nread != size)
     return false;
@@ -169,7 +176,8 @@ bool MacDolphinProcess::readFromRAM(const u32 offset, char* buffer, size_t size,
   return true;
 }
 
-bool MacDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const size_t size, const bool withBSwap)
+bool MacDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const size_t size,
+                                   const bool withBSwap)
 {
   u64 RAMAddress = 0;
   if (m_ARAMAccessible)
@@ -222,7 +230,7 @@ bool MacDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const s
     }
   }
 
-  if(vm_write(m_task, RAMAddress, reinterpret_cast<vm_offset_t>(bufferCopy), size) != KERN_SUCCESS)
+  if (vm_write(m_task, RAMAddress, reinterpret_cast<vm_offset_t>(bufferCopy), size) != KERN_SUCCESS)
   {
     delete[] bufferCopy;
     return false;
@@ -231,5 +239,5 @@ bool MacDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const s
   delete[] bufferCopy;
   return true;
 }
-} // namespace DolphinComm
+}  // namespace DolphinComm
 #endif

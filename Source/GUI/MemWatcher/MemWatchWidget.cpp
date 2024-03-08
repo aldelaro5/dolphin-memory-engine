@@ -411,7 +411,8 @@ void MemWatchWidget::onDataEdited(const QModelIndex& index, const QVariant& valu
       if (selectedIndex.column() != MemWatchModel::WATCH_COL_VALUE)
         continue;
 
-      MemWatchTreeNode* const selectedNode{static_cast<MemWatchTreeNode*>(selectedIndex.internalPointer())};
+      MemWatchTreeNode* const selectedNode{
+          static_cast<MemWatchTreeNode*>(selectedIndex.internalPointer())};
       if (selectedNode->isGroup())
         continue;
       MemWatchEntry* const selectedEntry{selectedNode->getEntry()};

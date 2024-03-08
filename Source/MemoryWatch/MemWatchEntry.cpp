@@ -261,7 +261,7 @@ Common::MemOperationReturnCode MemWatchEntry::readMemoryFromRAM()
     m_isValidPointer = true;
   }
 
-  if(!DolphinComm::DolphinAccessor::isValidConsoleAddress(realConsoleAddress))
+  if (!DolphinComm::DolphinAccessor::isValidConsoleAddress(realConsoleAddress))
     return Common::MemOperationReturnCode::OK;
 
   if (DolphinComm::DolphinAccessor::readFromRAM(
@@ -306,7 +306,7 @@ Common::MemOperationReturnCode MemWatchEntry::writeMemoryToRAM(const char* memor
     m_isValidPointer = true;
   }
 
-  if(!DolphinComm::DolphinAccessor::isValidConsoleAddress(realConsoleAddress))
+  if (!DolphinComm::DolphinAccessor::isValidConsoleAddress(realConsoleAddress))
     return Common::MemOperationReturnCode::OK;
 
   if (DolphinComm::DolphinAccessor::writeToRAM(
@@ -320,7 +320,7 @@ Common::MemOperationReturnCode MemWatchEntry::writeMemoryToRAM(const char* memor
 std::string MemWatchEntry::getStringFromMemory() const
 {
   if ((m_boundToPointer && !m_isValidPointer) ||
-    !DolphinComm::DolphinAccessor::isValidConsoleAddress(m_consoleAddress))
+      !DolphinComm::DolphinAccessor::isValidConsoleAddress(m_consoleAddress))
     return "???";
   return Common::formatMemoryToString(m_memory, m_type, m_length, m_base, m_isUnsigned);
 }

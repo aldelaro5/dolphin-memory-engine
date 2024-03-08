@@ -285,10 +285,12 @@ void DlgAddWatchEntry::accept()
   {
     QString errorMsg = tr("The address you entered is invalid, make sure it is an "
                           "hexadecimal number between 0x%1 and 0x%2")
-                           .arg(Common::MEM1_START, 8, 16).arg(Common::GetMEM1End() - 1, 8, 16);
+                           .arg(Common::MEM1_START, 8, 16)
+                           .arg(Common::GetMEM1End() - 1, 8, 16);
     if (DolphinComm::DolphinAccessor::isMEM2Present())
-      errorMsg.append(
-          tr(" or between 0x%1 and 0x%2").arg(Common::MEM2_START, 8, 16).arg(Common::GetMEM2End() - 1, 8, 16));
+      errorMsg.append(tr(" or between 0x%1 and 0x%2")
+                          .arg(Common::MEM2_START, 8, 16)
+                          .arg(Common::GetMEM2End() - 1, 8, 16));
     QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid address"), errorMsg,
                                             QMessageBox::Ok, this);
     errorBox->exec();
