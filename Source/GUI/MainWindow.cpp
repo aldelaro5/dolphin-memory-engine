@@ -1,10 +1,10 @@
 #include "MainWindow.h"
 
 #include <QApplication>
+#include <QDialog>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QMenuBar>
-#include <QMessageBox>
 #include <QShortcut>
 #include <QString>
 #include <QVBoxLayout>
@@ -477,23 +477,68 @@ void MainWindow::onOpenSettings()
 
 void MainWindow::onAbout()
 {
-  QString title = tr("About %1").arg(QApplication::applicationName());
-  QString text =
-      tr("Version %1").arg(QApplication::applicationVersion()) + "<br></br>" +
-      tr("A RAM search made to facilitate research and reverse engineering of GameCube and Wii "
-         "games using the Dolphin emulator.") +
-      "<br>" +
-      tr("<a href=\"https://github.com/aldelaro5/dolphin-memory-engine\">Visit the project "
-         "page</a> to learn more and check for updates.") +
-      "<br><br>" +
-      tr("This program is licensed under the MIT license. You should have received a copy of the "
-         "MIT license along with this program.");
+  const int fontHeight{fontMetrics().height()};
 
-  QMessageBox aboutBox;
-  aboutBox.setWindowTitle(title);
-  aboutBox.setTextFormat(Qt::RichText);
-  aboutBox.setText(text);
-  aboutBox.exec();
+  QLabel* const logo_label{new QLabel};
+  logo_label->setPixmap(windowIcon().pixmap(fontHeight * 10, fontHeight * 10));
+  logo_label->setContentsMargins(fontHeight, 0, fontHeight, 0);
+
+  QLabel* const text_label{new QLabel(
+      QStringLiteral(R"(
+<p><font size="+3">%APPLICATION%</font></p>
+
+<p><small>%QT_VERSION%</small></p>
+
+<br/>
+
+<p>%ABOUT_DESC%</p>
+<p>%LICENSE_DESC%</p>
+
+<br/>
+
+<p>
+<a href='%URL%'>%SOURCE_CODE%</a> |
+<a href='%URL%/blob/master/LICENSE'>%LICENSE%</a> |
+<a href='%URL%/graphs/contributors'>%CONTRIBUTORS%</a> |
+<a href='%URL%/releases'>%UPDATES%</a>
+</p>
+)")
+          .replace("%APPLICATION%",
+                   QApplication::applicationName() + " " + QApplication::applicationVersion())
+          .replace("%QT_VERSION%", tr("Built with Qt %1").arg(QT_VERSION_STR))
+          .replace("%ABOUT_DESC%",
+                   tr("A RAM search made to facilitate research and reverse engineering of "
+                      "GameCube and Wii games using the Dolphin Emulator."))
+          .replace("%LICENSE_DESC%",
+                   tr("This program is licensed under the MIT license. You should have received a "
+                      "copy of the MIT license along with this program."))
+          .replace("%URL%", "https://github.com/aldelaro5/dolphin-memory-engine")
+          .replace("%SOURCE_CODE%", tr("Source Code"))
+          .replace("%LICENSE%", tr("License"))
+          .replace("%CONTRIBUTORS%", tr("Contributors"))
+          .replace("%UPDATES%", tr("Updates")))};
+  text_label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+  text_label->setOpenExternalLinks(true);
+  text_label->setWordWrap(true);
+
+  QLabel* const copyright_label{new QLabel(QStringLiteral("<small>&#127279; 2017+ %1 Team</small>")
+                                               .arg(QApplication::applicationName()))};
+  copyright_label->setAlignment(Qt::AlignCenter);
+  copyright_label->setContentsMargins(0, fontHeight * 2, 0, 0);
+
+  QVBoxLayout* const main_layout{new QVBoxLayout};
+  QHBoxLayout* const horizontal_layout{new QHBoxLayout};
+  main_layout->addLayout(horizontal_layout);
+  main_layout->addWidget(copyright_label);
+  horizontal_layout->setAlignment(Qt::AlignLeft);
+  horizontal_layout->addWidget(logo_label);
+  horizontal_layout->addWidget(text_label);
+
+  QDialog dialog(this);
+  dialog.setWindowTitle(tr("About %1").arg(QApplication::applicationName()));
+  dialog.setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+  dialog.setLayout(main_layout);
+  dialog.exec();
 }
 
 void MainWindow::onQuit()
