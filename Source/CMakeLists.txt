@@ -48,6 +48,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(Qt6Widgets REQUIRED)
 find_package(Qt6Core REQUIRED)
 find_package(Qt6Gui REQUIRED)
+if (NOT APPLE)
+    find_package(Qt6Svg REQUIRED)
+endif ()
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -61,31 +64,47 @@ add_executable(dolphin-memory-engine ${GUI_TYPE} ${SRCS})
 target_link_libraries(dolphin-memory-engine Qt6::Widgets)
 target_link_libraries(dolphin-memory-engine Qt6::Gui)
 target_link_libraries(dolphin-memory-engine Qt6::Core)
+if (NOT APPLE)
+    target_link_libraries(dolphin-memory-engine Qt6::Svg)
+endif ()
 
 if(WIN32)
     set_target_properties(dolphin-memory-engine PROPERTIES OUTPUT_NAME DolphinMemoryEngine)
     if($<CONFIG:Debug>)
         get_target_property(WIDGETDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
-		get_target_property(COREDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
-		get_target_property(GUIDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
+        get_target_property(COREDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
+        get_target_property(GUIDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
+        get_target_property(SVGDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
     else($<CONFIG:Debug>)
         get_target_property(WIDGETDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
-		get_target_property(COREDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
-		get_target_property(GUIDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
+        get_target_property(COREDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
+        get_target_property(GUIDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
+        get_target_property(SVGDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
     endif($<CONFIG:Debug>)
     add_custom_command(
-		TARGET dolphin-memory-engine POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<TARGET_FILE:Qt6::Widgets>
-			$<TARGET_FILE_DIR:dolphin-memory-engine>
-		TARGET dolphin-memory-engine POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<TARGET_FILE:Qt6::Core>
-			$<TARGET_FILE_DIR:dolphin-memory-engine>
-		TARGET dolphin-memory-engine POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<TARGET_FILE:Qt6::Gui>
-			$<TARGET_FILE_DIR:dolphin-memory-engine>
+        TARGET dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:Qt6::Widgets>
+            $<TARGET_FILE_DIR:dolphin-memory-engine>
+        TARGET dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:Qt6::Core>
+            $<TARGET_FILE_DIR:dolphin-memory-engine>
+        TARGET dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:Qt6::Gui>
+            $<TARGET_FILE_DIR:dolphin-memory-engine>
+        TARGET dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:Qt6::Svg>
+            $<TARGET_FILE_DIR:dolphin-memory-engine>
+        TARGET dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            $<TARGET_FILE_DIR:dolphin-memory-engine>/imageformats
+        TARGET dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:Qt6::QSvgPlugin>
+            $<TARGET_FILE_DIR:dolphin-memory-engine>/imageformats
         TARGET dolphin-memory-engine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
             $<TARGET_FILE_DIR:dolphin-memory-engine>/platforms
@@ -93,13 +112,14 @@ if(WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:Qt6::QWindowsIntegrationPlugin>
             $<TARGET_FILE_DIR:dolphin-memory-engine>/platforms
+        TARGET dolphin-memory-engine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
             $<TARGET_FILE_DIR:dolphin-memory-engine>/styles
         TARGET dolphin-memory-engine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:Qt6::QWindowsVistaStylePlugin>
             $<TARGET_FILE_DIR:dolphin-memory-engine>/styles
-	)
+    )
 endif(WIN32)
 
 if(APPLE)
