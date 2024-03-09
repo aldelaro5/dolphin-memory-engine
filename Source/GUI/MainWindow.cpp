@@ -521,8 +521,8 @@ void MainWindow::onAbout()
   text_label->setOpenExternalLinks(true);
   text_label->setWordWrap(true);
 
-  QLabel* const copyright_label{new QLabel(QStringLiteral("<small>&#127279; 2017+ %1 Team</small>")
-                                               .arg(QApplication::applicationName()))};
+  QLabel* const copyright_label{new QLabel(
+      QStringLiteral("<small>\u00A9 2017+ %1 Team</small>").arg(QApplication::applicationName()))};
   copyright_label->setAlignment(Qt::AlignCenter);
   copyright_label->setContentsMargins(0, fontHeight * 2, 0, 0);
 
