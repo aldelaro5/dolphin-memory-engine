@@ -66,26 +66,26 @@ if(WIN32)
     set_target_properties(dolphin-memory-engine PROPERTIES OUTPUT_NAME DolphinMemoryEngine)
     if($<CONFIG:Debug>)
         get_target_property(WIDGETDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
-		get_target_property(COREDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
-		get_target_property(GUIDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
+        get_target_property(COREDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
+        get_target_property(GUIDLL Qt6::Widgets IMPORTED_LOCATION_DEBUG)
     else($<CONFIG:Debug>)
         get_target_property(WIDGETDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
-		get_target_property(COREDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
-		get_target_property(GUIDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
+        get_target_property(COREDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
+        get_target_property(GUIDLL Qt6::Widgets IMPORTED_LOCATION_RELEASE)
     endif($<CONFIG:Debug>)
     add_custom_command(
-		TARGET dolphin-memory-engine POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<TARGET_FILE:Qt6::Widgets>
-			$<TARGET_FILE_DIR:dolphin-memory-engine>
-		TARGET dolphin-memory-engine POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<TARGET_FILE:Qt6::Core>
-			$<TARGET_FILE_DIR:dolphin-memory-engine>
-		TARGET dolphin-memory-engine POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<TARGET_FILE:Qt6::Gui>
-			$<TARGET_FILE_DIR:dolphin-memory-engine>
+        TARGET dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:Qt6::Widgets>
+            $<TARGET_FILE_DIR:dolphin-memory-engine>
+        TARGET dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:Qt6::Core>
+            $<TARGET_FILE_DIR:dolphin-memory-engine>
+        TARGET dolphin-memory-engine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:Qt6::Gui>
+            $<TARGET_FILE_DIR:dolphin-memory-engine>
         TARGET dolphin-memory-engine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
             $<TARGET_FILE_DIR:dolphin-memory-engine>/platforms
@@ -99,7 +99,7 @@ if(WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:Qt6::QWindowsVistaStylePlugin>
             $<TARGET_FILE_DIR:dolphin-memory-engine>/styles
-	)
+    )
 endif(WIN32)
 
 if(APPLE)
