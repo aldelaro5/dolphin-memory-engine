@@ -264,34 +264,106 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
 
   case MemType::type_float:
   {
-    float theFloat = 0.0f;
-    // 9 digits is the max number of digits in a flaot that can recover any binary format
-    ss >> std::setprecision(9) >> theFloat;
-    if (ss.fail())
+    if (base != MemBase::base_decimal)
     {
-      delete[] buffer;
-      buffer = nullptr;
-      returnCode = MemOperationReturnCode::invalidInput;
-      return buffer;
+      u32 theWord = 0;
+      if (base == MemBase::base_binary)
+      {
+        unsigned long long input = 0;
+        try
+        {
+          input = std::bitset<sizeof(u32) * 8>(inputString).to_ullong();
+        }
+        catch (const std::invalid_argument&)
+        {
+          delete[] buffer;
+          buffer = nullptr;
+          returnCode = MemOperationReturnCode::invalidInput;
+          return buffer;
+        }
+        theWord = static_cast<u32>(input);
+      }
+      else
+      {
+        ss >> theWord;
+        if (ss.fail())
+        {
+          delete[] buffer;
+          buffer = nullptr;
+          returnCode = MemOperationReturnCode::invalidInput;
+          return buffer;
+        }
+      }
+      std::memcpy(buffer, &theWord, size);
     }
-    std::memcpy(buffer, &theFloat, size);
+    else
+    {
+      float theFloat = 0.0f;
+      // 9 digits is the max number of digits in a flaot that can recover any binary format
+      ss >> std::setprecision(9) >> theFloat;
+      if (ss.fail())
+      {
+        delete[] buffer;
+        buffer = nullptr;
+        returnCode = MemOperationReturnCode::invalidInput;
+        return buffer;
+      }
+      std::memcpy(buffer, &theFloat, size);
+    }
+
     actualLength = sizeof(float);
     break;
   }
 
   case MemType::type_double:
   {
-    double theDouble = 0.0;
-    // 17 digits is the max number of digits in a double that can recover any binary format
-    ss >> std::setprecision(17) >> theDouble;
-    if (ss.fail())
+    if (base != MemBase::base_decimal)
     {
-      delete[] buffer;
-      buffer = nullptr;
-      returnCode = MemOperationReturnCode::invalidInput;
-      return buffer;
+      u64 theDoubleWord = 0;
+      if (base == MemBase::base_binary)
+      {
+        unsigned long long input = 0;
+        try
+        {
+          input = std::bitset<sizeof(u64) * 8>(inputString).to_ullong();
+        }
+        catch (const std::invalid_argument&)
+        {
+          delete[] buffer;
+          buffer = nullptr;
+          returnCode = MemOperationReturnCode::invalidInput;
+          return buffer;
+        }
+        theDoubleWord = static_cast<u64>(input);
+      }
+      else
+      {
+        ss >> theDoubleWord;
+        if (ss.fail())
+        {
+          delete[] buffer;
+          buffer = nullptr;
+          returnCode = MemOperationReturnCode::invalidInput;
+          return buffer;
+        }
+      }
+      std::memcpy(buffer, &theDoubleWord, size);
     }
-    std::memcpy(buffer, &theDouble, size);
+    else
+    {
+      double theDouble = 0.0;
+      // 17 digits is the max number of digits in a double that can recover any binary format
+      ss >> std::setprecision(17) >> theDouble;
+      if (ss.fail())
+      {
+        delete[] buffer;
+        buffer = nullptr;
+        returnCode = MemOperationReturnCode::invalidInput;
+        return buffer;
+      }
+      std::memcpy(buffer, &theDouble, size);
+    }
+
     actualLength = sizeof(double);
     break;
   }
@@ -490,11 +562,27 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
       std::memcpy(memoryCopy, &word, sizeof(u32));
     }
 
-    float aFloat = 0.0f;
-    std::memcpy(&aFloat, memoryCopy, sizeof(float));
-    // With 9 digits of precision, it is possible to convert a float back and forth to its binary
-    // representation without any loss
-    ss << std::setprecision(9) << aFloat;
+    if (base != Common::MemBase::base_decimal)
+    {
+      u32 unsignedWord = 0;
+      std::memcpy(&unsignedWord, memoryCopy, sizeof(u32));
+      if (base == Common::MemBase::base_binary)
+      {
+        ss << std::bitset<sizeof(u32) * 8>(unsignedWord).to_string();
+      }
+      else
+      {
+        ss << unsignedWord;
+      }
+    }
+    else
+    {
+      float aFloat = 0.0f;
+      std::memcpy(&aFloat, memoryCopy, sizeof(float));
+      // With 9 digits of precision, it is possible to convert a float back and forth to its binary
+      // representation without any loss
+      ss << std::setprecision(9) << aFloat;
+    }
     delete[] memoryCopy;
     return ss.str();
   }
@@ -510,11 +598,27 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
       std::memcpy(memoryCopy, &doubleword, sizeof(u64));
     }
 
-    double aDouble = 0.0;
-    std::memcpy(&aDouble, memoryCopy, sizeof(double));
-    // With 17 digits of precision, it is possible to convert a double back and forth to its binary
-    // representation without any loss
-    ss << std::setprecision(17) << aDouble;
+    if (base != Common::MemBase::base_decimal)
+    {
+      u64 unsignedDoubleWord = 0;
+      std::memcpy(&unsignedDoubleWord, memoryCopy, sizeof(u64));
+      if (base == Common::MemBase::base_binary)
+      {
+        ss << std::bitset<sizeof(u64) * 8>(unsignedDoubleWord).to_string();
+      }
+      else
+      {
+        ss << unsignedDoubleWord;
+      }
+    }
+    else
+    {
+      double aDouble = 0.0;
+      std::memcpy(&aDouble, memoryCopy, sizeof(double));
+      // With 17 digits of precision, it is possible to convert a double back and forth to its
+      // binary representation without any loss
+      ss << std::setprecision(17) << aDouble;
+    }
     delete[] memoryCopy;
     return ss.str();
   }
