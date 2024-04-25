@@ -200,9 +200,7 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       }
       case WATCH_COL_ADDRESS:
       {
-        u32 address = entry->getConsoleAddress();
-        bool isPointer = entry->isBoundToPointer();
-        return getAddressString(address, isPointer);
+        return getAddressString(entry);
       }
       case WATCH_COL_VALUE:
       {
@@ -624,14 +622,17 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
   }
 }
 
-QString MemWatchModel::getAddressString(u32 address, bool isPointer) const
+QString MemWatchModel::getAddressString(const MemWatchEntry* entry) const
 {
   std::stringstream ss;
-  if (isPointer)
+  if (entry->isBoundToPointer())
   {
-    ss << "P->" << std::hex << std::uppercase << address;
+    int level = static_cast<int>(entry->getPointerLevel());
+    std::string strAddress = entry->getAddressStringForPointerLevel(level);
+    ss << "(" << level << "*)" << std::hex << std::uppercase << strAddress;
     return QString::fromStdString(ss.str());
   }
+  u32 address = entry->getConsoleAddress();
   ss << std::hex << std::uppercase << address;
   return QString::fromStdString(ss.str());
 }

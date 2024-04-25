@@ -186,7 +186,7 @@ Common::MemOperationReturnCode MemWatchEntry::freeze()
   return writeCode;
 }
 
-u32 MemWatchEntry::getAddressForPointerLevel(const int level)
+u32 MemWatchEntry::getAddressForPointerLevel(const int level) const
 {
   if (!m_boundToPointer && level > m_pointerOffsets.size() && level > 0)
     return 0;
@@ -213,7 +213,7 @@ u32 MemWatchEntry::getAddressForPointerLevel(const int level)
   return address;
 }
 
-std::string MemWatchEntry::getAddressStringForPointerLevel(const int level)
+std::string MemWatchEntry::getAddressStringForPointerLevel(const int level) const
 {
   u32 address = getAddressForPointerLevel(level);
   if (address == 0)

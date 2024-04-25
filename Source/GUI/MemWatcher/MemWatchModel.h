@@ -79,7 +79,7 @@ private:
                                 const bool readSucess = true);
   bool freezeNodeValueRecursive(MemWatchTreeNode* node, const QModelIndex& parent = QModelIndex(),
                                 const bool writeSucess = true);
-  QString getAddressString(u32 address, bool isPointer) const;
+  QString getAddressString(const MemWatchEntry* entry) const;
   MemWatchTreeNode* getLeastDeepNodeFromList(const QList<MemWatchTreeNode*> nodes) const;
   int getNodeDeepness(const MemWatchTreeNode* node) const;
 
