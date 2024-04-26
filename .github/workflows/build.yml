@@ -45,7 +45,7 @@ jobs:
         shell: bash
 
       - name: Publish Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.set-artifact-name.outputs.artifact_name }}
           path: Source\bin\${{ matrix.configuration }}
