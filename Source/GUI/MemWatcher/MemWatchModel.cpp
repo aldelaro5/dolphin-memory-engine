@@ -527,7 +527,7 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
   case WATCH_COL_LABEL:
   {
     std::sort(
-        children.begin(), children.end(), [=](MemWatchTreeNode* left, MemWatchTreeNode* right) {
+        children.begin(), children.end(), [order](MemWatchTreeNode* left, MemWatchTreeNode* right) {
           if (left->isGroup() && right->isGroup())
           {
             int compareResult =
@@ -548,7 +548,7 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
   case WATCH_COL_TYPE:
   {
     std::sort(children.begin(), children.end(),
-              [=](MemWatchTreeNode* left, MemWatchTreeNode* right) {
+              [order](MemWatchTreeNode* left, MemWatchTreeNode* right) {
                 if (left->isGroup())
                   return true;
                 else if (right->isGroup())
@@ -563,7 +563,7 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
   case WATCH_COL_ADDRESS:
   {
     std::sort(children.begin(), children.end(),
-              [=](MemWatchTreeNode* left, MemWatchTreeNode* right) {
+              [order](MemWatchTreeNode* left, MemWatchTreeNode* right) {
                 if (left->isGroup())
                   return true;
                 else if (right->isGroup())
@@ -580,7 +580,7 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
   case WATCH_COL_LOCK:
   {
     std::sort(children.begin(), children.end(),
-              [=](MemWatchTreeNode* left, MemWatchTreeNode* right) {
+              [order](MemWatchTreeNode* left, MemWatchTreeNode* right) {
                 if (left->isGroup())
                   return true;
                 else if (right->isGroup())
@@ -595,7 +595,7 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
   case WATCH_COL_VALUE:
   {
     std::sort(
-        children.begin(), children.end(), [=](MemWatchTreeNode* left, MemWatchTreeNode* right) {
+        children.begin(), children.end(), [order](MemWatchTreeNode* left, MemWatchTreeNode* right) {
           if (left->isGroup() && right->isGroup())
             return false;
           else if (left->isGroup())

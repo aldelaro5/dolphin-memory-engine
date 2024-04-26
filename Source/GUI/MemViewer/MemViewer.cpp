@@ -34,7 +34,7 @@ MemViewer::MemViewer(QWidget* parent) : QAbstractScrollArea(parent)
 
   m_copyShortcut = new QShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key::Key_C), parent);
   connect(m_copyShortcut, &QShortcut::activated, this,
-          [=]() { copySelection(Common::MemType::type_byteArray); });
+          [this]() { copySelection(Common::MemType::type_byteArray); });
 
   // The viewport is implicitly updated at the constructor's end
 }
@@ -322,12 +322,12 @@ void MemViewer::contextMenuEvent(QContextMenuEvent* event)
     {
       QAction* copyBytesAction = new QAction(tr("&Copy selection as bytes"));
       connect(copyBytesAction, &QAction::triggered, this,
-              [=]() { copySelection(Common::MemType::type_byteArray); });
+              [this]() { copySelection(Common::MemType::type_byteArray); });
       contextMenu->addAction(copyBytesAction);
 
       QAction* copyStringAction = new QAction(tr("&Copy selection as ASCII string"));
       connect(copyStringAction, &QAction::triggered, this,
-              [=]() { copySelection(Common::MemType::type_string); });
+              [this]() { copySelection(Common::MemType::type_string); });
       contextMenu->addAction(copyStringAction);
 
       QAction* editAction = new QAction(tr("&Edit all selection..."));
@@ -342,7 +342,7 @@ void MemViewer::contextMenuEvent(QContextMenuEvent* event)
 
     QAction* addSingleWatchAction = new QAction(tr("&Add a watch to this address..."));
     connect(addSingleWatchAction, &QAction::triggered, this,
-            [=]() { addByteIndexAsWatch(indexMouse); });
+            [this, indexMouse]() { addByteIndexAsWatch(indexMouse); });
     contextMenu->addAction(addSingleWatchAction);
 
     contextMenu->popup(viewport()->mapToGlobal(event->pos()));

@@ -59,7 +59,7 @@ DlgCopy::DlgCopy(QWidget* parent) : QDialog(parent)
   });
 
   connect(m_cmbViewerBytesSeparator, &QComboBox::currentTextChanged, this,
-          [=](const QString& string) { updateMemoryText(); });
+          [this](const QString& string) { updateMemoryText(); });
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(grbCopySettings);

@@ -69,7 +69,7 @@ void MemScanWidget::initialiseWidgets()
   connect(m_btnUndoScan, &QPushButton::clicked, this, &MemScanWidget::onUndoScan);
 
   QShortcut* scanShortcut = new QShortcut(QKeySequence(Qt::Key::Key_Enter), this);
-  connect(scanShortcut, &QShortcut::activated, this, [=] {
+  connect(scanShortcut, &QShortcut::activated, this, [this] {
     if (m_memScanner->hasScanStarted())
       onNextScan();
     else
