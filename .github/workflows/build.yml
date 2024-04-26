@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up MSBuild
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Initialize submodules
         run: git submodule update --init
@@ -92,13 +92,13 @@ jobs:
         shell: bash
 
       - name: Publish Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-ubuntu-22.04-binary
           path: Source/build/artifacts
 
       - name: Publish Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-ubuntu-22.04-appimage
           path: dolphin-memory-engine.AppImage
@@ -138,7 +138,7 @@ jobs:
         shell: bash
 
       - name: Publish Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macOS-intel
           path: Source/build/artifacts
