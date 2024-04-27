@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(GCC_min_version 10)
 project(dolphin-memory-engine)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 if(WIN32)
     set(DolphinProcessSrc DolphinProcess/Windows/WindowsDolphinProcess.cpp)
     set(ExeIconSrc Resources/exeicon.rc)
