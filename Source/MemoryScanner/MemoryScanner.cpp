@@ -501,7 +501,8 @@ std::string MemScanner::getFormattedScannedValueAt(const int index) const
   bool aramAccessible = DolphinComm::DolphinAccessor::isARAMAccessible();
   u32 offset = Common::dolphinAddrToOffset(m_resultsConsoleAddr.at(index), aramAccessible);
   u32 ramIndex = Common::offsetToCacheIndex(offset, aramAccessible);
-  return Common::formatMemoryToString(&m_scanRAMCache[ramIndex], m_memType, m_memSize, m_memBase,
+  const size_t length{m_memType == Common::MemType::type_string ? ~0ULL : m_memSize};
+  return Common::formatMemoryToString(&m_scanRAMCache[ramIndex], m_memType, length, m_memBase,
                                       !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
 }
 
