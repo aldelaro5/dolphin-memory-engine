@@ -1,6 +1,7 @@
 #include "MemoryCommon.h"
 
 #include <bitset>
+#include <cctype>
 #include <cstring>
 #include <iomanip>
 #include <sstream>
@@ -624,13 +625,23 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
   }
   case Common::MemType::type_string:
   {
-    int actualLength = 0;
-    for (actualLength; actualLength < length; ++actualLength)
+    std::string text;
+    for (std::string::size_type i{0}; i < length; ++i)
     {
-      if (*(memory + actualLength) == 0x00)
+      const char c{memory[i]};
+      if (c == '\0')
         break;
+
+      if (std::isprint(c))
+      {
+        text.push_back(c);
+      }
+      else
+      {
+        text += "�";
+      }
     }
-    return std::string(memory, actualLength);
+    return text;
   }
   case Common::MemType::type_byteArray:
   {
