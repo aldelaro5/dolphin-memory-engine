@@ -1,8 +1,8 @@
-[submodule "Externals/Qt"]
-	path = Externals/Qt
-	url = https://github.com/dolphin-emu/ext-win-qt.git
-	branch = master
-	shallow = true
 [submodule "Externals/Qt-macOS"]
 	path = Externals/Qt-macOS
 	url = https://github.com/campital/ext-macos-qt-dme
+[submodule "Externals/Qt"]
+	path = Externals/Qt
+	url = https://github.com/dreamsyntax/dme-ext-win-qt.git
+	branch = master
+	shallow = true
