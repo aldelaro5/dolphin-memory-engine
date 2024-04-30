@@ -106,7 +106,7 @@
     <FilesToCopy Include="$(QTDIR)plugins\platforms\qwindows$(DebugSuffix).dll">
       <SubDir>platforms\</SubDir>
     </FilesToCopy>
-    <FilesToCopy Include="$(QTDIR)plugins\styles\qwindowsvistastyle$(DebugSuffix).dll">
+    <FilesToCopy Include="$(QTDIR)plugins\styles\qmodernwindowsstyle$(DebugSuffix).dll">
       <SubDir>styles\</SubDir>
     </FilesToCopy>
   </ItemGroup>
