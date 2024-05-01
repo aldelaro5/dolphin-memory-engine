@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
   QApplication::setApplicationName("Dolphin Memory Engine");
-  QApplication::setApplicationVersion("1.0.0");
+  QApplication::setApplicationVersion("1.1.0");
 
   QCommandLineParser parser;
   parser.setApplicationDescription(
