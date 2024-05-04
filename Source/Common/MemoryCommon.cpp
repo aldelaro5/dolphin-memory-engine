@@ -128,7 +128,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
                            const std::string_view inputString, const MemBase base,
                            const MemType type, const size_t length)
 {
-  if (inputString.length() == 0)
+  if (inputString.empty())
   {
     returnCode = MemOperationReturnCode::invalidInput;
     return nullptr;
