@@ -163,7 +163,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       {
         input = static_cast<u8>(std::bitset<sizeof(u8) * 8>(inputString).to_ullong());
       }
-      catch (std::invalid_argument)
+      catch (const std::invalid_argument&)
       {
         delete[] buffer;
         buffer = nullptr;
@@ -201,7 +201,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       {
         input = static_cast<u16>(std::bitset<sizeof(u16) * 8>(inputString).to_ullong());
       }
-      catch (std::invalid_argument)
+      catch (const std::invalid_argument&)
       {
         delete[] buffer;
         buffer = nullptr;
@@ -237,7 +237,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       {
         input = static_cast<u32>(std::bitset<sizeof(u32) * 8>(inputString).to_ullong());
       }
-      catch (std::invalid_argument)
+      catch (const std::invalid_argument&)
       {
         delete[] buffer;
         buffer = nullptr;

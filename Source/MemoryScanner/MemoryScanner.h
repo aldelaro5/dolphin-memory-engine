@@ -4,6 +4,7 @@
 #include <cstring>
 #include <stack>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "../Common/CommonTypes.h"
