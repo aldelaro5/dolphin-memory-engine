@@ -190,10 +190,10 @@ void MemWatchTreeNode::writeToJson(QJsonObject& json) const
   {
     json["groupName"] = m_groupName;
     QJsonArray entries;
-    for (auto i : m_children)
+    for (MemWatchTreeNode* const child : m_children)
     {
       QJsonObject theNode;
-      i->writeToJson(theNode);
+      child->writeToJson(theNode);
       entries.append(theNode);
     }
     json["groupEntries"] = entries;
@@ -203,10 +203,10 @@ void MemWatchTreeNode::writeToJson(QJsonObject& json) const
     if (m_parent == nullptr)
     {
       QJsonArray watchList;
-      for (auto i : m_children)
+      for (MemWatchTreeNode* const child : m_children)
       {
         QJsonObject theNode;
-        i->writeToJson(theNode);
+        child->writeToJson(theNode);
         watchList.append(theNode);
       }
       json["watchList"] = watchList;
@@ -244,9 +244,9 @@ QString MemWatchTreeNode::writeAsCSV() const
   if (isGroup() || m_parent == nullptr)
   {
     QString rootCsv;
-    for (auto i : m_children)
+    for (MemWatchTreeNode* const child : m_children)
     {
-      QString theCsvLine = i->writeAsCSV();
+      QString theCsvLine = child->writeAsCSV();
       rootCsv.append(theCsvLine);
     }
     return rootCsv;
