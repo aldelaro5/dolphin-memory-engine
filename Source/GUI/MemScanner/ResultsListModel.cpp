@@ -5,9 +5,7 @@ ResultsListModel::ResultsListModel(QObject* parent, MemScanner* scanner)
 {
 }
 
-ResultsListModel::~ResultsListModel()
-{
-}
+ResultsListModel::~ResultsListModel() = default;
 
 int ResultsListModel::columnCount(const QModelIndex& parent) const
 {

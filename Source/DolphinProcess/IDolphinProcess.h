@@ -10,7 +10,7 @@ namespace DolphinComm
 class IDolphinProcess
 {
 public:
-  virtual ~IDolphinProcess() {}
+  virtual ~IDolphinProcess() = default;
   virtual bool findPID() = 0;
   virtual bool obtainEmuRAMInformations() = 0;
   virtual bool readFromRAM(const u32 offset, char* buffer, const size_t size,

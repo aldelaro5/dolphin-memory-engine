@@ -13,7 +13,7 @@ namespace DolphinComm
 class LinuxDolphinProcess : public IDolphinProcess
 {
 public:
-  LinuxDolphinProcess() {}
+  LinuxDolphinProcess() = default;
   bool findPID() override;
   bool obtainEmuRAMInformations() override;
   bool readFromRAM(const u32 offset, char* buffer, size_t size, const bool withBSwap) override;

@@ -10,7 +10,7 @@ namespace DolphinComm
 class MacDolphinProcess : public IDolphinProcess
 {
 public:
-  MacDolphinProcess() {}
+  MacDolphinProcess() = default;
   bool findPID() override;
   bool obtainEmuRAMInformations() override;
   bool readFromRAM(const u32 offset, char* buffer, size_t size, const bool withBSwap) override;
