@@ -57,13 +57,13 @@ bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QMode
   QVector<MemWatchTreeNode*> children = node->getChildren();
   if (children.count() > 0)
   {
-    for (auto i : children)
+    for (MemWatchTreeNode* const child : children)
     {
-      QModelIndex theIndex = index(i->getRow(), WATCH_COL_VALUE, parent);
-      readSucess = updateNodeValueRecursive(i, theIndex, readSucess);
+      QModelIndex theIndex = index(child->getRow(), WATCH_COL_VALUE, parent);
+      readSucess = updateNodeValueRecursive(child, theIndex, readSucess);
       if (!readSucess)
         return false;
-      if (!GUICommon::g_valueEditing && !i->isGroup())
+      if (!GUICommon::g_valueEditing && !child->isGroup())
         emit dataChanged(theIndex, theIndex);
     }
   }
@@ -81,10 +81,10 @@ bool MemWatchModel::freezeNodeValueRecursive(MemWatchTreeNode* node, const QMode
   QVector<MemWatchTreeNode*> children = node->getChildren();
   if (children.count() > 0)
   {
-    for (auto i : children)
+    for (MemWatchTreeNode* const child : children)
     {
-      QModelIndex theIndex = index(i->getRow(), WATCH_COL_VALUE, parent);
-      writeSucess = freezeNodeValueRecursive(i, theIndex, writeSucess);
+      QModelIndex theIndex = index(child->getRow(), WATCH_COL_VALUE, parent);
+      writeSucess = freezeNodeValueRecursive(child, theIndex, writeSucess);
       if (!writeSucess)
         return false;
     }
@@ -421,12 +421,12 @@ MemWatchModel::getLeastDeepNodeFromList(const QList<MemWatchTreeNode*>& nodes) c
 {
   int leastLevelFound = std::numeric_limits<int>::max();
   MemWatchTreeNode* returnNode = new MemWatchTreeNode(nullptr);
-  for (auto i : nodes)
+  for (MemWatchTreeNode* const node : nodes)
   {
-    int deepness = getNodeDeepness(i);
+    int deepness = getNodeDeepness(node);
     if (deepness < leastLevelFound)
     {
-      returnNode = i;
+      returnNode = node;
       leastLevelFound = deepness;
     }
   }
@@ -632,10 +632,12 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
 
   parent->setChildren(children);
 
-  for (auto i : parent->getChildren())
+  for (MemWatchTreeNode* const child : parent->getChildren())
   {
-    if (i->isGroup())
-      sortRecursive(column, order, i);
+    if (child->isGroup())
+    {
+      sortRecursive(column, order, child);
+    }
   }
 }
 

@@ -345,17 +345,17 @@ void MemWatchWidget::pasteWatchFromClipBoard(MemWatchTreeNode* node, int row)
   if (copiedRootNode->hasChildren())
   {
     int numberIterated = 0;
-    for (auto i : copiedRootNode->getChildren())
+    for (MemWatchTreeNode* const child : copiedRootNode->getChildren())
     {
       if (node == nullptr)
         node = m_watchModel->getRootNode();
       if (node->isGroup() || (node->getParent() == nullptr))
       {
-        node->appendChild(i);
+        node->appendChild(child);
       }
       else
       {
-        node->getParent()->insertChild(row + numberIterated, i);
+        node->getParent()->insertChild(row + numberIterated, child);
       }
       numberIterated++;
     }
