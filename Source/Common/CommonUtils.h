@@ -21,6 +21,19 @@
 
 namespace Common
 {
+template <typename To, typename From>
+To bit_cast(From from)  // To be replaced with std::bit_cast when available
+{
+  static_assert(sizeof(From) == sizeof(To), "Type sizes do not match");
+  union
+  {
+    From f;
+    To t;
+  } u;
+  u.f = from;
+  return u.t;
+}
+
 #ifdef _WIN32
 inline u16 bSwap16(u16 data)
 {

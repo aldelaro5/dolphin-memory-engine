@@ -2,11 +2,13 @@
 
 #include <QDataStream>
 #include <QMimeData>
+
 #include <cstring>
 #include <limits>
 #include <sstream>
 
 #include "../../CheatEngineParser/CheatEngineParser.h"
+#include "../../Common/CommonUtils.h"
 #include "../GUICommon.h"
 
 MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
@@ -427,15 +429,14 @@ QMimeData* MemWatchModel::mimeData(const QModelIndexList& indexes) const
     if (!nodes.contains(node))
       nodes << node;
   }
-  qulonglong leastDeepPointer = 0;
   MemWatchTreeNode* leastDeepNode = getLeastDeepNodeFromList(nodes);
-  std::memcpy(&leastDeepPointer, &leastDeepNode, sizeof(MemWatchTreeNode*));
+  const qulonglong leastDeepPointer{
+      Common::bit_cast<qulonglong, MemWatchTreeNode*>(leastDeepNode)};
   stream << leastDeepPointer;
   stream << static_cast<int>(nodes.count());
   foreach (MemWatchTreeNode* node, nodes)
   {
-    qulonglong pointer = 0;
-    std::memcpy(&pointer, &node, sizeof(node));
+    const auto pointer{Common::bit_cast<qulonglong, MemWatchTreeNode*>(node)};
     stream << pointer;
   }
   mimeData->setData("application/x-memwatchtreenode", data);
@@ -456,10 +457,9 @@ bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, i
   else
     destParentNode = static_cast<MemWatchTreeNode*>(parent.internalPointer());
 
-  qlonglong leastDeepNodePtr;
+  qulonglong leastDeepNodePtr{};
   stream >> leastDeepNodePtr;
-  MemWatchTreeNode* leastDeepNode = nullptr;
-  std::memcpy(&leastDeepNode, &leastDeepNodePtr, sizeof(leastDeepNodePtr));
+  auto* const leastDeepNode{Common::bit_cast<MemWatchTreeNode*, qulonglong>(leastDeepNodePtr)};
 
   if (row == -1)
   {
@@ -483,10 +483,9 @@ bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, i
 
   for (int i = 0; i < count; ++i)
   {
-    qlonglong nodePtr;
+    qulonglong nodePtr{};
     stream >> nodePtr;
-    MemWatchTreeNode* srcNode = nullptr;
-    std::memcpy(&srcNode, &nodePtr, sizeof(nodePtr));
+    auto* const srcNode{Common::bit_cast<MemWatchTreeNode*, qulonglong>(nodePtr)};
 
     // Since beginMoveRows uses the same row format then the one received, we want to keep that, but
     // still use the correct row number for inserting.
