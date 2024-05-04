@@ -228,10 +228,10 @@ std::string DlgCopy::charToHexString(const char* const input, const size_t count
   std::stringstream ss;
   const char convert[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
                             '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-  std::string beforeAll = "";
-  std::string beforeByte = "";
-  std::string betweenBytes = "";
-  std::string afterAll = "";
+  std::string beforeAll;
+  std::string beforeByte;
+  std::string betweenBytes;
+  std::string afterAll;
 
   switch (format)
   {
