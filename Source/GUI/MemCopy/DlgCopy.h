@@ -36,7 +36,7 @@ private:
   static bool isHexString(std::string_view str);
   static bool isUnsignedIntegerString(std::string_view str);
   static bool uintStringToU32(std::string_view str, u32& output);
-  static std::string charToHexString(char* input, size_t count, ByteStringFormats format);
+  static std::string charToHexString(const char* input, size_t count, ByteStringFormats format);
 
   QLineEdit* m_spnWatcherCopyAddress;
   QLineEdit* m_spnWatcherCopySize;
