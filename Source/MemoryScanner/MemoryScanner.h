@@ -50,7 +50,7 @@ public:
                                               bool bswapSecond, size_t length) const;
 
   template <typename T>
-  inline T convertMemoryToType(const char* memory, bool invert) const
+  T convertMemoryToType(const char* memory, bool invert) const
   {
     T theType;
     std::memcpy(&theType, memory, sizeof(T));
@@ -60,9 +60,9 @@ public:
   }
 
   template <typename T>
-  inline CompareResult compareMemoryAsNumbersWithType(const char* first, const char* second,
-                                                      const char* offset, bool offsetInvert,
-                                                      bool bswapSecond) const
+  CompareResult compareMemoryAsNumbersWithType(const char* first, const char* second,
+                                               const char* offset, bool offsetInvert,
+                                               bool bswapSecond) const
   {
     T firstByte;
     T secondByte;
