@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <cstring>
 #include <stack>
 #include <string>
@@ -113,8 +114,9 @@ public:
     }
     }
 
-    if (firstByte != firstByte)
-      return CompareResult::nan;
+    if constexpr (std::is_floating_point<T>::value)
+      if (std::isnan(firstByte))
+        return CompareResult::nan;
 
     if (firstByte < (secondByte + convertMemoryToType<T>(offset, offsetInvert)))
       return CompareResult::smaller;
