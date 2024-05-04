@@ -158,10 +158,10 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     u8 theByte = 0;
     if (base == MemBase::base_binary)
     {
-      unsigned long long input = 0;
+      u8 input{};
       try
       {
-        input = std::bitset<sizeof(u8) * 8>(inputString).to_ullong();
+        input = static_cast<u8>(std::bitset<sizeof(u8) * 8>(inputString).to_ullong());
       }
       catch (std::invalid_argument)
       {
@@ -170,7 +170,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
         returnCode = MemOperationReturnCode::invalidInput;
         return buffer;
       }
-      theByte = static_cast<u8>(input);
+      theByte = input;
     }
     else
     {
@@ -196,10 +196,10 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     u16 theHalfword = 0;
     if (base == MemBase::base_binary)
     {
-      unsigned long long input = 0;
+      u16 input{};
       try
       {
-        input = std::bitset<sizeof(u16) * 8>(inputString).to_ullong();
+        input = static_cast<u16>(std::bitset<sizeof(u16) * 8>(inputString).to_ullong());
       }
       catch (std::invalid_argument)
       {
@@ -208,7 +208,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
         returnCode = MemOperationReturnCode::invalidInput;
         return buffer;
       }
-      theHalfword = static_cast<u16>(input);
+      theHalfword = input;
     }
     else
     {
@@ -232,10 +232,10 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     u32 theWord = 0;
     if (base == MemBase::base_binary)
     {
-      unsigned long long input = 0;
+      u32 input{};
       try
       {
-        input = std::bitset<sizeof(u32) * 8>(inputString).to_ullong();
+        input = static_cast<u32>(std::bitset<sizeof(u32) * 8>(inputString).to_ullong());
       }
       catch (std::invalid_argument)
       {
@@ -244,7 +244,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
         returnCode = MemOperationReturnCode::invalidInput;
         return buffer;
       }
-      theWord = static_cast<u32>(input);
+      theWord = input;
     }
     else
     {
@@ -270,10 +270,10 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       u32 theWord = 0;
       if (base == MemBase::base_binary)
       {
-        unsigned long long input = 0;
+        u32 input{};
         try
         {
-          input = std::bitset<sizeof(u32) * 8>(inputString).to_ullong();
+          input = static_cast<u32>(std::bitset<sizeof(u32) * 8>(inputString).to_ullong());
         }
         catch (const std::invalid_argument&)
         {
@@ -282,7 +282,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
           returnCode = MemOperationReturnCode::invalidInput;
           return buffer;
         }
-        theWord = static_cast<u32>(input);
+        theWord = input;
       }
       else
       {
@@ -323,10 +323,10 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       u64 theDoubleWord = 0;
       if (base == MemBase::base_binary)
       {
-        unsigned long long input = 0;
+        u64 input{};
         try
         {
-          input = std::bitset<sizeof(u64) * 8>(inputString).to_ullong();
+          input = static_cast<u64>(std::bitset<sizeof(u64) * 8>(inputString).to_ullong());
         }
         catch (const std::invalid_argument&)
         {
@@ -335,7 +335,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
           returnCode = MemOperationReturnCode::invalidInput;
           return buffer;
         }
-        theDoubleWord = static_cast<u64>(input);
+        theDoubleWord = input;
       }
       else
       {
