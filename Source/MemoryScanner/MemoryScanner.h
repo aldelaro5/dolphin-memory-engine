@@ -132,9 +132,9 @@ public:
   void setEnforceMemAlignment(const bool enforceAlignment);
   void setIsSigned(const bool isSigned);
   void resetSearchRange();
-  bool setSearchRangeBegin(u32 beginIndex);
-  bool setSearchRangeEnd(u32 endIndex);
-  bool setSearchRange(u32 beginIndex, u32 endIndex);
+  bool setSearchRangeBegin(u32 beginRange);
+  bool setSearchRangeEnd(u32 endRange);
+  bool setSearchRange(u32 beginRange, u32 endRange);
 
   std::vector<u32> getResultsConsoleAddr() const;
   size_t getResultCount() const;
