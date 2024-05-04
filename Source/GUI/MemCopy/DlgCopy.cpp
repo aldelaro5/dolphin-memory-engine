@@ -6,6 +6,8 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <qmessagebox.h>
+
+#include <algorithm>
 #include <sstream>
 #include <utility>
 #include "../../Common/CommonUtils.h"
@@ -166,15 +168,9 @@ bool DlgCopy::isHexString(std::string_view str)
     str = str.substr(2);
   }
 
-  for (char c : str)
-  {
-    if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
-    {
-      continue;
-    }
-    return false;
-  }
-  return true;
+  return std::ranges::all_of(str.cbegin(), str.cend(), [](const char c) {
+    return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F');
+  });
 }
 
 bool DlgCopy::hexStringToU32(const std::string_view str, u32& output)
@@ -197,15 +193,8 @@ bool DlgCopy::hexStringToU32(const std::string_view str, u32& output)
 
 bool DlgCopy::isUnsignedIntegerString(const std::string_view str)
 {
-  for (char c : str)
-  {
-    if (c >= '0' && c <= '9')
-    {
-      continue;
-    }
-    return false;
-  }
-  return true;
+  return std::ranges::all_of(str.cbegin(), str.cend(),
+                             [](const char c) { return '0' <= c && c <= '9'; });
 }
 
 bool DlgCopy::uintStringToU32(const std::string_view str, u32& output)
