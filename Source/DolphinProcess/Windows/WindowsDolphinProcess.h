@@ -11,7 +11,7 @@ namespace DolphinComm
 class WindowsDolphinProcess : public IDolphinProcess
 {
 public:
-  WindowsDolphinProcess() {}
+  WindowsDolphinProcess() = default;
   bool findPID() override;
   bool obtainEmuRAMInformations() override;
   bool readFromRAM(const u32 offset, char* buffer, const size_t size,
