@@ -125,8 +125,8 @@ int getNbrBytesAlignmentForType(const MemType type)
 }
 
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
-                           const std::string inputString, const MemBase base, const MemType type,
-                           const size_t length)
+                           const std::string_view inputString, const MemBase base,
+                           const MemType type, const size_t length)
 {
   if (inputString.length() == 0)
   {
@@ -134,7 +134,8 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     return nullptr;
   }
 
-  std::stringstream ss(inputString);
+  std::stringstream ss;
+  ss << inputString;
   switch (base)
   {
   case MemBase::base_octal:
@@ -161,7 +162,8 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       u8 input{};
       try
       {
-        input = static_cast<u8>(std::bitset<sizeof(u8) * 8>(inputString).to_ullong());
+        input = static_cast<u8>(
+            std::bitset<sizeof(u8) * 8>(inputString.data(), inputString.size()).to_ullong());
       }
       catch (const std::invalid_argument&)
       {
@@ -199,7 +201,8 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       u16 input{};
       try
       {
-        input = static_cast<u16>(std::bitset<sizeof(u16) * 8>(inputString).to_ullong());
+        input = static_cast<u16>(
+            std::bitset<sizeof(u16) * 8>(inputString.data(), inputString.size()).to_ullong());
       }
       catch (const std::invalid_argument&)
       {
@@ -235,7 +238,8 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       u32 input{};
       try
       {
-        input = static_cast<u32>(std::bitset<sizeof(u32) * 8>(inputString).to_ullong());
+        input = static_cast<u32>(
+            std::bitset<sizeof(u32) * 8>(inputString.data(), inputString.size()).to_ullong());
       }
       catch (const std::invalid_argument&)
       {
@@ -273,7 +277,8 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
         u32 input{};
         try
         {
-          input = static_cast<u32>(std::bitset<sizeof(u32) * 8>(inputString).to_ullong());
+          input = static_cast<u32>(
+              std::bitset<sizeof(u32) * 8>(inputString.data(), inputString.size()).to_ullong());
         }
         catch (const std::invalid_argument&)
         {
@@ -326,7 +331,8 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
         u64 input{};
         try
         {
-          input = static_cast<u64>(std::bitset<sizeof(u64) * 8>(inputString).to_ullong());
+          input = static_cast<u64>(
+              std::bitset<sizeof(u64) * 8>(inputString.data(), inputString.size()).to_ullong());
         }
         catch (const std::invalid_argument&)
         {
@@ -378,7 +384,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       returnCode = MemOperationReturnCode::inputTooLong;
       return buffer;
     }
-    std::memcpy(buffer, inputString.c_str(), length);
+    std::memcpy(buffer, inputString.data(), length);
     actualLength = length;
     break;
   }

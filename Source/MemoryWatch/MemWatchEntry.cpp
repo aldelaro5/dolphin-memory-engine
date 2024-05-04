@@ -6,16 +6,16 @@
 #include <ios>
 #include <limits>
 #include <sstream>
+#include <utility>
 
 #include "../Common/CommonUtils.h"
 #include "../DolphinProcess/DolphinAccessor.h"
 
-MemWatchEntry::MemWatchEntry(const QString label, const u32 consoleAddress,
-                             const Common::MemType type, const Common::MemBase base,
-                             const bool isUnsigned, const size_t length,
+MemWatchEntry::MemWatchEntry(QString label, const u32 consoleAddress, const Common::MemType type,
+                             const Common::MemBase base, const bool isUnsigned, const size_t length,
                              const bool isBoundToPointer)
-    : m_label(label), m_consoleAddress(consoleAddress), m_type(type), m_isUnsigned(isUnsigned),
-      m_base(base), m_boundToPointer(isBoundToPointer), m_length(length)
+    : m_label(std::move(label)), m_consoleAddress(consoleAddress), m_type(type),
+      m_isUnsigned(isUnsigned), m_base(base), m_boundToPointer(isBoundToPointer), m_length(length)
 {
   m_memory = new char[getSizeForType(m_type, m_length)];
 }
