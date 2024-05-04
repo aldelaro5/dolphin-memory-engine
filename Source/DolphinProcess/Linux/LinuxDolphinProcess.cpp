@@ -36,7 +36,7 @@ bool LinuxDolphinProcess::obtainEmuRAMInformations()
       continue;
 
     bool foundDevShmDolphin = false;
-    for (auto str : lineData)
+    for (const std::string& str : lineData)
     {
       if (str.substr(0, 19) == "/dev/shm/dolphinmem" || str.substr(0, 20) == "/dev/shm/dolphin-emu")
       {
