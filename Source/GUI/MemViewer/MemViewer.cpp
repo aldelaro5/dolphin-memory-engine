@@ -730,8 +730,9 @@ bool MemViewer::writeCharacterToSelectedMemory(char byteToWrite)
       byteToWrite = selectedMemoryValue & 0x0F | (byteToWrite << 4);
   }
 
-  u32 offsetToWrite = Common::dolphinAddrToOffset(m_currentFirstAddress + (u32)memoryOffset,
-                                                  DolphinComm::DolphinAccessor::isARAMAccessible());
+  const u32 offsetToWrite{
+      Common::dolphinAddrToOffset(m_currentFirstAddress + static_cast<u32>(memoryOffset),
+                                  DolphinComm::DolphinAccessor::isARAMAccessible())};
   return DolphinComm::DolphinAccessor::writeToRAM(offsetToWrite, &byteToWrite, 1, false);
 }
 

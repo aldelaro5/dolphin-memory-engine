@@ -154,9 +154,9 @@ bool DlgCopy::copyMemory()
 
 void DlgCopy::updateMemoryText()
 {
-  m_spnWatcherCopyOutput->setText(QString::fromStdString(
-      charToHexString(m_Data.data(), m_Data.size(),
-                      (DlgCopy::ByteStringFormats)m_cmbViewerBytesSeparator->currentIndex())));
+  m_spnWatcherCopyOutput->setText(QString::fromStdString(charToHexString(
+      m_Data.data(), m_Data.size(),
+      static_cast<DlgCopy::ByteStringFormats>(m_cmbViewerBytesSeparator->currentIndex()))));
 }
 
 bool DlgCopy::isHexString(std::string str)
@@ -217,7 +217,7 @@ bool DlgCopy::uintStringToU32(std::string str, u32& output)
   if (u > ULONG_MAX)
     return false;
 
-  output = (u32)u;
+  output = static_cast<u32>(u);
   return true;
 }
 

@@ -173,7 +173,8 @@ bool WindowsDolphinProcess::readFromRAM(const u32 offset, char* buffer, const si
   }
 
   SIZE_T nread = 0;
-  bool bResult = ReadProcessMemory(m_hDolphin, (void*)RAMAddress, buffer, size, &nread);
+  const bool bResult{static_cast<bool>(
+      ReadProcessMemory(m_hDolphin, reinterpret_cast<void*>(RAMAddress), buffer, size, &nread))};
   if (bResult && nread == size)
   {
     if (withBSwap)
@@ -265,7 +266,8 @@ bool WindowsDolphinProcess::writeToRAM(const u32 offset, const char* buffer, con
     }
   }
 
-  bool bResult = WriteProcessMemory(m_hDolphin, (void*)RAMAddress, bufferCopy, size, &nread);
+  const bool bResult{static_cast<bool>(WriteProcessMemory(
+      m_hDolphin, reinterpret_cast<void*>(RAMAddress), bufferCopy, size, &nread))};
   delete[] bufferCopy;
   return (bResult && nread == size);
 }

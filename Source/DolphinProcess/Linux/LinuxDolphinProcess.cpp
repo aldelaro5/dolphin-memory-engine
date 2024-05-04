@@ -163,7 +163,7 @@ bool LinuxDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size
 
   local.iov_base = buffer;
   local.iov_len = size;
-  remote.iov_base = (void*)RAMAddress;
+  remote.iov_base = reinterpret_cast<void*>(RAMAddress);
   remote.iov_len = size;
 
   nread = process_vm_readv(m_PID, &local, 1, &remote, 1, 0);
@@ -232,7 +232,7 @@ bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const
 
   local.iov_base = bufferCopy;
   local.iov_len = size;
-  remote.iov_base = (void*)RAMAddress;
+  remote.iov_base = reinterpret_cast<void*>(RAMAddress);
   remote.iov_len = size;
 
   if (withBSwap)
