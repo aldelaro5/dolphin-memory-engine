@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string_view>
+
 #include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -30,10 +32,10 @@ private:
   bool copyMemory();
   void updateMemoryText();
 
-  static bool hexStringToU32(std::string str, u32& output);
-  static bool isHexString(std::string str);
-  static bool isUnsignedIntegerString(std::string str);
-  static bool uintStringToU32(std::string str, u32& output);
+  static bool hexStringToU32(std::string_view str, u32& output);
+  static bool isHexString(std::string_view str);
+  static bool isUnsignedIntegerString(std::string_view str);
+  static bool uintStringToU32(std::string_view str, u32& output);
   static std::string charToHexString(char* input, size_t count, ByteStringFormats format);
 
   QLineEdit* m_spnWatcherCopyAddress;

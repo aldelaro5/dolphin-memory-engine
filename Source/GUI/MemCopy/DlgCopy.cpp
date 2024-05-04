@@ -159,7 +159,7 @@ void DlgCopy::updateMemoryText()
       static_cast<DlgCopy::ByteStringFormats>(m_cmbViewerBytesSeparator->currentIndex()))));
 }
 
-bool DlgCopy::isHexString(std::string str)
+bool DlgCopy::isHexString(std::string_view str)
 {
   if (str.length() > 2 && str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
   {
@@ -177,7 +177,7 @@ bool DlgCopy::isHexString(std::string str)
   return true;
 }
 
-bool DlgCopy::hexStringToU32(std::string str, u32& output)
+bool DlgCopy::hexStringToU32(const std::string_view str, u32& output)
 {
   // if (str.empty() || str.length() % 2 == 1)
   if (str.empty())
@@ -186,7 +186,8 @@ bool DlgCopy::hexStringToU32(std::string str, u32& output)
   if (!isHexString(str))
     return false;
 
-  std::stringstream ss(str);
+  std::stringstream ss;
+  ss << str;
 
   ss >> std::hex;
   ss >> output;
@@ -194,7 +195,7 @@ bool DlgCopy::hexStringToU32(std::string str, u32& output)
   return true;
 }
 
-bool DlgCopy::isUnsignedIntegerString(std::string str)
+bool DlgCopy::isUnsignedIntegerString(const std::string_view str)
 {
   for (char c : str)
   {
@@ -207,12 +208,12 @@ bool DlgCopy::isUnsignedIntegerString(std::string str)
   return true;
 }
 
-bool DlgCopy::uintStringToU32(std::string str, u32& output)
+bool DlgCopy::uintStringToU32(const std::string_view str, u32& output)
 {
   if (!isUnsignedIntegerString(str) || str.empty() || str.length() > 10)
     return false;
 
-  u64 u = std::stoll(str);
+  const auto u{static_cast<u64>(std::stoll(std::string{str}))};
 
   if (u > ULONG_MAX)
     return false;

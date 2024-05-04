@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <string>
+#include <string_view>
 
 #include "CommonTypes.h"
 
@@ -58,8 +59,7 @@ size_t getSizeForType(const MemType type, const size_t length);
 bool shouldBeBSwappedForType(const MemType type);
 int getNbrBytesAlignmentForType(const MemType type);
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
-                           const std::string inputString, const MemBase base, const MemType type,
-                           const size_t length);
+                           std::string_view inputString, MemBase base, MemType type, size_t length);
 std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
                                  const MemBase base, const bool isUnsigned,
                                  const bool withBSwap = false);

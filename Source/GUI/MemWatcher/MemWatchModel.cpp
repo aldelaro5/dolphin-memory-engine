@@ -399,7 +399,7 @@ int MemWatchModel::getNodeDeepness(const MemWatchTreeNode* node) const
 }
 
 MemWatchTreeNode*
-MemWatchModel::getLeastDeepNodeFromList(const QList<MemWatchTreeNode*> nodes) const
+MemWatchModel::getLeastDeepNodeFromList(const QList<MemWatchTreeNode*>& nodes) const
 {
   int leastLevelFound = std::numeric_limits<int>::max();
   MemWatchTreeNode* returnNode = new MemWatchTreeNode(nullptr);
