@@ -1,7 +1,31 @@
 #include "MemoryScanner.h"
 
+#include <string_view>
+
 #include "../Common/CommonUtils.h"
 #include "../DolphinProcess/DolphinAccessor.h"
+
+namespace
+{
+std::string addSpacesToBytesArrays(const std::string_view bytesArray)
+{
+  std::string result(bytesArray);
+  int spacesAdded = 0;
+  for (int i = 2; i < bytesArray.length(); i += 2)
+  {
+    if (bytesArray[i] != ' ')
+    {
+      result.insert(i + spacesAdded, 1, ' ');
+      spacesAdded++;
+    }
+    else
+    {
+      i++;
+    }
+  }
+  return result;
+}
+}  // namespace
 
 MemScanner::MemScanner() : m_resultsConsoleAddr(std::vector<u32>())
 {
@@ -473,7 +497,7 @@ bool MemScanner::setSearchRangeEnd(u32 endRange)
   return true;
 }
 
-int MemScanner::getTermsNumForFilter(const MemScanner::ScanFiter filter) const
+int MemScanner::getTermsNumForFilter(const MemScanner::ScanFiter filter)
 {
   if (filter == MemScanner::ScanFiter::between)
     return 2;
@@ -485,7 +509,7 @@ int MemScanner::getTermsNumForFilter(const MemScanner::ScanFiter filter) const
   return 0;
 }
 
-bool MemScanner::typeSupportsAdditionalOptions(const Common::MemType type) const
+bool MemScanner::typeSupportsAdditionalOptions(const Common::MemType type)
 {
   return (type == Common::MemType::type_byte || type == Common::MemType::type_halfword ||
           type == Common::MemType::type_word);
@@ -522,25 +546,6 @@ void MemScanner::removeResultAt(int index)
 {
   m_resultsConsoleAddr.erase(m_resultsConsoleAddr.begin() + index);
   m_resultCount--;
-}
-
-std::string MemScanner::addSpacesToBytesArrays(const std::string& bytesArray) const
-{
-  std::string result(bytesArray);
-  int spacesAdded = 0;
-  for (int i = 2; i < bytesArray.length(); i += 2)
-  {
-    if (bytesArray[i] != ' ')
-    {
-      result.insert(i + spacesAdded, 1, ' ');
-      spacesAdded++;
-    }
-    else
-    {
-      i++;
-    }
-  }
-  return result;
 }
 
 bool MemScanner::undoScan()

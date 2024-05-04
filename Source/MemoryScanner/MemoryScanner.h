@@ -140,7 +140,7 @@ public:
   size_t getResultCount() const;
   bool hasUndo() const;
   size_t getUndoCount() const;
-  int getTermsNumForFilter(const ScanFiter filter) const;
+  static int getTermsNumForFilter(ScanFiter filter);
   Common::MemType getType() const;
   Common::MemBase getBase() const;
   size_t getLength() const;
@@ -148,7 +148,7 @@ public:
   std::string getFormattedScannedValueAt(const int index) const;
   std::string getFormattedCurrentValueAt(int index) const;
   void removeResultAt(int index);
-  bool typeSupportsAdditionalOptions(const Common::MemType type) const;
+  static bool typeSupportsAdditionalOptions(Common::MemType type);
   bool hasScanStarted() const;
 
 private:
@@ -156,7 +156,6 @@ private:
                             const char* memoryToCompare2, const char* noOffset,
                             const char* newerRAMCache, const size_t realSize,
                             const u32 consoleOffset) const;
-  std::string addSpacesToBytesArrays(const std::string& bytesArray) const;
 
   bool m_searchInRangeBegin = false;
   bool m_searchInRangeEnd = false;
