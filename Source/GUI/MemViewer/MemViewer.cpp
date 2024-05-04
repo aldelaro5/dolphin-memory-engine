@@ -952,7 +952,7 @@ void MemViewer::renderASCIIText(QPainter& painter, const int rowIndex, const int
   std::string asciiStr = Common::formatMemoryToString(
       m_updatedRawMemoryData + ((rowIndex * m_numColumns) + columnIndex),
       Common::MemType::type_string, 1, Common::MemBase::base_none, true);
-  int asciiByte = (int)asciiStr[0];
+  const int asciiByte{static_cast<int>(static_cast<unsigned char>(asciiStr[0]))};
   if (asciiByte > 0x7E || asciiByte < 0x20)
     asciiStr = ".";
   QRect* currentCharRect = new QRect(
