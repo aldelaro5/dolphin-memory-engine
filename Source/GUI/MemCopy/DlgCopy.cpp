@@ -222,7 +222,8 @@ bool DlgCopy::uintStringToU32(const std::string_view str, u32& output)
   return true;
 }
 
-std::string DlgCopy::charToHexString(char* input, size_t count, DlgCopy::ByteStringFormats format)
+std::string DlgCopy::charToHexString(const char* const input, const size_t count,
+                                     const DlgCopy::ByteStringFormats format)
 {
   std::stringstream ss;
   const char convert[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
