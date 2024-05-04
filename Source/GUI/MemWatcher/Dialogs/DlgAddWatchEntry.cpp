@@ -185,7 +185,6 @@ void DlgAddWatchEntry::addPointerOffset()
   int level = static_cast<int>(m_entry->getPointerLevel());
   QLabel* lblLevel = new QLabel(QString::fromStdString("Level " + std::to_string(level + 1) + ":"));
   QLineEdit* txbOffset = new QLineEdit();
-  txbOffset->setText(0);
   m_offsets.append(txbOffset);
   QLabel* lblAddressOfPath = new QLabel(" -> ");
   m_addressPath.append(lblAddressOfPath);
