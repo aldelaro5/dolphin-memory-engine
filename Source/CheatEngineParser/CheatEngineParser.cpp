@@ -359,7 +359,7 @@ void CheatEngineParser::verifyCheatEntryParsingErrors(cheatEntryParsingState sta
   }
 }
 
-QString CheatEngineParser::formatImportedEntryBasicInfo(const MemWatchEntry* entry) const
+QString CheatEngineParser::formatImportedEntryBasicInfo(const MemWatchEntry* const entry)
 {
   QString formatedEntry = "";
   formatedEntry += "Label: " + entry->getLabel() + "\n";

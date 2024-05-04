@@ -49,7 +49,7 @@ public:
                     const QModelIndex& parent) override;
 
   void changeType(const QModelIndex& index, const Common::MemType type, const size_t length);
-  MemWatchEntry* getEntryFromIndex(const QModelIndex& index) const;
+  static MemWatchEntry* getEntryFromIndex(const QModelIndex& index);
   void addGroup(const QString& name);
   void addEntry(MemWatchEntry* entry);
   void editEntry(MemWatchEntry* entry, const QModelIndex& index);
@@ -65,7 +65,7 @@ public:
   QString writeRootToCSVStringRecursive() const;
   bool hasAnyNodes() const;
   MemWatchTreeNode* getRootNode() const;
-  MemWatchTreeNode* getTreeNodeFromIndex(const QModelIndex& index) const;
+  static MemWatchTreeNode* getTreeNodeFromIndex(const QModelIndex& index);
   bool editData(const QModelIndex& index, const QVariant& value, int role, bool emitEdit = false);
 
 signals:
@@ -79,7 +79,6 @@ private:
                                 const bool readSucess = true);
   bool freezeNodeValueRecursive(MemWatchTreeNode* node, const QModelIndex& parent = QModelIndex(),
                                 const bool writeSucess = true);
-  QString getAddressString(const MemWatchEntry* entry) const;
   MemWatchTreeNode* getLeastDeepNodeFromList(const QList<MemWatchTreeNode*>& nodes) const;
   int getNodeDeepness(const MemWatchTreeNode* node) const;
 

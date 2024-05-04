@@ -38,7 +38,7 @@ private:
   void parseCheatEntry(MemWatchTreeNode* node, const bool useDolphinPointer);
   void verifyCheatEntryParsingErrors(cheatEntryParsingState state, MemWatchEntry* entry,
                                      bool isGroup, const bool useDolphinPointer);
-  QString formatImportedEntryBasicInfo(const MemWatchEntry* entry) const;
+  static QString formatImportedEntryBasicInfo(const MemWatchEntry* entry);
 
   u64 m_tableStartAddress = 0;
   QString m_errorMessages = "";

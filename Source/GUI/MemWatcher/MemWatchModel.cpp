@@ -11,6 +11,24 @@
 #include "../../Common/CommonUtils.h"
 #include "../GUICommon.h"
 
+namespace
+{
+QString getAddressString(const MemWatchEntry* const entry)
+{
+  std::stringstream ss;
+  if (entry->isBoundToPointer())
+  {
+    int level = static_cast<int>(entry->getPointerLevel());
+    std::string strAddress = entry->getAddressStringForPointerLevel(level);
+    ss << "(" << level << "*)" << std::hex << std::uppercase << strAddress;
+    return QString::fromStdString(ss.str());
+  }
+  u32 address = entry->getConsoleAddress();
+  ss << std::hex << std::uppercase << address;
+  return QString::fromStdString(ss.str());
+}
+}  // namespace
+
 MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
 {
   m_rootNode = new MemWatchTreeNode(nullptr);
@@ -94,7 +112,7 @@ void MemWatchModel::changeType(const QModelIndex& index, Common::MemType type, s
   emit dataChanged(index, index);
 }
 
-MemWatchEntry* MemWatchModel::getEntryFromIndex(const QModelIndex& index) const
+MemWatchEntry* MemWatchModel::getEntryFromIndex(const QModelIndex& index)
 {
   MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
   return node->getEntry();
@@ -621,21 +639,6 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
   }
 }
 
-QString MemWatchModel::getAddressString(const MemWatchEntry* entry) const
-{
-  std::stringstream ss;
-  if (entry->isBoundToPointer())
-  {
-    int level = static_cast<int>(entry->getPointerLevel());
-    std::string strAddress = entry->getAddressStringForPointerLevel(level);
-    ss << "(" << level << "*)" << std::hex << std::uppercase << strAddress;
-    return QString::fromStdString(ss.str());
-  }
-  u32 address = entry->getConsoleAddress();
-  ss << std::hex << std::uppercase << address;
-  return QString::fromStdString(ss.str());
-}
-
 void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json)
 {
   m_rootNode->readFromJson(json);
@@ -684,7 +687,7 @@ MemWatchTreeNode* MemWatchModel::getRootNode() const
   return m_rootNode;
 }
 
-MemWatchTreeNode* MemWatchModel::getTreeNodeFromIndex(const QModelIndex& index) const
+MemWatchTreeNode* MemWatchModel::getTreeNodeFromIndex(const QModelIndex& index)
 {
   return static_cast<MemWatchTreeNode*>(index.internalPointer());
 }
