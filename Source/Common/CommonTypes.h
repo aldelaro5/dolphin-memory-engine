@@ -2,12 +2,12 @@
 
 #include <cstdint>
 
-typedef uint64_t u64;
-typedef uint32_t u32;
-typedef uint16_t u16;
-typedef uint8_t u8;
+using u64 = uint64_t;
+using u32 = uint32_t;
+using u16 = uint16_t;
+using u8 = uint8_t;
 
-typedef int64_t s64;
-typedef int32_t s32;
-typedef int16_t s16;
-typedef int8_t s8;
+using s64 = int64_t;
+using s32 = int32_t;
+using s16 = int16_t;
+using s8 = int8_t;
