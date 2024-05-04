@@ -27,9 +27,7 @@ std::string addSpacesToBytesArrays(const std::string_view bytesArray)
 }
 }  // namespace
 
-MemScanner::MemScanner() : m_resultsConsoleAddr(std::vector<u32>())
-{
-}
+MemScanner::MemScanner() = default;
 
 MemScanner::~MemScanner()
 {
