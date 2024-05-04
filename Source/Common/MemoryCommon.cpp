@@ -419,7 +419,6 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     int index = 0;
     for (const auto& i : bytes)
     {
-      std::stringstream byteStream(i);
       ss >> std::hex;
       u8 theByte = 0;
       int theByteInt = 0;

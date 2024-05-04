@@ -39,7 +39,6 @@ MemWatchTreeNode* CheatEngineParser::parseCTFile(QIODevice* CTFileIODevice,
 
   if (m_xmlReader->readNextStartElement())
   {
-    std::string test = m_xmlReader->name().toString().toStdString();
     if (m_xmlReader->name() == QString("CheatTable"))
     {
       MemWatchTreeNode* rootNode = new MemWatchTreeNode(nullptr);
@@ -71,7 +70,6 @@ MemWatchTreeNode* CheatEngineParser::parseCheatTable(MemWatchTreeNode* rootNode,
   {
     if (m_xmlReader->readNextStartElement())
     {
-      std::string test = m_xmlReader->name().toString().toStdString();
       if (m_xmlReader->name() == QString("CheatEntries"))
         parseCheatEntries(rootNode, useDolphinPointer);
     }
@@ -95,7 +93,6 @@ MemWatchTreeNode* CheatEngineParser::parseCheatEntries(MemWatchTreeNode* node,
   {
     if (m_xmlReader->readNextStartElement())
     {
-      std::string test = m_xmlReader->name().toString().toStdString();
       if (m_xmlReader->name() == QString("CheatEntry"))
         parseCheatEntry(node, useDolphinPointer);
     }
