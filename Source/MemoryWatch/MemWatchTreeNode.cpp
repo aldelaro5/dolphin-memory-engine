@@ -3,12 +3,13 @@
 #include <QJsonArray>
 
 #include <sstream>
+#include <utility>
 
 #include "../GUI/GUICommon.h"
 
-MemWatchTreeNode::MemWatchTreeNode(MemWatchEntry* entry, MemWatchTreeNode* parent,
-                                   const bool isGroup, const QString& groupName)
-    : m_entry(entry), m_parent(parent), m_isGroup(isGroup), m_groupName(groupName)
+MemWatchTreeNode::MemWatchTreeNode(MemWatchEntry* const entry, MemWatchTreeNode* const parent,
+                                   const bool isGroup, QString groupName)
+    : m_entry(entry), m_parent(parent), m_isGroup(isGroup), m_groupName(std::move(groupName))
 {
 }
 
