@@ -915,9 +915,10 @@ void MemViewer::determineMemoryTextRenderProperties(const int rowIndex, const in
   {
     QColor baseColor = QColor(Qt::red);
     float alphaPercentage =
-        (1000 - (m_elapsedTimer.elapsed() -
-                 m_memoryMsElapsedLastChange[rowIndex * m_numColumns + columnIndex])) /
-        (1000 / 100);
+        (1000.0f -
+         static_cast<float>(m_elapsedTimer.elapsed() -
+                            m_memoryMsElapsedLastChange[rowIndex * m_numColumns + columnIndex])) /
+        (1000.0f / 100.0f);
     int newAlpha = std::trunc(baseColor.alpha() * (alphaPercentage / 100));
     bgColor = QColor(baseColor.red(), baseColor.green(), baseColor.blue(), newAlpha);
   }
