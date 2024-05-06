@@ -48,15 +48,14 @@ bool LinuxDolphinProcess::obtainEmuRAMInformations()
     if (!foundDevShmDolphin)
       continue;
 
-    u32 offset = 0;
     std::string offsetStr("0x" + lineData[2]);
-    offset = std::stoul(offsetStr, nullptr, 16);
+    const u32 offset{static_cast<u32>(std::stoul(offsetStr, nullptr, 16))};
     if (offset != 0 && offset != Common::GetMEM1Size() + 0x40000)
       continue;
 
     u64 firstAddress = 0;
     u64 SecondAddress = 0;
-    int indexDash = lineData[0].find('-');
+    const std::size_t indexDash{lineData[0].find('-')};
     std::string firstAddressStr("0x" + lineData[0].substr(0, indexDash));
     std::string secondAddressStr("0x" + lineData[0].substr(indexDash + 1));
 

@@ -216,7 +216,7 @@ QModelIndexList MemScanWidget::getSelectedResults() const
 
 MemScanner::ScanFiter MemScanWidget::getSelectedFilter() const
 {
-  int index = GUICommon::g_memScanFilter.indexOf(
+  const auto index = GUICommon::g_memScanFilter.indexOf(
       QRegularExpression("^" + m_cmbScanFilter->currentText() + "$"));
   return static_cast<MemScanner::ScanFiter>(index);
 }

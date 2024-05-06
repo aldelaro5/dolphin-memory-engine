@@ -14,7 +14,7 @@ public:
 
   QString getErrorMessages() const;
   bool hasACriticalErrorOccured() const;
-  void setTableStartAddress(const u64 tableStartAddress);
+  void setTableStartAddress(u32 tableStartAddress);
   MemWatchTreeNode* parseCTFile(QIODevice* CTFileIODevice, const bool useDolphinPointer);
 
 private:
@@ -40,7 +40,7 @@ private:
                                      bool isGroup, const bool useDolphinPointer);
   static QString formatImportedEntryBasicInfo(const MemWatchEntry* entry);
 
-  u64 m_tableStartAddress = 0;
+  u32 m_tableStartAddress = 0;
   QString m_errorMessages = "";
   bool m_criticalErrorOccured = false;
   QXmlStreamReader* m_xmlReader;

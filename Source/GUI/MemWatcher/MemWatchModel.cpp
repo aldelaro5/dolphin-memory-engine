@@ -189,7 +189,7 @@ int MemWatchModel::rowCount(const QModelIndex& parent) const
   else
     parentItem = static_cast<MemWatchTreeNode*>(parent.internalPointer());
 
-  return parentItem->getChildren().size();
+  return static_cast<int>(parentItem->getChildren().size());
 }
 
 QVariant MemWatchModel::data(const QModelIndex& index, int role) const
@@ -654,7 +654,7 @@ void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json)
 }
 
 MemWatchModel::CTParsingErrors
-MemWatchModel::importRootFromCTFile(QFile* CTFile, const bool useDolphinPointer, const u64 CEStart)
+MemWatchModel::importRootFromCTFile(QFile* const CTFile, const bool useDolphinPointer, const u32 CEStart)
 {
   CheatEngineParser parser = CheatEngineParser();
   parser.setTableStartAddress(CEStart);

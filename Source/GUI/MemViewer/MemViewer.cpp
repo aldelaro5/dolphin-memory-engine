@@ -384,7 +384,7 @@ void MemViewer::updateFontSize(int newSize)
   m_charHeight = fontMetrics().height();
   m_hexAreaWidth = m_numColumns * (m_charWidthEm * 2 + m_charWidthEm / 2);
   m_hexAreaHeight = m_numRows * m_charHeight;
-  m_rowHeaderWidth = m_charWidthEm * (sizeof(u32) * 2 + 1) + m_charWidthEm / 2;
+  m_rowHeaderWidth = m_charWidthEm * (static_cast<int>(sizeof(u32)) * 2 + 1) + m_charWidthEm / 2;
   m_hexAsciiSeparatorPosX = m_rowHeaderWidth + m_hexAreaWidth;
   m_columnHeaderHeight = m_charHeight + m_charWidthEm / 2;
 }
@@ -725,9 +725,9 @@ bool MemViewer::writeCharacterToSelectedMemory(char byteToWrite)
 
     const char selectedMemoryValue = *(m_updatedRawMemoryData + memoryOffset);
     if (m_carretBetweenHex)
-      byteToWrite = (selectedMemoryValue & 0xF0) | byteToWrite;
+      byteToWrite = (selectedMemoryValue & static_cast<char>(0xF0)) | byteToWrite;
     else
-      byteToWrite = (selectedMemoryValue & 0x0F) | (byteToWrite << 4);
+      byteToWrite = (selectedMemoryValue & static_cast<char>(0x0F)) | (byteToWrite << 4);
   }
 
   const u32 offsetToWrite{
@@ -842,7 +842,8 @@ void MemViewer::renderColumnsHeaderText(QPainter& painter)
 {
   QColor oldPenColor = painter.pen().color();
   painter.setPen(QGuiApplication::palette().color(QPalette::WindowText));
-  painter.drawText(m_charWidthEm * 1.5f, m_charHeight, tr("Address"));
+  painter.drawText(static_cast<int>(static_cast<double>(m_charWidthEm) * 1.5), m_charHeight,
+                   tr("Address"));
   int posXHeaderText = m_rowHeaderWidth;
   for (int i = 0; i < m_numColumns; i++)
   {
@@ -854,8 +855,9 @@ void MemViewer::renderColumnsHeaderText(QPainter& painter)
     posXHeaderText += m_charWidthEm * 2 + m_charWidthEm / 2;
   }
 
-  painter.drawText(m_hexAsciiSeparatorPosX + m_charWidthEm * 2.5f, m_charHeight,
-                   tr("Text (ASCII)"));
+  painter.drawText(m_hexAsciiSeparatorPosX +
+                       static_cast<int>(static_cast<double>(m_charWidthEm) * 2.5),
+                   m_charHeight, tr("Text (ASCII)"));
   painter.drawText(0, 0, 0, 0, 0, QString());
   painter.setPen(oldPenColor);
 }
@@ -907,7 +909,8 @@ void MemViewer::determineMemoryTextRenderProperties(const int rowIndex, const in
   else if (m_lastRawMemoryData[rowIndex * m_numColumns + columnIndex] !=
            m_updatedRawMemoryData[rowIndex * m_numColumns + columnIndex])
   {
-    m_memoryMsElapsedLastChange[rowIndex * m_numColumns + columnIndex] = m_elapsedTimer.elapsed();
+    m_memoryMsElapsedLastChange[rowIndex * m_numColumns + columnIndex] =
+        static_cast<int>(m_elapsedTimer.elapsed());
     bgColor = QColor(Qt::red);
   }
   // If the last changes is less than a second old
@@ -922,7 +925,8 @@ void MemViewer::determineMemoryTextRenderProperties(const int rowIndex, const in
          static_cast<float>(m_elapsedTimer.elapsed() -
                             m_memoryMsElapsedLastChange[rowIndex * m_numColumns + columnIndex])) /
         (1000.0f / 100.0f);
-    int newAlpha = std::trunc(baseColor.alpha() * (alphaPercentage / 100));
+    const int newAlpha{
+        static_cast<int>(static_cast<float>(baseColor.alpha()) * alphaPercentage / 100.0f)};
     bgColor = QColor(baseColor.red(), baseColor.green(), baseColor.blue(), newAlpha);
   }
 }

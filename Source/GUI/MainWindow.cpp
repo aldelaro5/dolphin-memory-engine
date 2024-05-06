@@ -444,7 +444,7 @@ void MainWindow::onScannerActionToggled(const bool checked)
     const QVariant scannerFactorVariant{m_splitter->property("previous_scanner_factor")};
     const double scannerFactor{scannerFactorVariant.isValid() ? scannerFactorVariant.toDouble() :
                                                                 0.5};
-    const double scannerSize{std::round(scannerFactor * totalSize)};
+    const int scannerSize{static_cast<int>(std::round(scannerFactor * totalSize))};
 
     sizes << scannerSize << totalSize - scannerSize;
   }

@@ -43,7 +43,7 @@ bool MemWatchTreeNode::hasChildren() const
 
 int MemWatchTreeNode::childrenCount() const
 {
-  return m_children.count();
+  return static_cast<int>(m_children.count());
 }
 
 bool MemWatchTreeNode::isValueEditing() const
@@ -95,7 +95,7 @@ MemWatchTreeNode* MemWatchTreeNode::getParent() const
 int MemWatchTreeNode::getRow() const
 {
   if (m_parent != nullptr)
-    return m_parent->m_children.indexOf(const_cast<MemWatchTreeNode*>(this));
+    return static_cast<int>(m_parent->m_children.indexOf(const_cast<MemWatchTreeNode*>(this)));
 
   return 0;
 }
