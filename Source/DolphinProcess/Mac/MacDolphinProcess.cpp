@@ -230,7 +230,8 @@ bool MacDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const s
     }
   }
 
-  if (vm_write(m_task, RAMAddress, reinterpret_cast<vm_offset_t>(bufferCopy), size) != KERN_SUCCESS)
+  if (vm_write(m_task, RAMAddress, reinterpret_cast<vm_offset_t>(bufferCopy),
+               static_cast<mach_msg_type_number_t>(size)) != KERN_SUCCESS)
   {
     delete[] bufferCopy;
     return false;
