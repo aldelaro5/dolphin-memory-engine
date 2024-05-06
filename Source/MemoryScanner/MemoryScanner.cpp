@@ -10,8 +10,8 @@ namespace
 std::string addSpacesToBytesArrays(const std::string_view bytesArray)
 {
   std::string result(bytesArray);
-  int spacesAdded = 0;
-  for (int i = 2; i < bytesArray.length(); i += 2)
+  std::string::size_type spacesAdded = 0;
+  for (std::string::size_type i{2}; i < bytesArray.length(); i += 2)
   {
     if (bytesArray[i] != ' ')
     {

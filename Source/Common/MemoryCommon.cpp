@@ -668,7 +668,7 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
   {
     if (base == Common::MemBase::base_binary)
     {
-      for (int i = 0; i < length; ++i)
+      for (size_t i{0}; i < length; ++i)
       {
         ss << std::bitset<sizeof(u8) * 8>(static_cast<u8>(memory[i])).to_string() << " ";
       }
@@ -677,7 +677,7 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
     {
       // Force Hexadecimal, no matter the base
       ss << std::hex << std::uppercase;
-      for (int i = 0; i < length; ++i)
+      for (size_t i{0}; i < length; ++i)
       {
         ss << std::setfill('0') << std::setw(2) << static_cast<int>(static_cast<u8>(memory[i]))
            << " ";

@@ -188,7 +188,7 @@ Common::MemOperationReturnCode MemWatchEntry::freeze()
 
 u32 MemWatchEntry::getAddressForPointerLevel(const int level) const
 {
-  if (!m_boundToPointer && level > m_pointerOffsets.size() && level > 0)
+  if (!m_boundToPointer && level > static_cast<int>(m_pointerOffsets.size()) && level > 0)
     return 0;
 
   u32 address = m_consoleAddress;

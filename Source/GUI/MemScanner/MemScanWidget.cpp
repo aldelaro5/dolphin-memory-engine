@@ -403,9 +403,9 @@ void MemScanWidget::onFirstScan()
   }
   else
   {
-    int resultsFound = static_cast<int>(m_memScanner->getResultCount());
-    m_lblResultCount->setText(
-        tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
+    const size_t resultsFound{m_memScanner->getResultCount()};
+    m_lblResultCount->setText(tr("%1 result(s) found", "", static_cast<int>(resultsFound))
+                                  .arg(QString::number(resultsFound)));
     if (resultsFound <= m_showThreshold && resultsFound != 0)
     {
       m_btnAddAll->setEnabled(true);
@@ -438,9 +438,9 @@ void MemScanWidget::onNextScan()
   }
   else
   {
-    int resultsFound = static_cast<int>(m_memScanner->getResultCount());
-    m_lblResultCount->setText(
-        tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
+    const size_t resultsFound{m_memScanner->getResultCount()};
+    m_lblResultCount->setText(tr("%1 result(s) found", "", static_cast<int>(resultsFound))
+                                  .arg(QString::number(resultsFound)));
     if (resultsFound <= m_showThreshold && resultsFound != 0)
     {
       m_btnAddAll->setEnabled(true);
@@ -458,9 +458,9 @@ void MemScanWidget::onUndoScan()
   {
     m_memScanner->undoScan();
 
-    int resultsFound = static_cast<int>(m_memScanner->getResultCount());
-    m_lblResultCount->setText(
-        tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
+    const size_t resultsFound{m_memScanner->getResultCount()};
+    m_lblResultCount->setText(tr("%1 result(s) found", "", static_cast<int>(resultsFound))
+                                  .arg(QString::number(resultsFound)));
     if (resultsFound <= 1000 && resultsFound != 0)
     {
       m_btnAddAll->setEnabled(true);
@@ -519,9 +519,9 @@ void MemScanWidget::onRemoveSelection()
     m_resultsListModel->removeRow(m_tblResulstList->selectionModel()->selectedRows().at(0).row());
 
   // The result count is already updated at the backend by this point
-  int resultsFound = static_cast<int>(m_memScanner->getResultCount());
-  m_lblResultCount->setText(
-      tr("%1 result(s) found", "", resultsFound).arg(QString::number(resultsFound)));
+  const size_t resultsFound{m_memScanner->getResultCount()};
+  m_lblResultCount->setText(tr("%1 result(s) found", "", static_cast<int>(resultsFound))
+                                .arg(QString::number(resultsFound)));
 }
 
 void MemScanWidget::onAddAll()

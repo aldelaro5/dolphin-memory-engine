@@ -149,7 +149,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     if (m_entry->isBoundToPointer())
     {
       m_pointerWidget->show();
-      for (int i = 0; i < m_entry->getPointerLevel(); ++i)
+      for (int i{0}; i < static_cast<int>(m_entry->getPointerLevel()); ++i)
       {
         std::stringstream ss;
         ss << std::hex << std::uppercase << m_entry->getPointerOffset(i);
@@ -376,7 +376,7 @@ void DlgAddWatchEntry::updatePreview()
   m_lblValuePreview->setText(QString::fromStdString(m_entry->getStringFromMemory()));
   if (m_entry->isBoundToPointer())
   {
-    size_t level = m_entry->getPointerLevel();
+    const int level{static_cast<int>(m_entry->getPointerLevel())};
     for (int i = 0; i < level; ++i)
     {
       QLabel* lblAddressOfPath =
