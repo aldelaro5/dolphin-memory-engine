@@ -9,7 +9,7 @@
 
 MemWatchTreeNode::MemWatchTreeNode(MemWatchEntry* const entry, MemWatchTreeNode* const parent,
                                    const bool isGroup, QString groupName)
-    : m_entry(entry), m_parent(parent), m_isGroup(isGroup), m_groupName(std::move(groupName))
+    : m_isGroup(isGroup), m_groupName(std::move(groupName)), m_entry(entry), m_parent(parent)
 {
 }
 
