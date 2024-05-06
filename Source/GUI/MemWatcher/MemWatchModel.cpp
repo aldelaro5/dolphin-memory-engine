@@ -156,7 +156,6 @@ void MemWatchModel::removeNode(const QModelIndex& index)
   if (index.isValid())
   {
     MemWatchTreeNode* toDelete = static_cast<MemWatchTreeNode*>(index.internalPointer());
-    MemWatchTreeNode* parent = toDelete->getParent();
 
     int toDeleteRow = toDelete->getRow();
 

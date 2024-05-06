@@ -300,7 +300,7 @@ void DlgAddWatchEntry::accept()
     {
       bool allOffsetsValid = true;
       int i = 0;
-      for (i; i < m_offsets.count(); ++i)
+      for (; i < m_offsets.count(); ++i)
       {
         allOffsetsValid = validateAndSetOffset(i);
         if (!allOffsetsValid)
@@ -379,7 +379,6 @@ void DlgAddWatchEntry::updatePreview()
     size_t level = m_entry->getPointerLevel();
     for (int i = 0; i < level; ++i)
     {
-      QWidget* test = m_offsetsLayout->itemAtPosition(i, 2)->widget();
       QLabel* lblAddressOfPath =
           static_cast<QLabel*>(m_offsetsLayout->itemAtPosition(i, 2)->widget());
       lblAddressOfPath->setText(

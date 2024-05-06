@@ -87,7 +87,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     return Common::MemOperationReturnCode::OK;
   }
 
-  bool m_wasUnknownInitialValue = false;
+  m_wasUnknownInitialValue = false;
   Common::MemOperationReturnCode scanReturn = Common::MemOperationReturnCode::OK;
   size_t termActualLength = 0;
   size_t termMaxLength = 0;
@@ -129,8 +129,6 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
       return scanReturn;
     }
   }
-
-  bool withBSwap = Common::shouldBeBSwappedForType(m_memType);
 
   m_memSize = Common::getSizeForType(m_memType, termActualLength);
 
@@ -242,8 +240,6 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
     if (scanReturn != Common::MemOperationReturnCode::OK)
       return scanReturn;
   }
-
-  bool withBSwap = Common::shouldBeBSwappedForType(m_memType);
 
   m_memSize = Common::getSizeForType(m_memType, termActualLength);
 
