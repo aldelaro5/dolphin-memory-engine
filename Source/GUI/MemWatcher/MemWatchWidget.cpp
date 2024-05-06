@@ -483,6 +483,8 @@ void MemWatchWidget::onValueWriteError(const QModelIndex& index,
     emit mustUnhook();
     break;
   }
+  case Common::MemOperationReturnCode::OK:
+    break;
   }
 }
 

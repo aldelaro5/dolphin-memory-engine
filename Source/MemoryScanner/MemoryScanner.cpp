@@ -179,6 +179,8 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
                                          m_memSize) == MemScanner::CompareResult::smaller);
       break;
     }
+    default:
+      break;
     }
 
     if (isResult)

@@ -147,6 +147,8 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
   case MemBase::base_hexadecimal:
     ss >> std::hex;
     break;
+  default:
+    break;
   }
 
   size_t size = getSizeForType(type, length);
@@ -472,6 +474,8 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
     break;
   case Common::MemBase::base_hexadecimal:
     ss << std::hex << std::uppercase;
+    break;
+  default:
     break;
   }
 
