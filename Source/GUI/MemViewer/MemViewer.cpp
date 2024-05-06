@@ -727,7 +727,8 @@ bool MemViewer::writeCharacterToSelectedMemory(char byteToWrite)
     if (m_carretBetweenHex)
       byteToWrite = (selectedMemoryValue & static_cast<char>(0xF0)) | byteToWrite;
     else
-      byteToWrite = (selectedMemoryValue & static_cast<char>(0x0F)) | (byteToWrite << 4);
+      byteToWrite =
+          (selectedMemoryValue & static_cast<char>(0x0F)) | static_cast<char>(byteToWrite << 4);
   }
 
   const u32 offsetToWrite{
