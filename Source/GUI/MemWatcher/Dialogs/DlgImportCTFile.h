@@ -20,7 +20,7 @@ public:
   u32 getCommonBase() const;
   void onAddressImportMethodChanged();
   void onBrowseFiles();
-  void accept();
+  void accept() override;
 
 private:
   bool m_useDolphinPointers;

@@ -29,7 +29,7 @@ public:
   };
 
   MemWatchModel(QObject* parent);
-  ~MemWatchModel();
+  ~MemWatchModel() override;
 
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;

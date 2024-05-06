@@ -20,7 +20,7 @@ class MemScanWidget : public QWidget
 
 public:
   MemScanWidget();
-  ~MemScanWidget();
+  ~MemScanWidget() override;
 
   ResultsListModel* getResultListModel() const;
   std::vector<u32> getAllResults() const;

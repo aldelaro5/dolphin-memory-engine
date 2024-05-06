@@ -20,7 +20,7 @@ class MainWindow : public QMainWindow
 
 public:
   MainWindow();
-  ~MainWindow();
+  ~MainWindow() override;
   void closeEvent(QCloseEvent* event) override;
   void addWatchRequested(u32 address, Common::MemType type, size_t length, bool isUnsigned,
                          Common::MemBase base);

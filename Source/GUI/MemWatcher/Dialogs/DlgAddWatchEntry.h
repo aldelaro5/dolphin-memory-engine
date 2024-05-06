@@ -17,9 +17,9 @@ class DlgAddWatchEntry : public QDialog
 {
 public:
   DlgAddWatchEntry(bool newEntry, MemWatchEntry* entry, QWidget* parent);
-  ~DlgAddWatchEntry();
+  ~DlgAddWatchEntry() override;
   void onTypeChange(int index);
-  void accept();
+  void accept() override;
   void onAddressChanged();
   void onIsPointerChanged();
   void onLengthChanged();

@@ -12,7 +12,7 @@ class MemViewerWidget : public QWidget
 
 public:
   explicit MemViewerWidget(QWidget* parent);
-  ~MemViewerWidget();
+  ~MemViewerWidget() override;
 
   void onJumpToAddressTextChanged();
   void onGoToMEM1Start();

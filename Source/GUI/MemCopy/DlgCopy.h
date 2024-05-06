@@ -15,7 +15,7 @@ class DlgCopy : public QDialog
 {
 public:
   DlgCopy(QWidget* parent = nullptr);
-  ~DlgCopy();
+  ~DlgCopy() override;
 
 private:
   enum ByteStringFormats

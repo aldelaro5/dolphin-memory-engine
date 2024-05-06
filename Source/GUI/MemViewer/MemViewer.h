@@ -19,7 +19,7 @@ class MemViewer : public QAbstractScrollArea
 
 public:
   MemViewer(QWidget* parent);
-  ~MemViewer();
+  ~MemViewer() override;
   QSize sizeHint() const override;
   void mousePressEvent(QMouseEvent* event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
