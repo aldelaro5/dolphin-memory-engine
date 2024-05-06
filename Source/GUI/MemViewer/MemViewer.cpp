@@ -791,6 +791,8 @@ void MemViewer::keyPressEvent(QKeyEvent* event)
 
 void MemViewer::scrollContentsBy(int dx, int dy)
 {
+  (void)dx;
+
   if (!m_disableScrollContentEvent && m_validMemory)
   {
     u32 newAddress = m_currentFirstAddress + m_numColumns * (-dy);
@@ -999,6 +1001,8 @@ void MemViewer::renderMemory(QPainter& painter, const int rowIndex, const int co
 
 void MemViewer::paintEvent(QPaintEvent* event)
 {
+  (void)event;
+
   QPainter painter(viewport());
   painter.setPen(QColor(Qt::black));
 

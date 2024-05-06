@@ -7,7 +7,7 @@
 
 #include "../../DolphinProcess/DolphinAccessor.h"
 
-MemViewerWidget::MemViewerWidget(QWidget* parent, u32 consoleAddress) : QWidget(parent)
+MemViewerWidget::MemViewerWidget(QWidget* const parent) : QWidget(parent)
 {
   setWindowTitle("Memory Viewer");
   initialiseWidgets();

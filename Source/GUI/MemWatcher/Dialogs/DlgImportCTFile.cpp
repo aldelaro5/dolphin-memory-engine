@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 
-DlgImportCTFile::DlgImportCTFile(QWidget* parent)
+DlgImportCTFile::DlgImportCTFile(QWidget* const parent) : QDialog(parent)
 {
   initialiseWidgets();
   makeLayouts();

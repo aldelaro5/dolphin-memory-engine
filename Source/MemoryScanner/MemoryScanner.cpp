@@ -392,6 +392,8 @@ inline MemScanner::CompareResult
 MemScanner::compareMemoryAsNumbers(const char* first, const char* second, const char* offset,
                                    bool offsetInvert, bool bswapSecond, size_t length) const
 {
+  (void)length;
+
   switch (m_memType)
   {
   case Common::MemType::type_byte:

@@ -9,11 +9,15 @@ ResultsListModel::~ResultsListModel() = default;
 
 int ResultsListModel::columnCount(const QModelIndex& parent) const
 {
+  (void)parent;
+
   return RESULT_COL_NUM;
 }
 
 int ResultsListModel::rowCount(const QModelIndex& parent) const
 {
+  (void)parent;
+
   if (m_scanner->getResultCount() > m_showThreshold)
     return 0;
   return static_cast<int>(m_scanner->getResultCount());

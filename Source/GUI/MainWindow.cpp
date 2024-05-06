@@ -183,7 +183,7 @@ void MainWindow::makeLayouts()
 
 void MainWindow::makeMemViewer()
 {
-  m_viewer = new MemViewerWidget(nullptr, Common::MEM1_START);
+  m_viewer = new MemViewerWidget(nullptr);
   connect(m_viewer, &MemViewerWidget::mustUnhook, this, &MainWindow::onUnhook);
   connect(m_viewer, &MemViewerWidget::addWatchRequested, m_watcher, &MemWatchWidget::addWatchEntry);
   connect(m_watcher, &MemWatchWidget::goToAddressInViewer, this,
@@ -367,6 +367,9 @@ void MainWindow::onHookIfNotHooked()
 
 void MainWindow::onSplitterMoved(const int pos, const int index)
 {
+  (void)pos;
+  (void)index;
+
   SConfig::getInstance().setSplitterState(m_splitter->saveState());
 
   const QList<int> currentSizes{m_splitter->sizes()};

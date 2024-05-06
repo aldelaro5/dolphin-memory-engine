@@ -173,6 +173,8 @@ void MemWatchModel::removeNode(const QModelIndex& index)
 
 int MemWatchModel::columnCount(const QModelIndex& parent) const
 {
+  (void)parent;
+
   return WATCH_COL_NUM;
 }
 
@@ -463,6 +465,11 @@ QMimeData* MemWatchModel::mimeData(const QModelIndexList& indexes) const
 bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column,
                                  const QModelIndex& parent)
 {
+  (void)column;
+
+  if (action != Qt::CopyAction && action != Qt::MoveAction)
+    return false;
+
   if (!data->hasFormat("application/x-memwatchtreenode"))
     return false;
 
