@@ -61,6 +61,31 @@ IF(WIN32)
 SET(GUI_TYPE WIN32)
 ENDIF(WIN32)
 
+if (UNIX)
+    add_compile_options(
+        -Wall
+        -Wextra
+
+        -Wconversion
+        -Wsuggest-override
+
+        -Werror
+    )
+endif ()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
+    add_compile_options(
+        -Wno-fortify-source   # FIXME(CA): Too verbose at the moment, but worth fixing
+        -Wno-sign-conversion  # FIXME(CA): Too verbose at the moment, but worth fixing
+    )
+endif ()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    add_compile_options(
+        -W4
+    )
+endif ()
+
 add_executable(dolphin-memory-engine ${GUI_TYPE} ${SRCS})
 
 target_link_libraries(dolphin-memory-engine Qt6::Widgets)
