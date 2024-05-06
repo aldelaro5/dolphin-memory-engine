@@ -405,6 +405,11 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       }
       else
       {
+        if (base == MemBase::base_binary && next.size() == 8)
+        {
+          bytes.push_back(next);
+          next.clear();
+        }
         next += i;
       }
     }
@@ -425,18 +430,25 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     int index = 0;
     for (const auto& i : bytes)
     {
-      ss >> std::hex;
       u8 theByte = 0;
-      int theByteInt = 0;
-      ss >> theByteInt;
-      if (ss.fail())
+      if (base == MemBase::base_binary)
       {
-        delete[] buffer;
-        buffer = nullptr;
-        returnCode = MemOperationReturnCode::invalidInput;
-        return buffer;
+        theByte = static_cast<u8>(std::bitset<sizeof(u8) * 8>(i.data(), i.size()).to_ullong());
       }
-      theByte = static_cast<u8>(theByteInt);
+      else
+      {
+        ss >> std::hex;
+        int theByteInt = 0;
+        ss >> theByteInt;
+        if (ss.fail())
+        {
+          delete[] buffer;
+          buffer = nullptr;
+          returnCode = MemOperationReturnCode::invalidInput;
+          return buffer;
+        }
+        theByte = static_cast<u8>(theByteInt);
+      }
       std::memcpy(&(buffer[index]), &theByte, sizeof(u8));
       index++;
     }
@@ -650,13 +662,22 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
   }
   case Common::MemType::type_byteArray:
   {
-    // Force Hexadecimal, no matter the base
-    ss << std::hex << std::uppercase;
-    for (int i = 0; i < length; ++i)
+    if (base == Common::MemBase::base_binary)
     {
-      u8 aByte = 0;
-      std::memcpy(&aByte, memory + i, sizeof(u8));
-      ss << std::setfill('0') << std::setw(2) << static_cast<int>(aByte) << " ";
+      for (int i = 0; i < length; ++i)
+      {
+        ss << std::bitset<sizeof(u8) * 8>(static_cast<u8>(memory[i])).to_string() << " ";
+      }
+    }
+    else
+    {
+      // Force Hexadecimal, no matter the base
+      ss << std::hex << std::uppercase;
+      for (int i = 0; i < length; ++i)
+      {
+        ss << std::setfill('0') << std::setw(2) << static_cast<int>(static_cast<u8>(memory[i]))
+           << " ";
+      }
     }
     std::string str = ss.str();
     // Remove the space at the end
