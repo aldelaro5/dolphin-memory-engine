@@ -14,8 +14,8 @@
 MemWatchEntry::MemWatchEntry(QString label, const u32 consoleAddress, const Common::MemType type,
                              const Common::MemBase base, const bool isUnsigned, const size_t length,
                              const bool isBoundToPointer)
-    : m_label(std::move(label)), m_consoleAddress(consoleAddress), m_type(type),
-      m_isUnsigned(isUnsigned), m_base(base), m_boundToPointer(isBoundToPointer), m_length(length)
+    : m_label(std::move(label)), m_consoleAddress(consoleAddress), m_type(type), m_base(base),
+      m_isUnsigned(isUnsigned), m_boundToPointer(isBoundToPointer), m_length(length)
 {
   m_memory = new char[getSizeForType(m_type, m_length)];
 }
@@ -32,9 +32,9 @@ MemWatchEntry::MemWatchEntry()
 
 MemWatchEntry::MemWatchEntry(MemWatchEntry* entry)
     : m_label(entry->m_label), m_consoleAddress(entry->m_consoleAddress), m_type(entry->m_type),
-      m_isUnsigned(entry->m_isUnsigned), m_base(entry->m_base),
+      m_base(entry->m_base), m_isUnsigned(entry->m_isUnsigned),
       m_boundToPointer(entry->m_boundToPointer), m_pointerOffsets(entry->m_pointerOffsets),
-      m_length(entry->m_length), m_isValidPointer(entry->m_isValidPointer)
+      m_isValidPointer(entry->m_isValidPointer), m_length(entry->m_length)
 {
   m_memory = new char[getSizeForType(entry->getType(), entry->getLength())];
   std::memcpy(m_memory, entry->getMemory(), getSizeForType(entry->getType(), entry->getLength()));
@@ -188,7 +188,7 @@ Common::MemOperationReturnCode MemWatchEntry::freeze()
 
 u32 MemWatchEntry::getAddressForPointerLevel(const int level) const
 {
-  if (!m_boundToPointer && level > m_pointerOffsets.size() && level > 0)
+  if (!m_boundToPointer && level > static_cast<int>(m_pointerOffsets.size()) && level > 0)
     return 0;
 
   u32 address = m_consoleAddress;

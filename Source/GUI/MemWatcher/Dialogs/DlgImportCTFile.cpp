@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 
-DlgImportCTFile::DlgImportCTFile(QWidget* parent)
+DlgImportCTFile::DlgImportCTFile(QWidget* const parent) : QDialog(parent)
 {
   initialiseWidgets();
   makeLayouts();
@@ -111,7 +111,7 @@ bool DlgImportCTFile::willUseDolphinPointers() const
   return m_useDolphinPointers;
 }
 
-u64 DlgImportCTFile::getCommonBase() const
+u32 DlgImportCTFile::getCommonBase() const
 {
   return m_commonBase;
 }

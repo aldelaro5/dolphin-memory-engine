@@ -27,7 +27,7 @@ bool MacDolphinProcess::findPID()
   static const char* const s_dolphinProcessName{std::getenv("DME_DOLPHIN_PROCESS_NAME")};
 
   m_PID = -1;
-  for (int i = 0; i < procSize / sizeof(kinfo_proc); i++)
+  for (size_t i{0}; i < procSize / sizeof(kinfo_proc); ++i)
   {
     const std::string_view name{procs[i].kp_proc.p_comm};
     const bool match{s_dolphinProcessName ? name == s_dolphinProcessName :
@@ -230,7 +230,8 @@ bool MacDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const s
     }
   }
 
-  if (vm_write(m_task, RAMAddress, reinterpret_cast<vm_offset_t>(bufferCopy), size) != KERN_SUCCESS)
+  if (vm_write(m_task, RAMAddress, reinterpret_cast<vm_offset_t>(bufferCopy),
+               static_cast<mach_msg_type_number_t>(size)) != KERN_SUCCESS)
   {
     delete[] bufferCopy;
     return false;

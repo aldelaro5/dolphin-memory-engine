@@ -29,7 +29,7 @@ public:
   };
 
   MemWatchModel(QObject* parent);
-  ~MemWatchModel();
+  ~MemWatchModel() override;
 
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -59,8 +59,7 @@ public:
   void onUpdateTimer();
   void onFreezeTimer();
   void loadRootFromJsonRecursive(const QJsonObject& json);
-  CTParsingErrors importRootFromCTFile(QFile* CTFile, const bool useDolphinPointer,
-                                       const u64 CEStart = 0);
+  CTParsingErrors importRootFromCTFile(QFile* CTFile, bool useDolphinPointer, u32 CEStart = 0);
   void writeRootToJsonRecursive(QJsonObject& json) const;
   QString writeRootToCSVStringRecursive() const;
   bool hasAnyNodes() const;

@@ -9,7 +9,7 @@
 
 MemWatchTreeNode::MemWatchTreeNode(MemWatchEntry* const entry, MemWatchTreeNode* const parent,
                                    const bool isGroup, QString groupName)
-    : m_entry(entry), m_parent(parent), m_isGroup(isGroup), m_groupName(std::move(groupName))
+    : m_isGroup(isGroup), m_groupName(std::move(groupName)), m_entry(entry), m_parent(parent)
 {
 }
 
@@ -43,7 +43,7 @@ bool MemWatchTreeNode::hasChildren() const
 
 int MemWatchTreeNode::childrenCount() const
 {
-  return m_children.count();
+  return static_cast<int>(m_children.count());
 }
 
 bool MemWatchTreeNode::isValueEditing() const
@@ -95,7 +95,7 @@ MemWatchTreeNode* MemWatchTreeNode::getParent() const
 int MemWatchTreeNode::getRow() const
 {
   if (m_parent != nullptr)
-    return m_parent->m_children.indexOf(const_cast<MemWatchTreeNode*>(this));
+    return static_cast<int>(m_parent->m_children.indexOf(const_cast<MemWatchTreeNode*>(this)));
 
   return 0;
 }
@@ -227,7 +227,7 @@ void MemWatchTreeNode::writeToJson(QJsonObject& json) const
       if (m_entry->isBoundToPointer())
       {
         QJsonArray offsets;
-        for (int i = 0; i < m_entry->getPointerOffsets().size(); ++i)
+        for (int i{0}; i < static_cast<int>(m_entry->getPointerOffsets().size()); ++i)
         {
           std::stringstream ssOffset;
           ssOffset << std::hex << std::uppercase << m_entry->getPointerOffset(i);
@@ -257,7 +257,7 @@ QString MemWatchTreeNode::writeAsCSV() const
     ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
     if (m_entry->isBoundToPointer())
     {
-      for (int i = 0; i < m_entry->getPointerLevel(); i++)
+      for (int i = 0; i < static_cast<int>(m_entry->getPointerLevel()); ++i)
       {
         std::stringstream ssOffset;
         ssOffset << std::hex << std::uppercase << m_entry->getPointerOffset(i);

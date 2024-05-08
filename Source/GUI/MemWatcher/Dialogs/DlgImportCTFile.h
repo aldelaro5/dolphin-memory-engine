@@ -17,14 +17,14 @@ public:
   void makeLayouts();
   QString getFileName() const;
   bool willUseDolphinPointers() const;
-  u64 getCommonBase() const;
+  u32 getCommonBase() const;
   void onAddressImportMethodChanged();
   void onBrowseFiles();
-  void accept();
+  void accept() override;
 
 private:
   bool m_useDolphinPointers;
-  u64 m_commonBase = 0;
+  u32 m_commonBase = 0;
   QString m_strFileName;
   QLineEdit* m_txbFileName;
   QPushButton* m_btnBrowseFiles;

@@ -9,6 +9,8 @@
 QWidget* MemWatchDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option,
                                         const QModelIndex& index) const
 {
+  (void)option;
+
   const MemWatchModel* model = static_cast<const MemWatchModel*>(index.model());
   MemWatchTreeNode* node = model->getTreeNodeFromIndex(index);
   QLineEdit* editor = new QLineEdit(parent);

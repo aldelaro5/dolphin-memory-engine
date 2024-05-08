@@ -143,7 +143,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
         connect(showPointerInViewer, &QAction::triggered, this,
                 [this, entry] { emit goToAddressInViewer(entry->getConsoleAddress()); });
         memViewerSubMenu->addAction(showPointerInViewer);
-        for (int i = 0; i < entry->getPointerLevel(); ++i)
+        for (int i{0}; i < static_cast<int>(entry->getPointerLevel()); ++i)
         {
           std::string strAddressOfPath = entry->getAddressStringForPointerLevel(i + 1);
           if (strAddressOfPath == "???")
@@ -483,6 +483,8 @@ void MemWatchWidget::onValueWriteError(const QModelIndex& index,
     emit mustUnhook();
     break;
   }
+  case Common::MemOperationReturnCode::OK:
+    break;
   }
 }
 

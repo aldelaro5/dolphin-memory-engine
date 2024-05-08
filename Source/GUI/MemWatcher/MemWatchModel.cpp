@@ -156,7 +156,6 @@ void MemWatchModel::removeNode(const QModelIndex& index)
   if (index.isValid())
   {
     MemWatchTreeNode* toDelete = static_cast<MemWatchTreeNode*>(index.internalPointer());
-    MemWatchTreeNode* parent = toDelete->getParent();
 
     int toDeleteRow = toDelete->getRow();
 
@@ -174,6 +173,8 @@ void MemWatchModel::removeNode(const QModelIndex& index)
 
 int MemWatchModel::columnCount(const QModelIndex& parent) const
 {
+  (void)parent;
+
   return WATCH_COL_NUM;
 }
 
@@ -188,7 +189,7 @@ int MemWatchModel::rowCount(const QModelIndex& parent) const
   else
     parentItem = static_cast<MemWatchTreeNode*>(parent.internalPointer());
 
-  return parentItem->getChildren().size();
+  return static_cast<int>(parentItem->getChildren().size());
 }
 
 QVariant MemWatchModel::data(const QModelIndex& index, int role) const
@@ -464,6 +465,11 @@ QMimeData* MemWatchModel::mimeData(const QModelIndexList& indexes) const
 bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column,
                                  const QModelIndex& parent)
 {
+  (void)column;
+
+  if (action != Qt::CopyAction && action != Qt::MoveAction)
+    return false;
+
   if (!data->hasFormat("application/x-memwatchtreenode"))
     return false;
 
@@ -648,7 +654,7 @@ void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json)
 }
 
 MemWatchModel::CTParsingErrors
-MemWatchModel::importRootFromCTFile(QFile* CTFile, const bool useDolphinPointer, const u64 CEStart)
+MemWatchModel::importRootFromCTFile(QFile* const CTFile, const bool useDolphinPointer, const u32 CEStart)
 {
   CheatEngineParser parser = CheatEngineParser();
   parser.setTableStartAddress(CEStart);

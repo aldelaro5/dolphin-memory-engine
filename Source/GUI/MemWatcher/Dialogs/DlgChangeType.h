@@ -12,7 +12,7 @@ public:
   DlgChangeType(QWidget* parent, const int typeIndex, const size_t length);
   int getTypeIndex() const;
   size_t getLength() const;
-  void accept();
+  void accept() override;
   void onTypeChange(int index);
 
 private:

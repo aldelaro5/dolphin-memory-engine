@@ -61,7 +61,7 @@ DlgCopy::DlgCopy(QWidget* parent) : QDialog(parent)
   });
 
   connect(m_cmbViewerBytesSeparator, &QComboBox::currentTextChanged, this,
-          [this](const QString& string) { updateMemoryText(); });
+          [this](const QString&) { updateMemoryText(); });
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(grbCopySettings);
@@ -260,7 +260,7 @@ std::string DlgCopy::charToHexString(const char* const input, const size_t count
 
   ss << beforeAll;
 
-  for (int i = 0; i < count; i++)
+  for (size_t i{0}; i < count; ++i)
   {
     ss << beforeByte << convert[(input[i] >> 4) & 0xf] << convert[input[i] & 0xf];
 

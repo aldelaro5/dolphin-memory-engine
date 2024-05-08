@@ -10,8 +10,8 @@ namespace
 std::string addSpacesToBytesArrays(const std::string_view bytesArray)
 {
   std::string result(bytesArray);
-  int spacesAdded = 0;
-  for (int i = 2; i < bytesArray.length(); i += 2)
+  std::string::size_type spacesAdded = 0;
+  for (std::string::size_type i{2}; i < bytesArray.length(); i += 2)
   {
     if (bytesArray[i] != ' ')
     {
@@ -87,7 +87,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     return Common::MemOperationReturnCode::OK;
   }
 
-  bool m_wasUnknownInitialValue = false;
+  m_wasUnknownInitialValue = false;
   Common::MemOperationReturnCode scanReturn = Common::MemOperationReturnCode::OK;
   size_t termActualLength = 0;
   size_t termMaxLength = 0;
@@ -129,8 +129,6 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
       return scanReturn;
     }
   }
-
-  bool withBSwap = Common::shouldBeBSwappedForType(m_memType);
 
   m_memSize = Common::getSizeForType(m_memType, termActualLength);
 
@@ -181,6 +179,8 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
                                          m_memSize) == MemScanner::CompareResult::smaller);
       break;
     }
+    default:
+      break;
     }
 
     if (isResult)
@@ -242,8 +242,6 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
     if (scanReturn != Common::MemOperationReturnCode::OK)
       return scanReturn;
   }
-
-  bool withBSwap = Common::shouldBeBSwappedForType(m_memType);
 
   m_memSize = Common::getSizeForType(m_memType, termActualLength);
 
@@ -396,6 +394,8 @@ inline MemScanner::CompareResult
 MemScanner::compareMemoryAsNumbers(const char* first, const char* second, const char* offset,
                                    bool offsetInvert, bool bswapSecond, size_t length) const
 {
+  (void)length;
+
   switch (m_memType)
   {
   case Common::MemType::type_byte:

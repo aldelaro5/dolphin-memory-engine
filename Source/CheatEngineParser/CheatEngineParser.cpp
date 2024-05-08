@@ -27,7 +27,7 @@ bool CheatEngineParser::hasACriticalErrorOccured() const
   return m_criticalErrorOccured;
 }
 
-void CheatEngineParser::setTableStartAddress(const u64 tableStartAddress)
+void CheatEngineParser::setTableStartAddress(const u32 tableStartAddress)
 {
   m_tableStartAddress = tableStartAddress;
 }
@@ -190,7 +190,7 @@ void CheatEngineParser::parseCheatEntry(MemWatchTreeNode* node, const bool useDo
         else
         {
           currentCheatEntryState.consoleAddressFound = true;
-          u64 consoleAddressCandidate = 0;
+          u32 consoleAddressCandidate = 0;
           std::string strCEAddress = m_xmlReader->readElementText().toStdString();
           std::stringstream ss(strCEAddress);
           ss >> std::hex;
