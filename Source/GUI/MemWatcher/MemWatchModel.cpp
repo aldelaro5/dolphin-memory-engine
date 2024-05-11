@@ -120,7 +120,7 @@ MemWatchEntry* MemWatchModel::getEntryFromIndex(const QModelIndex& index)
 
 void MemWatchModel::addGroup(const QString& name)
 {
-  const QModelIndex rootIndex = index(0, 0);
+  const QModelIndex rootIndex = index(0, 0, QModelIndex{});
   MemWatchTreeNode* node = new MemWatchTreeNode(nullptr, m_rootNode, true, name);
   beginInsertRows(rootIndex, rowCount(rootIndex), rowCount(rootIndex));
   m_rootNode->appendChild(node);
@@ -131,7 +131,7 @@ void MemWatchModel::addGroup(const QString& name)
 void MemWatchModel::addEntry(MemWatchEntry* entry)
 {
   MemWatchTreeNode* newNode = new MemWatchTreeNode(entry);
-  QModelIndex idx = index(0, 0);
+  QModelIndex idx = index(0, 0, QModelIndex{});
   beginInsertRows(idx, rowCount(QModelIndex()), rowCount(QModelIndex()));
   m_rootNode->appendChild(newNode);
   endInsertRows();
