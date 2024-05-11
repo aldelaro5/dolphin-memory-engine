@@ -494,21 +494,19 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
       ss << static_cast<unsigned int>(unsignedByte);
       return ss.str();
     }
+
+    s8 aByte = 0;
+    std::memcpy(&aByte, memory, sizeof(s8));
+    // This has to be converted to an integer type because printing a uint8_t would resolve to a
+    // char and print a single character.  Additionaly, casting a signed type to a larger signed
+    // type will extend the sign to match the size of the destination type, this is required for
+    // signed values in decimal, but must be bypassed for other bases, this is solved by first
+    // casting to u8 then to signed int.
+    if (base == Common::MemBase::base_decimal)
+      ss << static_cast<int>(aByte);
     else
-    {
-      s8 aByte = 0;
-      std::memcpy(&aByte, memory, sizeof(s8));
-      // This has to be converted to an integer type because printing a uint8_t would resolve to a
-      // char and print a single character.  Additionaly, casting a signed type to a larger signed
-      // type will extend the sign to match the size of the destination type, this is required for
-      // signed values in decimal, but must be bypassed for other bases, this is solved by first
-      // casting to u8 then to signed int.
-      if (base == Common::MemBase::base_decimal)
-        ss << static_cast<int>(aByte);
-      else
-        ss << static_cast<int>(static_cast<u8>(aByte));
-      return ss.str();
-    }
+      ss << static_cast<int>(static_cast<u8>(aByte));
+    return ss.str();
   }
   case Common::MemType::type_halfword:
   {

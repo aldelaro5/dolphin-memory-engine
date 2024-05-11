@@ -220,12 +220,10 @@ std::string MemWatchEntry::getAddressStringForPointerLevel(const int level) cons
   {
     return "???";
   }
-  else
-  {
-    std::stringstream ss;
-    ss << std::hex << std::uppercase << address;
-    return ss.str();
-  }
+
+  std::stringstream ss;
+  ss << std::hex << std::uppercase << address;
+  return ss.str();
 }
 
 Common::MemOperationReturnCode MemWatchEntry::readMemoryFromRAM()
@@ -339,12 +337,7 @@ Common::MemOperationReturnCode MemWatchEntry::writeMemoryFromString(const std::s
   {
     if (m_lock)
       std::memcpy(m_freezeMemory, buffer, m_freezeMemSize);
-    delete[] buffer;
-    return writeReturn;
   }
-  else
-  {
-    delete[] buffer;
-    return writeReturn;
-  }
+  delete[] buffer;
+  return writeReturn;
 }

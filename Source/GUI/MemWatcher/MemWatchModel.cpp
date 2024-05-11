@@ -356,8 +356,8 @@ QModelIndex MemWatchModel::index(int row, int column, const QModelIndex& parent)
   MemWatchTreeNode* childNode = parentNode->getChildren().at(row);
   if (childNode)
     return createIndex(row, column, childNode);
-  else
-    return {};
+
+  return {};
 }
 
 QModelIndex MemWatchModel::parent(const QModelIndex& index) const
@@ -416,10 +416,10 @@ int MemWatchModel::getNodeDeepness(const MemWatchTreeNode* node) const
 {
   if (node == m_rootNode)
     return 0;
-  else if (node->getParent() == m_rootNode)
+  if (node->getParent() == m_rootNode)
     return 1;
-  else
-    return getNodeDeepness(node->getParent()) + 1;
+
+  return getNodeDeepness(node->getParent()) + 1;
 }
 
 MemWatchTreeNode*
@@ -562,9 +562,9 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
                 QString::compare(left->getGroupName(), right->getGroupName(), Qt::CaseInsensitive);
             return order == Qt::AscendingOrder ? compareResult < 0 : compareResult > 0;
           }
-          else if (left->isGroup())
+          if (left->isGroup())
             return true;
-          else if (right->isGroup())
+          if (right->isGroup())
             return false;
 
           int compareResult = QString::compare(left->getEntry()->getLabel(),
@@ -579,7 +579,7 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
               [order](MemWatchTreeNode* left, MemWatchTreeNode* right) {
                 if (left->isGroup())
                   return true;
-                else if (right->isGroup())
+                if (right->isGroup())
                   return false;
 
                 int compareResult = static_cast<int>(left->getEntry()->getType()) -
@@ -594,7 +594,7 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
               [order](MemWatchTreeNode* left, MemWatchTreeNode* right) {
                 if (left->isGroup())
                   return true;
-                else if (right->isGroup())
+                if (right->isGroup())
                   return false;
 
                 u32 leftAddress = left->getEntry()->getConsoleAddress();
@@ -611,7 +611,7 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
               [order](MemWatchTreeNode* left, MemWatchTreeNode* right) {
                 if (left->isGroup())
                   return true;
-                else if (right->isGroup())
+                if (right->isGroup())
                   return false;
 
                 bool lessThan = !left->getEntry()->isLocked() && right->getEntry()->isLocked();
@@ -626,9 +626,9 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
         children.begin(), children.end(), [order](MemWatchTreeNode* left, MemWatchTreeNode* right) {
           if (left->isGroup() && right->isGroup())
             return false;
-          else if (left->isGroup())
+          if (left->isGroup())
             return true;
-          else if (right->isGroup())
+          if (right->isGroup())
             return false;
 
           int compareResult =

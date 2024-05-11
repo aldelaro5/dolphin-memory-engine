@@ -125,10 +125,9 @@ public:
 
     if (firstByte < (secondByte + convertMemoryToType<T>(offset, offsetInvert)))
       return CompareResult::smaller;
-    else if (firstByte > (secondByte + convertMemoryToType<T>(offset, offsetInvert)))
+    if (firstByte > (secondByte + convertMemoryToType<T>(offset, offsetInvert)))
       return CompareResult::bigger;
-    else
-      return CompareResult::equal;
+    return CompareResult::equal;
   }
 
   void setType(const Common::MemType type);

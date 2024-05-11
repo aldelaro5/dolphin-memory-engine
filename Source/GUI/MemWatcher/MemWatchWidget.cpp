@@ -532,10 +532,9 @@ bool MemWatchWidget::isAnyAncestorSelected(const QModelIndex index) const
 {
   if (m_watchModel->parent(index) == QModelIndex())
     return false;
-  else if (m_watchView->selectionModel()->isSelected(index.parent()))
+  if (m_watchView->selectionModel()->isSelected(index.parent()))
     return true;
-  else
-    return isAnyAncestorSelected(index.parent());
+  return isAnyAncestorSelected(index.parent());
 }
 
 void MemWatchWidget::onLockSelection(bool lockStatus)
@@ -627,7 +626,7 @@ void MemWatchWidget::openWatchFile()
       int answer = questionBox->exec();
       if (answer == QMessageBox::Cancel)
         return;
-      else if (answer == QMessageBox::No)
+      if (answer == QMessageBox::No)
         m_watchModel->clearRoot();
     }
 

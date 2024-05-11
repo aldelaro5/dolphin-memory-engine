@@ -326,9 +326,9 @@ inline bool MemScanner::isHitNextScan(const MemScanner::ScanFiter filter,
   {
     if (m_memType == Common::MemType::type_string || m_memType == Common::MemType::type_byteArray)
       return (std::memcmp(newerMemory, memoryToCompare1, realSize) == 0);
-    else
-      return (compareMemoryAsNumbers(newerMemory, memoryToCompare1, noOffset, false, false,
-                                     realSize) == MemScanner::CompareResult::equal);
+
+    return (compareMemoryAsNumbers(newerMemory, memoryToCompare1, noOffset, false, false,
+                                   realSize) == MemScanner::CompareResult::equal);
   }
   case ScanFiter::between:
   {
@@ -499,10 +499,9 @@ int MemScanner::getTermsNumForFilter(const MemScanner::ScanFiter filter)
 {
   if (filter == MemScanner::ScanFiter::between)
     return 2;
-  else if (filter == MemScanner::ScanFiter::exact || filter == MemScanner::ScanFiter::increasedBy ||
-           filter == MemScanner::ScanFiter::decreasedBy ||
-           filter == MemScanner::ScanFiter::biggerThan ||
-           filter == MemScanner::ScanFiter::smallerThan)
+  if (filter == MemScanner::ScanFiter::exact || filter == MemScanner::ScanFiter::increasedBy ||
+      filter == MemScanner::ScanFiter::decreasedBy || filter == MemScanner::ScanFiter::biggerThan ||
+      filter == MemScanner::ScanFiter::smallerThan)
     return 1;
   return 0;
 }
