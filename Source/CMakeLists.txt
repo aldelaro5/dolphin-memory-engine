@@ -144,7 +144,7 @@ if(WIN32)
             $<TARGET_FILE_DIR:dolphin-memory-engine>/styles
         TARGET dolphin-memory-engine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_FILE:Qt6::QModernWindowsStylePlugin>
+            $<TARGET_FILE:Qt6::QWindowsVistaStylePlugin>
             $<TARGET_FILE_DIR:dolphin-memory-engine>/styles
     )
 endif(WIN32)

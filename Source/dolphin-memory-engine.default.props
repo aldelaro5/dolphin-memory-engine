@@ -12,7 +12,7 @@
     <!-- Root of project -->
     <ProjectRoot>$(SolutionDir)..\</ProjectRoot>
     <!-- Path to Qt build files -->
-    <QTDIR>$(ProjectRoot)Externals\Qt\Qt6.7.0\x64\</QTDIR>
+    <QTDIR>$(ProjectRoot)Externals\Qt\Qt6.5.3\x64\</QTDIR>
     <!-- Flags passed to Qt's MOC tool, values dependent on current configuration -->
     <QtMocFlags Condition="'$(Configuration)' == 'Debug'">-DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB</QtMocFlags>
     <QtMocFlags Condition="'$(Configuration)' == 'Release'">-DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB</QtMocFlags>
