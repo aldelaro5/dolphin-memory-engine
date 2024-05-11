@@ -251,22 +251,20 @@ QString MemWatchTreeNode::writeAsCSV() const
     }
     return rootCsv;
   }
-  else
+
+  std::stringstream ssAddress;
+  ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
+  if (m_entry->isBoundToPointer())
   {
-    std::stringstream ssAddress;
-    ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
-    if (m_entry->isBoundToPointer())
+    for (int i = 0; i < static_cast<int>(m_entry->getPointerLevel()); ++i)
     {
-      for (int i = 0; i < static_cast<int>(m_entry->getPointerLevel()); ++i)
-      {
-        std::stringstream ssOffset;
-        ssOffset << std::hex << std::uppercase << m_entry->getPointerOffset(i);
-        ssAddress << "[" << ssOffset.str() << "]";
-      }
+      std::stringstream ssOffset;
+      ssOffset << std::hex << std::uppercase << m_entry->getPointerOffset(i);
+      ssAddress << "[" << ssOffset.str() << "]";
     }
-    std::string csvLine =
-        m_entry->getLabel().toStdString() + ";" + ssAddress.str() + ";" +
-        GUICommon::getStringFromType(m_entry->getType(), m_entry->getLength()).toStdString() + "\n";
-    return QString::fromStdString(csvLine);
   }
+  std::string csvLine =
+      m_entry->getLabel().toStdString() + ";" + ssAddress.str() + ";" +
+      GUICommon::getStringFromType(m_entry->getType(), m_entry->getLength()).toStdString() + "\n";
+  return QString::fromStdString(csvLine);
 }

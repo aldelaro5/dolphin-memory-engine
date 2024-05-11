@@ -127,14 +127,12 @@ size_t DolphinAccessor::getRAMTotalSize()
   {
     return Common::GetMEM1SizeReal() + Common::GetMEM2SizeReal();
   }
-  else if (isARAMAccessible())
+  if (isARAMAccessible())
   {
     return Common::GetMEM1SizeReal() + Common::ARAM_SIZE;
   }
-  else
-  {
-    return Common::GetMEM1SizeReal();
-  }
+
+  return Common::GetMEM1SizeReal();
 }
 
 Common::MemOperationReturnCode DolphinAccessor::readEntireRAM(char* buffer)

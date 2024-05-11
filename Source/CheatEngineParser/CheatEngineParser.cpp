@@ -49,7 +49,7 @@ MemWatchTreeNode* CheatEngineParser::parseCTFile(QIODevice* CTFileIODevice,
         m_criticalErrorOccured = true;
         return nullptr;
       }
-      else if (!m_errorMessages.isEmpty())
+      if (!m_errorMessages.isEmpty())
       {
         if (m_errorMessages.endsWith("\n\n"))
           m_errorMessages.remove(m_errorMessages.length() - 2, 2);
@@ -142,18 +142,16 @@ void CheatEngineParser::parseCheatEntry(MemWatchTreeNode* node, const bool useDo
         {
           continue;
         }
+
+        currentCheatEntryState.typeFound = true;
+        if (strVarType == "Byte" || strVarType == "Binary")
+          type = Common::MemType::type_byte;
+        else if (strVarType == "String")
+          type = Common::MemType::type_string;
+        else if (strVarType == "Array of byte")
+          type = Common::MemType::type_byteArray;
         else
-        {
-          currentCheatEntryState.typeFound = true;
-          if (strVarType == "Byte" || strVarType == "Binary")
-            type = Common::MemType::type_byte;
-          else if (strVarType == "String")
-            type = Common::MemType::type_string;
-          else if (strVarType == "Array of byte")
-            type = Common::MemType::type_byteArray;
-          else
-            currentCheatEntryState.validType = false;
-        }
+          currentCheatEntryState.validType = false;
       }
       else if (m_xmlReader->name() == QString("CustomType"))
       {
