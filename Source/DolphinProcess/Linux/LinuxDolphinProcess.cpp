@@ -4,6 +4,7 @@
 #include "../../Common/CommonUtils.h"
 #include "../../Common/MemoryCommon.h"
 
+#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <dirent.h>
@@ -195,6 +196,9 @@ bool LinuxDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size
       std::memcpy(buffer, &doubleword, sizeof(u64));
       break;
     }
+    default:
+      assert(0 && "Unexpected type size");
+      break;
     }
   }
 
@@ -260,6 +264,9 @@ bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const
       std::memcpy(bufferCopy, &doubleword, sizeof(u64));
       break;
     }
+    default:
+      assert(0 && "Unexpected type size");
+      break;
     }
   }
   delete[] bufferCopy;

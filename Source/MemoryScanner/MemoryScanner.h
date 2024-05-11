@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <cmath>
 #include <cstring>
 #include <stack>
@@ -113,6 +114,9 @@ public:
       }
       break;
     }
+    default:
+      assert(0 && "Unexpected type size");
+      break;
     }
 
     if constexpr (std::is_floating_point<T>::value)

@@ -38,6 +38,8 @@ QVariant ResultsListModel::data(const QModelIndex& index, int role) const
       return QString::fromStdString(m_scanner->getFormattedScannedValueAt(index.row()));
     case RESULT_COL_CURRENT:
       return QString::fromStdString(m_scanner->getFormattedCurrentValueAt(index.row()));
+    default:
+      break;
     }
   }
   return QVariant();
@@ -70,6 +72,8 @@ QVariant ResultsListModel::headerData(int section, Qt::Orientation orientation, 
       return tr("Scanned");
     case RESULT_COL_CURRENT:
       return tr("Current");
+    default:
+      break;
     }
   }
   return QVariant();

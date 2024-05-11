@@ -831,6 +831,8 @@ bool MemWatchWidget::warnIfUnsavedChanges()
     case QMessageBox::Yes:
       saveWatchFile();
       return true;
+    default:
+      return false;
     }
   }
   return true;
