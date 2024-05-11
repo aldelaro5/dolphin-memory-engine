@@ -88,7 +88,8 @@ void DlgCopy::setDefaults()
 
 bool DlgCopy::copyMemory()
 {
-  u32 address, count;
+  u32 address{};
+  u32 count{};
   QMessageBox* errorBox;
 
   if (!hexStringToU32(m_spnWatcherCopyAddress->text().toStdString(), address))

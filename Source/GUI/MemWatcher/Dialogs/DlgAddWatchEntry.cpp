@@ -259,7 +259,9 @@ void DlgAddWatchEntry::onOffsetChanged()
   QLineEdit* theLineEdit = static_cast<QLineEdit*>(sender());
   int index = 0;
   // Dummy variable for getItemPosition
-  int column, rowSpan, columnSpan;
+  int column{};
+  int rowSpan{};
+  int columnSpan{};
   m_offsetsLayout->getItemPosition(m_offsetsLayout->indexOf(theLineEdit), &index, &column, &rowSpan,
                                    &columnSpan);
   if (validateAndSetOffset(index))
