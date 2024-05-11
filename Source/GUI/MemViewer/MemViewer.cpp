@@ -760,7 +760,8 @@ void MemViewer::keyPressEvent(QKeyEvent* event)
     // Beep when entering a non-valid value
     const std::string hexChar = event->text().toUpper().toStdString();
     const char value = hexChar[0];
-    if (!(value >= '0' && value <= '9') && !(value >= 'A' && value <= 'F'))
+    const bool ishex{('0' <= value && value <= '9') || ('A' <= value && value <= 'F')};
+    if (!ishex)
     {
       QApplication::beep();
       return;
@@ -980,8 +981,10 @@ void MemViewer::renderMemory(QPainter& painter, const int rowIndex, const int co
   QColor oldPenColor = painter.pen().color();
   QColor fgColor = QGuiApplication::palette().color(QPalette::WindowText);
   int posXHex = m_rowHeaderWidth + (m_charWidthEm * 2 + m_charWidthEm / 2) * columnIndex;
-  if (!(m_currentFirstAddress + (m_numColumns * rowIndex + columnIndex) >= m_memViewStart &&
-        m_currentFirstAddress + (m_numColumns * rowIndex + columnIndex) < m_memViewEnd) ||
+  const bool validRange{
+      m_currentFirstAddress + (m_numColumns * rowIndex + columnIndex) >= m_memViewStart &&
+      m_currentFirstAddress + (m_numColumns * rowIndex + columnIndex) < m_memViewEnd};
+  if (!validRange ||
       !DolphinComm::DolphinAccessor::isValidConsoleAddress(
           m_currentFirstAddress + (m_numColumns * rowIndex + columnIndex)) ||
       !m_validMemory)

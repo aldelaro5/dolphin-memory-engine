@@ -169,10 +169,7 @@ void DlgImportCTFile::accept()
     }
   }
 
-  if (m_btnGroupImportAddressMethod->checkedId() == 0)
-    m_useDolphinPointers = false;
-  else
-    m_useDolphinPointers = true;
+  m_useDolphinPointers = m_btnGroupImportAddressMethod->checkedId() != 0;
   m_strFileName = m_txbFileName->text();
 
   setResult(QDialog::Accepted);
