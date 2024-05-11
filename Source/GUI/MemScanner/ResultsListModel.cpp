@@ -26,7 +26,7 @@ int ResultsListModel::rowCount(const QModelIndex& parent) const
 QVariant ResultsListModel::data(const QModelIndex& index, int role) const
 {
   if (!index.isValid())
-    return QVariant();
+    return {};
 
   if (role == Qt::DisplayRole)
   {
@@ -42,7 +42,7 @@ QVariant ResultsListModel::data(const QModelIndex& index, int role) const
       break;
     }
   }
-  return QVariant();
+  return {};
 }
 
 bool ResultsListModel::removeRows(int row, int count, const QModelIndex& parent)
@@ -76,7 +76,7 @@ QVariant ResultsListModel::headerData(int section, Qt::Orientation orientation, 
       break;
     }
   }
-  return QVariant();
+  return {};
 }
 
 void ResultsListModel::updateScanner()

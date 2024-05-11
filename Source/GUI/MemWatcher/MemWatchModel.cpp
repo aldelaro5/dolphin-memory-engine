@@ -196,14 +196,14 @@ int MemWatchModel::rowCount(const QModelIndex& parent) const
 QVariant MemWatchModel::data(const QModelIndex& index, int role) const
 {
   if (!index.isValid())
-    return QVariant();
+    return {};
 
   MemWatchTreeNode* item = static_cast<MemWatchTreeNode*>(index.internalPointer());
 
   if (!item->isGroup())
   {
     if (role == Qt::EditRole && index.column() == WATCH_COL_TYPE)
-      return QVariant(static_cast<int>(item->getEntry()->getType()));
+      return {static_cast<int>(item->getEntry()->getType())};
 
     MemWatchEntry* entry = item->getEntry();
     if (role == Qt::DisplayRole || role == Qt::EditRole)
@@ -244,7 +244,7 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
     if (index.column() == 0 && (role == Qt::DisplayRole || role == Qt::EditRole))
       return item->getGroupName();
   }
-  return QVariant();
+  return {};
 }
 
 bool MemWatchModel::setData(const QModelIndex& index, const QVariant& value, int role)
@@ -344,7 +344,7 @@ Qt::ItemFlags MemWatchModel::flags(const QModelIndex& index) const
 QModelIndex MemWatchModel::index(int row, int column, const QModelIndex& parent) const
 {
   if (!hasIndex(row, column, parent))
-    return QModelIndex();
+    return {};
 
   MemWatchTreeNode* parentNode;
 
@@ -357,19 +357,19 @@ QModelIndex MemWatchModel::index(int row, int column, const QModelIndex& parent)
   if (childNode)
     return createIndex(row, column, childNode);
   else
-    return QModelIndex();
+    return {};
 }
 
 QModelIndex MemWatchModel::parent(const QModelIndex& index) const
 {
   if (!index.isValid())
-    return QModelIndex();
+    return {};
 
   MemWatchTreeNode* childNode = static_cast<MemWatchTreeNode*>(index.internalPointer());
   MemWatchTreeNode* parentNode = childNode->getParent();
 
   if (parentNode == m_rootNode || parentNode == nullptr)
-    return QModelIndex();
+    return {};
 
   return createIndex(parentNode->getRow(), 0, parentNode);
 }
@@ -394,7 +394,7 @@ QVariant MemWatchModel::headerData(int section, Qt::Orientation orientation, int
       break;
     }
   }
-  return QVariant();
+  return {};
 }
 
 Qt::DropActions MemWatchModel::supportedDropActions() const

@@ -50,7 +50,7 @@ QString getStringFromType(const Common::MemType type, const size_t length)
   case Common::MemType::type_byteArray:
     return QString::fromStdString("array of bytes[" + std::to_string(length) + "]");
   default:
-    return QString("");
+    return {};
   }
 }
 
@@ -67,7 +67,7 @@ QString getNameFromBase(const Common::MemBase base)
   case Common::MemBase::base_hexadecimal:
     return QCoreApplication::translate("Common", "hexadecimal");
   default:
-    return QString("");
+    return {};
   }
 }
 
