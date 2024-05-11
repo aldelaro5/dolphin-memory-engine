@@ -20,12 +20,11 @@ public:
   ResultsListModel(QObject* parent, MemScanner* scanner);
   ~ResultsListModel() override;
 
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-  QVariant headerData(int section, Qt::Orientation orientation,
-                      int role = Qt::DisplayRole) const override;
-  bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
+  int columnCount(const QModelIndex& parent) const override;
+  int rowCount(const QModelIndex& parent) const override;
+  QVariant data(const QModelIndex& index, int role) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  bool removeRows(int row, int count, const QModelIndex& parent) override;
 
   u32 getResultAddress(const int row) const;
   void updateScanner();
