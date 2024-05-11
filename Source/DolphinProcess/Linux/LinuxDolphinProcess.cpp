@@ -131,10 +131,8 @@ bool LinuxDolphinProcess::findPID()
   }
   closedir(directoryPointer);
 
-  if (m_PID == -1)
-    // Here, Dolphin apparently isn't running on the system
-    return false;
-  return true;
+  const bool running{m_PID != -1};
+  return running;
 }
 
 bool LinuxDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size_t size,
@@ -208,7 +206,7 @@ bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const
 {
   struct iovec local;
   struct iovec remote;
-  size_t nwrote;
+
   u64 RAMAddress = 0;
   if (m_ARAMAccessible)
   {
@@ -264,13 +262,16 @@ bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const
     }
     }
   }
-
-  nwrote = process_vm_writev(m_PID, &local, 1, &remote, 1, 0);
   delete[] bufferCopy;
-  if (nwrote != size)
-    return false;
 
-  return true;
+  const ssize_t nwrote{process_vm_writev(m_PID, &local, 1, &remote, 1, 0)};
+  if (nwrote == -1)
+  {
+    // A more specific error type should be available in `errno` (if ever interested).
+    return false;
+  }
+
+  return static_cast<size_t>(nwrote) == size;
 }
 }  // namespace DolphinComm
 #endif

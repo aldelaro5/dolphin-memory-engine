@@ -38,9 +38,8 @@ bool MacDolphinProcess::findPID()
     }
   }
 
-  if (m_PID == -1)
-    return false;
-  return true;
+  const bool running{m_PID != -1};
+  return running;
 }
 
 bool MacDolphinProcess::obtainEmuRAMInformations()
