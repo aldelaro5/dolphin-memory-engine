@@ -409,7 +409,7 @@ void MemViewer::scrollToSelection()
   viewport()->update();
 }
 
-void MemViewer::copySelection(Common::MemType type)
+void MemViewer::copySelection(const Common::MemType type) const
 {
   int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
   int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
@@ -813,7 +813,7 @@ void MemViewer::scrollContentsBy(int dx, int dy)
   }
 }
 
-void MemViewer::renderSeparatorLines(QPainter& painter)
+void MemViewer::renderSeparatorLines(QPainter& painter) const
 {
   QColor oldPenColor = painter.pen().color();
   painter.setPen(QGuiApplication::palette().color(QPalette::WindowText));
@@ -840,7 +840,7 @@ void MemViewer::renderSeparatorLines(QPainter& painter)
   painter.setPen(oldPenColor);
 }
 
-void MemViewer::renderColumnsHeaderText(QPainter& painter)
+void MemViewer::renderColumnsHeaderText(QPainter& painter) const
 {
   QColor oldPenColor = painter.pen().color();
   painter.setPen(QGuiApplication::palette().color(QPalette::WindowText));
@@ -864,7 +864,7 @@ void MemViewer::renderColumnsHeaderText(QPainter& painter)
   painter.setPen(oldPenColor);
 }
 
-void MemViewer::renderRowHeaderText(QPainter& painter, const int rowIndex)
+void MemViewer::renderRowHeaderText(QPainter& painter, const int rowIndex) const
 {
   std::stringstream ss;
   ss << std::setfill('0') << std::setw(sizeof(u32) * 2) << std::hex << std::uppercase
