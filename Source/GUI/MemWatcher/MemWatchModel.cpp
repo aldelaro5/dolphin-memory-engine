@@ -3,6 +3,7 @@
 #include <QDataStream>
 #include <QMimeData>
 
+#include <cassert>
 #include <cstring>
 #include <limits>
 #include <sstream>
@@ -227,6 +228,8 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       {
         return QString::fromStdString(entry->getStringFromMemory());
       }
+      default:
+        break;
       }
     }
     else if (role == Qt::CheckStateRole && index.column() == WATCH_COL_LOCK)
@@ -387,6 +390,8 @@ QVariant MemWatchModel::headerData(int section, Qt::Orientation orientation, int
       return tr("Value");
     case WATCH_COL_LOCK:
       return tr("Lock");
+    default:
+      break;
     }
   }
   return QVariant();
@@ -634,6 +639,9 @@ void MemWatchModel::sortRecursive(int column, Qt::SortOrder order, MemWatchTreeN
         });
     break;
   }
+  default:
+    assert(0 && "Unhandled column index");
+    break;
   }
 
   parent->setChildren(children);

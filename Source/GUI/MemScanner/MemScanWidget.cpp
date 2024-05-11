@@ -7,6 +7,7 @@
 #include <QRegularExpression>
 #include <QShortcut>
 #include <QVBoxLayout>
+#include <cassert>
 #include <sstream>
 #include "../GUICommon.h"
 
@@ -287,6 +288,9 @@ void MemScanWidget::onScanFilterChanged()
     m_txbSearchTerm1->show();
     m_searchTerm2Widget->show();
     updateTypeAdditionalOptions();
+    break;
+  default:
+    assert(0 && "Unexpected number of terms");
     break;
   }
 }
