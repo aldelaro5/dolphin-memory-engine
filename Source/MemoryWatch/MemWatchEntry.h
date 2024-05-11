@@ -15,7 +15,7 @@ public:
   MemWatchEntry(QString label, u32 consoleAddress, Common::MemType type,
                 Common::MemBase = Common::MemBase::base_decimal, bool m_isUnsigned = false,
                 size_t length = 1, bool isBoundToPointer = false);
-  MemWatchEntry(MemWatchEntry* entry);
+  explicit MemWatchEntry(MemWatchEntry* entry);
   ~MemWatchEntry();
 
   QString getLabel() const;
