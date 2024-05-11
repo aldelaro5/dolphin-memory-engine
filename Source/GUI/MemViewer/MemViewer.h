@@ -64,7 +64,7 @@ private:
   void updateFontSize(int newSize);
   bytePosFromMouse mousePosToBytePos(QPoint pos);
   void scrollToSelection();
-  void copySelection(Common::MemType type);
+  void copySelection(Common::MemType type) const;
   void editSelection();
   void addSelectionAsArrayOfBytes();
   void addByteIndexAsWatch(int index);
@@ -72,9 +72,9 @@ private:
   bool writeCharacterToSelectedMemory(char byteToWrite);
   void updateMemoryData();
   void changeMemoryRegion(const MemoryRegion region);
-  void renderColumnsHeaderText(QPainter& painter);
-  void renderRowHeaderText(QPainter& painter, const int rowIndex);
-  void renderSeparatorLines(QPainter& painter);
+  void renderColumnsHeaderText(QPainter& painter) const;
+  void renderRowHeaderText(QPainter& painter, int rowIndex) const;
+  void renderSeparatorLines(QPainter& painter) const;
   void renderMemory(QPainter& painter, const int rowIndex, const int columnIndex);
   void renderHexByte(QPainter& painter, const int rowIndex, const int columnIndex, QColor& bgColor,
                      QColor& fgColor, bool drawCarret);
