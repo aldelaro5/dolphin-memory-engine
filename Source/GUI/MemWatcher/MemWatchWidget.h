@@ -12,7 +12,7 @@ class MemWatchWidget : public QWidget
   Q_OBJECT
 
 public:
-  MemWatchWidget(QWidget* parent);
+  explicit MemWatchWidget(QWidget* parent);
   ~MemWatchWidget() override;
 
   void onMemWatchContextMenuRequested(const QPoint& pos);

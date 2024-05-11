@@ -11,7 +11,7 @@
 class DlgImportCTFile : public QDialog
 {
 public:
-  DlgImportCTFile(QWidget* parent);
+  explicit DlgImportCTFile(QWidget* parent);
 
   void initialiseWidgets();
   void makeLayouts();

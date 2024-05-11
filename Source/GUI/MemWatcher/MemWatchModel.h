@@ -28,7 +28,7 @@ public:
     bool isCritical;
   };
 
-  MemWatchModel(QObject* parent);
+  explicit MemWatchModel(QObject* parent);
   ~MemWatchModel() override;
 
   int columnCount(const QModelIndex& parent) const override;

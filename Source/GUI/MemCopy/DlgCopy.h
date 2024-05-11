@@ -14,7 +14,7 @@
 class DlgCopy : public QDialog
 {
 public:
-  DlgCopy(QWidget* parent = nullptr);
+  explicit DlgCopy(QWidget* parent = nullptr);
   ~DlgCopy() override;
 
 private:

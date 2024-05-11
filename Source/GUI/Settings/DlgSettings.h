@@ -11,7 +11,7 @@
 class DlgSettings : public QDialog
 {
 public:
-  DlgSettings(QWidget* parent = nullptr);
+  explicit DlgSettings(QWidget* parent = nullptr);
   ~DlgSettings() override;
 
 private:
