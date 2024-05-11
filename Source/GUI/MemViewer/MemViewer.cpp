@@ -65,9 +65,8 @@ void MemViewer::initialise()
 
 QSize MemViewer::sizeHint() const
 {
-  return QSize(m_rowHeaderWidth + m_hexAreaWidth + 17 * m_charWidthEm +
-                   verticalScrollBar()->width(),
-               m_columnHeaderHeight + m_hexAreaHeight + m_charHeight / 2);
+  return {m_rowHeaderWidth + m_hexAreaWidth + 17 * m_charWidthEm + verticalScrollBar()->width(),
+          m_columnHeaderHeight + m_hexAreaHeight + m_charHeight / 2};
 }
 
 void MemViewer::memoryValidityChanged(const bool valid)
