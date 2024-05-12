@@ -434,13 +434,11 @@ void MemViewer::copySelection(const Common::MemType type) const
 
 void MemViewer::editSelection()
 {
-  QInputDialog* dlg = new QInputDialog(this);
-
   int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
   int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
   size_t selectionLength = static_cast<size_t>(indexEnd - indexStart + 1);
 
-  QString strByte = dlg->getText(this, "Enter the new byte", "Byte (in hex)");
+  QString strByte = QInputDialog::getText(this, "Enter the new byte", "Byte (in hex)");
   if (!strByte.isEmpty())
   {
     QRegularExpression hexMatcher("^[0-9A-F]{1,2}$", QRegularExpression::CaseInsensitiveOption);
@@ -478,13 +476,11 @@ void MemViewer::editSelection()
 
 void MemViewer::addSelectionAsArrayOfBytes()
 {
-  QInputDialog* dlg = new QInputDialog(this);
-
   int indexStart = m_StartBytesSelectionPosY * m_numColumns + m_StartBytesSelectionPosX;
   int indexEnd = m_EndBytesSelectionPosY * m_numColumns + m_EndBytesSelectionPosX;
   size_t selectionLength = static_cast<size_t>(indexEnd - indexStart + 1);
 
-  QString strLabel = dlg->getText(this, "Enter the label of the new watch", "label");
+  QString strLabel{QInputDialog::getText(this, "Enter the label of the new watch", "label")};
   if (!strLabel.isEmpty())
   {
     MemWatchEntry* newEntry = new MemWatchEntry(strLabel, m_currentFirstAddress + indexStart,

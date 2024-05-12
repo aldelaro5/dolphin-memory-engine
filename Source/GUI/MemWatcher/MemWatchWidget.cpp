@@ -87,7 +87,7 @@ void MemWatchWidget::initialiseWidgets()
       new QShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key::Key_V), m_watchView);
   connect(pasteWatchShortcut, &QShortcut::activated, this, [this] {
     pasteWatchFromClipBoard(
-        m_watchModel->getTreeNodeFromIndex(m_watchView->selectionModel()->currentIndex()),
+        MemWatchModel::getTreeNodeFromIndex(m_watchView->selectionModel()->currentIndex()),
         m_watchView->selectionModel()->currentIndex().row() + 1);
   });
 
@@ -129,10 +129,10 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   MemWatchTreeNode* node = nullptr;
   if (index != QModelIndex())
   {
-    node = m_watchModel->getTreeNodeFromIndex(index);
+    node = MemWatchModel::getTreeNodeFromIndex(index);
     if (!node->isGroup())
     {
-      MemWatchEntry* entry = m_watchModel->getEntryFromIndex(index);
+      MemWatchEntry* const entry{MemWatchModel::getEntryFromIndex(index)};
       int typeIndex = static_cast<int>(entry->getType());
       Common::MemType theType = static_cast<Common::MemType>(typeIndex);
 
@@ -287,7 +287,7 @@ void MemWatchWidget::setSelectedWatchesBase(MemWatchEntry* entry, Common::MemBas
   {
     for (int x = 0; x < selectedItems.count(); x++)
     {
-      MemWatchEntry* selectedEntry = m_watchModel->getEntryFromIndex(selectedItems.at(x));
+      MemWatchEntry* const selectedEntry{MemWatchModel::getEntryFromIndex(selectedItems.at(x))};
       if (selectedEntry != nullptr && selectedEntry->getType() != Common::MemType::type_string)
         selectedEntry->setBase(base);
     }
@@ -321,7 +321,7 @@ void MemWatchWidget::copySelectedWatchesToClipBoard()
   MemWatchTreeNode* rootNodeCopy = new MemWatchTreeNode(nullptr, nullptr, false, QString(""));
   for (auto i : *toCopyList)
   {
-    MemWatchTreeNode* theNode = new MemWatchTreeNode(*(m_watchModel->getTreeNodeFromIndex(i)));
+    MemWatchTreeNode* const theNode{new MemWatchTreeNode(*MemWatchModel::getTreeNodeFromIndex(i))};
     rootNodeCopy->appendChild(theNode);
   }
 
@@ -433,7 +433,7 @@ void MemWatchWidget::onValueWriteError(const QModelIndex& index,
   {
   case Common::MemOperationReturnCode::invalidInput:
   {
-    MemWatchTreeNode* node = m_watchModel->getTreeNodeFromIndex(index);
+    MemWatchTreeNode* const node{MemWatchModel::getTreeNodeFromIndex(index)};
     MemWatchEntry* entry = node->getEntry();
     int typeIndex = static_cast<int>(entry->getType());
     int baseIndex = static_cast<int>(entry->getBase());
@@ -545,7 +545,7 @@ void MemWatchWidget::onLockSelection(bool lockStatus)
 
   for (int i = 0; i < selection.count(); i++)
   {
-    MemWatchTreeNode* node = m_watchModel->getTreeNodeFromIndex(selection.at(i));
+    MemWatchTreeNode* const node{MemWatchModel::getTreeNodeFromIndex(selection.at(i))};
     if (!node->isGroup())
     {
       MemWatchEntry* entry = node->getEntry();

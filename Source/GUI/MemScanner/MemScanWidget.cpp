@@ -254,7 +254,7 @@ void MemScanWidget::updateScanFilterChoices()
 
 void MemScanWidget::updateTypeAdditionalOptions()
 {
-  if (m_memScanner->typeSupportsAdditionalOptions(
+  if (MemScanner::typeSupportsAdditionalOptions(
           static_cast<Common::MemType>(m_cmbScanType->currentIndex())))
   {
     m_chkSignedScan->show();
@@ -270,7 +270,7 @@ void MemScanWidget::updateTypeAdditionalOptions()
 void MemScanWidget::onScanFilterChanged()
 {
   MemScanner::ScanFiter theFilter = getSelectedFilter();
-  int numTerms = m_memScanner->getTermsNumForFilter(theFilter);
+  const int numTerms{MemScanner::getTermsNumForFilter(theFilter)};
   switch (numTerms)
   {
   case 0:
