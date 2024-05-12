@@ -31,6 +31,11 @@ SConfig& SConfig::getInstance()
   return instance;
 }
 
+QString SConfig::getSettingsFilepath() const
+{
+  return m_settings->fileName();
+}
+
 QString SConfig::getWatchModel() const
 {
   return m_settings->value("watchModel", QString{}).toString();

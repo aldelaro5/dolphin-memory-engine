@@ -12,6 +12,8 @@ public:
   SConfig(SConfig const&) = delete;
   void operator=(SConfig const&) = delete;
 
+  QString getSettingsFilepath() const;
+
   QByteArray getMainWindowGeometry() const;
   QByteArray getMainWindowState() const;
   QByteArray getSplitterState() const;
