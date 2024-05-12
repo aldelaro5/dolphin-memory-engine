@@ -21,7 +21,7 @@ private:
 
   int m_typeIndex;
   size_t m_length;
-  QComboBox* m_cmbTypes;
-  QSpinBox* m_spnLength;
-  QWidget* m_lengthSelection;
+  QComboBox* m_cmbTypes{};
+  QSpinBox* m_spnLength{};
+  QWidget* m_lengthSelection{};
 };

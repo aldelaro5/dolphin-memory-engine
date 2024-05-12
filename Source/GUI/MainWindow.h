@@ -58,34 +58,34 @@ private:
 
   QSplitter* m_splitter{};
 
-  MemWatchWidget* m_watcher;
-  MemScanWidget* m_scanner;
-  MemViewerWidget* m_viewer;
-  DlgCopy* m_copier;
+  MemWatchWidget* m_watcher{};
+  MemScanWidget* m_scanner{};
+  MemViewerWidget* m_viewer{};
+  DlgCopy* m_copier{};
 
   QTimer m_autoHookTimer;
 
-  QLabel* m_lblDolphinStatus;
-  QLabel* m_lblMem2Status;
+  QLabel* m_lblDolphinStatus{};
+  QLabel* m_lblMem2Status{};
 
-  QMenu* m_menuFile;
-  QMenu* m_menuEdit;
-  QMenu* m_menuDolphin;
-  QMenu* m_menuView;
-  QMenu* m_menuHelp;
-  QAction* m_actOpenWatchList;
-  QAction* m_actSaveWatchList;
-  QAction* m_actSaveAsWatchList;
-  QAction* m_actClearWatchList;
-  QAction* m_actImportFromCT;
-  QAction* m_actExportAsCSV;
-  QAction* m_actSettings;
-  QAction* m_actAutoHook;
-  QAction* m_actHook;
-  QAction* m_actUnhook;
-  QAction* m_actMemoryViewer;
-  QAction* m_actCopyMemory;
+  QMenu* m_menuFile{};
+  QMenu* m_menuEdit{};
+  QMenu* m_menuDolphin{};
+  QMenu* m_menuView{};
+  QMenu* m_menuHelp{};
+  QAction* m_actOpenWatchList{};
+  QAction* m_actSaveWatchList{};
+  QAction* m_actSaveAsWatchList{};
+  QAction* m_actClearWatchList{};
+  QAction* m_actImportFromCT{};
+  QAction* m_actExportAsCSV{};
+  QAction* m_actSettings{};
+  QAction* m_actAutoHook{};
+  QAction* m_actHook{};
+  QAction* m_actUnhook{};
+  QAction* m_actMemoryViewer{};
+  QAction* m_actCopyMemory{};
   QAction* m_actScanner{};
-  QAction* m_actQuit;
-  QAction* m_actAbout;
+  QAction* m_actQuit{};
+  QAction* m_actAbout{};
 };

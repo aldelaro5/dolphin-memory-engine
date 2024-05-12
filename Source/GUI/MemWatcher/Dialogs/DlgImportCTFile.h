@@ -23,15 +23,15 @@ public:
   void accept() override;
 
 private:
-  bool m_useDolphinPointers;
+  bool m_useDolphinPointers{};
   u32 m_commonBase = 0;
   QString m_strFileName;
-  QLineEdit* m_txbFileName;
-  QPushButton* m_btnBrowseFiles;
-  QLineEdit* m_txbCommonBase;
-  QButtonGroup* m_btnGroupImportAddressMethod;
-  QRadioButton* m_rdbUseDolphinPointers;
-  QRadioButton* m_rdbUseCommonBase;
-  QGroupBox* m_groupImportAddressMethod;
-  QWidget* m_widgetAddressMethod;
+  QLineEdit* m_txbFileName{};
+  QPushButton* m_btnBrowseFiles{};
+  QLineEdit* m_txbCommonBase{};
+  QButtonGroup* m_btnGroupImportAddressMethod{};
+  QRadioButton* m_rdbUseDolphinPointers{};
+  QRadioButton* m_rdbUseCommonBase{};
+  QGroupBox* m_groupImportAddressMethod{};
+  QWidget* m_widgetAddressMethod{};
 };

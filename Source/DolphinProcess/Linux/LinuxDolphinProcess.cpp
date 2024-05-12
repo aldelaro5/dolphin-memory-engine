@@ -139,9 +139,6 @@ bool LinuxDolphinProcess::findPID()
 bool LinuxDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size_t size,
                                       const bool withBSwap)
 {
-  struct iovec local;
-  struct iovec remote;
-  size_t nread;
   u64 RAMAddress = 0;
   if (m_ARAMAccessible)
   {
@@ -159,13 +156,22 @@ bool LinuxDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size
     RAMAddress = m_emuRAMAddressStart + offset;
   }
 
+  iovec local{};
   local.iov_base = buffer;
   local.iov_len = size;
+
+  iovec remote{};
   remote.iov_base = reinterpret_cast<void*>(RAMAddress);
   remote.iov_len = size;
 
-  nread = process_vm_readv(m_PID, &local, 1, &remote, 1, 0);
-  if (nread != size)
+  const ssize_t nread{process_vm_readv(m_PID, &local, 1, &remote, 1, 0)};
+  if (nread == -1)
+  {
+    // A more specific error type should be available in `errno` (if ever interested).
+    return false;
+  }
+
+  if (static_cast<size_t>(nread) != size)
     return false;
 
   if (withBSwap)
@@ -208,9 +214,6 @@ bool LinuxDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size
 bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const size_t size,
                                      const bool withBSwap)
 {
-  struct iovec local;
-  struct iovec remote;
-
   u64 RAMAddress = 0;
   if (m_ARAMAccessible)
   {
@@ -231,8 +234,11 @@ bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const
   char* bufferCopy = new char[size];
   std::memcpy(bufferCopy, buffer, size);
 
+  iovec local{};
   local.iov_base = bufferCopy;
   local.iov_len = size;
+
+  iovec remote{};
   remote.iov_base = reinterpret_cast<void*>(RAMAddress);
   remote.iov_len = size;
 
