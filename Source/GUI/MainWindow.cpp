@@ -9,6 +9,7 @@
 #include <QMenuBar>
 #include <QShortcut>
 #include <QString>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <string>
 
@@ -83,7 +84,10 @@ void MainWindow::makeMenus()
   m_actScanner = new QAction(tr("&Scanner"), this);
   m_actScanner->setShortcut(QKeySequence("F3"));
   m_actScanner->setCheckable(true);
-  m_actScanner->setChecked(m_splitter->sizes()[0] > 0);
+  QTimer::singleShot(0, [this]() {
+    QSignalBlocker signalBlocker(m_actScanner);
+    m_actScanner->setChecked(m_scanner->isVisible());
+  });
 
   m_actQuit = new QAction(tr("&Quit"), this);
   m_actAbout = new QAction(tr("&About"), this);
