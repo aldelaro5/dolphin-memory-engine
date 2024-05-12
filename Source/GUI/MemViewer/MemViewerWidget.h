@@ -30,9 +30,9 @@ private:
   void initialiseWidgets();
   void makeLayouts();
 
-  QLineEdit* m_txtJumpAddress;
-  QPushButton* m_btnGoToMEM1Start;
-  QPushButton* m_btnGoToSecondaryRAMStart;
-  QTimer* m_updateMemoryTimer;
-  MemViewer* m_memViewer;
+  QLineEdit* m_txtJumpAddress{};
+  QPushButton* m_btnGoToMEM1Start{};
+  QPushButton* m_btnGoToSecondaryRAMStart{};
+  QTimer* m_updateMemoryTimer{};
+  MemViewer* m_memViewer{};
 };

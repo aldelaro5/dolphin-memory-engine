@@ -167,7 +167,7 @@ private:
 
   Common::MemType m_memType = Common::MemType::type_byte;
   Common::MemBase m_memBase = Common::MemBase::base_decimal;
-  size_t m_memSize;
+  size_t m_memSize{};
   bool m_enforceMemAlignment = true;
   bool m_memIsSigned = false;
 

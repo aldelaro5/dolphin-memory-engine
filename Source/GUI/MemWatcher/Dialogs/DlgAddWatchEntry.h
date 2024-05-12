@@ -38,17 +38,17 @@ private:
   void removePointerOffset();
   void removeAllPointerOffset();
 
-  MemWatchEntry* m_entry;
-  QLineEdit* m_txbAddress;
+  MemWatchEntry* m_entry{};
+  QLineEdit* m_txbAddress{};
   QVector<QLineEdit*> m_offsets;
   QVector<QLabel*> m_addressPath;
-  QGridLayout* m_offsetsLayout;
-  QCheckBox* m_chkBoundToPointer;
-  QLineEdit* m_lblValuePreview;
-  QLineEdit* m_txbLabel;
-  QComboBox* m_cmbTypes;
-  QSpinBox* m_spnLength;
-  QGroupBox* m_pointerWidget;
-  QPushButton* m_btnAddOffset;
-  QPushButton* m_btnRemoveOffset;
+  QGridLayout* m_offsetsLayout{};
+  QCheckBox* m_chkBoundToPointer{};
+  QLineEdit* m_lblValuePreview{};
+  QLineEdit* m_txbLabel{};
+  QComboBox* m_cmbTypes{};
+  QSpinBox* m_spnLength{};
+  QGroupBox* m_pointerWidget{};
+  QPushButton* m_btnAddOffset{};
+  QPushButton* m_btnRemoveOffset{};
 };

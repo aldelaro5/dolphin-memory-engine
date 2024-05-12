@@ -110,7 +110,7 @@ private:
   u32 m_currentFirstAddress = 0;
   u32 m_memViewStart = 0;
   u32 m_memViewEnd = 0;
-  QRect* m_curosrRect;
-  QShortcut* m_copyShortcut;
+  QRect* m_curosrRect{};
+  QShortcut* m_copyShortcut{};
   QElapsedTimer m_elapsedTimer;
 };

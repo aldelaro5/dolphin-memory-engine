@@ -49,13 +49,13 @@ private:
   void initialiseWidgets();
   void makeLayouts();
 
-  QTreeView* m_watchView;
-  MemWatchModel* m_watchModel;
-  MemWatchDelegate* m_watchDelegate;
-  QPushButton* m_btnAddGroup;
-  QPushButton* m_btnAddWatchEntry;
-  QTimer* m_updateTimer;
-  QTimer* m_freezeTimer;
+  QTreeView* m_watchView{};
+  MemWatchModel* m_watchModel{};
+  MemWatchDelegate* m_watchDelegate{};
+  QPushButton* m_btnAddGroup{};
+  QPushButton* m_btnAddWatchEntry{};
+  QTimer* m_updateTimer{};
+  QTimer* m_freezeTimer{};
   QString m_watchListFile = "";
   bool m_hasUnsavedChanges = false;
 
