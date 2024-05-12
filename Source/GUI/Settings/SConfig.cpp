@@ -1,9 +1,21 @@
 #include "SConfig.h"
+
+#include <cassert>
+#include <iostream>
+
 #include <qcoreapplication.h>
 #include <qfile.h>
 
+namespace
+{
+SConfig* g_instance{};
+}
+
 SConfig::SConfig()
 {
+  assert(!g_instance && "Only a single SConfig instance is allowed");
+  g_instance = this;
+
   const QString exeDir = QCoreApplication::applicationDirPath();
   const QString portableFilePath = exeDir + "/portable.txt";
   QFile file(portableFilePath);
@@ -18,17 +30,29 @@ SConfig::SConfig()
     m_settings =
         new QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application);
   }
+
+  const QString lockFilepath{m_settings->fileName() + "_lock"};
+  m_lockFile = std::make_unique<QLockFile>(lockFilepath);
+  if (!m_lockFile->tryLock())
+  {
+    std::cerr << "ERROR: Unable to lock \"" + lockFilepath.toStdString() +
+                     "\". Is another instance running?\n";
+  }
 }
 
 SConfig::~SConfig()
 {
   delete m_settings;
+  m_lockFile.reset();
+
+  assert(g_instance == this && "Inconsistent handling of the SConfig global instance");
+  g_instance = nullptr;
 }
 
 SConfig& SConfig::getInstance()
 {
-  static SConfig instance;
-  return instance;
+  assert(g_instance && "SConfig must be instantiated first");
+  return *g_instance;
 }
 
 QString SConfig::getSettingsFilepath() const
@@ -38,140 +62,165 @@ QString SConfig::getSettingsFilepath() const
 
 QString SConfig::getWatchModel() const
 {
-  return m_settings->value("watchModel", QString{}).toString();
+  return value("watchModel", QString{}).toString();
 }
 
 bool SConfig::getAutoHook() const
 {
-  return m_settings->value("autoHook", true).toBool();
+  return value("autoHook", true).toBool();
 }
 
 QByteArray SConfig::getMainWindowGeometry() const
 {
-  return m_settings->value("mainWindowSettings/mainWindowGeometry", QByteArray{}).toByteArray();
+  return value("mainWindowSettings/mainWindowGeometry", QByteArray{}).toByteArray();
 }
 
 QByteArray SConfig::getMainWindowState() const
 {
-  return m_settings->value("mainWindowSettings/mainWindowState", QByteArray{}).toByteArray();
+  return value("mainWindowSettings/mainWindowState", QByteArray{}).toByteArray();
 }
 
 QByteArray SConfig::getSplitterState() const
 {
-  return m_settings->value("mainWindowSettings/splitterState", QByteArray{}).toByteArray();
+  return value("mainWindowSettings/splitterState", QByteArray{}).toByteArray();
 }
 
 int SConfig::getTheme() const
 {
-  return m_settings->value("coreSettings/theme", 0).toInt();
+  return value("coreSettings/theme", 0).toInt();
 }
 
 int SConfig::getWatcherUpdateTimerMs() const
 {
-  return m_settings->value("timerSettings/watcherUpdateTimerMs", 100).toInt();
+  return value("timerSettings/watcherUpdateTimerMs", 100).toInt();
 }
 
 int SConfig::getFreezeTimerMs() const
 {
-  return m_settings->value("timerSettings/freezeTimerMs", 10).toInt();
+  return value("timerSettings/freezeTimerMs", 10).toInt();
 }
 
 int SConfig::getScannerUpdateTimerMs() const
 {
-  return m_settings->value("timerSettings/scannerUpdateTimerMs", 10).toInt();
+  return value("timerSettings/scannerUpdateTimerMs", 10).toInt();
 }
 
 int SConfig::getViewerUpdateTimerMs() const
 {
-  return m_settings->value("timerSettings/viewerUpdateTimerMs", 100).toInt();
+  return value("timerSettings/viewerUpdateTimerMs", 100).toInt();
 }
 
 int SConfig::getScannerShowThreshold() const
 {
-  return m_settings->value("scannerSettings/scannerShowThreshold", 1000).toInt();
+  return value("scannerSettings/scannerShowThreshold", 1000).toInt();
 }
 
 int SConfig::getViewerNbrBytesSeparator() const
 {
-  return m_settings->value("viewerSettings/nbrBytesSeparator", 1).toInt();
+  return value("viewerSettings/nbrBytesSeparator", 1).toInt();
 }
 
 u32 SConfig::getMEM1Size() const
 {
-  return m_settings->value("memorySettings/MEM1Size", 24u * 1024 * 1024).toUInt();
+  return value("memorySettings/MEM1Size", 24u * 1024 * 1024).toUInt();
 }
 
 u32 SConfig::getMEM2Size() const
 {
-  return m_settings->value("memorySettings/MEM2Size", 64u * 1024 * 1024).toUInt();
+  return value("memorySettings/MEM2Size", 64u * 1024 * 1024).toUInt();
 }
 
 void SConfig::setWatchModel(const QString& json)
 {
-  m_settings->setValue("watchModel", json);
+  setValue("watchModel", json);
 }
 
 void SConfig::setAutoHook(const bool enabled)
 {
-  m_settings->setValue("autoHook", enabled);
+  setValue("autoHook", enabled);
 }
 
 void SConfig::setMainWindowGeometry(QByteArray const& geometry)
 {
-  m_settings->setValue("mainWindowSettings/mainWindowGeometry", geometry);
+  setValue("mainWindowSettings/mainWindowGeometry", geometry);
 }
 
 void SConfig::setMainWindowState(QByteArray const& state)
 {
-  m_settings->setValue("mainWindowSettings/mainWindowState", state);
+  setValue("mainWindowSettings/mainWindowState", state);
 }
 
 void SConfig::setSplitterState(QByteArray const& state)
 {
-  m_settings->setValue("mainWindowSettings/splitterState", state);
+  setValue("mainWindowSettings/splitterState", state);
 }
 
 void SConfig::setTheme(const int theme)
 {
-  m_settings->setValue("coreSettings/theme", theme);
+  setValue("coreSettings/theme", theme);
 }
 
 void SConfig::setWatcherUpdateTimerMs(const int updateTimerMs)
 {
-  m_settings->setValue("timerSettings/watcherUpdateTimerMs", updateTimerMs);
+  setValue("timerSettings/watcherUpdateTimerMs", updateTimerMs);
 }
 
 void SConfig::setFreezeTimerMs(const int freezeTimerMs)
 {
-  m_settings->setValue("timerSettings/freezeTimerMs", freezeTimerMs);
+  setValue("timerSettings/freezeTimerMs", freezeTimerMs);
 }
 
 void SConfig::setScannerUpdateTimerMs(const int scannerUpdateTimerMs)
 {
-  m_settings->setValue("timerSettings/scannerUpdateTimerMs", scannerUpdateTimerMs);
+  setValue("timerSettings/scannerUpdateTimerMs", scannerUpdateTimerMs);
 }
 
 void SConfig::setViewerUpdateTimerMs(const int viewerUpdateTimerMs)
 {
-  m_settings->setValue("timerSettings/viewerUpdateTimerMs", viewerUpdateTimerMs);
+  setValue("timerSettings/viewerUpdateTimerMs", viewerUpdateTimerMs);
 }
 
 void SConfig::setScannerShowThreshold(const int scannerShowThreshold)
 {
-  m_settings->setValue("scannerSettings/scannerShowThreshold", scannerShowThreshold);
+  setValue("scannerSettings/scannerShowThreshold", scannerShowThreshold);
 }
 
 void SConfig::setViewerNbrBytesSeparator(const int viewerNbrBytesSeparator)
 {
-  m_settings->setValue("viewerSettings/nbrBytesSeparator", viewerNbrBytesSeparator);
+  setValue("viewerSettings/nbrBytesSeparator", viewerNbrBytesSeparator);
 }
 
 void SConfig::setMEM1Size(const u32 mem1SizeReal)
 {
-  m_settings->setValue("memorySettings/MEM1Size", mem1SizeReal);
+  setValue("memorySettings/MEM1Size", mem1SizeReal);
 }
 
 void SConfig::setMEM2Size(const u32 mem2SizeReal)
 {
-  m_settings->setValue("memorySettings/MEM2Size", mem2SizeReal);
+  setValue("memorySettings/MEM2Size", mem2SizeReal);
+}
+
+bool SConfig::ownsSettingsFile() const
+{
+  return m_lockFile->isLocked();
+}
+
+void SConfig::setValue(const QString& key, const QVariant& value)
+{
+  m_map[key] = value;
+
+  if (ownsSettingsFile())
+  {
+    m_settings->setValue(key, value);
+  }
+}
+
+QVariant SConfig::value(const QString& key, const QVariant& defaultValue) const
+{
+  const auto it = m_map.find(key);
+  if (it != m_map.cend())
+  {
+    return it->second;
+  }
+  return m_settings->value(key, defaultValue);
 }

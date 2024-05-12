@@ -572,6 +572,17 @@ void MainWindow::closeEvent(QCloseEvent* event)
   SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
   SConfig::getInstance().setMainWindowGeometry(saveGeometry());
   SConfig::getInstance().setMainWindowState(saveState());
+
+  if (!SConfig::getInstance().ownsSettingsFile())
+  {
+    // Give the user a chance to save the ephemeral watch model.
+    if (!m_watcher->warnIfUnsavedChanges())
+    {
+      event->setAccepted(false);
+      return;
+    }
+  }
+
   m_viewer->close();
   event->accept();
 }
