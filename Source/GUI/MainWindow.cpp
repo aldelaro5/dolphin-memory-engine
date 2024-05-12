@@ -1,7 +1,9 @@
 #include "MainWindow.h"
 
 #include <QApplication>
+#include <QDesktopServices>
 #include <QDialog>
+#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QMenuBar>
@@ -62,6 +64,7 @@ void MainWindow::makeMenus()
   m_actClearWatchList = new QAction(tr("&Clear the watch list"), this);
   m_actImportFromCT = new QAction(tr("&Import from Cheat Engine's CT file..."), this);
   m_actExportAsCSV = new QAction(tr("&Export as CSV..."), this);
+  QAction* const actOpenConfigDir{new QAction(tr("Open Configuration Directory..."), this)};
 
   m_actOpenWatchList->setShortcut(Qt::Modifier::CTRL | Qt::Key::Key_O);
   m_actSaveWatchList->setShortcut(Qt::Modifier::CTRL | Qt::Key::Key_S);
@@ -90,6 +93,12 @@ void MainWindow::makeMenus()
   connect(m_actClearWatchList, &QAction::triggered, this, &MainWindow::onClearWatchList);
   connect(m_actImportFromCT, &QAction::triggered, this, &MainWindow::onImportFromCT);
   connect(m_actExportAsCSV, &QAction::triggered, this, &MainWindow::onExportAsCSV);
+  connect(actOpenConfigDir, &QAction::triggered, this, []() {
+    const QString filepath{SConfig::getInstance().getSettingsFilepath()};
+    const QFileInfo fileInfo{filepath};
+    const QUrl url{QUrl::fromLocalFile(fileInfo.absolutePath())};
+    QDesktopServices::openUrl(url);
+  });
 
   connect(m_actSettings, &QAction::triggered, this, &MainWindow::onOpenSettings);
 
@@ -109,8 +118,12 @@ void MainWindow::makeMenus()
   m_menuFile->addAction(m_actSaveWatchList);
   m_menuFile->addAction(m_actSaveAsWatchList);
   m_menuFile->addAction(m_actClearWatchList);
+  m_menuFile->addSeparator();
   m_menuFile->addAction(m_actImportFromCT);
   m_menuFile->addAction(m_actExportAsCSV);
+  m_menuFile->addSeparator();
+  m_menuFile->addAction(actOpenConfigDir);
+  m_menuFile->addSeparator();
   m_menuFile->addAction(m_actQuit);
 
   m_menuEdit = menuBar()->addMenu(tr("&Edit"));
