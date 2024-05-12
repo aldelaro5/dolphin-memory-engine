@@ -11,8 +11,7 @@ QWidget* MemWatchDelegate::createEditor(QWidget* parent, const QStyleOptionViewI
 {
   (void)option;
 
-  const MemWatchModel* model = static_cast<const MemWatchModel*>(index.model());
-  MemWatchTreeNode* node = model->getTreeNodeFromIndex(index);
+  MemWatchTreeNode* const node{MemWatchModel::getTreeNodeFromIndex(index)};
   QLineEdit* editor = new QLineEdit(parent);
   if (index.column() == MemWatchModel::WATCH_COL_VALUE && !node->isGroup())
     node->setValueEditing(true);
@@ -30,8 +29,7 @@ void MemWatchDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 
 void MemWatchDelegate::destroyEditor(QWidget* editor, const QModelIndex& index) const
 {
-  const MemWatchModel* model = static_cast<const MemWatchModel*>(index.model());
-  MemWatchTreeNode* node = model->getTreeNodeFromIndex(index);
+  MemWatchTreeNode* const node{MemWatchModel::getTreeNodeFromIndex(index)};
   if (index.column() == MemWatchModel::WATCH_COL_VALUE && !node->isGroup())
     node->setValueEditing(false);
   GUICommon::g_valueEditing = false;
