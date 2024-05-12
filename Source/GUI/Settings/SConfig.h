@@ -1,6 +1,9 @@
 #pragma once
 
+#include <memory>
+
 #include <QByteArray>
+#include <QLockFile>
 #include <QSettings>
 
 #include "../../Common/CommonTypes.h"
@@ -9,6 +12,10 @@ class SConfig
 {
 public:
   static SConfig& getInstance();
+
+  SConfig();
+  ~SConfig();
+
   SConfig(SConfig const&) = delete;
   void operator=(SConfig const&) = delete;
 
@@ -52,9 +59,13 @@ public:
 
   void setViewerNbrBytesSeparator(const int viewerNbrBytesSeparator);
 
-private:
-  SConfig();
-  ~SConfig();
+  bool ownsSettingsFile() const;
 
-  QSettings* m_settings;
+private:
+  void setValue(const QString& key, const QVariant& value);
+  QVariant value(const QString& key, const QVariant& defaultValue) const;
+
+  std::unique_ptr<QLockFile> m_lockFile;
+  std::unordered_map<QString, QVariant> m_map;
+  QSettings* m_settings{};
 };
