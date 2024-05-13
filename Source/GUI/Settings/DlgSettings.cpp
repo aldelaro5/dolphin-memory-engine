@@ -157,8 +157,8 @@ void DlgSettings::loadSettings()
       m_cmbViewerBytesSeparator->findData(SConfig::getInstance().getViewerNbrBytesSeparator()));
   m_cmbTheme->setCurrentIndex(m_cmbTheme->findData(SConfig::getInstance().getTheme()));
   // This erases fractional mebibyte sizes, but nobody should be using those anyway.
-  m_sldMEM1Size->setValue(SConfig::getInstance().getMEM1Size() / 1024 / 1024);
-  m_sldMEM2Size->setValue(SConfig::getInstance().getMEM2Size() / 1024 / 1024);
+  m_sldMEM1Size->setValue(static_cast<int>(SConfig::getInstance().getMEM1Size()) / 1024 / 1024);
+  m_sldMEM2Size->setValue(static_cast<int>(SConfig::getInstance().getMEM2Size()) / 1024 / 1024);
 }
 
 void DlgSettings::saveSettings() const
