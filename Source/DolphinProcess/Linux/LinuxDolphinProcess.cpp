@@ -113,13 +113,14 @@ bool LinuxDolphinProcess::findPID()
   struct dirent* directoryEntry = nullptr;
   while (m_PID == -1 && (directoryEntry = readdir(directoryPointer)))
   {
-    std::istringstream conversionStream(directoryEntry->d_name);
+    const char* const name{static_cast<const char*>(directoryEntry->d_name)};
+    std::istringstream conversionStream(name);
     int aPID = 0;
     if (!(conversionStream >> aPID))
       continue;
     std::ifstream aCmdLineFile;
     std::string line;
-    aCmdLineFile.open("/proc/" + std::string(directoryEntry->d_name) + "/comm");
+    aCmdLineFile.open("/proc/" + std::string(name) + "/comm");
     getline(aCmdLineFile, line);
 
     const bool match{s_dolphinProcessName ? line == s_dolphinProcessName :
