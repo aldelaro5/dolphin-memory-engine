@@ -35,7 +35,7 @@ public:
   void onScanMemTypeChanged();
   void onCurrentValuesUpdateTimer();
   void onResultListDoubleClicked(const QModelIndex& index);
-  void handleScannerErrors(const Common::MemOperationReturnCode errorCode);
+  void handleScannerErrors(Common::MemOperationReturnCode errorCode);
   void onFirstScan();
   void onNextScan();
   void onUndoScan();

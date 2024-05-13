@@ -54,12 +54,11 @@ enum class MemOperationReturnCode
   OK
 };
 
-size_t getSizeForType(const MemType type, const size_t length);
-bool shouldBeBSwappedForType(const MemType type);
-int getNbrBytesAlignmentForType(const MemType type);
+size_t getSizeForType(MemType type, size_t length);
+bool shouldBeBSwappedForType(MemType type);
+int getNbrBytesAlignmentForType(MemType type);
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
                            std::string_view inputString, MemBase base, MemType type, size_t length);
-std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
-                                 const MemBase base, const bool isUnsigned,
-                                 const bool withBSwap = false);
+std::string formatMemoryToString(const char* memory, MemType type, size_t length, MemBase base,
+                                 bool isUnsigned, bool withBSwap = false);
 }  // namespace Common

@@ -31,11 +31,11 @@ public:
   bool isValueEditing() const;
   bool hasChildren() const;
   int childrenCount() const;
-  void setValueEditing(const bool valueEditing);
+  void setValueEditing(bool valueEditing);
 
   void appendChild(MemWatchTreeNode* node);
-  void insertChild(const int row, MemWatchTreeNode* node);
-  void removeChild(const int row);
+  void insertChild(int row, MemWatchTreeNode* node);
+  void removeChild(int row);
   void clearAllChild();
 
   void readFromJson(const QJsonObject& json, MemWatchTreeNode* parent = nullptr);

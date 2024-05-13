@@ -49,17 +49,17 @@ public:
   void setWatchModel(const QString& json);
   void setAutoHook(bool enabled);
 
-  void setTheme(const int theme);
+  void setTheme(int theme);
 
-  void setWatcherUpdateTimerMs(const int watcherUpdateTimerMs);
-  void setFreezeTimerMs(const int freezeTimerMs);
-  void setScannerUpdateTimerMs(const int scannerUpdateTimerMs);
-  void setViewerUpdateTimerMs(const int viewerUpdateTimerMs);
+  void setWatcherUpdateTimerMs(int watcherUpdateTimerMs);
+  void setFreezeTimerMs(int freezeTimerMs);
+  void setScannerUpdateTimerMs(int scannerUpdateTimerMs);
+  void setViewerUpdateTimerMs(int viewerUpdateTimerMs);
   void setScannerShowThreshold(int scannerShowThreshold);
-  void setMEM1Size(const u32 mem1SizeReal);
-  void setMEM2Size(const u32 mem2SizeReal);
+  void setMEM1Size(u32 mem1SizeReal);
+  void setMEM2Size(u32 mem2SizeReal);
 
-  void setViewerNbrBytesSeparator(const int viewerNbrBytesSeparator);
+  void setViewerNbrBytesSeparator(int viewerNbrBytesSeparator);
 
   bool ownsSettingsFile() const;
 

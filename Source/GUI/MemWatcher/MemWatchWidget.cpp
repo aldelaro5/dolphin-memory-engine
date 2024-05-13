@@ -541,7 +541,7 @@ QModelIndexList MemWatchWidget::simplifySelection() const
   return simplifiedSelection;
 }
 
-bool MemWatchWidget::isAnyAncestorSelected(const QModelIndex index) const
+bool MemWatchWidget::isAnyAncestorSelected(const QModelIndex& index) const
 {
   if (m_watchModel->parent(index) == QModelIndex())
     return false;

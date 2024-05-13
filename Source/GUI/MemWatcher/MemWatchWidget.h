@@ -64,6 +64,6 @@ private:
   QString m_watchListFile = "";
   bool m_hasUnsavedChanges = false;
 
-  bool isAnyAncestorSelected(const QModelIndex index) const;
+  bool isAnyAncestorSelected(const QModelIndex& index) const;
   QModelIndexList simplifySelection() const;
 };

@@ -31,7 +31,7 @@ public:
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
   bool removeRows(int row, int count, const QModelIndex& parent) override;
 
-  u32 getResultAddress(const int row) const;
+  u32 getResultAddress(int row) const;
   void updateScanner();
   void updateAfterScannerReset();
   void setShowThreshold(size_t showThreshold);

@@ -35,9 +35,9 @@ public:
   void paintEvent(QPaintEvent* event) override;
   void scrollContentsBy(int dx, int dy) override;
   u32 getCurrentFirstAddress() const;
-  void jumpToAddress(const u32 address);
+  void jumpToAddress(u32 address);
   void updateViewer();
-  void memoryValidityChanged(const bool valid);
+  void memoryValidityChanged(bool valid);
 
 signals:
   void memErrorOccured();
@@ -74,21 +74,21 @@ private:
   void editSelection();
   void addSelectionAsArrayOfBytes();
   void addByteIndexAsWatch(int index);
-  bool handleNaviguationKey(const int key, bool shiftIsHeld);
+  bool handleNaviguationKey(int key, bool shiftIsHeld);
   bool writeCharacterToSelectedMemory(char byteToWrite);
   void updateMemoryData();
-  void changeMemoryRegion(const MemoryRegion region);
+  void changeMemoryRegion(MemoryRegion region);
   void renderColumnsHeaderText(QPainter& painter) const;
   void renderRowHeaderText(QPainter& painter, int rowIndex) const;
   void renderSeparatorLines(QPainter& painter) const;
-  void renderMemory(QPainter& painter, const int rowIndex, const int columnIndex);
-  void renderHexByte(QPainter& painter, const int rowIndex, const int columnIndex, QColor& bgColor,
+  void renderMemory(QPainter& painter, int rowIndex, int columnIndex);
+  void renderHexByte(QPainter& painter, int rowIndex, int columnIndex, QColor& bgColor,
                      QColor& fgColor, bool drawCarret);
-  void renderASCIIText(QPainter& painter, const int rowIndex, const int columnIndex,
-                       QColor& bgColor, QColor& fgColor);
-  void renderCarret(QPainter& painter, const int rowIndex, const int columnIndex);
-  void determineMemoryTextRenderProperties(const int rowIndex, const int columnIndex,
-                                           bool& drawCarret, QColor& bgColor, QColor& fgColor);
+  void renderASCIIText(QPainter& painter, int rowIndex, int columnIndex, QColor& bgColor,
+                       QColor& fgColor);
+  void renderCarret(QPainter& painter, int rowIndex, int columnIndex);
+  void determineMemoryTextRenderProperties(int rowIndex, int columnIndex, bool& drawCarret,
+                                           QColor& bgColor, QColor& fgColor);
 
   const int m_numRows = 16;
   const int m_numColumns = 16;  // Should be a multiple of 16, or the header doesn't make much sense

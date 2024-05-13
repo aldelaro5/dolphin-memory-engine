@@ -20,10 +20,8 @@ public:
 
   virtual bool findPID() = 0;
   virtual bool obtainEmuRAMInformations() = 0;
-  virtual bool readFromRAM(const u32 offset, char* buffer, const size_t size,
-                           const bool withBSwap) = 0;
-  virtual bool writeToRAM(const u32 offset, const char* buffer, const size_t size,
-                          const bool withBSwap) = 0;
+  virtual bool readFromRAM(u32 offset, char* buffer, size_t size, bool withBSwap) = 0;
+  virtual bool writeToRAM(u32 offset, const char* buffer, size_t size, bool withBSwap) = 0;
 
   int getPID() const { return m_PID; };
   u64 getEmuRAMAddressStart() const { return m_emuRAMAddressStart; };
