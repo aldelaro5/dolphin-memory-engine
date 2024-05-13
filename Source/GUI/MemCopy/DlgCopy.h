@@ -17,6 +17,11 @@ public:
   explicit DlgCopy(QWidget* parent = nullptr);
   ~DlgCopy() override;
 
+  DlgCopy(const DlgCopy&) = delete;
+  DlgCopy(DlgCopy&&) = delete;
+  DlgCopy& operator=(const DlgCopy&) = delete;
+  DlgCopy& operator=(DlgCopy&&) = delete;
+
 private:
   enum ByteStringFormats
   {

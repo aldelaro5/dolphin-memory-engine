@@ -10,7 +10,14 @@ namespace DolphinComm
 class IDolphinProcess
 {
 public:
+  IDolphinProcess() = default;
   virtual ~IDolphinProcess() = default;
+
+  IDolphinProcess(const IDolphinProcess&) = delete;
+  IDolphinProcess(IDolphinProcess&&) = delete;
+  IDolphinProcess& operator=(const IDolphinProcess&) = delete;
+  IDolphinProcess& operator=(IDolphinProcess&&) = delete;
+
   virtual bool findPID() = 0;
   virtual bool obtainEmuRAMInformations() = 0;
   virtual bool readFromRAM(const u32 offset, char* buffer, const size_t size,

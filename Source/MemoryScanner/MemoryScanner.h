@@ -40,6 +40,12 @@ public:
 
   MemScanner();
   ~MemScanner();
+
+  MemScanner(const MemScanner&) = delete;
+  MemScanner(MemScanner&&) = delete;
+  MemScanner& operator=(const MemScanner&) = delete;
+  MemScanner& operator=(MemScanner&&) = delete;
+
   Common::MemOperationReturnCode firstScan(const ScanFiter filter, const std::string& searchTerm1,
                                            const std::string& searchTerm2);
   Common::MemOperationReturnCode nextScan(const ScanFiter filter, const std::string& searchTerm1,

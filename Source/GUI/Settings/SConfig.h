@@ -16,8 +16,10 @@ public:
   SConfig();
   ~SConfig();
 
-  SConfig(SConfig const&) = delete;
-  void operator=(SConfig const&) = delete;
+  SConfig(const SConfig&) = delete;
+  SConfig(SConfig&&) = delete;
+  SConfig& operator=(const SConfig&) = delete;
+  SConfig& operator=(SConfig&&) = delete;
 
   QString getSettingsFilepath() const;
 

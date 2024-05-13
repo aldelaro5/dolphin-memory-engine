@@ -20,6 +20,12 @@ class MemViewer : public QAbstractScrollArea
 public:
   explicit MemViewer(QWidget* parent);
   ~MemViewer() override;
+
+  MemViewer(const MemViewer&) = delete;
+  MemViewer(MemViewer&&) = delete;
+  MemViewer& operator=(const MemViewer&) = delete;
+  MemViewer& operator=(MemViewer&&) = delete;
+
   QSize sizeHint() const override;
   void mousePressEvent(QMouseEvent* event) override;
   void mouseMoveEvent(QMouseEvent* event) override;

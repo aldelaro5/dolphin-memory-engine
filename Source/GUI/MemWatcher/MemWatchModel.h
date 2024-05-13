@@ -31,6 +31,11 @@ public:
   explicit MemWatchModel(QObject* parent);
   ~MemWatchModel() override;
 
+  MemWatchModel(const MemWatchModel&) = delete;
+  MemWatchModel(MemWatchModel&&) = delete;
+  MemWatchModel& operator=(const MemWatchModel&) = delete;
+  MemWatchModel& operator=(MemWatchModel&&) = delete;
+
   int columnCount(const QModelIndex& parent) const override;
   int rowCount(const QModelIndex& parent) const override;
   QVariant data(const QModelIndex& index, int role) const override;

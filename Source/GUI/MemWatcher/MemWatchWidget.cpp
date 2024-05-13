@@ -316,17 +316,29 @@ void MemWatchWidget::copySelectedWatchesToClipBoard()
   if (selection.count() == 0)
     return;
 
-  QModelIndexList* toCopyList = simplifySelection();
-
-  MemWatchTreeNode* rootNodeCopy = new MemWatchTreeNode(nullptr, nullptr, false, QString(""));
-  for (auto i : *toCopyList)
+  QJsonObject jsonNode;
   {
-    MemWatchTreeNode* const theNode{new MemWatchTreeNode(*MemWatchModel::getTreeNodeFromIndex(i))};
-    rootNodeCopy->appendChild(theNode);
+    QModelIndexList* toCopyList = simplifySelection();
+
+    std::unordered_map<MemWatchTreeNode*, MemWatchTreeNode*> parentMap;
+    MemWatchTreeNode rootNodeCopy(nullptr, nullptr, false, QString{});
+    for (auto i : *toCopyList)
+    {
+      MemWatchTreeNode* const childNode{MemWatchModel::getTreeNodeFromIndex(i)};
+      parentMap[childNode] = childNode->getParent();
+
+      rootNodeCopy.appendChild(childNode);  // Borrow node temporarily.
+    }
+    rootNodeCopy.writeToJson(jsonNode);
+
+    // Clear borrowed children before going out of scope.
+    rootNodeCopy.clearAllChild();
+    for (auto& [childNode, parentNode] : parentMap)
+    {
+      childNode->setParent(parentNode);
+    }
   }
 
-  QJsonObject jsonNode;
-  rootNodeCopy->writeToJson(jsonNode);
   QJsonDocument doc(jsonNode);
   QString nodeJsonStr(doc.toJson());
 

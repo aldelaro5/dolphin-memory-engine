@@ -22,6 +22,11 @@ public:
   MemScanWidget();
   ~MemScanWidget() override;
 
+  MemScanWidget(const MemScanWidget&) = delete;
+  MemScanWidget(MemScanWidget&&) = delete;
+  MemScanWidget& operator=(const MemScanWidget&) = delete;
+  MemScanWidget& operator=(MemScanWidget&&) = delete;
+
   ResultsListModel* getResultListModel() const;
   std::vector<u32> getAllResults() const;
   QModelIndexList getSelectedResults() const;

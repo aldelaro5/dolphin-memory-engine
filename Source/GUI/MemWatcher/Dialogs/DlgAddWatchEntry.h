@@ -18,6 +18,12 @@ class DlgAddWatchEntry : public QDialog
 public:
   DlgAddWatchEntry(bool newEntry, MemWatchEntry* entry, QWidget* parent);
   ~DlgAddWatchEntry() override;
+
+  DlgAddWatchEntry(const DlgAddWatchEntry&) = delete;
+  DlgAddWatchEntry(DlgAddWatchEntry&&) = delete;
+  DlgAddWatchEntry& operator=(const DlgAddWatchEntry&) = delete;
+  DlgAddWatchEntry& operator=(DlgAddWatchEntry&&) = delete;
+
   void onTypeChange(int index);
   void accept() override;
   void onAddressChanged();

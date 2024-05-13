@@ -18,6 +18,11 @@ public:
   explicit MemWatchEntry(MemWatchEntry* entry);
   ~MemWatchEntry();
 
+  MemWatchEntry(const MemWatchEntry&) = delete;
+  MemWatchEntry(MemWatchEntry&&) = delete;
+  MemWatchEntry& operator=(const MemWatchEntry&) = delete;
+  MemWatchEntry& operator=(MemWatchEntry&&) = delete;
+
   QString getLabel() const;
   Common::MemType getType() const;
   u32 getConsoleAddress() const;

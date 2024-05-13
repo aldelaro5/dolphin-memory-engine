@@ -12,6 +12,11 @@ public:
   CheatEngineParser();
   ~CheatEngineParser();
 
+  CheatEngineParser(const CheatEngineParser&) = delete;
+  CheatEngineParser(CheatEngineParser&&) = delete;
+  CheatEngineParser& operator=(const CheatEngineParser&) = delete;
+  CheatEngineParser& operator=(CheatEngineParser&&) = delete;
+
   QString getErrorMessages() const;
   bool hasACriticalErrorOccured() const;
   void setTableStartAddress(u32 tableStartAddress);

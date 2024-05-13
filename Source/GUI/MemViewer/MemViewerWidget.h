@@ -14,6 +14,11 @@ public:
   explicit MemViewerWidget(QWidget* parent);
   ~MemViewerWidget() override;
 
+  MemViewerWidget(const MemViewerWidget&) = delete;
+  MemViewerWidget(MemViewerWidget&&) = delete;
+  MemViewerWidget& operator=(const MemViewerWidget&) = delete;
+  MemViewerWidget& operator=(MemViewerWidget&&) = delete;
+
   void onJumpToAddressTextChanged();
   void onGoToMEM1Start();
   void onGoToSecondaryRAMStart();
