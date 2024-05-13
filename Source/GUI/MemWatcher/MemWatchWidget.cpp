@@ -299,12 +299,11 @@ void MemWatchWidget::cutSelectedWatchesToClipBoard()
 {
   copySelectedWatchesToClipBoard();
 
-  QModelIndexList* cutList = simplifySelection();
-
-  if (cutList->count() > 0)
+  const QModelIndexList cutList{simplifySelection()};
+  if (!cutList.empty())
   {
-    for (auto i : *cutList)
-      m_watchModel->removeNode(i);
+    for (const auto& index : cutList)
+      m_watchModel->removeNode(index);
 
     m_hasUnsavedChanges = true;
   }
@@ -318,13 +317,13 @@ void MemWatchWidget::copySelectedWatchesToClipBoard()
 
   QJsonObject jsonNode;
   {
-    QModelIndexList* toCopyList = simplifySelection();
+    const QModelIndexList toCopyList{simplifySelection()};
 
     std::unordered_map<MemWatchTreeNode*, MemWatchTreeNode*> parentMap;
     MemWatchTreeNode rootNodeCopy(nullptr, nullptr, false, QString{});
-    for (auto i : *toCopyList)
+    for (const auto& index : toCopyList)
     {
-      MemWatchTreeNode* const childNode{MemWatchModel::getTreeNodeFromIndex(i)};
+      MemWatchTreeNode* const childNode{MemWatchModel::getTreeNodeFromIndex(index)};
       parentMap[childNode] = childNode->getParent();
 
       rootNodeCopy.appendChild(childNode);  // Borrow node temporarily.
@@ -525,9 +524,9 @@ void MemWatchWidget::addWatchEntry(MemWatchEntry* entry)
   m_hasUnsavedChanges = true;
 }
 
-QModelIndexList* MemWatchWidget::simplifySelection() const
+QModelIndexList MemWatchWidget::simplifySelection() const
 {
-  QModelIndexList* simplifiedSelection = new QModelIndexList();
+  QModelIndexList simplifiedSelection;
   QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
 
   // Discard all indexes whose parent is selected already
@@ -535,7 +534,9 @@ QModelIndexList* MemWatchWidget::simplifySelection() const
   {
     const QModelIndex index = selection.at(i);
     if (!isAnyAncestorSelected(index))
-      simplifiedSelection->append(index);
+    {
+      simplifiedSelection.append(index);
+    }
   }
   return simplifiedSelection;
 }
@@ -599,10 +600,11 @@ void MemWatchWidget::onDeleteSelection()
   confirmationBox->setDefaultButton(QMessageBox::Yes);
   if (confirmationBox->exec() == QMessageBox::Yes)
   {
-    QModelIndexList* toDeleteList = simplifySelection();
-
-    for (auto i : *toDeleteList)
-      m_watchModel->removeNode(i);
+    const QModelIndexList toDeleteList{simplifySelection()};
+    for (const auto& index : toDeleteList)
+    {
+      m_watchModel->removeNode(index);
+    }
 
     m_hasUnsavedChanges = true;
   }
