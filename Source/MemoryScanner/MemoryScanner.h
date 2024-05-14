@@ -75,54 +75,45 @@ public:
     T secondByte;
     std::memcpy(&firstByte, first, sizeof(T));
     std::memcpy(&secondByte, second, sizeof(T));
-    size_t size = sizeof(T);
-    switch (size)
+
+    constexpr size_t size{sizeof(T)};
+    static_assert(size == 1 || size == 2 || size == 4 || size == 8, "Unexpected type size");
+
+    if constexpr (size == 2)
     {
-    case 2:
-    {
-      u16 firstHalfword = 0;
-      std::memcpy(&firstHalfword, &firstByte, sizeof(u16));
+      u16 firstHalfword = Common::bit_cast<u16, T>(firstByte);
       firstHalfword = Common::bSwap16(firstHalfword);
-      std::memcpy(&firstByte, &firstHalfword, sizeof(u16));
+      firstByte = Common::bit_cast<T, u16>(firstHalfword);
       if (bswapSecond)
       {
-        std::memcpy(&firstHalfword, &secondByte, sizeof(u16));
+        firstHalfword = Common::bit_cast<u16, T>(secondByte);
         firstHalfword = Common::bSwap16(firstHalfword);
-        std::memcpy(&secondByte, &firstHalfword, sizeof(u16));
+        secondByte = Common::bit_cast<T, u16>(firstHalfword);
       }
-      break;
     }
-    case 4:
+    else if constexpr (size == 4)
     {
-      u32 firstWord = 0;
-      std::memcpy(&firstWord, &firstByte, sizeof(u32));
+      u32 firstWord = Common::bit_cast<u32, T>(firstByte);
       firstWord = Common::bSwap32(firstWord);
-      std::memcpy(&firstByte, &firstWord, sizeof(u32));
+      firstByte = Common::bit_cast<T, u32>(firstWord);
       if (bswapSecond)
       {
-        std::memcpy(&firstWord, &secondByte, sizeof(u32));
+        firstWord = Common::bit_cast<u32, T>(secondByte);
         firstWord = Common::bSwap32(firstWord);
-        std::memcpy(&secondByte, &firstWord, sizeof(u32));
+        secondByte = Common::bit_cast<T, u32>(firstWord);
       }
-      break;
     }
-    case 8:
+    else if constexpr (size == 8)
     {
-      u64 firstDoubleword = 0;
-      std::memcpy(&firstDoubleword, &firstByte, sizeof(u64));
+      u64 firstDoubleword = Common::bit_cast<u64, T>(firstByte);
       firstDoubleword = Common::bSwap64(firstDoubleword);
-      std::memcpy(&firstByte, &firstDoubleword, sizeof(u64));
+      firstByte = Common::bit_cast<T, u64>(firstDoubleword);
       if (bswapSecond)
       {
-        std::memcpy(&firstDoubleword, &secondByte, sizeof(u64));
+        firstDoubleword = Common::bit_cast<u64, T>(secondByte);
         firstDoubleword = Common::bSwap64(firstDoubleword);
-        std::memcpy(&secondByte, &firstDoubleword, sizeof(u64));
+        secondByte = Common::bit_cast<T, u64>(firstDoubleword);
       }
-      break;
-    }
-    default:
-      assert(0 && "Unexpected type size");
-      break;
     }
 
     if constexpr (std::is_floating_point<T>::value)

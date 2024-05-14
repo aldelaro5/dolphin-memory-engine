@@ -75,7 +75,6 @@ endif ()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
     add_compile_options(
-        -Wno-fortify-source   # FIXME(CA): Too verbose at the moment, but worth fixing
         -Wno-sign-conversion  # FIXME(CA): Too verbose at the moment, but worth fixing
     )
 endif ()
