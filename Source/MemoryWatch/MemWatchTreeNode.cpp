@@ -13,16 +13,6 @@ MemWatchTreeNode::MemWatchTreeNode(MemWatchEntry* const entry, MemWatchTreeNode*
 {
 }
 
-MemWatchTreeNode::MemWatchTreeNode(const MemWatchTreeNode& node)
-{
-  m_isGroup = node.m_isGroup;
-  m_isValueEditing = node.m_isValueEditing;
-  m_groupName = node.m_groupName;
-  m_entry = node.m_entry;
-  m_children = node.m_children;
-  m_parent = node.m_parent;
-}
-
 MemWatchTreeNode::~MemWatchTreeNode()
 {
   if (hasChildren())
@@ -90,6 +80,11 @@ void MemWatchTreeNode::setChildren(QVector<MemWatchTreeNode*> children)
 MemWatchTreeNode* MemWatchTreeNode::getParent() const
 {
   return m_parent;
+}
+
+void MemWatchTreeNode::setParent(MemWatchTreeNode* const parent)
+{
+  m_parent = parent;
 }
 
 int MemWatchTreeNode::getRow() const

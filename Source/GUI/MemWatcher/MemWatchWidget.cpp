@@ -299,12 +299,11 @@ void MemWatchWidget::cutSelectedWatchesToClipBoard()
 {
   copySelectedWatchesToClipBoard();
 
-  QModelIndexList* cutList = simplifySelection();
-
-  if (cutList->count() > 0)
+  const QModelIndexList cutList{simplifySelection()};
+  if (!cutList.empty())
   {
-    for (auto i : *cutList)
-      m_watchModel->removeNode(i);
+    for (const auto& index : cutList)
+      m_watchModel->removeNode(index);
 
     m_hasUnsavedChanges = true;
   }
@@ -316,17 +315,29 @@ void MemWatchWidget::copySelectedWatchesToClipBoard()
   if (selection.count() == 0)
     return;
 
-  QModelIndexList* toCopyList = simplifySelection();
-
-  MemWatchTreeNode* rootNodeCopy = new MemWatchTreeNode(nullptr, nullptr, false, QString(""));
-  for (auto i : *toCopyList)
+  QJsonObject jsonNode;
   {
-    MemWatchTreeNode* const theNode{new MemWatchTreeNode(*MemWatchModel::getTreeNodeFromIndex(i))};
-    rootNodeCopy->appendChild(theNode);
+    const QModelIndexList toCopyList{simplifySelection()};
+
+    std::unordered_map<MemWatchTreeNode*, MemWatchTreeNode*> parentMap;
+    MemWatchTreeNode rootNodeCopy(nullptr, nullptr, false, QString{});
+    for (const auto& index : toCopyList)
+    {
+      MemWatchTreeNode* const childNode{MemWatchModel::getTreeNodeFromIndex(index)};
+      parentMap[childNode] = childNode->getParent();
+
+      rootNodeCopy.appendChild(childNode);  // Borrow node temporarily.
+    }
+    rootNodeCopy.writeToJson(jsonNode);
+
+    // Clear borrowed children before going out of scope.
+    rootNodeCopy.clearAllChild();
+    for (auto& [childNode, parentNode] : parentMap)
+    {
+      childNode->setParent(parentNode);
+    }
   }
 
-  QJsonObject jsonNode;
-  rootNodeCopy->writeToJson(jsonNode);
   QJsonDocument doc(jsonNode);
   QString nodeJsonStr(doc.toJson());
 
@@ -513,9 +524,9 @@ void MemWatchWidget::addWatchEntry(MemWatchEntry* entry)
   m_hasUnsavedChanges = true;
 }
 
-QModelIndexList* MemWatchWidget::simplifySelection() const
+QModelIndexList MemWatchWidget::simplifySelection() const
 {
-  QModelIndexList* simplifiedSelection = new QModelIndexList();
+  QModelIndexList simplifiedSelection;
   QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
 
   // Discard all indexes whose parent is selected already
@@ -523,12 +534,14 @@ QModelIndexList* MemWatchWidget::simplifySelection() const
   {
     const QModelIndex index = selection.at(i);
     if (!isAnyAncestorSelected(index))
-      simplifiedSelection->append(index);
+    {
+      simplifiedSelection.append(index);
+    }
   }
   return simplifiedSelection;
 }
 
-bool MemWatchWidget::isAnyAncestorSelected(const QModelIndex index) const
+bool MemWatchWidget::isAnyAncestorSelected(const QModelIndex& index) const
 {
   if (m_watchModel->parent(index) == QModelIndex())
     return false;
@@ -587,10 +600,11 @@ void MemWatchWidget::onDeleteSelection()
   confirmationBox->setDefaultButton(QMessageBox::Yes);
   if (confirmationBox->exec() == QMessageBox::Yes)
   {
-    QModelIndexList* toDeleteList = simplifySelection();
-
-    for (auto i : *toDeleteList)
-      m_watchModel->removeNode(i);
+    const QModelIndexList toDeleteList{simplifySelection()};
+    for (const auto& index : toDeleteList)
+    {
+      m_watchModel->removeNode(index);
+    }
 
     m_hasUnsavedChanges = true;
   }

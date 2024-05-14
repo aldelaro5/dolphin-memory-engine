@@ -31,6 +31,11 @@ public:
   explicit MemWatchModel(QObject* parent);
   ~MemWatchModel() override;
 
+  MemWatchModel(const MemWatchModel&) = delete;
+  MemWatchModel(MemWatchModel&&) = delete;
+  MemWatchModel& operator=(const MemWatchModel&) = delete;
+  MemWatchModel& operator=(MemWatchModel&&) = delete;
+
   int columnCount(const QModelIndex& parent) const override;
   int rowCount(const QModelIndex& parent) const override;
   QVariant data(const QModelIndex& index, int role) const override;
@@ -47,7 +52,7 @@ public:
   bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column,
                     const QModelIndex& parent) override;
 
-  void changeType(const QModelIndex& index, const Common::MemType type, const size_t length);
+  void changeType(const QModelIndex& index, Common::MemType type, size_t length);
   static MemWatchEntry* getEntryFromIndex(const QModelIndex& index);
   void addGroup(const QString& name);
   void addEntry(MemWatchEntry* entry);
@@ -74,9 +79,9 @@ signals:
 
 private:
   bool updateNodeValueRecursive(MemWatchTreeNode* node, const QModelIndex& parent = QModelIndex(),
-                                const bool readSucess = true);
+                                bool readSucess = true);
   bool freezeNodeValueRecursive(MemWatchTreeNode* node, const QModelIndex& parent = QModelIndex(),
-                                const bool writeSucess = true);
+                                bool writeSucess = true);
   MemWatchTreeNode* getLeastDeepNodeFromList(const QList<MemWatchTreeNode*>& nodes) const;
   int getNodeDeepness(const MemWatchTreeNode* node) const;
 

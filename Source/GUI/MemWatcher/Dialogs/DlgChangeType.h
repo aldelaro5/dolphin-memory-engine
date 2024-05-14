@@ -9,7 +9,7 @@ class DlgChangeType : public QDialog
   Q_OBJECT
 
 public:
-  DlgChangeType(QWidget* parent, const int typeIndex, const size_t length);
+  DlgChangeType(QWidget* parent, int typeIndex, size_t length);
   int getTypeIndex() const;
   size_t getLength() const;
   void accept() override;

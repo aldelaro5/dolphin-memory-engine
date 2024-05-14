@@ -40,9 +40,15 @@ public:
 
   MemScanner();
   ~MemScanner();
-  Common::MemOperationReturnCode firstScan(const ScanFiter filter, const std::string& searchTerm1,
+
+  MemScanner(const MemScanner&) = delete;
+  MemScanner(MemScanner&&) = delete;
+  MemScanner& operator=(const MemScanner&) = delete;
+  MemScanner& operator=(MemScanner&&) = delete;
+
+  Common::MemOperationReturnCode firstScan(ScanFiter filter, const std::string& searchTerm1,
                                            const std::string& searchTerm2);
-  Common::MemOperationReturnCode nextScan(const ScanFiter filter, const std::string& searchTerm1,
+  Common::MemOperationReturnCode nextScan(ScanFiter filter, const std::string& searchTerm1,
                                           const std::string& searchTerm2);
   bool undoScan();
   void reset();
@@ -130,10 +136,10 @@ public:
     return CompareResult::equal;
   }
 
-  void setType(const Common::MemType type);
-  void setBase(const Common::MemBase base);
-  void setEnforceMemAlignment(const bool enforceAlignment);
-  void setIsSigned(const bool isSigned);
+  void setType(Common::MemType type);
+  void setBase(Common::MemBase base);
+  void setEnforceMemAlignment(bool enforceAlignment);
+  void setIsSigned(bool isSigned);
   void resetSearchRange();
   bool setSearchRangeBegin(u32 beginRange);
   bool setSearchRangeEnd(u32 endRange);
@@ -148,17 +154,16 @@ public:
   Common::MemBase getBase() const;
   size_t getLength() const;
   bool getIsUnsigned() const;
-  std::string getFormattedScannedValueAt(const int index) const;
+  std::string getFormattedScannedValueAt(int index) const;
   std::string getFormattedCurrentValueAt(int index) const;
   void removeResultAt(int index);
   static bool typeSupportsAdditionalOptions(Common::MemType type);
   bool hasScanStarted() const;
 
 private:
-  inline bool isHitNextScan(const ScanFiter filter, const char* memoryToCompare1,
+  inline bool isHitNextScan(ScanFiter filter, const char* memoryToCompare1,
                             const char* memoryToCompare2, const char* noOffset,
-                            const char* newerRAMCache, const size_t realSize,
-                            const u32 consoleOffset) const;
+                            const char* newerRAMCache, size_t realSize, u32 consoleOffset) const;
 
   bool m_searchInRangeBegin = false;
   bool m_searchInRangeEnd = false;

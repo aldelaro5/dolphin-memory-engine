@@ -12,10 +12,15 @@ public:
   CheatEngineParser();
   ~CheatEngineParser();
 
+  CheatEngineParser(const CheatEngineParser&) = delete;
+  CheatEngineParser(CheatEngineParser&&) = delete;
+  CheatEngineParser& operator=(const CheatEngineParser&) = delete;
+  CheatEngineParser& operator=(CheatEngineParser&&) = delete;
+
   QString getErrorMessages() const;
   bool hasACriticalErrorOccured() const;
   void setTableStartAddress(u32 tableStartAddress);
-  MemWatchTreeNode* parseCTFile(QIODevice* CTFileIODevice, const bool useDolphinPointer);
+  MemWatchTreeNode* parseCTFile(QIODevice* CTFileIODevice, bool useDolphinPointer);
 
 private:
   struct cheatEntryParsingState
@@ -33,11 +38,11 @@ private:
     bool validLengthForStr = true;
   };
 
-  MemWatchTreeNode* parseCheatTable(MemWatchTreeNode* rootNode, const bool useDolphinPointer);
-  MemWatchTreeNode* parseCheatEntries(MemWatchTreeNode* node, const bool useDolphinPointer);
-  void parseCheatEntry(MemWatchTreeNode* node, const bool useDolphinPointer);
+  MemWatchTreeNode* parseCheatTable(MemWatchTreeNode* rootNode, bool useDolphinPointer);
+  MemWatchTreeNode* parseCheatEntries(MemWatchTreeNode* node, bool useDolphinPointer);
+  void parseCheatEntry(MemWatchTreeNode* node, bool useDolphinPointer);
   void verifyCheatEntryParsingErrors(cheatEntryParsingState state, MemWatchEntry* entry,
-                                     bool isGroup, const bool useDolphinPointer);
+                                     bool isGroup, bool useDolphinPointer);
   static QString formatImportedEntryBasicInfo(const MemWatchEntry* entry);
 
   u32 m_tableStartAddress = 0;

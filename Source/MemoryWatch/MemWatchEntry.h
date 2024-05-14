@@ -18,6 +18,11 @@ public:
   explicit MemWatchEntry(MemWatchEntry* entry);
   ~MemWatchEntry();
 
+  MemWatchEntry(const MemWatchEntry&) = delete;
+  MemWatchEntry(MemWatchEntry&&) = delete;
+  MemWatchEntry& operator=(const MemWatchEntry&) = delete;
+  MemWatchEntry& operator=(MemWatchEntry&&) = delete;
+
   QString getLabel() const;
   Common::MemType getType() const;
   u32 getConsoleAddress() const;
@@ -27,31 +32,31 @@ public:
   size_t getLength() const;
   char* getMemory() const;
   bool isUnsigned() const;
-  int getPointerOffset(const int index) const;
+  int getPointerOffset(int index) const;
   std::vector<int> getPointerOffsets() const;
   size_t getPointerLevel() const;
   void setLabel(const QString& label);
-  void setConsoleAddress(const u32 address);
-  void setTypeAndLength(const Common::MemType type, const size_t length = 1);
-  void setBase(const Common::MemBase base);
-  void setLock(const bool doLock);
-  void setSignedUnsigned(const bool isUnsigned);
-  void setBoundToPointer(const bool boundToPointer);
-  void setPointerOffset(const int pointerOffset, const int index);
-  void addOffset(const int offset);
+  void setConsoleAddress(u32 address);
+  void setTypeAndLength(Common::MemType type, size_t length = 1);
+  void setBase(Common::MemBase base);
+  void setLock(bool doLock);
+  void setSignedUnsigned(bool isUnsigned);
+  void setBoundToPointer(bool boundToPointer);
+  void setPointerOffset(int pointerOffset, int index);
+  void addOffset(int offset);
   void removeOffset();
 
   Common::MemOperationReturnCode freeze();
 
-  u32 getAddressForPointerLevel(const int level) const;
-  std::string getAddressStringForPointerLevel(const int level) const;
+  u32 getAddressForPointerLevel(int level) const;
+  std::string getAddressStringForPointerLevel(int level) const;
   Common::MemOperationReturnCode readMemoryFromRAM();
 
   std::string getStringFromMemory() const;
   Common::MemOperationReturnCode writeMemoryFromString(const std::string& inputString);
 
 private:
-  Common::MemOperationReturnCode writeMemoryToRAM(const char* memory, const size_t size);
+  Common::MemOperationReturnCode writeMemoryToRAM(const char* memory, size_t size);
 
   QString m_label;
   u32 m_consoleAddress;

@@ -11,8 +11,12 @@ class MemWatchTreeNode
 public:
   explicit MemWatchTreeNode(MemWatchEntry* entry, MemWatchTreeNode* parent = nullptr,
                             bool isGroup = false, QString groupName = {});
-  MemWatchTreeNode(const MemWatchTreeNode& node);
   ~MemWatchTreeNode();
+
+  MemWatchTreeNode(const MemWatchTreeNode&) = delete;
+  MemWatchTreeNode(MemWatchTreeNode&&) = delete;
+  MemWatchTreeNode& operator=(const MemWatchTreeNode&) = delete;
+  MemWatchTreeNode& operator=(MemWatchTreeNode&&) = delete;
 
   bool isGroup() const;
   QString getGroupName() const;
@@ -22,15 +26,16 @@ public:
   QVector<MemWatchTreeNode*> getChildren() const;
   void setChildren(QVector<MemWatchTreeNode*> children);
   MemWatchTreeNode* getParent() const;
+  void setParent(MemWatchTreeNode* parent);
   int getRow() const;
   bool isValueEditing() const;
   bool hasChildren() const;
   int childrenCount() const;
-  void setValueEditing(const bool valueEditing);
+  void setValueEditing(bool valueEditing);
 
   void appendChild(MemWatchTreeNode* node);
-  void insertChild(const int row, MemWatchTreeNode* node);
-  void removeChild(const int row);
+  void insertChild(int row, MemWatchTreeNode* node);
+  void removeChild(int row);
   void clearAllChild();
 
   void readFromJson(const QJsonObject& json, MemWatchTreeNode* parent = nullptr);

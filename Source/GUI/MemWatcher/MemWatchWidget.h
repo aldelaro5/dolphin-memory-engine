@@ -15,6 +15,11 @@ public:
   explicit MemWatchWidget(QWidget* parent);
   ~MemWatchWidget() override;
 
+  MemWatchWidget(const MemWatchWidget&) = delete;
+  MemWatchWidget(MemWatchWidget&&) = delete;
+  MemWatchWidget& operator=(const MemWatchWidget&) = delete;
+  MemWatchWidget& operator=(MemWatchWidget&&) = delete;
+
   void onMemWatchContextMenuRequested(const QPoint& pos);
   void onDataEdited(const QModelIndex& index, const QVariant& value, int role);
   void onValueWriteError(const QModelIndex& index, Common::MemOperationReturnCode writeReturn);
@@ -59,6 +64,6 @@ private:
   QString m_watchListFile = "";
   bool m_hasUnsavedChanges = false;
 
-  bool isAnyAncestorSelected(const QModelIndex index) const;
-  QModelIndexList* simplifySelection() const;
+  bool isAnyAncestorSelected(const QModelIndex& index) const;
+  QModelIndexList simplifySelection() const;
 };

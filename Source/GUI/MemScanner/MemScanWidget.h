@@ -22,6 +22,11 @@ public:
   MemScanWidget();
   ~MemScanWidget() override;
 
+  MemScanWidget(const MemScanWidget&) = delete;
+  MemScanWidget(MemScanWidget&&) = delete;
+  MemScanWidget& operator=(const MemScanWidget&) = delete;
+  MemScanWidget& operator=(MemScanWidget&&) = delete;
+
   ResultsListModel* getResultListModel() const;
   std::vector<u32> getAllResults() const;
   QModelIndexList getSelectedResults() const;
@@ -30,7 +35,7 @@ public:
   void onScanMemTypeChanged();
   void onCurrentValuesUpdateTimer();
   void onResultListDoubleClicked(const QModelIndex& index);
-  void handleScannerErrors(const Common::MemOperationReturnCode errorCode);
+  void handleScannerErrors(Common::MemOperationReturnCode errorCode);
   void onFirstScan();
   void onNextScan();
   void onUndoScan();

@@ -1,5 +1,6 @@
 #include "MemWatchEntry.h"
 
+#include <array>
 #include <bitset>
 #include <cstring>
 #include <iomanip>
@@ -192,14 +193,14 @@ u32 MemWatchEntry::getAddressForPointerLevel(const int level) const
     return 0;
 
   u32 address = m_consoleAddress;
-  char addressBuffer[sizeof(u32)] = {0};
+  std::array<char, sizeof(u32)> addressBuffer{};
   for (int i = 0; i < level; ++i)
   {
     if (DolphinComm::DolphinAccessor::readFromRAM(
             Common::dolphinAddrToOffset(address, DolphinComm::DolphinAccessor::isARAMAccessible()),
-            addressBuffer, sizeof(u32), true))
+            addressBuffer.data(), sizeof(u32), true))
     {
-      std::memcpy(&address, addressBuffer, sizeof(u32));
+      std::memcpy(&address, addressBuffer.data(), sizeof(u32));
       if (DolphinComm::DolphinAccessor::isValidConsoleAddress(address))
         address += m_pointerOffsets.at(i);
       else
@@ -231,15 +232,15 @@ Common::MemOperationReturnCode MemWatchEntry::readMemoryFromRAM()
   u32 realConsoleAddress = m_consoleAddress;
   if (m_boundToPointer)
   {
-    char realConsoleAddressBuffer[sizeof(u32)] = {0};
+    std::array<char, sizeof(u32)> realConsoleAddressBuffer{};
     for (int offset : m_pointerOffsets)
     {
       if (DolphinComm::DolphinAccessor::readFromRAM(
               Common::dolphinAddrToOffset(realConsoleAddress,
                                           DolphinComm::DolphinAccessor::isARAMAccessible()),
-              realConsoleAddressBuffer, sizeof(u32), true))
+              realConsoleAddressBuffer.data(), sizeof(u32), true))
       {
-        std::memcpy(&realConsoleAddress, realConsoleAddressBuffer, sizeof(u32));
+        std::memcpy(&realConsoleAddress, realConsoleAddressBuffer.data(), sizeof(u32));
         if (DolphinComm::DolphinAccessor::isValidConsoleAddress(realConsoleAddress))
         {
           realConsoleAddress += offset;
@@ -276,15 +277,15 @@ Common::MemOperationReturnCode MemWatchEntry::writeMemoryToRAM(const char* memor
   u32 realConsoleAddress = m_consoleAddress;
   if (m_boundToPointer)
   {
-    char realConsoleAddressBuffer[sizeof(u32)] = {0};
+    std::array<char, sizeof(u32)> realConsoleAddressBuffer{};
     for (int offset : m_pointerOffsets)
     {
       if (DolphinComm::DolphinAccessor::readFromRAM(
               Common::dolphinAddrToOffset(realConsoleAddress,
                                           DolphinComm::DolphinAccessor::isARAMAccessible()),
-              realConsoleAddressBuffer, sizeof(u32), true))
+              realConsoleAddressBuffer.data(), sizeof(u32), true))
       {
-        std::memcpy(&realConsoleAddress, realConsoleAddressBuffer, sizeof(u32));
+        std::memcpy(&realConsoleAddress, realConsoleAddressBuffer.data(), sizeof(u32));
         if (DolphinComm::DolphinAccessor::isValidConsoleAddress(realConsoleAddress))
         {
           realConsoleAddress += offset;

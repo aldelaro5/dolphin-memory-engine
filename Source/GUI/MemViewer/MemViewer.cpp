@@ -89,7 +89,8 @@ void MemViewer::memoryValidityChanged(const bool valid)
       m_memViewStart = Common::ARAM_START;
       m_memViewEnd = Common::ARAM_END;
     }
-    verticalScrollBar()->setRange(0, ((m_memViewEnd - m_memViewStart) / m_numColumns) - m_numRows);
+    verticalScrollBar()->setRange(
+        0, (static_cast<int>(m_memViewEnd - m_memViewStart) / m_numColumns) - m_numRows);
   }
   viewport()->update();
 }
@@ -143,7 +144,8 @@ void MemViewer::jumpToAddress(const u32 address)
     m_carretBetweenHex = false;
 
     m_disableScrollContentEvent = true;
-    verticalScrollBar()->setValue(((address & 0xFFFFFFF0) - m_memViewStart) / m_numColumns);
+    verticalScrollBar()->setValue(static_cast<int>((address & 0xFFFFFFF0) - m_memViewStart) /
+                                  m_numColumns);
     m_disableScrollContentEvent = false;
 
     viewport()->update();
@@ -167,7 +169,8 @@ void MemViewer::changeMemoryRegion(const MemoryRegion region)
     m_memViewEnd = Common::GetMEM2End();
     break;
   }
-  verticalScrollBar()->setRange(0, ((m_memViewEnd - m_memViewStart) / m_numColumns) - m_numRows);
+  verticalScrollBar()->setRange(
+      0, (static_cast<int>(m_memViewEnd - m_memViewStart) / m_numColumns) - m_numRows);
 }
 
 MemViewer::bytePosFromMouse MemViewer::mousePosToBytePos(QPoint pos)
@@ -720,10 +723,11 @@ bool MemViewer::writeCharacterToSelectedMemory(char byteToWrite)
 
     const char selectedMemoryValue = *(m_updatedRawMemoryData + memoryOffset);
     if (m_carretBetweenHex)
-      byteToWrite = (selectedMemoryValue & static_cast<char>(0xF0)) | byteToWrite;
+      byteToWrite = static_cast<char>((static_cast<u32>(selectedMemoryValue) & 0xF0) |
+                                      static_cast<u32>(byteToWrite));
     else
-      byteToWrite =
-          (selectedMemoryValue & static_cast<char>(0x0F)) | static_cast<char>(byteToWrite << 4);
+      byteToWrite = static_cast<char>((static_cast<u32>(selectedMemoryValue) & 0x0F) |
+                                      (static_cast<u32>(byteToWrite) << 4));
   }
 
   const u32 offsetToWrite{
@@ -845,7 +849,7 @@ void MemViewer::renderColumnsHeaderText(QPainter& painter) const
   for (int i = 0; i < m_numColumns; i++)
   {
     std::stringstream ss;
-    int byte = (m_currentFirstAddress + i) & 0xF;
+    const u32 byte{(m_currentFirstAddress + static_cast<u32>(i)) & 0xF};
     ss << std::hex << std::uppercase << byte;
     std::string headerText = "." + ss.str();
     painter.drawText(posXHeaderText, m_charHeight, QString::fromStdString(headerText));

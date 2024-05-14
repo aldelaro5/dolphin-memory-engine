@@ -22,9 +22,8 @@ public:
   static void free();
   static void hook();
   static void unHook();
-  static bool readFromRAM(const u32 offset, char* buffer, const size_t size, const bool withBSwap);
-  static bool writeToRAM(const u32 offset, const char* buffer, const size_t size,
-                         const bool withBSwap);
+  static bool readFromRAM(u32 offset, char* buffer, size_t size, bool withBSwap);
+  static bool writeToRAM(u32 offset, const char* buffer, size_t size, bool withBSwap);
   static int getPID();
   static u64 getEmuRAMAddressStart();
   static DolphinStatus getStatus();
@@ -33,10 +32,10 @@ public:
   static bool isMEM2Present();
   static size_t getRAMTotalSize();
   static Common::MemOperationReturnCode readEntireRAM(char* buffer);
-  static std::string getFormattedValueFromMemory(const u32 ramIndex, Common::MemType memType,
+  static std::string getFormattedValueFromMemory(u32 ramIndex, Common::MemType memType,
                                                  size_t memSize, Common::MemBase memBase,
                                                  bool memIsUnsigned);
-  static bool isValidConsoleAddress(const u32 address);
+  static bool isValidConsoleAddress(u32 address);
 
 private:
   static IDolphinProcess* m_instance;

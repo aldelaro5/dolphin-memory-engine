@@ -14,6 +14,11 @@ public:
   explicit DlgSettings(QWidget* parent = nullptr);
   ~DlgSettings() override;
 
+  DlgSettings(const DlgSettings&) = delete;
+  DlgSettings(DlgSettings&&) = delete;
+  DlgSettings& operator=(const DlgSettings&) = delete;
+  DlgSettings& operator=(DlgSettings&&) = delete;
+
 private:
   void loadSettings();
   void saveSettings() const;
