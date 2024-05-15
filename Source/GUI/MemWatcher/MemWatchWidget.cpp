@@ -87,9 +87,8 @@ void MemWatchWidget::initialiseWidgets()
   QShortcut* pasteWatchShortcut =
       new QShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key::Key_V), m_watchView);
   connect(pasteWatchShortcut, &QShortcut::activated, this, [this] {
-    pasteWatchFromClipBoard(
-        MemWatchModel::getTreeNodeFromIndex(m_watchView->selectionModel()->currentIndex()),
-        m_watchView->selectionModel()->currentIndex().row() + 1);
+    const QModelIndexList selectedIndexes{m_watchView->selectionModel()->selectedIndexes()};
+    pasteWatchFromClipBoard(selectedIndexes.empty() ? QModelIndex{} : selectedIndexes.back());
   });
 
   m_btnAddGroup = new QPushButton(tr("Add group"), this);
@@ -256,9 +255,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   contextMenu->addAction(copy);
 
   QAction* paste = new QAction(tr("&Paste"), this);
-  connect(paste, &QAction::triggered, this, [this, node] {
-    pasteWatchFromClipBoard(node, m_watchView->selectionModel()->currentIndex().row() + 1);
-  });
+  connect(paste, &QAction::triggered, this, [this, index] { pasteWatchFromClipBoard(index); });
   contextMenu->addAction(paste);
 
   contextMenu->addSeparator();
@@ -346,35 +343,22 @@ void MemWatchWidget::copySelectedWatchesToClipBoard()
   clipboard->setText(nodeJsonStr);
 }
 
-void MemWatchWidget::pasteWatchFromClipBoard(MemWatchTreeNode* node, int row)
+void MemWatchWidget::pasteWatchFromClipBoard(const QModelIndex& referenceIndex)
 {
-  QClipboard* clipboard = QApplication::clipboard();
-  QString nodeStr = clipboard->text();
-
-  QJsonDocument loadDoc(QJsonDocument::fromJson(nodeStr.toUtf8()));
-  MemWatchTreeNode* copiedRootNode = new MemWatchTreeNode(nullptr);
-  copiedRootNode->readFromJson(loadDoc.object(), nullptr);
-  if (copiedRootNode->hasChildren())
+  MemWatchTreeNode copiedRootNode(nullptr);
   {
-    int numberIterated = 0;
-    for (MemWatchTreeNode* const child : copiedRootNode->getChildren())
-    {
-      if (node == nullptr)
-        node = m_watchModel->getRootNode();
-      if (node->isGroup() || (node->getParent() == nullptr))
-      {
-        node->appendChild(child);
-      }
-      else
-      {
-        node->getParent()->insertChild(row + numberIterated, child);
-      }
-      numberIterated++;
-    }
-    emit m_watchModel->layoutChanged();
-
-    m_hasUnsavedChanges = true;
+    const QString nodeStr{QApplication::clipboard()->text()};
+    const QJsonDocument loadDoc{QJsonDocument::fromJson(nodeStr.toUtf8())};
+    copiedRootNode.readFromJson(loadDoc.object(), nullptr);
   }
+
+  const QVector<MemWatchTreeNode*> children{copiedRootNode.getChildren()};
+  copiedRootNode.clearAllChild();
+
+  std::vector<MemWatchTreeNode*> childrenVec(children.constBegin(), children.constEnd());
+  m_watchModel->addNodes(childrenVec, referenceIndex);
+
+  m_hasUnsavedChanges = true;
 }
 
 void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
