@@ -506,7 +506,8 @@ void MemWatchWidget::onAddGroup()
                                        "Enter the group name:", QLineEdit::Normal, "", &ok);
   if (ok && !text.isEmpty())
   {
-    m_watchModel->addGroup(text);
+    const QModelIndexList selectedIndexes{m_watchView->selectionModel()->selectedIndexes()};
+    m_watchModel->addGroup(text, selectedIndexes.empty() ? QModelIndex{} : selectedIndexes.back());
     m_hasUnsavedChanges = true;
   }
 }
@@ -520,7 +521,8 @@ void MemWatchWidget::onAddWatchEntry()
 
 void MemWatchWidget::addWatchEntry(MemWatchEntry* entry)
 {
-  m_watchModel->addEntry(entry);
+  const QModelIndexList selectedIndexes{m_watchView->selectionModel()->selectedIndexes()};
+  m_watchModel->addEntry(entry, selectedIndexes.empty() ? QModelIndex{} : selectedIndexes.back());
   m_hasUnsavedChanges = true;
 }
 
