@@ -30,6 +30,7 @@ public:
   void onLockSelection(bool lockStatus);
   void onDeleteSelection();
   void onDropSucceeded();
+  void onRowsInserted(const QModelIndex& parent, int first, int last);
   void openWatchFile();
   void setSelectedWatchesBase(MemWatchEntry* entry, Common::MemBase base);
   void copySelectedWatchesToClipBoard();

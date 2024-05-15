@@ -47,6 +47,7 @@ void MemWatchWidget::initialiseWidgets()
   connect(m_watchModel, &MemWatchModel::writeFailed, this, &MemWatchWidget::onValueWriteError);
   connect(m_watchModel, &MemWatchModel::dropSucceeded, this, &MemWatchWidget::onDropSucceeded);
   connect(m_watchModel, &MemWatchModel::readFailed, this, &MemWatchWidget::mustUnhook);
+  connect(m_watchModel, &MemWatchModel::rowsInserted, this, &MemWatchWidget::onRowsInserted);
 
   m_watchDelegate = new MemWatchDelegate();
 
@@ -615,6 +616,19 @@ void MemWatchWidget::onDeleteSelection()
 void MemWatchWidget::onDropSucceeded()
 {
   m_hasUnsavedChanges = true;
+}
+
+void MemWatchWidget::onRowsInserted(const QModelIndex& parent, const int first, const int last)
+{
+  const QModelIndex firstIndex{m_watchModel->index(first, 0, parent)};
+  const QModelIndex lastIndex{m_watchModel->index(last, 0, parent)};
+  const QItemSelection selection{firstIndex, lastIndex};
+
+  QItemSelectionModel* const selectionModel{m_watchView->selectionModel()};
+  selectionModel->select(selection, QItemSelectionModel::ClearAndSelect);
+  selectionModel->setCurrentIndex(lastIndex, QItemSelectionModel::Current);
+
+  QTimer::singleShot(0, [this, lastIndex] { m_watchView->scrollTo(lastIndex); });
 }
 
 QTimer* MemWatchWidget::getUpdateTimer() const
