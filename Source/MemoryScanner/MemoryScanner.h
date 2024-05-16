@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cassert>
 #include <cmath>
 #include <cstring>
 #include <stack>
