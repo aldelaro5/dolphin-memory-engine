@@ -112,7 +112,7 @@ void MemWatchTreeNode::removeChild(const int row)
   m_children.remove(row);
 }
 
-void MemWatchTreeNode::clearAllChild()
+void MemWatchTreeNode::removeChildren()
 {
   m_children.clear();
 }

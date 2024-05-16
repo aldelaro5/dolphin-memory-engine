@@ -328,8 +328,8 @@ void MemWatchWidget::copySelectedWatchesToClipBoard()
     }
     rootNodeCopy.writeToJson(jsonNode);
 
-    // Clear borrowed children before going out of scope.
-    rootNodeCopy.clearAllChild();
+    // Remove borrowed children before going out of scope.
+    rootNodeCopy.removeChildren();
     for (auto& [childNode, parentNode] : parentMap)
     {
       childNode->setParent(parentNode);
@@ -353,7 +353,7 @@ void MemWatchWidget::pasteWatchFromClipBoard(const QModelIndex& referenceIndex)
   }
 
   const QVector<MemWatchTreeNode*> children{copiedRootNode.getChildren()};
-  copiedRootNode.clearAllChild();
+  copiedRootNode.removeChildren();
 
   std::vector<MemWatchTreeNode*> childrenVec(children.constBegin(), children.constEnd());
   m_watchModel->addNodes(childrenVec, referenceIndex);
