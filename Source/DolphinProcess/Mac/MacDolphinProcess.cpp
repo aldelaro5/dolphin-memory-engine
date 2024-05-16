@@ -4,7 +4,6 @@
 #include "../../Common/CommonUtils.h"
 #include "../../Common/MemoryCommon.h"
 
-#include <cassert>
 #include <cstdlib>
 #include <mach/mach_vm.h>
 #include <memory>
@@ -171,7 +170,6 @@ bool MacDolphinProcess::readFromRAM(const u32 offset, char* buffer, size_t size,
       break;
     }
     default:
-      assert(0 && "Unexpected type size");
       break;
     }
   }
@@ -231,7 +229,6 @@ bool MacDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const s
       break;
     }
     default:
-      assert(0 && "Unexpected type size");
       break;
     }
   }

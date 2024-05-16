@@ -4,7 +4,6 @@
 #include "../../Common/CommonUtils.h"
 #include "../../Common/MemoryCommon.h"
 
-#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <dirent.h>
@@ -204,7 +203,6 @@ bool LinuxDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size
       break;
     }
     default:
-      assert(0 && "Unexpected type size");
       break;
     }
   }
@@ -272,13 +270,13 @@ bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const
       break;
     }
     default:
-      assert(0 && "Unexpected type size");
       break;
     }
   }
-  delete[] bufferCopy;
 
   const ssize_t nwrote{process_vm_writev(m_PID, &local, 1, &remote, 1, 0)};
+  delete[] bufferCopy;
+
   if (nwrote == -1)
   {
     // A more specific error type should be available in `errno` (if ever interested).

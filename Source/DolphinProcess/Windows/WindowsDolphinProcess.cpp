@@ -8,7 +8,6 @@
 #ifdef UNICODE
 #include <codecvt>
 #endif
-#include <cassert>
 #include <cstdlib>
 #include <string>
 #include <tlhelp32.h>
@@ -207,7 +206,6 @@ bool WindowsDolphinProcess::readFromRAM(const u32 offset, char* buffer, const si
         break;
       }
       default:
-        assert(0 && "Unexpected type size");
         break;
       }
     }
@@ -268,7 +266,6 @@ bool WindowsDolphinProcess::writeToRAM(const u32 offset, const char* buffer, con
       break;
     }
     default:
-      assert(0 && "Unexpected type size");
       break;
     }
   }
