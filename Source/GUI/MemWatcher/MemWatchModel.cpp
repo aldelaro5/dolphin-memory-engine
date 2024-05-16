@@ -181,8 +181,9 @@ void MemWatchModel::editEntry(MemWatchEntry* entry, const QModelIndex& index)
 
 void MemWatchModel::clearRoot()
 {
-  m_rootNode->removeChildren();
-  emit layoutChanged();
+  beginResetModel();
+  m_rootNode->deleteChildren();
+  endResetModel();
 }
 
 void MemWatchModel::removeNode(const QModelIndex& index)
