@@ -273,9 +273,10 @@ bool LinuxDolphinProcess::writeToRAM(const u32 offset, const char* buffer, const
       break;
     }
   }
-  delete[] bufferCopy;
 
   const ssize_t nwrote{process_vm_writev(m_PID, &local, 1, &remote, 1, 0)};
+  delete[] bufferCopy;
+
   if (nwrote == -1)
   {
     // A more specific error type should be available in `errno` (if ever interested).
