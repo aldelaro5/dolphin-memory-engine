@@ -86,7 +86,7 @@ void MainWindow::makeMenus()
   m_actScanner->setCheckable(true);
   QTimer::singleShot(0, [this]() {
     QSignalBlocker signalBlocker(m_actScanner);
-    m_actScanner->setChecked(m_scanner->isVisible());
+    m_actScanner->setChecked(m_splitter->sizes()[0] > 0);
   });
 
   m_actQuit = new QAction(tr("&Quit"), this);
