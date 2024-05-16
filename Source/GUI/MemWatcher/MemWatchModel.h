@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <QAbstractItemModel>
 #include <QFile>
 #include <QJsonObject>
@@ -54,8 +56,9 @@ public:
 
   void changeType(const QModelIndex& index, Common::MemType type, size_t length);
   static MemWatchEntry* getEntryFromIndex(const QModelIndex& index);
-  void addGroup(const QString& name);
-  void addEntry(MemWatchEntry* entry);
+  void addNodes(const std::vector<MemWatchTreeNode*>& nodes, const QModelIndex& referenceIndex = QModelIndex{});
+  void addGroup(const QString& name, const QModelIndex& referenceIndex = QModelIndex{});
+  void addEntry(MemWatchEntry* entry, const QModelIndex& referenceIndex = QModelIndex{});
   void editEntry(MemWatchEntry* entry, const QModelIndex& index);
   void sortRecursive(int column, Qt::SortOrder order, MemWatchTreeNode* parent);
   void clearRoot();
