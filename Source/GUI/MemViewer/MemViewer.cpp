@@ -497,9 +497,11 @@ void MemViewer::addByteIndexAsWatch(int index)
 {
   MemWatchEntry* entry = new MemWatchEntry();
   entry->setConsoleAddress(m_currentFirstAddress + index);
-  DlgAddWatchEntry* dlg = new DlgAddWatchEntry(true, entry, this);
-  if (dlg->exec() == QDialog::Accepted)
-    emit addWatch(dlg->stealEntry());
+  DlgAddWatchEntry dlg(true, entry, this);
+  if (dlg.exec() == QDialog::Accepted)
+  {
+    emit addWatch(dlg.stealEntry());
+  }
 }
 
 bool MemViewer::handleNaviguationKey(const int key, bool shiftIsHeld)
