@@ -381,10 +381,10 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
     else if (index.column() == MemWatchModel::WATCH_COL_ADDRESS && !node->isGroup())
     {
       MemWatchEntry* entryCopy = new MemWatchEntry(node->getEntry());
-      DlgAddWatchEntry* dlg = new DlgAddWatchEntry(false, entryCopy, this);
-      if (dlg->exec() == QDialog::Accepted)
+      DlgAddWatchEntry dlg(false, entryCopy, this);
+      if (dlg.exec() == QDialog::Accepted)
       {
-        m_watchModel->editEntry(entryCopy, index);
+        m_watchModel->editEntry(dlg.stealEntry(), index);
         m_hasUnsavedChanges = true;
       }
     }
@@ -499,9 +499,11 @@ void MemWatchWidget::onAddGroup()
 
 void MemWatchWidget::onAddWatchEntry()
 {
-  DlgAddWatchEntry* dlg = new DlgAddWatchEntry(true, nullptr, this);
-  if (dlg->exec() == QDialog::Accepted)
-    addWatchEntry(dlg->stealEntry());
+  DlgAddWatchEntry dlg(true, nullptr, this);
+  if (dlg.exec() == QDialog::Accepted)
+  {
+    addWatchEntry(dlg.stealEntry());
+  }
 }
 
 void MemWatchWidget::addWatchEntry(MemWatchEntry* entry)
