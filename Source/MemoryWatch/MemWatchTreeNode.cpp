@@ -15,10 +15,10 @@ MemWatchTreeNode::MemWatchTreeNode(MemWatchEntry* const entry, MemWatchTreeNode*
 
 MemWatchTreeNode::~MemWatchTreeNode()
 {
-  if (hasChildren())
-    qDeleteAll(m_children);
+  deleteChildren();
   m_parent = nullptr;
   delete m_entry;
+  m_entry = nullptr;
 }
 
 bool MemWatchTreeNode::isGroup() const
@@ -112,8 +112,14 @@ void MemWatchTreeNode::removeChild(const int row)
   m_children.remove(row);
 }
 
-void MemWatchTreeNode::clearAllChild()
+void MemWatchTreeNode::removeChildren()
 {
+  m_children.clear();
+}
+
+void MemWatchTreeNode::deleteChildren()
+{
+  qDeleteAll(m_children);
   m_children.clear();
 }
 
