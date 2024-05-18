@@ -1,6 +1,7 @@
 #include "MemWatchModel.h"
 
 #include <QDataStream>
+#include <QIcon>
 #include <QMimeData>
 
 #include <cassert>
@@ -277,6 +278,12 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
   {
     if (index.column() == 0 && (role == Qt::DisplayRole || role == Qt::EditRole))
       return item->getGroupName();
+    if (index.column() == 0 && role == Qt::DecorationRole)
+    {
+      static const QIcon s_folderIcon(":/folder.svg");
+      static const QIcon s_emptyFolderIcon(":/folder_empty.svg");
+      return item->hasChildren() ? s_folderIcon : s_emptyFolderIcon;
+    }
   }
   return {};
 }

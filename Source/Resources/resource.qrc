@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
+        <file>folder_empty.svg</file>
+        <file>folder.svg</file>
         <file>logo.svg</file>
     </qresource>
 </RCC>
