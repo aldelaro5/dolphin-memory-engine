@@ -585,7 +585,7 @@ void MemWatchWidget::onDeleteSelection()
 
   QMessageBox* confirmationBox =
       new QMessageBox(QMessageBox::Question, QString("Deleting confirmation"), confirmationMsg,
-                      QMessageBox::Yes | QMessageBox::No, this);
+                      QMessageBox::Yes | QMessageBox::Cancel, this);
   confirmationBox->setDefaultButton(QMessageBox::Yes);
   if (confirmationBox->exec() == QMessageBox::Yes)
   {
