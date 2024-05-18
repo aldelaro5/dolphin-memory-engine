@@ -36,8 +36,8 @@ public:
   void copySelectedWatchesToClipBoard();
   void cutSelectedWatchesToClipBoard();
   void pasteWatchFromClipBoard(const QModelIndex& referenceIndex);
-  void saveWatchFile();
-  void saveAsWatchFile();
+  bool saveWatchFile();
+  bool saveAsWatchFile();
   void clearWatchList();
   void importFromCTFile();
   void exportWatchListAsCSV();
