@@ -702,7 +702,10 @@ MemWatchModel::CTParsingErrors MemWatchModel::importRootFromCTFile(QFile* const 
   parser.setTableStartAddress(CEStart);
   MemWatchTreeNode* importedRoot = parser.parseCTFile(CTFile, useDolphinPointer);
   if (importedRoot != nullptr)
+  {
+    delete m_rootNode;
     m_rootNode = importedRoot;
+  }
 
   CTParsingErrors parsingErrors;
   parsingErrors.errorStr = parser.getErrorMessages();
