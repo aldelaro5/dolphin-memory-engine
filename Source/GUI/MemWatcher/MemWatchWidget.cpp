@@ -672,7 +672,7 @@ void MemWatchWidget::openWatchFile()
   }
 }
 
-void MemWatchWidget::saveWatchFile()
+bool MemWatchWidget::saveWatchFile()
 {
   if (QFile::exists(m_watchListFile))
   {
@@ -684,7 +684,7 @@ void MemWatchWidget::saveWatchFile()
           "An error occured while creating and opening the watch list file for writting",
           QMessageBox::Ok, this);
       errorBox->exec();
-      return;
+      return false;
     }
     QJsonObject root;
     m_watchModel->writeRootToJsonRecursive(root);
@@ -692,14 +692,12 @@ void MemWatchWidget::saveWatchFile()
     watchFile.write(saveDoc.toJson());
     watchFile.close();
     m_hasUnsavedChanges = false;
+    return true;
   }
-  else
-  {
-    saveAsWatchFile();
-  }
+  return saveAsWatchFile();
 }
 
-void MemWatchWidget::saveAsWatchFile()
+bool MemWatchWidget::saveAsWatchFile()
 {
   QString fileName = QFileDialog::getSaveFileName(this, "Save watch list", m_watchListFile,
                                                   "Dolphin memory watches file (*.dmw)");
@@ -715,7 +713,7 @@ void MemWatchWidget::saveAsWatchFile()
           "An error occured while creating and opening the watch list file for writting",
           QMessageBox::Ok, this);
       errorBox->exec();
-      return;
+      return false;
     }
     QJsonObject root;
     m_watchModel->writeRootToJsonRecursive(root);
@@ -724,7 +722,9 @@ void MemWatchWidget::saveAsWatchFile()
     watchFile.close();
     m_watchListFile = fileName;
     m_hasUnsavedChanges = false;
+    return true;
   }
+  return false;
 }
 
 void MemWatchWidget::clearWatchList()
@@ -844,8 +844,7 @@ bool MemWatchWidget::warnIfUnsavedChanges()
     case QMessageBox::No:
       return true;
     case QMessageBox::Yes:
-      saveWatchFile();
-      return true;
+      return saveWatchFile();
     default:
       return false;
     }
