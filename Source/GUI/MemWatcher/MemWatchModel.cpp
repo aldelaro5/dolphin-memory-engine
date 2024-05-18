@@ -186,7 +186,7 @@ void MemWatchModel::clearRoot()
   endResetModel();
 }
 
-void MemWatchModel::removeNode(const QModelIndex& index)
+void MemWatchModel::deleteNode(const QModelIndex& index)
 {
   if (index.isValid())
   {

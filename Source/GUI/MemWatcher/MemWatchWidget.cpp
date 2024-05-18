@@ -301,7 +301,9 @@ void MemWatchWidget::cutSelectedWatchesToClipBoard()
   if (!cutList.empty())
   {
     for (const auto& index : cutList)
-      m_watchModel->removeNode(index);
+    {
+      m_watchModel->deleteNode(index);
+    }
 
     m_hasUnsavedChanges = true;
   }
@@ -592,7 +594,7 @@ void MemWatchWidget::onDeleteSelection()
     const QModelIndexList toDeleteList{simplifySelection()};
     for (const auto& index : toDeleteList)
     {
-      m_watchModel->removeNode(index);
+      m_watchModel->deleteNode(index);
     }
 
     m_hasUnsavedChanges = true;
