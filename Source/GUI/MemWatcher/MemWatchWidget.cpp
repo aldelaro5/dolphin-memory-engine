@@ -732,7 +732,11 @@ void MemWatchWidget::clearWatchList()
   if (!m_watchModel->hasAnyNodes())
     return;
 
-  if (!warnIfUnsavedChanges())
+  const QString msg{tr("Are you sure you want to delete these watches and/or groups?")};
+  QMessageBox box(QMessageBox::Question, tr("Clear watch list confirmation"), msg,
+                  QMessageBox::Yes | QMessageBox::Cancel, this);
+  box.setDefaultButton(QMessageBox::Yes);
+  if (box.exec() != QMessageBox::Yes)
     return;
 
   m_watchModel->clearRoot();
