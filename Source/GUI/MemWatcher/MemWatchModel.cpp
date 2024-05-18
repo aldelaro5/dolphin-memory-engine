@@ -176,7 +176,7 @@ void MemWatchModel::editEntry(MemWatchEntry* entry, const QModelIndex& index)
 {
   MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
   node->setEntry(entry);
-  emit layoutChanged();
+  emit dataChanged(index.siblingAtColumn(0), index.siblingAtColumn(columnCount({}) - 1));
 }
 
 void MemWatchModel::clearRoot()
@@ -572,8 +572,9 @@ bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, i
 
 void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json)
 {
+  beginResetModel();
   m_rootNode->readFromJson(json);
-  emit layoutChanged();
+  endResetModel();
 }
 
 MemWatchModel::CTParsingErrors MemWatchModel::importRootFromCTFile(QFile* const CTFile,
@@ -584,15 +585,14 @@ MemWatchModel::CTParsingErrors MemWatchModel::importRootFromCTFile(QFile* const 
   parser.setTableStartAddress(CEStart);
   MemWatchTreeNode* importedRoot = parser.parseCTFile(CTFile, useDolphinPointer);
   if (importedRoot != nullptr)
+  {
+    beginResetModel();
+    delete m_rootNode;
     m_rootNode = importedRoot;
+    endResetModel();
+  }
 
-  CTParsingErrors parsingErrors;
-  parsingErrors.errorStr = parser.getErrorMessages();
-  parsingErrors.isCritical = parser.hasACriticalErrorOccured();
-  if (!parsingErrors.isCritical)
-    emit layoutChanged();
-
-  return parsingErrors;
+  return {parser.getErrorMessages(), parser.hasACriticalErrorOccured()};
 }
 
 void MemWatchModel::writeRootToJsonRecursive(QJsonObject& json) const
