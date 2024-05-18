@@ -50,7 +50,6 @@ public:
   Qt::DropActions supportedDragActions() const override;
   QStringList mimeTypes() const override;
   QMimeData* mimeData(const QModelIndexList& indexes) const override;
-  void sort(int column, Qt::SortOrder order) override;
   bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column,
                     const QModelIndex& parent) override;
 
@@ -60,7 +59,6 @@ public:
   void addGroup(const QString& name, const QModelIndex& referenceIndex = QModelIndex{});
   void addEntry(MemWatchEntry* entry, const QModelIndex& referenceIndex = QModelIndex{});
   void editEntry(MemWatchEntry* entry, const QModelIndex& index);
-  void sortRecursive(int column, Qt::SortOrder order, MemWatchTreeNode* parent);
   void clearRoot();
   void removeNode(const QModelIndex& index);
   void onUpdateTimer();
