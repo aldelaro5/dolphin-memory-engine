@@ -4,7 +4,9 @@
 #include <iostream>
 
 #include <qcoreapplication.h>
+#include <QDir>
 #include <qfile.h>
+#include <QFileInfo>
 
 namespace
 {
@@ -32,6 +34,7 @@ SConfig::SConfig()
   }
 
   const QString lockFilepath{m_settings->fileName() + "_lock"};
+  QDir().mkpath(QFileInfo{lockFilepath}.absolutePath());
   m_lockFile = std::make_unique<QLockFile>(lockFilepath);
   if (!m_lockFile->tryLock())
   {
