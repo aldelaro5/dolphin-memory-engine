@@ -283,7 +283,6 @@ void MainWindow::updateDolphinHookingStatus()
         tr("Hooked successfully to Dolphin, current start address: ") +
         QString::number(DolphinComm::DolphinAccessor::getEmuRAMAddressStart(), 16).toUpper());
     m_scanner->setEnabled(true);
-    m_watcher->setEnabled(true);
     m_copier->setEnabled(true);
     m_actMemoryViewer->setEnabled(true);
     m_actCopyMemory->setEnabled(true);
@@ -295,7 +294,6 @@ void MainWindow::updateDolphinHookingStatus()
   {
     m_lblDolphinStatus->setText(tr("Cannot hook to Dolphin, the process is not running"));
     m_scanner->setDisabled(true);
-    m_watcher->setDisabled(true);
     m_copier->setDisabled(true);
     m_actMemoryViewer->setDisabled(true);
     m_actCopyMemory->setDisabled(true);
@@ -308,7 +306,6 @@ void MainWindow::updateDolphinHookingStatus()
     m_lblDolphinStatus->setText(
         tr("Cannot hook to Dolphin, the process is running, but no emulation has been started"));
     m_scanner->setDisabled(true);
-    m_watcher->setDisabled(true);
     m_copier->setDisabled(true);
     m_actMemoryViewer->setDisabled(true);
     m_actCopyMemory->setDisabled(true);
@@ -320,7 +317,6 @@ void MainWindow::updateDolphinHookingStatus()
   {
     m_lblDolphinStatus->setText(tr("Unhooked, press \"Hook\" to hook to Dolphin again"));
     m_scanner->setDisabled(true);
-    m_watcher->setDisabled(true);
     m_copier->setDisabled(true);
     m_actMemoryViewer->setDisabled(true);
     m_actCopyMemory->setDisabled(true);
