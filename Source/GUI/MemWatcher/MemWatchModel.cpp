@@ -280,12 +280,6 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
         break;
       }
     }
-    else if (role == Qt::CheckStateRole && index.column() == WATCH_COL_LOCK)
-    {
-      if (entry->isLocked())
-        return Qt::Checked;
-      return Qt::Unchecked;
-    }
   }
   else
   {
@@ -349,12 +343,6 @@ bool MemWatchModel::editData(const QModelIndex& index, const QVariant& value, co
       }
       }
     }
-    else if (role == Qt::CheckStateRole && index.column() == WATCH_COL_LOCK)
-    {
-      value == Qt::Checked ? entry->setLock(true) : entry->setLock(false);
-      emit dataChanged(index, index);
-      return true;
-    }
     else
     {
       return false;
@@ -388,7 +376,7 @@ Qt::ItemFlags MemWatchModel::flags(const QModelIndex& index) const
   }
 
   if (index.column() == WATCH_COL_LOCK)
-    return flags |= Qt::ItemIsUserCheckable;
+    return flags;
 
   if (index.column() != WATCH_COL_ADDRESS && index.column() != WATCH_COL_TYPE)
     flags |= Qt::ItemIsEditable;
