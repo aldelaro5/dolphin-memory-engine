@@ -12,6 +12,7 @@
 
 #include "../../CheatEngineParser/CheatEngineParser.h"
 #include "../../Common/CommonUtils.h"
+#include "../../DolphinProcess/DolphinAccessor.h"
 #include "../GUICommon.h"
 
 namespace
@@ -378,8 +379,18 @@ Qt::ItemFlags MemWatchModel::flags(const QModelIndex& index) const
   if (index.column() == WATCH_COL_LOCK)
     return flags;
 
-  if (index.column() != WATCH_COL_ADDRESS && index.column() != WATCH_COL_TYPE)
+  if (index.column() == WATCH_COL_LABEL)
+  {
     flags |= Qt::ItemIsEditable;
+  }
+  else if (index.column() == WATCH_COL_VALUE)
+  {
+    const bool hooked{DolphinComm::DolphinAccessor::getStatus() ==
+                      DolphinComm::DolphinAccessor::DolphinStatus::hooked};
+    const Qt::ItemFlag itemIsEditable{hooked ? Qt::ItemIsEditable : Qt::NoItemFlags};
+    flags |= itemIsEditable;
+  }
+
   return flags;
 }
 
