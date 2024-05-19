@@ -1,5 +1,6 @@
 #include "MemWatchDelegate.h"
 
+#include <QFontDatabase>
 #include <QLineEdit>
 
 #include "../../MemoryWatch/MemWatchTreeNode.h"
@@ -14,7 +15,10 @@ QWidget* MemWatchDelegate::createEditor(QWidget* parent, const QStyleOptionViewI
   MemWatchTreeNode* const node{MemWatchModel::getTreeNodeFromIndex(index)};
   QLineEdit* editor = new QLineEdit(parent);
   if (index.column() == MemWatchModel::WATCH_COL_VALUE && !node->isGroup())
+  {
+    editor->setFont(QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont));
     node->setValueEditing(true);
+  }
   GUICommon::g_valueEditing = true;
   return editor;
 }

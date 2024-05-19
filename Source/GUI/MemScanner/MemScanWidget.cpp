@@ -1,5 +1,6 @@
 #include "MemScanWidget.h"
 
+#include <QFontDatabase>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QMessageBox>
@@ -97,6 +98,12 @@ void MemScanWidget::initialiseWidgets()
   m_txbSearchRange2->setMaxLength(8);
   m_txbSearchRange2->setPlaceholderText("Search End (Optional)");
   m_txbSearchRange2->setToolTip("Search Range End (Optional)");
+
+  const QFont fixedFont{QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
+  m_txbSearchTerm1->setFont(fixedFont);
+  m_txbSearchTerm2->setFont(fixedFont);
+  m_txbSearchRange1->setFont(fixedFont);
+  m_txbSearchRange2->setFont(fixedFont);
 
   m_searchTerm2Widget = new QWidget();
 

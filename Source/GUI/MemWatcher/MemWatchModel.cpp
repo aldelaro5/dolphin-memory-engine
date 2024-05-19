@@ -1,6 +1,7 @@
 #include "MemWatchModel.h"
 
 #include <QDataStream>
+#include <QFontDatabase>
 #include <QIcon>
 #include <QMimeData>
 
@@ -233,10 +234,22 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
   if (!index.isValid())
     return {};
 
+  const int column{index.column()};
+
   MemWatchTreeNode* item = static_cast<MemWatchTreeNode*>(index.internalPointer());
 
   if (!item->isGroup())
   {
+    if (role == Qt::FontRole)
+    {
+      if (column == WATCH_COL_ADDRESS || column == WATCH_COL_VALUE)
+      {
+        static const QFont s_fixedFont{
+            QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
+        return s_fixedFont;
+      }
+    }
+
     if (role == Qt::EditRole && index.column() == WATCH_COL_TYPE)
       return {static_cast<int>(item->getEntry()->getType())};
 
