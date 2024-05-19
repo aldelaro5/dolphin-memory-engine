@@ -56,6 +56,8 @@ void MemWatchWidget::initialiseWidgets()
   m_watchView->setAcceptDrops(true);
   m_watchView->setDragDropMode(QAbstractItemView::InternalMove);
   m_watchView->setDropIndicatorShown(true);
+  m_watchView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+  m_watchView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
   m_watchView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_watchView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_watchView->setContextMenuPolicy(Qt::CustomContextMenu);

@@ -38,6 +38,8 @@ void MemScanWidget::initialiseWidgets()
   m_tblResulstList->horizontalHeader()->resizeSection(ResultsListModel::RESULT_COL_ADDRESS, 125);
   m_tblResulstList->horizontalHeader()->resizeSection(ResultsListModel::RESULT_COL_SCANNED, 150);
 
+  m_tblResulstList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+  m_tblResulstList->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
   m_tblResulstList->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_tblResulstList->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_tblResulstList->setMinimumWidth(385);
