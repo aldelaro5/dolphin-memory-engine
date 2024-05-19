@@ -68,10 +68,16 @@ void MemWatchWidget::initialiseWidgets()
   m_watchView->setItemDelegate(m_watchDelegate);
   m_watchView->setModel(m_watchModel);
 
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LOCK, 50);
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LABEL, 225);
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_TYPE, 130);
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_ADDRESS, 120);
+  const int charWidth{m_watchView->fontMetrics().averageCharWidth()};
+  m_watchView->header()->setMinimumSectionSize(charWidth);
+  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LABEL, charWidth * 35);
+
+  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_TYPE,
+                                              QHeaderView::ResizeToContents);
+  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_ADDRESS,
+                                              QHeaderView::ResizeToContents);
+  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_LOCK,
+                                              QHeaderView::ResizeToContents);
 
   QShortcut* deleteWatchShortcut = new QShortcut(QKeySequence::Delete, m_watchView);
   connect(deleteWatchShortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteSelection);

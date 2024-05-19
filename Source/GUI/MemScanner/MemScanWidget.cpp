@@ -35,8 +35,14 @@ void MemScanWidget::initialiseWidgets()
   m_tblResulstList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   m_tblResulstList->horizontalHeader()->setStretchLastSection(true);
-  m_tblResulstList->horizontalHeader()->resizeSection(ResultsListModel::RESULT_COL_ADDRESS, 125);
-  m_tblResulstList->horizontalHeader()->resizeSection(ResultsListModel::RESULT_COL_SCANNED, 150);
+
+  const int charWidth{m_tblResulstList->fontMetrics().averageCharWidth()};
+  m_tblResulstList->horizontalHeader()->setMinimumSectionSize(charWidth);
+  m_tblResulstList->horizontalHeader()->resizeSection(ResultsListModel::RESULT_COL_SCANNED,
+                                                      charWidth * 15);
+
+  m_tblResulstList->horizontalHeader()->setSectionResizeMode(ResultsListModel::RESULT_COL_ADDRESS,
+                                                             QHeaderView::ResizeToContents);
 
   m_tblResulstList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
   m_tblResulstList->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
