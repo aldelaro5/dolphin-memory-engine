@@ -55,12 +55,13 @@ public:
 
   void changeType(const QModelIndex& index, Common::MemType type, size_t length);
   static MemWatchEntry* getEntryFromIndex(const QModelIndex& index);
-  void addNodes(const std::vector<MemWatchTreeNode*>& nodes, const QModelIndex& referenceIndex = QModelIndex{});
+  void addNodes(const std::vector<MemWatchTreeNode*>& nodes,
+                const QModelIndex& referenceIndex = QModelIndex{});
   void addGroup(const QString& name, const QModelIndex& referenceIndex = QModelIndex{});
   void addEntry(MemWatchEntry* entry, const QModelIndex& referenceIndex = QModelIndex{});
   void editEntry(MemWatchEntry* entry, const QModelIndex& index);
   void clearRoot();
-  void removeNode(const QModelIndex& index);
+  void deleteNode(const QModelIndex& index);
   void onUpdateTimer();
   void onFreezeTimer();
   void loadRootFromJsonRecursive(const QJsonObject& json);

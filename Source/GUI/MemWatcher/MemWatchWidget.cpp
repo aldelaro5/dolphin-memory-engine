@@ -301,7 +301,9 @@ void MemWatchWidget::cutSelectedWatchesToClipBoard()
   if (!cutList.empty())
   {
     for (const auto& index : cutList)
-      m_watchModel->removeNode(index);
+    {
+      m_watchModel->deleteNode(index);
+    }
 
     m_hasUnsavedChanges = true;
   }
@@ -585,14 +587,14 @@ void MemWatchWidget::onDeleteSelection()
 
   QMessageBox* confirmationBox =
       new QMessageBox(QMessageBox::Question, QString("Deleting confirmation"), confirmationMsg,
-                      QMessageBox::Yes | QMessageBox::No, this);
+                      QMessageBox::Yes | QMessageBox::Cancel, this);
   confirmationBox->setDefaultButton(QMessageBox::Yes);
   if (confirmationBox->exec() == QMessageBox::Yes)
   {
     const QModelIndexList toDeleteList{simplifySelection()};
     for (const auto& index : toDeleteList)
     {
-      m_watchModel->removeNode(index);
+      m_watchModel->deleteNode(index);
     }
 
     m_hasUnsavedChanges = true;
@@ -732,7 +734,11 @@ void MemWatchWidget::clearWatchList()
   if (!m_watchModel->hasAnyNodes())
     return;
 
-  if (!warnIfUnsavedChanges())
+  const QString msg{tr("Are you sure you want to delete these watches and/or groups?")};
+  QMessageBox box(QMessageBox::Question, tr("Clear watch list confirmation"), msg,
+                  QMessageBox::Yes | QMessageBox::Cancel, this);
+  box.setDefaultButton(QMessageBox::Yes);
+  if (box.exec() != QMessageBox::Yes)
     return;
 
   m_watchModel->clearRoot();
