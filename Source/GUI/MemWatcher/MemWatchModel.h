@@ -62,6 +62,7 @@ public:
   void editEntry(MemWatchEntry* entry, const QModelIndex& index);
   void clearRoot();
   void deleteNode(const QModelIndex& index);
+  void groupSelection(const QModelIndexList& indexes);
   void onUpdateTimer();
   void onFreezeTimer();
   void loadRootFromJsonRecursive(const QJsonObject& json);
@@ -71,6 +72,7 @@ public:
   bool hasAnyNodes() const;
   MemWatchTreeNode* getRootNode() const;
   static MemWatchTreeNode* getTreeNodeFromIndex(const QModelIndex& index);
+  QModelIndex getIndexFromTreeNode(const MemWatchTreeNode* node);
   bool editData(const QModelIndex& index, const QVariant& value, int role, bool emitEdit = false);
 
 signals:

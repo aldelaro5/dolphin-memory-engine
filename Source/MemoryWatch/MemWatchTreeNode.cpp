@@ -109,7 +109,17 @@ void MemWatchTreeNode::insertChild(const int row, MemWatchTreeNode* node)
 
 void MemWatchTreeNode::removeChild(const int row)
 {
+  m_children[row]->m_parent = nullptr;
   m_children.remove(row);
+}
+
+void MemWatchTreeNode::removeChild(MemWatchTreeNode* const child)
+{
+  m_children.removeAll(child);
+  if (child->m_parent == this)
+  {
+    child->m_parent = nullptr;
+  }
 }
 
 void MemWatchTreeNode::removeChildren()
