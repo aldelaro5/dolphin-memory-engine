@@ -36,9 +36,9 @@ MainWindow::MainWindow()
     restoreGeometry(SConfig::getInstance().getMainWindowGeometry());
   if (SConfig::getInstance().getMainWindowState().size())
     restoreState(SConfig::getInstance().getMainWindowState());
-#ifdef _WIN32
-  GUICommon::changeApplicationStyle(SConfig::getInstance().getTheme());
-#endif
+
+  GUICommon::changeApplicationStyle(
+      static_cast<GUICommon::ApplicationStyle>(SConfig::getInstance().getTheme()));
 
   m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
