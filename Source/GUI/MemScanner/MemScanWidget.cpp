@@ -133,7 +133,7 @@ void MemScanWidget::initialiseWidgets()
   m_btnGroupScanBase->addButton(m_rdbBaseBinary, 3);
   m_rdbBaseDecimal->setChecked(true);
 
-  m_groupScanBase = new QGroupBox(tr("Base to use"));
+  m_groupScanBase = new QGroupBox({});
 
   m_chkSignedScan = new QCheckBox(tr("Signed value scan"));
   m_chkSignedScan->setChecked(false);
