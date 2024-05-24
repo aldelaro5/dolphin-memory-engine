@@ -618,7 +618,8 @@ void MemWatchWidget::onRowsInserted(const QModelIndex& parent, const int first, 
 {
   const QModelIndex firstIndex{m_watchModel->index(first, 0, parent)};
   const QModelIndex lastIndex{m_watchModel->index(last, 0, parent)};
-  const QItemSelection selection{firstIndex, lastIndex};
+  const QItemSelection selection{firstIndex,
+                                 lastIndex.siblingAtColumn(MemWatchModel::WATCH_COL_NUM - 1)};
 
   QItemSelectionModel* const selectionModel{m_watchView->selectionModel()};
   selectionModel->select(selection, QItemSelectionModel::ClearAndSelect);
