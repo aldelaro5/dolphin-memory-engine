@@ -56,6 +56,8 @@ void MemWatchWidget::initialiseWidgets()
   m_watchView->setAcceptDrops(true);
   m_watchView->setDragDropMode(QAbstractItemView::InternalMove);
   m_watchView->setDropIndicatorShown(true);
+  m_watchView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+  m_watchView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
   m_watchView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_watchView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_watchView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -66,10 +68,16 @@ void MemWatchWidget::initialiseWidgets()
   m_watchView->setItemDelegate(m_watchDelegate);
   m_watchView->setModel(m_watchModel);
 
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LOCK, 50);
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LABEL, 225);
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_TYPE, 130);
-  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_ADDRESS, 120);
+  const int charWidth{m_watchView->fontMetrics().averageCharWidth()};
+  m_watchView->header()->setMinimumSectionSize(charWidth);
+  m_watchView->header()->resizeSection(MemWatchModel::WATCH_COL_LABEL, charWidth * 35);
+
+  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_TYPE,
+                                              QHeaderView::ResizeToContents);
+  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_ADDRESS,
+                                              QHeaderView::ResizeToContents);
+  m_watchView->header()->setSectionResizeMode(MemWatchModel::WATCH_COL_LOCK,
+                                              QHeaderView::ResizeToContents);
 
   QShortcut* deleteWatchShortcut = new QShortcut(QKeySequence::Delete, m_watchView);
   connect(deleteWatchShortcut, &QShortcut::activated, this, &MemWatchWidget::onDeleteSelection);
@@ -624,7 +632,8 @@ void MemWatchWidget::onRowsInserted(const QModelIndex& parent, const int first, 
 {
   const QModelIndex firstIndex{m_watchModel->index(first, 0, parent)};
   const QModelIndex lastIndex{m_watchModel->index(last, 0, parent)};
-  const QItemSelection selection{firstIndex, lastIndex};
+  const QItemSelection selection{firstIndex,
+                                 lastIndex.siblingAtColumn(MemWatchModel::WATCH_COL_NUM - 1)};
 
   QItemSelectionModel* const selectionModel{m_watchView->selectionModel()};
   selectionModel->select(selection, QItemSelectionModel::ClearAndSelect);

@@ -1,5 +1,6 @@
 #include "MemScanWidget.h"
 
+#include <QFontDatabase>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QMessageBox>
@@ -35,9 +36,17 @@ void MemScanWidget::initialiseWidgets()
   m_tblResulstList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   m_tblResulstList->horizontalHeader()->setStretchLastSection(true);
-  m_tblResulstList->horizontalHeader()->resizeSection(ResultsListModel::RESULT_COL_ADDRESS, 125);
-  m_tblResulstList->horizontalHeader()->resizeSection(ResultsListModel::RESULT_COL_SCANNED, 150);
 
+  const int charWidth{m_tblResulstList->fontMetrics().averageCharWidth()};
+  m_tblResulstList->horizontalHeader()->setMinimumSectionSize(charWidth);
+  m_tblResulstList->horizontalHeader()->resizeSection(ResultsListModel::RESULT_COL_SCANNED,
+                                                      charWidth * 15);
+
+  m_tblResulstList->horizontalHeader()->setSectionResizeMode(ResultsListModel::RESULT_COL_ADDRESS,
+                                                             QHeaderView::ResizeToContents);
+
+  m_tblResulstList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+  m_tblResulstList->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
   m_tblResulstList->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_tblResulstList->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_tblResulstList->setMinimumWidth(385);
@@ -90,6 +99,12 @@ void MemScanWidget::initialiseWidgets()
   m_txbSearchRange2->setPlaceholderText("Search End (Optional)");
   m_txbSearchRange2->setToolTip("Search Range End (Optional)");
 
+  const QFont fixedFont{QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
+  m_txbSearchTerm1->setFont(fixedFont);
+  m_txbSearchTerm2->setFont(fixedFont);
+  m_txbSearchRange1->setFont(fixedFont);
+  m_txbSearchRange2->setFont(fixedFont);
+
   m_searchTerm2Widget = new QWidget();
 
   m_searchTerm2Widget->hide();
@@ -118,7 +133,7 @@ void MemScanWidget::initialiseWidgets()
   m_btnGroupScanBase->addButton(m_rdbBaseBinary, 3);
   m_rdbBaseDecimal->setChecked(true);
 
-  m_groupScanBase = new QGroupBox(tr("Base to use"));
+  m_groupScanBase = new QGroupBox({});
 
   m_chkSignedScan = new QCheckBox(tr("Signed value scan"));
   m_chkSignedScan->setChecked(false);

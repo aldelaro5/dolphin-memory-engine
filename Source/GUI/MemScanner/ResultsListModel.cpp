@@ -1,5 +1,7 @@
 #include "ResultsListModel.h"
 
+#include <QFontDatabase>
+
 ResultsListModel::ResultsListModel(QObject* parent, MemScanner* scanner)
     : QAbstractTableModel(parent), m_scanner(scanner)
 {
@@ -27,6 +29,12 @@ QVariant ResultsListModel::data(const QModelIndex& index, int role) const
 {
   if (!index.isValid())
     return {};
+
+  if (role == Qt::FontRole)
+  {
+    static const QFont s_fixedFont{QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
+    return s_fixedFont;
+  }
 
   if (role == Qt::DisplayRole)
   {

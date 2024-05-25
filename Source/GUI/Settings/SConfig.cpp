@@ -3,10 +3,10 @@
 #include <cassert>
 #include <iostream>
 
-#include <qcoreapplication.h>
 #include <QDir>
-#include <qfile.h>
 #include <QFileInfo>
+#include <qcoreapplication.h>
+#include <qfile.h>
 
 namespace
 {

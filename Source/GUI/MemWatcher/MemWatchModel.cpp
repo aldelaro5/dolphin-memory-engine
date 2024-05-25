@@ -1,6 +1,7 @@
 #include "MemWatchModel.h"
 
 #include <QDataStream>
+#include <QFontDatabase>
 #include <QIcon>
 #include <QMimeData>
 
@@ -11,6 +12,7 @@
 
 #include "../../CheatEngineParser/CheatEngineParser.h"
 #include "../../Common/CommonUtils.h"
+#include "../../DolphinProcess/DolphinAccessor.h"
 #include "../GUICommon.h"
 
 namespace
@@ -279,10 +281,22 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
   if (!index.isValid())
     return {};
 
+  const int column{index.column()};
+
   MemWatchTreeNode* item = static_cast<MemWatchTreeNode*>(index.internalPointer());
 
   if (!item->isGroup())
   {
+    if (role == Qt::FontRole)
+    {
+      if (column == WATCH_COL_ADDRESS || column == WATCH_COL_VALUE)
+      {
+        static const QFont s_fixedFont{
+            QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
+        return s_fixedFont;
+      }
+    }
+
     if (role == Qt::EditRole && index.column() == WATCH_COL_TYPE)
       return {static_cast<int>(item->getEntry()->getType())};
 
@@ -312,12 +326,6 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       default:
         break;
       }
-    }
-    else if (role == Qt::CheckStateRole && index.column() == WATCH_COL_LOCK)
-    {
-      if (entry->isLocked())
-        return Qt::Checked;
-      return Qt::Unchecked;
     }
   }
   else
@@ -382,12 +390,6 @@ bool MemWatchModel::editData(const QModelIndex& index, const QVariant& value, co
       }
       }
     }
-    else if (role == Qt::CheckStateRole && index.column() == WATCH_COL_LOCK)
-    {
-      value == Qt::Checked ? entry->setLock(true) : entry->setLock(false);
-      emit dataChanged(index, index);
-      return true;
-    }
     else
     {
       return false;
@@ -421,10 +423,20 @@ Qt::ItemFlags MemWatchModel::flags(const QModelIndex& index) const
   }
 
   if (index.column() == WATCH_COL_LOCK)
-    return flags |= Qt::ItemIsUserCheckable;
+    return flags;
 
-  if (index.column() != WATCH_COL_ADDRESS && index.column() != WATCH_COL_TYPE)
+  if (index.column() == WATCH_COL_LABEL)
+  {
     flags |= Qt::ItemIsEditable;
+  }
+  else if (index.column() == WATCH_COL_VALUE)
+  {
+    const bool hooked{DolphinComm::DolphinAccessor::getStatus() ==
+                      DolphinComm::DolphinAccessor::DolphinStatus::hooked};
+    const Qt::ItemFlag itemIsEditable{hooked ? Qt::ItemIsEditable : Qt::NoItemFlags};
+    flags |= itemIsEditable;
+  }
+
   return flags;
 }
 
