@@ -33,6 +33,7 @@ public:
   void onRowsInserted(const QModelIndex& parent, int first, int last);
   void openWatchFile();
   void setSelectedWatchesBase(MemWatchEntry* entry, Common::MemBase base);
+  void groupCurrentSelection();
   void copySelectedWatchesToClipBoard();
   void cutSelectedWatchesToClipBoard();
   void pasteWatchFromClipBoard(const QModelIndex& referenceIndex);

@@ -207,6 +207,52 @@ void MemWatchModel::deleteNode(const QModelIndex& index)
   }
 }
 
+void MemWatchModel::groupSelection(const QModelIndexList& indexes)
+{
+  if (indexes.isEmpty())
+    return;
+
+  // Collect nodes from indexes; indexes will be invalidated shortly as nodes are removed from their
+  // parents.
+  std::vector<MemWatchTreeNode*> nodes;
+  for (const QModelIndex& index : indexes)
+  {
+    nodes.push_back(static_cast<MemWatchTreeNode*>(index.internalPointer()));
+  }
+
+  MemWatchTreeNode* newParent{};
+  int newRow{std::numeric_limits<int>::max()};
+
+  // Extract nodes from their current parent.
+  for (MemWatchTreeNode* const node : nodes)
+  {
+    MemWatchTreeNode* const parent{node->getParent()};
+    const int row{static_cast<int>(parent->getChildren().indexOf(node))};
+
+    if (!newParent || newParent == parent)
+    {
+      newParent = parent;
+      newRow = std::min(newRow, row);
+    }
+
+    beginRemoveRows(getIndexFromTreeNode(parent), row, row);
+    parent->removeChild(node);
+    endRemoveRows();
+  }
+
+  beginInsertRows(getIndexFromTreeNode(newParent), newRow, newRow);
+
+  // Create new group with all the extracted nodes, and insert in the new parent.
+  MemWatchTreeNode* const group{new MemWatchTreeNode(nullptr, nullptr, true, "New Group")};
+  for (MemWatchTreeNode* const node : nodes)
+  {
+    group->appendChild(node);
+  }
+  newParent->insertChild(newRow, group);
+
+  endInsertRows();
+}
+
 int MemWatchModel::columnCount(const QModelIndex& parent) const
 {
   (void)parent;
@@ -629,4 +675,16 @@ MemWatchTreeNode* MemWatchModel::getRootNode() const
 MemWatchTreeNode* MemWatchModel::getTreeNodeFromIndex(const QModelIndex& index)
 {
   return static_cast<MemWatchTreeNode*>(index.internalPointer());
+}
+
+QModelIndex MemWatchModel::getIndexFromTreeNode(const MemWatchTreeNode* const node)
+{
+  if (node == m_rootNode)
+  {
+    return createIndex(0, 0, m_rootNode);
+  }
+
+  const MemWatchTreeNode* const parent{node->getParent()};
+  return index(static_cast<int>(parent->getChildren().indexOf(node)), 0,
+               getIndexFromTreeNode(parent));
 }

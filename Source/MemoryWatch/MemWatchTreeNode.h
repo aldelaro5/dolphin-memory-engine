@@ -36,6 +36,7 @@ public:
   void appendChild(MemWatchTreeNode* node);
   void insertChild(int row, MemWatchTreeNode* node);
   void removeChild(int row);
+  void removeChild(MemWatchTreeNode* child);
   void removeChildren();
   void deleteChildren();
 

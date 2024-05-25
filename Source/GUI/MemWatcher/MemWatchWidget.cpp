@@ -247,6 +247,15 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
     node = m_watchModel->getRootNode();
   }
 
+  const QModelIndexList simplifiedSelection{simplifySelection()};
+  if (!simplifiedSelection.empty())
+  {
+    QAction* const groupAction{new QAction(tr("&Group"), this)};
+    connect(groupAction, &QAction::triggered, this, &MemWatchWidget::groupCurrentSelection);
+    contextMenu->addAction(groupAction);
+    contextMenu->addSeparator();
+  }
+
   QAction* cut = new QAction(tr("Cu&t"), this);
   connect(cut, &QAction::triggered, this, [this] { cutSelectedWatchesToClipBoard(); });
   contextMenu->addAction(cut);
@@ -291,6 +300,11 @@ void MemWatchWidget::setSelectedWatchesBase(MemWatchEntry* entry, Common::MemBas
     }
   }
   m_hasUnsavedChanges = true;
+}
+
+void MemWatchWidget::groupCurrentSelection()
+{
+  m_watchModel->groupSelection(simplifySelection());
 }
 
 void MemWatchWidget::cutSelectedWatchesToClipBoard()
