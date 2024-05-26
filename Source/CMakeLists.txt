@@ -41,6 +41,7 @@ set(SRCS ${DolphinProcessSrc}
          GUI/MemViewer/MemViewer.cpp
          GUI/MemViewer/MemViewerWidget.cpp
          GUI/MainWindow.cpp
+         GUI/Widgets/AddressInputWidget.cpp
          Resources/resource.qrc
          ${ExeIconSrc}
          main.cpp)
