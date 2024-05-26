@@ -312,7 +312,13 @@ void MemWatchWidget::setSelectedWatchesBase(MemWatchEntry* entry, Common::MemBas
 
 void MemWatchWidget::groupCurrentSelection()
 {
-  m_watchModel->groupSelection(simplifySelection());
+  const QModelIndexList indexes{simplifySelection()};
+  if (indexes.isEmpty())
+    return;
+
+  m_watchModel->groupSelection(indexes);
+
+  m_hasUnsavedChanges = true;
 }
 
 void MemWatchWidget::cutSelectedWatchesToClipBoard()
