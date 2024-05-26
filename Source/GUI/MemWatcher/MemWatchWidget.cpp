@@ -312,7 +312,13 @@ void MemWatchWidget::setSelectedWatchesBase(MemWatchEntry* entry, Common::MemBas
 
 void MemWatchWidget::groupCurrentSelection()
 {
-  m_watchModel->groupSelection(simplifySelection());
+  const QModelIndexList indexes{simplifySelection()};
+  if (indexes.isEmpty())
+    return;
+
+  m_watchModel->groupSelection(indexes);
+
+  m_hasUnsavedChanges = true;
 }
 
 void MemWatchWidget::cutSelectedWatchesToClipBoard()
@@ -417,12 +423,18 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
 
 void MemWatchWidget::onDataEdited(const QModelIndex& index, const QVariant& value, const int role)
 {
-  MemWatchTreeNode* const node{static_cast<MemWatchTreeNode*>(index.internalPointer())};
-  if (node->isGroup())
+  if (role != Qt::EditRole)
     return;
 
-  if (role == Qt::EditRole && index.column() == MemWatchModel::WATCH_COL_VALUE)
+  const int column{index.column()};
+  if (column == MemWatchModel::WATCH_COL_LABEL || column == MemWatchModel::WATCH_COL_TYPE ||
+      column == MemWatchModel::WATCH_COL_ADDRESS)
   {
+    m_hasUnsavedChanges = true;
+  }
+  else if (column == MemWatchModel::WATCH_COL_VALUE)
+  {
+    MemWatchTreeNode* const node{static_cast<MemWatchTreeNode*>(index.internalPointer())};
     MemWatchEntry* const entry{node->getEntry()};
     const Common::MemType entryType{entry->getType()};
 

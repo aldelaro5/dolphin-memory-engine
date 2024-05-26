@@ -368,6 +368,8 @@ bool MemWatchModel::editData(const QModelIndex& index, const QVariant& value, co
       {
         entry->setLabel(value.toString());
         emit dataChanged(index, index);
+        if (emitEdit)
+          emit dataEdited(index, value, role);
         return true;
       }
       case WATCH_COL_VALUE:
