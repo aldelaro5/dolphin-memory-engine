@@ -41,12 +41,10 @@ void DlgAddWatchEntry::initialiseWidgets()
   m_lblValuePreview = new QLineEdit("", this);
   m_lblValuePreview->setReadOnly(true);
 
-  m_txbAddress = new QLineEdit(this);
-  m_txbAddress->setMaxLength(10);
+  m_txbAddress = new AddressInputWidget(this);
   connect(m_txbAddress, &QLineEdit::textEdited, this, &DlgAddWatchEntry::onAddressChanged);
 
   const QFont fixedFont{QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
-  m_txbAddress->setFont(fixedFont);
   m_lblValuePreview->setFont(fixedFont);
 
   m_offsetsLayout = new QGridLayout;
