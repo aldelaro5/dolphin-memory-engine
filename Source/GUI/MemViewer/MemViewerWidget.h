@@ -6,6 +6,8 @@
 
 #include "MemViewer.h"
 
+#include "../Widgets/AddressInputWidget.h"
+
 class MemViewerWidget : public QWidget
 {
   Q_OBJECT
@@ -35,7 +37,7 @@ private:
   void initialiseWidgets();
   void makeLayouts();
 
-  QLineEdit* m_txtJumpAddress{};
+  AddressInputWidget* m_txtJumpAddress{};
   QPushButton* m_btnGoToMEM1Start{};
   QPushButton* m_btnGoToSecondaryRAMStart{};
   QTimer* m_updateMemoryTimer{};

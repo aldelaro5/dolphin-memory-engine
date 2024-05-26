@@ -24,7 +24,7 @@ MemViewerWidget::~MemViewerWidget()
 
 void MemViewerWidget::initialiseWidgets()
 {
-  m_txtJumpAddress = new QLineEdit(this);
+  m_txtJumpAddress = new AddressInputWidget(this);
   connect(m_txtJumpAddress, &QLineEdit::textChanged, this,
           &MemViewerWidget::onJumpToAddressTextChanged);
   m_btnGoToMEM1Start = new QPushButton(tr("Go to MEM1"));

@@ -12,6 +12,7 @@
 #include <QVector>
 
 #include "../../../MemoryWatch/MemWatchEntry.h"
+#include "../../Widgets/AddressInputWidget.h"
 
 class DlgAddWatchEntry : public QDialog
 {
@@ -45,7 +46,7 @@ private:
   void removeAllPointerOffset();
 
   MemWatchEntry* m_entry{};
-  QLineEdit* m_txbAddress{};
+  AddressInputWidget* m_txbAddress{};
   QVector<QLineEdit*> m_offsets;
   QVector<QLabel*> m_addressPath;
   QGridLayout* m_offsetsLayout{};

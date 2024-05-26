@@ -20,8 +20,7 @@ DlgCopy::DlgCopy(QWidget* parent) : QDialog(parent)
   QVBoxLayout* entireCopyLayout = new QVBoxLayout;
 
   QFormLayout* copySettingsLayout = new QFormLayout();
-  m_spnWatcherCopyAddress = new QLineEdit();
-  m_spnWatcherCopyAddress->setMaxLength(8);
+  m_spnWatcherCopyAddress = new AddressInputWidget();
   copySettingsLayout->addRow("Base Address", m_spnWatcherCopyAddress);
 
   m_spnWatcherCopySize = new QLineEdit();

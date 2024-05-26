@@ -10,6 +10,7 @@
 #include <qtextedit.h>
 
 #include "../GUICommon.h"
+#include "../Widgets/AddressInputWidget.h"
 
 class DlgCopy : public QDialog
 {
@@ -43,7 +44,7 @@ private:
   static bool uintStringToU32(std::string_view str, u32& output);
   static std::string charToHexString(const char* input, size_t count, ByteStringFormats format);
 
-  QLineEdit* m_spnWatcherCopyAddress;
+  AddressInputWidget* m_spnWatcherCopyAddress{};
   QLineEdit* m_spnWatcherCopySize;
   QTextEdit* m_spnWatcherCopyOutput;
   QComboBox* m_cmbViewerBytesSeparator;
