@@ -89,21 +89,16 @@ void MemScanWidget::initialiseWidgets()
   m_txbSearchTerm1 = new QLineEdit();
   m_txbSearchTerm2 = new QLineEdit();
 
-  m_txbSearchRange1 = new QLineEdit();
-  m_txbSearchRange1->setMaxLength(8);
-  m_txbSearchRange1->setPlaceholderText("Search Begin (Optional)");
+  m_searchRange = new QWidget();
+  m_txbSearchRange1 = new AddressInputWidget();
   m_txbSearchRange1->setToolTip("Search Range Begin (Optional)");
 
-  m_txbSearchRange2 = new QLineEdit();
-  m_txbSearchRange2->setMaxLength(8);
-  m_txbSearchRange2->setPlaceholderText("Search End (Optional)");
+  m_txbSearchRange2 = new AddressInputWidget();
   m_txbSearchRange2->setToolTip("Search Range End (Optional)");
 
   const QFont fixedFont{QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
   m_txbSearchTerm1->setFont(fixedFont);
   m_txbSearchTerm2->setFont(fixedFont);
-  m_txbSearchRange1->setFont(fixedFont);
-  m_txbSearchRange2->setFont(fixedFont);
 
   m_searchTerm2Widget = new QWidget();
 
@@ -160,9 +155,16 @@ void MemScanWidget::makeLayouts()
   results_layout->addWidget(m_tblResulstList);
   results_layout->addLayout(multiAddButtons_layout);
 
-  QHBoxLayout* range_layout = new QHBoxLayout();
-  range_layout->addWidget(m_txbSearchRange1);
-  range_layout->addWidget(m_txbSearchRange2);
+  QHBoxLayout* const range_sublayout{new QHBoxLayout};
+  range_sublayout->setContentsMargins(0, 0, 0, 0);
+  range_sublayout->setSpacing(1);
+  range_sublayout->addWidget(m_txbSearchRange1);
+  range_sublayout->addWidget(new QLabel("-"));
+  range_sublayout->addWidget(m_txbSearchRange2);
+  QHBoxLayout* const range_layout{new QHBoxLayout(m_searchRange)};
+  range_layout->setContentsMargins(0, 0, 0, 0);
+  range_layout->addWidget(new QLabel("Search Range (Optional):"));
+  range_layout->addLayout(range_sublayout);
 
   QHBoxLayout* buttons_layout = new QHBoxLayout();
   buttons_layout->addWidget(m_btnFirstScan);
@@ -193,7 +195,7 @@ void MemScanWidget::makeLayouts()
   layout_extraParams->addWidget(m_chkSignedScan);
 
   QVBoxLayout* scannerParams_layout = new QVBoxLayout();
-  scannerParams_layout->addLayout(range_layout);
+  scannerParams_layout->addWidget(m_searchRange);
   scannerParams_layout->addLayout(buttons_layout);
   scannerParams_layout->addWidget(m_cmbScanType);
   scannerParams_layout->addWidget(m_cmbScanFilter);
@@ -436,8 +438,7 @@ void MemScanWidget::onFirstScan()
     m_btnResetScan->show();
     m_btnUndoScan->show();
     m_btnUndoScan->setEnabled(m_memScanner->hasUndo());
-    m_txbSearchRange1->hide();
-    m_txbSearchRange2->hide();
+    m_searchRange->hide();
     m_cmbScanType->setDisabled(true);
     m_chkSignedScan->setDisabled(true);
     m_chkEnforceMemAlignment->setDisabled(true);
@@ -513,8 +514,7 @@ void MemScanWidget::onResetScan()
   m_btnNextScan->hide();
   m_btnResetScan->hide();
   m_btnUndoScan->hide();
-  m_txbSearchRange1->show();
-  m_txbSearchRange2->show();
+  m_searchRange->show();
   m_cmbScanType->setEnabled(true);
   m_chkSignedScan->setEnabled(true);
   m_chkEnforceMemAlignment->setEnabled(true);
