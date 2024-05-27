@@ -19,6 +19,8 @@ public:
   MemWatchTreeNode& operator=(MemWatchTreeNode&&) = delete;
 
   bool isGroup() const;
+  bool isExpanded() const { return m_expanded; }
+  void setExpanded(const bool expanded) { m_expanded = expanded; };
   QString getGroupName() const;
   void setGroupName(const QString& groupName);
   MemWatchEntry* getEntry() const;
@@ -46,6 +48,7 @@ public:
 
 private:
   bool m_isGroup;
+  bool m_expanded{};
   bool m_isValueEditing = false;
   QString m_groupName;
   MemWatchEntry* m_entry;
