@@ -37,6 +37,7 @@ public:
   void onScanMemTypeChanged();
   void onCurrentValuesUpdateTimer();
   void onResultListDoubleClicked(const QModelIndex& index);
+  void onResultsListContextMenuRequested(const QPoint& pos);
   void handleScannerErrors(Common::MemOperationReturnCode errorCode);
   void onFirstScan();
   void onNextScan();
