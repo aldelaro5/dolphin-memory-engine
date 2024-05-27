@@ -46,7 +46,7 @@ void MemWatchTreeNode::setValueEditing(const bool valueEditing)
   m_isValueEditing = valueEditing;
 }
 
-QString MemWatchTreeNode::getGroupName() const
+const QString& MemWatchTreeNode::getGroupName() const
 {
   return m_groupName;
 }
@@ -67,7 +67,7 @@ void MemWatchTreeNode::setEntry(MemWatchEntry* entry)
   m_entry = entry;
 }
 
-QVector<MemWatchTreeNode*> MemWatchTreeNode::getChildren() const
+const QVector<MemWatchTreeNode*>& MemWatchTreeNode::getChildren() const
 {
   return m_children;
 }

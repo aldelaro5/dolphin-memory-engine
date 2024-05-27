@@ -21,11 +21,11 @@ public:
   bool isGroup() const;
   bool isExpanded() const { return m_expanded; }
   void setExpanded(const bool expanded) { m_expanded = expanded; };
-  QString getGroupName() const;
+  const QString& getGroupName() const;
   void setGroupName(const QString& groupName);
   MemWatchEntry* getEntry() const;
   void setEntry(MemWatchEntry* entry);
-  QVector<MemWatchTreeNode*> getChildren() const;
+  const QVector<MemWatchTreeNode*>& getChildren() const;
   void setChildren(QVector<MemWatchTreeNode*> children);
   MemWatchTreeNode* getParent() const;
   void setParent(MemWatchTreeNode* parent);
