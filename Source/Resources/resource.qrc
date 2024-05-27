@@ -3,5 +3,9 @@
         <file>folder_empty.svg</file>
         <file>folder.svg</file>
         <file>logo.svg</file>
+        <file>status_absent.svg</file>
+        <file>status_hooked.svg</file>
+        <file>status_present.svg</file>
+        <file>status_unhooked.svg</file>
     </qresource>
 </RCC>
