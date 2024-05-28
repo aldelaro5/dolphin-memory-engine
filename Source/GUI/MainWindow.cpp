@@ -8,6 +8,7 @@
 #include <QIcon>
 #include <QMenuBar>
 #include <QShortcut>
+#include <QStatusBar>
 #include <QString>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -165,12 +166,6 @@ void MainWindow::initialiseWidgets()
   connect(m_watcher, &MemWatchWidget::mustUnhook, this, &MainWindow::onUnhook);
 
   m_copier = new DlgCopy(this);
-
-  m_lblDolphinStatus = new QLabel("");
-  m_lblDolphinStatus->setAlignment(Qt::AlignHCenter);
-
-  m_lblMem2Status = new QLabel("");
-  m_lblMem2Status->setAlignment(Qt::AlignHCenter);
 }
 
 void MainWindow::makeLayouts()
@@ -187,15 +182,21 @@ void MainWindow::makeLayouts()
 
   connect(m_splitter, &QSplitter::splitterMoved, this, &MainWindow::onSplitterMoved);
 
-  QVBoxLayout* mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(m_lblDolphinStatus);
-  mainLayout->addWidget(m_lblMem2Status);
-  mainLayout->addWidget(separatorline);
-  mainLayout->addWidget(m_splitter);
+  m_statusIcon = new QLabel;
+  m_statusLabel = new QLabel;
 
-  QWidget* mainWidget = new QWidget();
-  mainWidget->setLayout(mainLayout);
-  setCentralWidget(mainWidget);
+  QWidget* statusWidget{new QWidget};
+  QHBoxLayout* statusLayout{new QHBoxLayout(statusWidget)};
+  statusLayout->setContentsMargins(0, 0, 0, 0);
+  statusLayout->setContentsMargins(statusLayout->spacing(), 0, 0, 0);
+  statusLayout->addWidget(m_statusIcon);
+  statusLayout->addWidget(m_statusLabel);
+
+  QStatusBar* const statusBar{new QStatusBar};
+  statusBar->addWidget(statusWidget);
+
+  setCentralWidget(m_splitter);
+  setStatusBar(statusBar);
 }
 
 void MainWindow::makeMemViewer()
@@ -254,34 +255,17 @@ void MainWindow::onOpenMemViewerWithAddress(u32 address)
 
 void MainWindow::updateMem2Status()
 {
-  QString strMem2 = QString();
-  bool mem2 = DolphinComm::DolphinAccessor::isMEM2Present();
-  if (mem2)
-    strMem2 = tr("The extended Wii-only memory is present");
-  else
-    strMem2 = tr("The extended Wii-only memory is absent");
-
-  QString strAram = QString();
-  if (!mem2)
-  {
-    if (DolphinComm::DolphinAccessor::isARAMAccessible())
-      strAram = tr(", the ARAM is accessible");
-    else
-      strAram = tr(", the ARAM is inaccessible, turn off MMU to use it");
-  }
-  m_lblMem2Status->setText(strMem2 + strAram);
+  updateStatusBar();
   m_viewer->onMEM2StatusChanged(DolphinComm::DolphinAccessor::isMEM2Present());
 }
 
 void MainWindow::updateDolphinHookingStatus()
 {
+  updateStatusBar();
   switch (DolphinComm::DolphinAccessor::getStatus())
   {
   case DolphinComm::DolphinAccessor::DolphinStatus::hooked:
   {
-    m_lblDolphinStatus->setText(
-        tr("Hooked successfully to Dolphin, current start address: ") +
-        QString::number(DolphinComm::DolphinAccessor::getEmuRAMAddressStart(), 16).toUpper());
     m_scanner->setEnabled(true);
     m_copier->setEnabled(true);
     m_actMemoryViewer->setEnabled(true);
@@ -292,7 +276,6 @@ void MainWindow::updateDolphinHookingStatus()
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::notRunning:
   {
-    m_lblDolphinStatus->setText(tr("Cannot hook to Dolphin, the process is not running"));
     m_scanner->setDisabled(true);
     m_copier->setDisabled(true);
     m_actMemoryViewer->setDisabled(true);
@@ -303,8 +286,6 @@ void MainWindow::updateDolphinHookingStatus()
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::noEmu:
   {
-    m_lblDolphinStatus->setText(
-        tr("Cannot hook to Dolphin, the process is running, but no emulation has been started"));
     m_scanner->setDisabled(true);
     m_copier->setDisabled(true);
     m_actMemoryViewer->setDisabled(true);
@@ -315,7 +296,6 @@ void MainWindow::updateDolphinHookingStatus()
   }
   case DolphinComm::DolphinAccessor::DolphinStatus::unHooked:
   {
-    m_lblDolphinStatus->setText(tr("Unhooked, press \"Hook\" to hook to Dolphin again"));
     m_scanner->setDisabled(true);
     m_copier->setDisabled(true);
     m_actMemoryViewer->setDisabled(true);
@@ -350,7 +330,6 @@ void MainWindow::onUnhook()
   m_watcher->getFreezeTimer()->stop();
   m_viewer->getUpdateTimer()->stop();
   m_viewer->hookStatusChanged(false);
-  m_lblMem2Status->setText(QString(""));
   DolphinComm::DolphinAccessor::unHook();
   updateDolphinHookingStatus();
 }
@@ -582,4 +561,104 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
   m_viewer->close();
   event->accept();
+}
+
+void MainWindow::updateStatusBar()
+{
+  QIcon icon;
+  QStringList tags;
+  QStringList toolTipLines;
+
+  switch (DolphinComm::DolphinAccessor::getStatus())
+  {
+  case DolphinComm::DolphinAccessor::DolphinStatus::hooked:
+  {
+    static const QIcon s_icon(":/status_hooked.svg");
+    icon = s_icon;
+
+    tags << tr("Hooked");
+
+    const bool mem2{DolphinComm::DolphinAccessor::isMEM2Present()};
+    const bool aram{!mem2 && DolphinComm::DolphinAccessor::isARAMAccessible()};
+
+    std::array<char, sizeof("GM4E01")> gameID{};
+    if (DolphinComm::DolphinAccessor::readFromRAM(
+            Common::dolphinAddrToOffset(Common::MEM1_START, aram), gameID.data(), gameID.size(),
+            false))
+    {
+      for (char& c : gameID)
+      {
+        if (!std::isprint(c))
+        {
+          c = '?';
+        }
+      }
+      gameID.back() = '\0';
+      tags << QString(gameID.data());
+    }
+
+    toolTipLines
+        << tr("Hooked to Dolphin successfully. Current start address: ") +
+               QString::number(DolphinComm::DolphinAccessor::getEmuRAMAddressStart(), 16).toUpper();
+
+    tags << tr("MEM1");
+    if (mem2)
+    {
+      tags << tr("MEM2");
+      toolTipLines << tr("The extended Wii-only memory is present.");
+    }
+    else
+    {
+      if (aram)
+      {
+        tags << tr("ARAM");
+        toolTipLines << tr("Dolphin's ARAM is accessible.");
+      }
+      else
+      {
+        toolTipLines << tr("Dolphin's ARAM is inaccessible; turn off MMU to use it.");
+      }
+    }
+
+    break;
+  }
+  case DolphinComm::DolphinAccessor::DolphinStatus::notRunning:
+  {
+    static const QIcon s_icon(":/status_absent.svg");
+    icon = s_icon;
+    tags << tr("Dolphin not detected");
+    toolTipLines << tr("Unable to hook to Dolphin. Dolphin does not appear to be running.");
+    break;
+  }
+  case DolphinComm::DolphinAccessor::DolphinStatus::noEmu:
+  {
+    static const QIcon s_icon(":/status_present.svg");
+    icon = s_icon;
+    tags << tr("No game running");
+    toolTipLines << tr("Unable to hook to Dolphin. The process appears to be running, but no "
+                       "emulation has been started.");
+    break;
+  }
+  case DolphinComm::DolphinAccessor::DolphinStatus::unHooked:
+  {
+    static const QIcon s_icon(":/status_unhooked.svg");
+    icon = s_icon;
+    tags << tr("Unhooked");
+    toolTipLines << tr("Unhooked. Press <b>Dolphin > Hook</b> to hook to Dolphin.");
+    break;
+  }
+  }
+
+  const QSize actualIconSize{icon.actualSize(QSize(100, 100))};
+  const double aspectRatio{static_cast<double>(actualIconSize.width()) /
+                           static_cast<double>(actualIconSize.height())};
+  const int fontHeight{fontMetrics().height()};
+  const int iconHeight{fontHeight};
+  const int iconWidth{static_cast<int>(std::round(static_cast<double>(iconHeight) * aspectRatio))};
+  m_statusIcon->setPixmap(icon.pixmap(iconWidth, iconHeight));
+
+  m_statusLabel->setText(tags.join(" | "));
+
+  const QString toolTip{toolTipLines.join("\n\n")};
+  m_statusLabel->parentWidget()->setToolTip(toolTip);
 }

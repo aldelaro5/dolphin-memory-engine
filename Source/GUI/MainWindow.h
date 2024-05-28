@@ -61,6 +61,7 @@ private:
   void initialiseWidgets();
   void makeLayouts();
   void makeMemViewer();
+  void updateStatusBar();
 
   QSplitter* m_splitter{};
 
@@ -70,9 +71,6 @@ private:
   DlgCopy* m_copier{};
 
   QTimer m_autoHookTimer;
-
-  QLabel* m_lblDolphinStatus{};
-  QLabel* m_lblMem2Status{};
 
   QMenu* m_menuFile{};
   QMenu* m_menuEdit{};
@@ -94,4 +92,6 @@ private:
   QAction* m_actScanner{};
   QAction* m_actQuit{};
   QAction* m_actAbout{};
+  QLabel* m_statusIcon{};
+  QLabel* m_statusLabel{};
 };
