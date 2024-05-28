@@ -1,8 +1,11 @@
 #include "MemScanWidget.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QFontDatabase>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QMenu>
 #include <QMessageBox>
 #include <QRadioButton>
 #include <QRegularExpression>
@@ -52,6 +55,9 @@ void MemScanWidget::initialiseWidgets()
   m_tblResulstList->setMinimumWidth(385);
   connect(m_tblResulstList, &QAbstractItemView::doubleClicked, this,
           &MemScanWidget::onResultListDoubleClicked);
+  m_tblResulstList->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(m_tblResulstList, &QWidget::customContextMenuRequested, this,
+          &MemScanWidget::onResultsListContextMenuRequested);
 
   m_btnAddAll = new QPushButton(tr("Add all"));
   connect(m_btnAddAll, &QPushButton::clicked, this, &MemScanWidget::onAddAll);
@@ -596,4 +602,25 @@ void MemScanWidget::onResultListDoubleClicked(const QModelIndex& index)
                               m_memScanner->getType(), m_memScanner->getLength(),
                               m_memScanner->getIsUnsigned(), m_memScanner->getBase());
   }
+}
+
+void MemScanWidget::onResultsListContextMenuRequested(const QPoint& pos)
+{
+  const QModelIndex index{m_tblResulstList->indexAt(pos)};
+  if (!index.isValid())
+    return;
+
+  QMenu menu(this);
+
+  QAction* const addAction{menu.addAction(tr("&Add Watch"))};
+  connect(addAction, &QAction::triggered, this,
+          [this, index] { onResultListDoubleClicked(index); });
+
+  QAction* const copyAction{menu.addAction(tr("&Copy Address"))};
+  connect(copyAction, &QAction::triggered, [index] {
+    const QModelIndex addressIndex{index.siblingAtColumn(ResultsListModel::RESULT_COL_ADDRESS)};
+    QApplication::clipboard()->setText(addressIndex.data(Qt::DisplayRole).toString());
+  });
+
+  menu.exec(m_tblResulstList->viewport()->mapToGlobal(pos));
 }
