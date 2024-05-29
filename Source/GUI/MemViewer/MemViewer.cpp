@@ -372,15 +372,9 @@ void MemViewer::updateFontSize(int newSize)
 {
   m_memoryFontSize = newSize;
 
-#ifdef __linux__
-  setFont(QFont("Monospace", m_memoryFontSize));
-#elif _WIN32
-  setFont(QFont("Courier New", m_memoryFontSize));
-#elif __APPLE__
   QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
   fixedFont.setPointSize(m_memoryFontSize);
   setFont(fixedFont);
-#endif
 
   m_charWidthEm = fontMetrics().horizontalAdvance(QLatin1Char('M'));
   m_charHeight = fontMetrics().height();
