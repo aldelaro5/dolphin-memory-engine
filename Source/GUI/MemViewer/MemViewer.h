@@ -67,7 +67,7 @@ private:
 
   void initialise();
 
-  void updateFontSize(int newSize);
+  void updateFontSize();
   bytePosFromMouse mousePosToBytePos(QPoint pos);
   void scrollToSelection();
   void copySelection(Common::MemType type) const;
@@ -93,7 +93,7 @@ private:
   const int m_numRows = 16;
   const int m_numColumns = 16;  // Should be a multiple of 16, or the header doesn't make much sense
   const int m_numCells = m_numRows * m_numColumns;
-  int m_memoryFontSize = 15;
+  int m_memoryFontSize = -1;
   int m_StartBytesSelectionPosX = 0;
   int m_StartBytesSelectionPosY = 0;
   int m_EndBytesSelectionPosX = 0;
