@@ -1007,6 +1007,7 @@ void MemViewer::paintEvent(QPaintEvent* event)
   (void)event;
 
   QPainter painter(viewport());
+  painter.setFont(font());
   painter.setPen(QColor(Qt::black));
 
   renderSeparatorLines(painter);
