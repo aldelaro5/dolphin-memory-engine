@@ -31,6 +31,8 @@ public:
   void onDeleteSelection();
   void onDropSucceeded();
   void onRowsInserted(const QModelIndex& parent, int first, int last);
+  void onCollapsed(const QModelIndex& index);
+  void onExpanded(const QModelIndex& index);
   void openWatchFile();
   void setSelectedWatchesBase(MemWatchEntry* entry, Common::MemBase base);
   void groupCurrentSelection();
@@ -55,6 +57,7 @@ signals:
 private:
   void initialiseWidgets();
   void makeLayouts();
+  void updateExpansionState(const MemWatchTreeNode* node = nullptr);
 
   QTreeView* m_watchView{};
   MemWatchModel* m_watchModel{};

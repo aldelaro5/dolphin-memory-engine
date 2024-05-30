@@ -46,7 +46,7 @@ void MemWatchTreeNode::setValueEditing(const bool valueEditing)
   m_isValueEditing = valueEditing;
 }
 
-QString MemWatchTreeNode::getGroupName() const
+const QString& MemWatchTreeNode::getGroupName() const
 {
   return m_groupName;
 }
@@ -67,7 +67,7 @@ void MemWatchTreeNode::setEntry(MemWatchEntry* entry)
   m_entry = entry;
 }
 
-QVector<MemWatchTreeNode*> MemWatchTreeNode::getChildren() const
+const QVector<MemWatchTreeNode*>& MemWatchTreeNode::getChildren() const
 {
   return m_children;
 }
@@ -152,6 +152,10 @@ void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* p
   {
     m_isGroup = true;
     m_groupName = json["groupName"].toString();
+    if (json.contains("expanded"))
+    {
+      m_expanded = json["expanded"].toBool();
+    }
     QJsonArray groupEntries = json["groupEntries"].toArray();
     for (auto i : groupEntries)
     {
@@ -200,6 +204,10 @@ void MemWatchTreeNode::writeToJson(QJsonObject& json) const
   if (isGroup())
   {
     json["groupName"] = m_groupName;
+    if (m_expanded)
+    {
+      json["expanded"] = m_expanded;
+    }
     QJsonArray entries;
     for (MemWatchTreeNode* const child : m_children)
     {

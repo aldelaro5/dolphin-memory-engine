@@ -65,6 +65,8 @@ void MemWatchWidget::initialiseWidgets()
           &MemWatchWidget::onMemWatchContextMenuRequested);
   connect(m_watchView, &QAbstractItemView::doubleClicked, this,
           &MemWatchWidget::onWatchDoubleClicked);
+  connect(m_watchView, &QTreeView::collapsed, this, &MemWatchWidget::onCollapsed);
+  connect(m_watchView, &QTreeView::expanded, this, &MemWatchWidget::onExpanded);
   m_watchView->setItemDelegate(m_watchDelegate);
   m_watchView->setModel(m_watchModel);
 
@@ -651,7 +653,34 @@ void MemWatchWidget::onRowsInserted(const QModelIndex& parent, const int first, 
   selectionModel->select(selection, QItemSelectionModel::ClearAndSelect);
   selectionModel->setCurrentIndex(lastIndex, QItemSelectionModel::Current);
 
-  QTimer::singleShot(0, [this, lastIndex] { m_watchView->scrollTo(lastIndex); });
+  QTimer::singleShot(0, [this, parent, first, last, lastIndex] {
+    for (int i{first}; i <= last; ++i)
+    {
+      const MemWatchTreeNode* const node{
+          MemWatchModel::getTreeNodeFromIndex(m_watchModel->index(i, 0, parent))};
+      updateExpansionState(node);
+    }
+
+    m_watchView->scrollTo(lastIndex);
+  });
+}
+
+void MemWatchWidget::onCollapsed(const QModelIndex& index)
+{
+  MemWatchTreeNode* const node{MemWatchModel::getTreeNodeFromIndex(index)};
+  if (!node)
+    return;
+  node->setExpanded(false);
+  m_hasUnsavedChanges = true;
+}
+
+void MemWatchWidget::onExpanded(const QModelIndex& index)
+{
+  MemWatchTreeNode* const node{MemWatchModel::getTreeNodeFromIndex(index)};
+  if (!node)
+    return;
+  node->setExpanded(true);
+  m_hasUnsavedChanges = true;
 }
 
 QTimer* MemWatchWidget::getUpdateTimer() const
@@ -704,6 +733,7 @@ void MemWatchWidget::openWatchFile()
     watchFile.close();
     QJsonDocument loadDoc(QJsonDocument::fromJson(bytes));
     m_watchModel->loadRootFromJsonRecursive(loadDoc.object());
+    updateExpansionState();
     m_watchListFile = fileName;
     m_hasUnsavedChanges = false;
   }
@@ -897,6 +927,7 @@ void MemWatchWidget::restoreWatchModel(const QString& json)
 {
   const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));
   m_watchModel->loadRootFromJsonRecursive(loadDoc.object());
+  updateExpansionState();
 }
 
 QString MemWatchWidget::saveWatchModel()
@@ -905,4 +936,31 @@ QString MemWatchWidget::saveWatchModel()
   m_watchModel->writeRootToJsonRecursive(root);
   QJsonDocument saveDoc(root);
   return saveDoc.toJson();
+}
+
+void MemWatchWidget::updateExpansionState(const MemWatchTreeNode* const node)
+{
+  QSignalBlocker signalBlocker(*m_watchView);
+
+  std::vector<const MemWatchTreeNode*> nodes;
+  nodes.push_back(node ? node : m_watchModel->getRootNode());
+
+  while (!nodes.empty())
+  {
+    const MemWatchTreeNode* const node{nodes.back()};
+    nodes.pop_back();
+
+    if (!node)
+      continue;
+
+    if (node->isExpanded())
+    {
+      m_watchView->setExpanded(m_watchModel->getIndexFromTreeNode(node), true);
+    }
+
+    for (const MemWatchTreeNode* const child : node->getChildren())
+    {
+      nodes.push_back(child);
+    }
+  }
 }
