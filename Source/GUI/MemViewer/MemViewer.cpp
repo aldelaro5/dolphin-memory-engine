@@ -49,7 +49,7 @@ MemViewer::~MemViewer()
 
 void MemViewer::initialise()
 {
-  updateFontSize(m_memoryFontSize);
+  updateFontSize();
   m_curosrRect = new QRect();
   m_updatedRawMemoryData = new char[m_numCells];
   m_lastRawMemoryData = new char[m_numCells];
@@ -356,9 +356,14 @@ void MemViewer::wheelEvent(QWheelEvent* event)
   if (event->modifiers().testFlag(Qt::ControlModifier))
   {
     if (event->angleDelta().y() < 0 && m_memoryFontSize > 5)
-      updateFontSize(m_memoryFontSize - 1);
+    {
+      m_memoryFontSize -= 1;
+    }
     else if (event->angleDelta().y() > 0)
-      updateFontSize(m_memoryFontSize + 1);
+    {
+      m_memoryFontSize += 1;
+    }
+    updateFontSize();
 
     viewport()->update();
   }
@@ -368,19 +373,16 @@ void MemViewer::wheelEvent(QWheelEvent* event)
   }
 }
 
-void MemViewer::updateFontSize(int newSize)
+void MemViewer::updateFontSize()
 {
-  m_memoryFontSize = newSize;
+  if (m_memoryFontSize == -1)
+  {
+    m_memoryFontSize = static_cast<int>(font().pointSize() * 1.5);
+  }
 
-#ifdef __linux__
-  setFont(QFont("Monospace", m_memoryFontSize));
-#elif _WIN32
-  setFont(QFont("Courier New", m_memoryFontSize));
-#elif __APPLE__
   QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
   fixedFont.setPointSize(m_memoryFontSize);
   setFont(fixedFont);
-#endif
 
   m_charWidthEm = fontMetrics().horizontalAdvance(QLatin1Char('M'));
   m_charHeight = fontMetrics().height();
@@ -1013,6 +1015,7 @@ void MemViewer::paintEvent(QPaintEvent* event)
   (void)event;
 
   QPainter painter(viewport());
+  painter.setFont(font());
   painter.setPen(QColor(Qt::black));
 
   renderSeparatorLines(painter);
