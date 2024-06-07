@@ -15,15 +15,36 @@ class AddressValidator : public QValidator
 public:
   QValidator::State validate(QString& input, int& pos) const override
   {
+    // Strip invalid characters.
+    {
+      const QString copy{input};
+      input.clear();
+      for (qsizetype i{0}; i < copy.size(); ++i)
+      {
+        const QChar c{copy[i].toLower()};
+        if (('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || c == 'x')
+        {
+          input.append(copy[i]);
+          continue;
+        }
+        if (i < pos)
+        {
+          pos -= 1;
+        }
+      }
+    }
+
+    // Drop the optional prefix.
     if (input.startsWith("0x"))
     {
       input.remove(0, 2);
-      pos -= 2;
+      pos = std::max(0, pos - 2);
     }
-    if (input.size() > 8)
-    {
-      return QValidator::Invalid;
-    }
+
+    // Drop excess.
+    input.truncate(8);
+    pos = std::min(8, pos);
+
     return QValidator::Acceptable;
   }
 };
@@ -33,7 +54,6 @@ AddressInputWidget::AddressInputWidget(QWidget* const parent) : QLineEdit(parent
 {
   setPlaceholderText("00000000");
   setValidator(new AddressValidator);
-  setMaxLength(10);  // 8 + 2, to allow the user to paste a value that includes  the "0x" prefix
 
   const QFont fixedFont{QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
   setFont(fixedFont);
