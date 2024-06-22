@@ -115,7 +115,7 @@ Options:
                                                      on Linux or macOS).
 ```
 
-## Troubleshouting
+## Troubleshooting
 
 On Linux, the program may require additional kernel permissions to be able to read and write memory to external processes (which is required to read and write the memory of Dolphin).  If nothing happens to Dolphin, but the program frequently unhooks itself, the program is missing the required permissions.  Grant these permissions by running the following command as root:
 
@@ -128,4 +128,4 @@ If it doesn't work, verify that you do not have the `nosuid` mount flag on your 
 On macOS, Dolphin (upon install or after an update) must be signed with specific entitlements to permit memory access. Follow the instructions [above](#macos-code-signing).
 
 ## License
-This program is licensed under the MIT license which grants you the permission to do  anything you wish to with the software, as long as you preserve all copyright notices. (See the file LICENSE for the legal text.)
+This program is licensed under the MIT license which grants you the permission to do anything you wish to with the software, as long as you preserve all copyright notices. (See the file LICENSE for the legal text.)
