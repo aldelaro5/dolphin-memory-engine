@@ -126,7 +126,7 @@
     <ClCompile Include="GeneratedFiles\$(Configuration)\moc_MemWatchModel.cpp" />
     <ClCompile Include="GeneratedFiles\$(Configuration)\moc_MemWatchWidget.cpp" />
     <ClCompile Include="GeneratedFiles\$(Configuration)\moc_ResultsListModel.cpp" />
-    <ClCompile Include="GeneratedFiles\$(Configuration)\moc_AddressInputWidget.cpp" />
+    <!--<ClCompile Include="GeneratedFiles\$(Configuration)\moc_AddressInputWidget.cpp" />-->
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="**\*.h" Exclude="GUI\**\*.h" />
