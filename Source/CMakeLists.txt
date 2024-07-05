@@ -48,7 +48,17 @@ set(SRCS ${DolphinProcessSrc}
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Qt6Widgets REQUIRED)
+if (WIN32)
+    find_package(Qt6Widgets QUIET)
+	  if (NOT Qt6Widgets_FOUND)
+		    message(STATUS "Qt package not found, using external lib")
+		    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}\\..\\Externals\\Qt\\Qt6.5.3\\x64")
+		    find_package(Qt6Widgets REQUIRED)
+	  endif ()
+else ()
+	  find_package(Qt6Widgets REQUIRED)
+endif ()
+
 find_package(Qt6Core REQUIRED)
 find_package(Qt6Gui REQUIRED)
 if (NOT APPLE)
