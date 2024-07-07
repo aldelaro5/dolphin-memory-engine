@@ -433,7 +433,7 @@ void MemWatchWidget::pasteWatchFromClipBoard(const QModelIndex& referenceIndex)
 void MemWatchWidget::copyAddressToClipboard(u32 addr)
 {
   char hex_string[10];
-  sprintf_s(hex_string, "%X", addr);
+  sprintf(hex_string, "%X", addr);
   QClipboard* clipboard = QApplication::clipboard();
   clipboard->setText(hex_string);
 }

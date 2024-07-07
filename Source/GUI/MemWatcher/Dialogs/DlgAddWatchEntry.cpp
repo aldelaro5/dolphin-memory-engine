@@ -446,7 +446,7 @@ void DlgAddWatchEntry::onPointerOffsetContextMenuRequested(const QPoint& pos)
     if (0 < yPos && yPos < lbl->height() && 0 < xPos && xPos < lbl->width())
     {
       QAction* copyAddr = new QAction(tr("&Copy Address"), this);
-      connect(copyAddr, &QAction::triggered, this, [this, lbl] {
+      connect(copyAddr, &QAction::triggered, this, [lbl] {
         QApplication::clipboard()->setText(lbl->text().mid(4, lbl->text().length() - 4));
       });
       contextMenu->addAction(copyAddr);
