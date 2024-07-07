@@ -283,7 +283,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       connect(copyPointer, &QAction::triggered, this,
               [this, entry] { copyAddressToClipboard(entry->getConsoleAddress()); });
       copyAddrSubmenu->addAction(copyPointer);
-      for (int i = 0; i < entry->getPointerLevel(); ++i)
+      for (int i = 0; i < static_cast<int>(entry->getPointerLevel()); ++i)
       {
         std::string strAddressOfPath = entry->getAddressStringForPointerLevel(i + 1);
         if (strAddressOfPath == "???")
