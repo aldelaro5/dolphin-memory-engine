@@ -273,6 +273,43 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   connect(copy, &QAction::triggered, this, [this] { copySelectedWatchesToClipBoard(); });
   contextMenu->addAction(copy);
 
+  if (index != QModelIndex())
+  {
+    MemWatchEntry* entry = m_watchModel->getEntryFromIndex(index);
+    if (entry->isBoundToPointer())
+    {
+      QMenu* copyAddrSubmenu = contextMenu->addMenu(tr("Copy add&ress..."));
+      QAction* copyPointer = new QAction(tr("Copy &base address..."), this);
+      connect(copyPointer, &QAction::triggered, this,
+              [=] { copyAddressToClipboard(entry->getConsoleAddress()); });
+      copyAddrSubmenu->addAction(copyPointer);
+      for (int i = 0; i < entry->getPointerLevel(); ++i)
+      {
+        std::string strAddressOfPath = entry->getAddressStringForPointerLevel(i + 1);
+        if (strAddressOfPath == "???")
+          break;
+        QAction* showAddressOfPathInViewer = new QAction(
+            tr("Copy pointed address at &level %1...").arg(QString::number(i + 1)), this);
+        connect(showAddressOfPathInViewer, &QAction::triggered, this,
+                [=] { copyAddressToClipboard(entry->getAddressForPointerLevel(i + 1)); });
+        copyAddrSubmenu->addAction(showAddressOfPathInViewer);
+      }
+    }
+    else
+    {
+      QAction* copyPointer = new QAction(tr("Copy add&ress"), this);
+      connect(copyPointer, &QAction::triggered, this,
+              [=] { copyAddressToClipboard(entry->getConsoleAddress()); });
+      contextMenu->addAction(copyPointer);
+
+      QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
+      if (selection.count() == 0)
+      {
+        copyPointer->setEnabled(false);
+      }
+    }
+  }
+
   QAction* paste = new QAction(tr("&Paste"), this);
   connect(paste, &QAction::triggered, this, [this, index] { pasteWatchFromClipBoard(index); });
   contextMenu->addAction(paste);
@@ -391,6 +428,14 @@ void MemWatchWidget::pasteWatchFromClipBoard(const QModelIndex& referenceIndex)
   m_watchModel->addNodes(childrenVec, referenceIndex);
 
   m_hasUnsavedChanges = true;
+}
+
+void MemWatchWidget::copyAddressToClipboard(u32 addr)
+{
+  char hex_string[10];
+  sprintf_s(hex_string, "%X", addr);
+  QClipboard* clipboard = QApplication::clipboard();
+  clipboard->setText(hex_string);
 }
 
 void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
