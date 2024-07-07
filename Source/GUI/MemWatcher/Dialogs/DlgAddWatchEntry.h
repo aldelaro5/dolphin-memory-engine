@@ -44,6 +44,7 @@ private:
   void addPointerOffset();
   void removePointerOffset();
   void removeAllPointerOffset();
+  void onPointerOffsetContextMenuRequested(const QPoint& pos);
 
   MemWatchEntry* m_entry{};
   AddressInputWidget* m_txbAddress{};

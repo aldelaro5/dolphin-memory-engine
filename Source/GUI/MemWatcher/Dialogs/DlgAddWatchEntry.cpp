@@ -6,6 +6,9 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include <QVBoxLayout>
+#include <QMenu>
+#include <QApplication>
+#include <QClipboard>
 #include <sstream>
 
 #include "../../../DolphinProcess/DolphinAccessor.h"
@@ -58,6 +61,9 @@ void DlgAddWatchEntry::initialiseWidgets()
   connect(m_btnRemoveOffset, &QPushButton::clicked, this, &DlgAddWatchEntry::removePointerOffset);
 
   m_pointerWidget = new QGroupBox("Offsets (in hex)", this);
+  m_pointerWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(m_pointerWidget, &QWidget::customContextMenuRequested, this,
+          &DlgAddWatchEntry::onPointerOffsetContextMenuRequested);
 
   m_txbLabel = new QLineEdit(this);
 
@@ -423,4 +429,33 @@ MemWatchEntry* DlgAddWatchEntry::stealEntry()
   MemWatchEntry* entry{m_entry};
   m_entry = nullptr;
   return entry;
+}
+
+void DlgAddWatchEntry::onPointerOffsetContextMenuRequested(const QPoint& pos)
+{
+  QMenu* contextMenu = new QMenu(this);
+
+  for (int i = 0; i < m_offsetsLayout->rowCount(); i++)
+  {
+    QLabel* lbl = (QLabel*)m_offsetsLayout->itemAtPosition(i, 2)->widget();
+
+    QPoint click_pos = lbl->mapFrom(m_pointerWidget, pos);
+    int xPos = click_pos.x();
+    int yPos = click_pos.y();
+
+    if (0 < yPos && yPos < lbl->height() && 0 < xPos && xPos < lbl->width())
+    {
+      QAction* copyAddr = new QAction(tr("&Copy Address"), this);
+      connect(copyAddr, &QAction::triggered, this, [this, lbl] {
+        QApplication::clipboard()->setText(lbl->text().mid(4, lbl->text().length() - 4));
+      });
+      contextMenu->addAction(copyAddr);
+      if (lbl->text().contains(QString("??")))
+      {
+        copyAddr->setEnabled(false);
+      }
+      contextMenu->popup(lbl->mapToGlobal(click_pos));
+      break;
+    }
+  }
 }
