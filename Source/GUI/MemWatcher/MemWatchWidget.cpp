@@ -281,7 +281,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       QMenu* copyAddrSubmenu = contextMenu->addMenu(tr("Copy add&ress..."));
       QAction* copyPointer = new QAction(tr("Copy &base address..."), this);
       connect(copyPointer, &QAction::triggered, this,
-              [=] { copyAddressToClipboard(entry->getConsoleAddress()); });
+              [this, entry] { copyAddressToClipboard(entry->getConsoleAddress()); });
       copyAddrSubmenu->addAction(copyPointer);
       for (int i = 0; i < entry->getPointerLevel(); ++i)
       {
@@ -291,7 +291,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
         QAction* showAddressOfPathInViewer = new QAction(
             tr("Copy pointed address at &level %1...").arg(QString::number(i + 1)), this);
         connect(showAddressOfPathInViewer, &QAction::triggered, this,
-                [=] { copyAddressToClipboard(entry->getAddressForPointerLevel(i + 1)); });
+                [this, entry, i] { copyAddressToClipboard(entry->getAddressForPointerLevel(i + 1)); });
         copyAddrSubmenu->addAction(showAddressOfPathInViewer);
       }
     }
@@ -299,7 +299,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
     {
       QAction* copyPointer = new QAction(tr("Copy add&ress"), this);
       connect(copyPointer, &QAction::triggered, this,
-              [=] { copyAddressToClipboard(entry->getConsoleAddress()); });
+              [this, entry] { copyAddressToClipboard(entry->getConsoleAddress()); });
       contextMenu->addAction(copyPointer);
 
       QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
@@ -432,8 +432,8 @@ void MemWatchWidget::pasteWatchFromClipBoard(const QModelIndex& referenceIndex)
 
 void MemWatchWidget::copyAddressToClipboard(u32 addr)
 {
-  char hex_string[10];
-  sprintf(hex_string, "%X", addr);
+  char hex_string[8];
+  snprintf(hex_string, 8, "%X", addr);
   QClipboard* clipboard = QApplication::clipboard();
   clipboard->setText(hex_string);
 }
