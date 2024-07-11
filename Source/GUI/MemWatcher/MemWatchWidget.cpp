@@ -275,11 +275,11 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
 
   if (index.isValid())
   {
-    MemWatchEntry* entry = m_watchModel->getEntryFromIndex(index);
+    MemWatchEntry* const entry = m_watchModel->getEntryFromIndex(index);
     if (entry->isBoundToPointer())
     {
-      QMenu* copyAddrSubmenu = contextMenu->addMenu(tr("Copy add&ress..."));
-      QAction* copyPointer = new QAction(tr("Copy &base address..."), this);
+      QMenu* const copyAddrSubmenu = contextMenu->addMenu(tr("Copy add&ress..."));
+      QAction* const copyPointer = new QAction(tr("Copy &base address..."), this);
       const QString addrString{QString::number(entry->getConsoleAddress(), 16).toUpper()};
       connect(copyPointer, &QAction::triggered, this,
               [addrString] { QApplication::clipboard()->setText(addrString);
@@ -287,20 +287,21 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       copyAddrSubmenu->addAction(copyPointer);
       for (int i = 0; i < static_cast<int>(entry->getPointerLevel()); ++i)
       {
-        std::string strAddressOfPath = entry->getAddressStringForPointerLevel(i + 1);
+        std::string const strAddressOfPath = entry->getAddressStringForPointerLevel(i + 1);
         if (!entry->getAddressForPointerLevel(i + 1))
           break;
-        QAction* showAddressOfPathInViewer = new QAction(
+        QAction* const copyAddrOfPointer = new QAction(
             tr("Copy pointed address at &level %1...").arg(i + 1), this);
         const QString addrString{
             QString::number(entry->getAddressForPointerLevel(i + 1), 16).toUpper()};
         connect(copyAddrOfPointer, &QAction::triggered, this,
                 [addrString] { QApplication::clipboard()->setText(addrString); });
+        copyAddrSubmenu->addAction(copyAddrOfPointer);
       }
     }
     else
     {
-      QAction* copyPointer = new QAction(tr("Copy add&ress"), this);
+      QAction* const copyPointer = new QAction(tr("Copy add&ress"), this);
       const QString addrString{QString::number(entry->getConsoleAddress(), 16).toUpper()};
       connect(copyPointer, &QAction::triggered, this,
               [addrString] { QApplication::clipboard()->setText(addrString); });
