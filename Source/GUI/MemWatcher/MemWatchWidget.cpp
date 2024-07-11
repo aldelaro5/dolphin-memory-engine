@@ -288,7 +288,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       for (int i = 0; i < static_cast<int>(entry->getPointerLevel()); ++i)
       {
         std::string strAddressOfPath = entry->getAddressStringForPointerLevel(i + 1);
-        if (strAddressOfPath == "???")
+        if (!entry->getAddressForPointerLevel(i + 1))
           break;
         QAction* showAddressOfPathInViewer = new QAction(
             tr("Copy pointed address at &level %1...").arg(QString::number(i + 1)), this);
