@@ -305,12 +305,6 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       connect(copyPointer, &QAction::triggered, this,
               [addrString] { QApplication::clipboard()->setText(addrString); });
       contextMenu->addAction(copyPointer);
-
-      QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
-      if (selection.count() == 0)
-      {
-        copyPointer->setEnabled(false);
-      }
     }
   }
 
