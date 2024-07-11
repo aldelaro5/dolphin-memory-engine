@@ -273,7 +273,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   connect(copy, &QAction::triggered, this, [this] { copySelectedWatchesToClipBoard(); });
   contextMenu->addAction(copy);
 
-  if (index != QModelIndex())
+  if (index.isValid())
   {
     MemWatchEntry* entry = m_watchModel->getEntryFromIndex(index);
     if (entry->isBoundToPointer())
