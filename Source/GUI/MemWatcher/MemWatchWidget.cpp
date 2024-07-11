@@ -291,7 +291,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
         if (!entry->getAddressForPointerLevel(i + 1))
           break;
         QAction* showAddressOfPathInViewer = new QAction(
-            tr("Copy pointed address at &level %1...").arg(QString::number(i + 1)), this);
+            tr("Copy pointed address at &level %1...").arg(i + 1), this);
         const QString addrString{
             QString::number(entry->getAddressForPointerLevel(i + 1), 16).toUpper()};
         connect(copyAddrOfPointer, &QAction::triggered, this,
