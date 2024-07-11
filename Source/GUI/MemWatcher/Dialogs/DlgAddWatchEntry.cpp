@@ -61,9 +61,6 @@ void DlgAddWatchEntry::initialiseWidgets()
   connect(m_btnRemoveOffset, &QPushButton::clicked, this, &DlgAddWatchEntry::removePointerOffset);
 
   m_pointerWidget = new QGroupBox("Offsets (in hex)", this);
-  m_pointerWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  connect(m_pointerWidget, &QWidget::customContextMenuRequested, this,
-          &DlgAddWatchEntry::onPointerOffsetContextMenuRequested);
 
   m_txbLabel = new QLineEdit(this);
 
@@ -173,6 +170,10 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
         QLabel* lblAddressOfPath = new QLabel();
         lblAddressOfPath->setText(
             QString::fromStdString(" -> " + m_entry->getAddressStringForPointerLevel(i + 1)));
+        lblAddressOfPath->setProperty("addr", m_entry->getAddressForPointerLevel(i + 1));
+        lblAddressOfPath->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(lblAddressOfPath, &QWidget::customContextMenuRequested, this,
+                &DlgAddWatchEntry::onPointerOffsetContextMenuRequested);
         m_addressPath.append(lblAddressOfPath);
         m_offsetsLayout->addWidget(lblLevel, i, 0);
         m_offsetsLayout->addWidget(txbOffset, i, 1);
@@ -196,6 +197,11 @@ void DlgAddWatchEntry::addPointerOffset()
   QLineEdit* txbOffset = new QLineEdit();
   m_offsets.append(txbOffset);
   QLabel* lblAddressOfPath = new QLabel(" -> ");
+  lblAddressOfPath->setText(QString::fromStdString(" -> " + m_entry->getAddressStringForPointerLevel(level + 1)));
+  lblAddressOfPath->setProperty("addr", m_entry->getAddressForPointerLevel(level + 1));
+  lblAddressOfPath->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(lblAddressOfPath, &QWidget::customContextMenuRequested, this,
+          &DlgAddWatchEntry::onPointerOffsetContextMenuRequested);
   m_addressPath.append(lblAddressOfPath);
   m_offsetsLayout->addWidget(lblLevel, level, 0);
   m_offsetsLayout->addWidget(txbOffset, level, 1);
@@ -394,6 +400,7 @@ void DlgAddWatchEntry::updatePreview()
           static_cast<QLabel*>(m_offsetsLayout->itemAtPosition(i, 2)->widget());
       lblAddressOfPath->setText(
           QString::fromStdString(" -> " + m_entry->getAddressStringForPointerLevel(i + 1)));
+      lblAddressOfPath->setProperty("addr", m_entry->getAddressForPointerLevel(i + 1));
     }
   }
 }
@@ -433,29 +440,20 @@ MemWatchEntry* DlgAddWatchEntry::stealEntry()
 
 void DlgAddWatchEntry::onPointerOffsetContextMenuRequested(const QPoint& pos)
 {
+  QLabel* const lbl = static_cast<QLabel*>(sender());
+
   QMenu* contextMenu = new QMenu(this);
+  QAction* copyAddr = new QAction(tr("&Copy Address"), this);
 
-  for (int i = 0; i < m_offsetsLayout->rowCount(); i++)
-  {
-    QLabel* lbl = (QLabel*)m_offsetsLayout->itemAtPosition(i, 2)->widget();
+  const QString text{QString::number(lbl->property("addr").toUInt(), 16).toUpper()};
+  connect(copyAddr, &QAction::triggered, this,
+    [text] { QApplication::clipboard()->setText(text); });
+  contextMenu->addAction(copyAddr);
 
-    QPoint click_pos = lbl->mapFrom(m_pointerWidget, pos);
-    int xPos = click_pos.x();
-    int yPos = click_pos.y();
-
-    if (0 < yPos && yPos < lbl->height() && 0 < xPos && xPos < lbl->width())
+  if (!lbl->property("addr").toUInt())
     {
-      QAction* copyAddr = new QAction(tr("&Copy Address"), this);
-      connect(copyAddr, &QAction::triggered, this, [lbl] {
-        QApplication::clipboard()->setText(lbl->text().mid(4, lbl->text().length() - 4));
-      });
-      contextMenu->addAction(copyAddr);
-      if (lbl->text().contains(QString("??")))
-      {
         copyAddr->setEnabled(false);
       }
-      contextMenu->popup(lbl->mapToGlobal(click_pos));
-      break;
-    }
-  }
+
+  contextMenu->popup(lbl->mapToGlobal(pos));
 }
