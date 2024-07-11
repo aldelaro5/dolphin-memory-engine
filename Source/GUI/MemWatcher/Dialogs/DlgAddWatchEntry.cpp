@@ -1,14 +1,14 @@
 #include "DlgAddWatchEntry.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QDialogButtonBox>
 #include <QFontDatabase>
 #include <QFormLayout>
 #include <QHBoxLayout>
+#include <QMenu>
 #include <QMessageBox>
 #include <QVBoxLayout>
-#include <QMenu>
-#include <QApplication>
-#include <QClipboard>
 #include <sstream>
 
 #include "../../../DolphinProcess/DolphinAccessor.h"
