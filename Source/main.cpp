@@ -21,8 +21,7 @@ int main(int argc, char** argv)
   parser.addVersionOption();
 
   const QCommandLineOption dolphinProcessNameOption(
-      QStringList() << "d"
-                    << "dolphin-process-name",
+      QStringList() << "d" << "dolphin-process-name",
       QObject::tr("Specify custom name for the Dolphin Emulator process. By default, "
                   "platform-specific names are used (e.g. \"Dolphin.exe\" on Windows, or "
                   "\"dolphin-emu\" on Linux or macOS)."),
