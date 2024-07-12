@@ -10,14 +10,14 @@ on:
 
 jobs:
   clang-format-check:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     name: Clang-Format Check
     steps:
       - uses: actions/checkout@v4
-      - uses: RafikFarhad/clang-format-github-action@v4
+      - uses: jidicula/clang-format-action@v4.13.0
         with:
-          style: "file"
-          sources: "Source/**/*.h,Source/**/*.cpp"
+          clang-format-version: '18'
+          check-path: Source
 
   build-windows:
     runs-on: windows-latest
