@@ -303,7 +303,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       QAction* const copyPointer = new QAction(tr("Copy add&ress"), this);
       const QString addrString{QString::number(entry->getConsoleAddress(), 16).toUpper()};
       connect(copyPointer, &QAction::triggered, this,
-        s[addrString] { QApplication::clipboard()->setText(addrString); });
+        [addrString] { QApplication::clipboard()->setText(addrString); });
       contextMenu->addAction(copyPointer);
     }
   }
