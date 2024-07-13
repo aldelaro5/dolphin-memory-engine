@@ -440,7 +440,7 @@ MemWatchEntry* DlgAddWatchEntry::stealEntry()
 
 void DlgAddWatchEntry::onPointerOffsetContextMenuRequested(const QPoint& pos)
 {
-  QLabel* const lbl = static_cast<QLabel*>(sender());
+  QLabel* const lbl = qobject_cast<QLabel*>(sender());
 
   QMenu* contextMenu = new QMenu(this);
   QAction* copyAddr = new QAction(tr("&Copy Address"), this);
