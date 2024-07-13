@@ -442,8 +442,8 @@ void DlgAddWatchEntry::onPointerOffsetContextMenuRequested(const QPoint& pos)
 {
   QLabel* const lbl = qobject_cast<QLabel*>(sender());
 
-  QMenu* contextMenu = new QMenu(this);
-  QAction* copyAddr = new QAction(tr("&Copy Address"), this);
+  QMenu* const contextMenu = new QMenu(this);
+  QAction* const copyAddr = new QAction(tr("&Copy Address"), this);
 
   const QString text{QString::number(lbl->property("addr").toUInt(), 16).toUpper()};
   connect(copyAddr, &QAction::triggered, this,
