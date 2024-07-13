@@ -287,7 +287,6 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       copyAddrSubmenu->addAction(copyPointer);
       for (int i = 0; i < static_cast<int>(entry->getPointerLevel()); ++i)
       {
-        std::string const strAddressOfPath = entry->getAddressStringForPointerLevel(i + 1);
         if (!entry->getAddressForPointerLevel(i + 1))
           break;
         QAction* const copyAddrOfPointer = new QAction(
