@@ -282,19 +282,19 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       QAction* const copyPointer = new QAction(tr("Copy &base address..."), this);
       const QString addrString{QString::number(entry->getConsoleAddress(), 16).toUpper()};
       connect(copyPointer, &QAction::triggered, this,
-              [addrString] { QApplication::clipboard()->setText(addrString);
+        [addrString] { QApplication::clipboard()->setText(addrString);
       });
       copyAddrSubmenu->addAction(copyPointer);
       for (int i = 0; i < static_cast<int>(entry->getPointerLevel()); ++i)
       {
         if (!entry->getAddressForPointerLevel(i + 1))
           break;
-        QAction* const copyAddrOfPointer = new QAction(
-            tr("Copy pointed address at &level %1...").arg(i + 1), this);
+        QAction* const copyAddrOfPointer =
+          new QAction(tr("Copy pointed address at &level %1...").arg(i + 1), this);
         const QString addrString{
-            QString::number(entry->getAddressForPointerLevel(i + 1), 16).toUpper()};
+          QString::number(entry->getAddressForPointerLevel(i + 1), 16).toUpper()};
         connect(copyAddrOfPointer, &QAction::triggered, this,
-                [addrString] { QApplication::clipboard()->setText(addrString); });
+          [addrString] { QApplication::clipboard()->setText(addrString); });
         copyAddrSubmenu->addAction(copyAddrOfPointer);
       }
     }
@@ -303,7 +303,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       QAction* const copyPointer = new QAction(tr("Copy add&ress"), this);
       const QString addrString{QString::number(entry->getConsoleAddress(), 16).toUpper()};
       connect(copyPointer, &QAction::triggered, this,
-              [addrString] { QApplication::clipboard()->setText(addrString); });
+        s[addrString] { QApplication::clipboard()->setText(addrString); });
       contextMenu->addAction(copyPointer);
     }
   }
