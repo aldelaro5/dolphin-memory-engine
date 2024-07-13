@@ -397,7 +397,7 @@ void DlgAddWatchEntry::updatePreview()
     for (int i = 0; i < level; ++i)
     {
       QLabel* lblAddressOfPath =
-          static_cast<QLabel*>(m_offsetsLayout->itemAtPosition(i, 2)->widget());
+        qobject_cast<QLabel*>(m_offsetsLayout->itemAtPosition(i, 2)->widget());
       lblAddressOfPath->setText(
           QString::fromStdString(" -> " + m_entry->getAddressStringForPointerLevel(i + 1)));
       lblAddressOfPath->setProperty("addr", m_entry->getAddressForPointerLevel(i + 1));
