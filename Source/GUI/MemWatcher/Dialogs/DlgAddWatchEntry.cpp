@@ -451,9 +451,9 @@ void DlgAddWatchEntry::onPointerOffsetContextMenuRequested(const QPoint& pos)
   contextMenu->addAction(copyAddr);
 
   if (!lbl->property("addr").toUInt())
-    {
-        copyAddr->setEnabled(false);
-      }
+  {
+    copyAddr->setEnabled(false);
+  }
 
   contextMenu->popup(lbl->mapToGlobal(pos));
 }
