@@ -1,9 +1,12 @@
 #include "DlgAddWatchEntry.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QDialogButtonBox>
 #include <QFontDatabase>
 #include <QFormLayout>
 #include <QHBoxLayout>
+#include <QMenu>
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <sstream>
@@ -167,6 +170,10 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
         QLabel* lblAddressOfPath = new QLabel();
         lblAddressOfPath->setText(
             QString::fromStdString(" -> " + m_entry->getAddressStringForPointerLevel(i + 1)));
+        lblAddressOfPath->setProperty("addr", m_entry->getAddressForPointerLevel(i + 1));
+        lblAddressOfPath->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(lblAddressOfPath, &QWidget::customContextMenuRequested, this,
+                &DlgAddWatchEntry::onPointerOffsetContextMenuRequested);
         m_addressPath.append(lblAddressOfPath);
         m_offsetsLayout->addWidget(lblLevel, i, 0);
         m_offsetsLayout->addWidget(txbOffset, i, 1);
@@ -190,6 +197,12 @@ void DlgAddWatchEntry::addPointerOffset()
   QLineEdit* txbOffset = new QLineEdit();
   m_offsets.append(txbOffset);
   QLabel* lblAddressOfPath = new QLabel(" -> ");
+  lblAddressOfPath->setText(
+      QString::fromStdString(" -> " + m_entry->getAddressStringForPointerLevel(level + 1)));
+  lblAddressOfPath->setProperty("addr", m_entry->getAddressForPointerLevel(level + 1));
+  lblAddressOfPath->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(lblAddressOfPath, &QWidget::customContextMenuRequested, this,
+          &DlgAddWatchEntry::onPointerOffsetContextMenuRequested);
   m_addressPath.append(lblAddressOfPath);
   m_offsetsLayout->addWidget(lblLevel, level, 0);
   m_offsetsLayout->addWidget(txbOffset, level, 1);
@@ -385,9 +398,10 @@ void DlgAddWatchEntry::updatePreview()
     for (int i = 0; i < level; ++i)
     {
       QLabel* lblAddressOfPath =
-          static_cast<QLabel*>(m_offsetsLayout->itemAtPosition(i, 2)->widget());
+          qobject_cast<QLabel*>(m_offsetsLayout->itemAtPosition(i, 2)->widget());
       lblAddressOfPath->setText(
           QString::fromStdString(" -> " + m_entry->getAddressStringForPointerLevel(i + 1)));
+      lblAddressOfPath->setProperty("addr", m_entry->getAddressForPointerLevel(i + 1));
     }
   }
 }
@@ -423,4 +437,24 @@ MemWatchEntry* DlgAddWatchEntry::stealEntry()
   MemWatchEntry* entry{m_entry};
   m_entry = nullptr;
   return entry;
+}
+
+void DlgAddWatchEntry::onPointerOffsetContextMenuRequested(const QPoint& pos)
+{
+  QLabel* const lbl = qobject_cast<QLabel*>(sender());
+
+  QMenu* const contextMenu = new QMenu(this);
+  QAction* const copyAddr = new QAction(tr("&Copy Address"), this);
+
+  const QString text{QString::number(lbl->property("addr").toUInt(), 16).toUpper()};
+  connect(copyAddr, &QAction::triggered, this,
+          [text] { QApplication::clipboard()->setText(text); });
+  contextMenu->addAction(copyAddr);
+
+  if (!lbl->property("addr").toUInt())
+  {
+    copyAddr->setEnabled(false);
+  }
+
+  contextMenu->popup(lbl->mapToGlobal(pos));
 }
