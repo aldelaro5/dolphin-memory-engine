@@ -20,6 +20,7 @@
 #include <QTextStream>
 #include <QVBoxLayout>
 #include <string>
+#include <unordered_map>
 
 #include "../../Common/MemoryCommon.h"
 #include "../../MemoryWatch/MemWatchEntry.h"
