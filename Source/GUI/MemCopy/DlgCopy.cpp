@@ -169,8 +169,8 @@ bool DlgCopy::isHexString(std::string_view str)
   }
 
   return std::find_if(str.cbegin(), str.cend(), [](const char c) {
-    return !(('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F'));
-  }) == str.cend();
+           return !(('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F'));
+         }) == str.cend();
 }
 
 bool DlgCopy::hexStringToU32(const std::string_view str, u32& output)
@@ -194,7 +194,7 @@ bool DlgCopy::hexStringToU32(const std::string_view str, u32& output)
 bool DlgCopy::isUnsignedIntegerString(const std::string_view str)
 {
   return std::find_if(str.cbegin(), str.cend(),
-                             [](const char c) { return !('0' <= c && c <= '9'); }) == str.cend();
+                      [](const char c) { return !('0' <= c && c <= '9'); }) == str.cend();
 }
 
 bool DlgCopy::uintStringToU32(const std::string_view str, u32& output)
