@@ -5,6 +5,7 @@
 #include "../../Common/MemoryCommon.h"
 
 #include <cstdlib>
+#include <cstring>
 #include <mach/mach_vm.h>
 #include <memory>
 #include <string_view>
