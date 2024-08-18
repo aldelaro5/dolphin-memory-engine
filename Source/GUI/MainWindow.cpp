@@ -588,7 +588,7 @@ void MainWindow::updateStatusBar()
     {
       for (char& c : gameID)
       {
-        if (!std::isprint(c))
+        if (!std::isprint(static_cast<int>(static_cast<unsigned char>(c))))
         {
           c = '?';
         }

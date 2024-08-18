@@ -651,7 +651,7 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
       if (c == '\0')
         break;
 
-      if (std::isprint(c))
+      if (std::isprint(static_cast<int>(static_cast<unsigned char>(c))))
       {
         text.push_back(c);
       }
