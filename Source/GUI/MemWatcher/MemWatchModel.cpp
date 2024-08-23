@@ -119,7 +119,9 @@ void MemWatchModel::changeType(const QModelIndex& index, Common::MemType type, s
 MemWatchEntry* MemWatchModel::getEntryFromIndex(const QModelIndex& index)
 {
   MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
-  return node->getEntry();
+  if (node)
+    return node->getEntry();
+  return nullptr;
 }
 
 void MemWatchModel::addNodes(const std::vector<MemWatchTreeNode*>& nodes,

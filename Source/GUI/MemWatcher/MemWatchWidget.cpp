@@ -267,6 +267,17 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
     contextMenu->addSeparator();
   }
 
+  MemWatchEntry* const entry{MemWatchModel::getEntryFromIndex(index)};
+  if (!entry) {
+    QAction* const addGroup{new QAction(tr("Add &group"), this)};
+    connect(addGroup, &QAction::triggered, this, &MemWatchWidget::onAddGroup);
+    contextMenu->addAction(addGroup);
+    QAction* const addWatch{new QAction(tr("Add &watch"), this)};
+    connect(addWatch, &QAction::triggered, this, &MemWatchWidget::onAddWatchEntry);
+    contextMenu->addAction(addWatch);
+    contextMenu->addSeparator();
+  }
+
   QAction* cut = new QAction(tr("Cu&t"), this);
   connect(cut, &QAction::triggered, this, [this] { cutSelectedWatchesToClipBoard(); });
   contextMenu->addAction(cut);
@@ -274,7 +285,6 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   connect(copy, &QAction::triggered, this, [this] { copySelectedWatchesToClipBoard(); });
   contextMenu->addAction(copy);
 
-  MemWatchEntry* const entry{MemWatchModel::getEntryFromIndex(index)};
   if (entry)
   {
     if (entry->isBoundToPointer())
