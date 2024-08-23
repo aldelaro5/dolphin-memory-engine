@@ -193,6 +193,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
 void DlgAddWatchEntry::addPointerOffset()
 {
   int level = static_cast<int>(m_entry->getPointerLevel());
+  m_entry->addOffset(0);
   QLabel* lblLevel = new QLabel(QString::fromStdString("Level " + std::to_string(level + 1) + ":"));
   QLineEdit* txbOffset = new QLineEdit();
   m_offsets.append(txbOffset);
@@ -207,7 +208,7 @@ void DlgAddWatchEntry::addPointerOffset()
   m_offsetsLayout->addWidget(lblLevel, level, 0);
   m_offsetsLayout->addWidget(txbOffset, level, 1);
   m_offsetsLayout->addWidget(lblAddressOfPath, level, 2);
-  m_entry->addOffset(0);
+
   connect(txbOffset, &QLineEdit::textEdited, this, &DlgAddWatchEntry::onOffsetChanged);
   if (m_entry->getPointerLevel() > 1)
     m_btnRemoveOffset->setEnabled(true);
