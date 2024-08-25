@@ -267,6 +267,17 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
     contextMenu->addSeparator();
   }
 
+  if (!node || node->isGroup())
+  {
+    QAction* const addGroup{new QAction(tr("Add gro&up"), this)};
+    connect(addGroup, &QAction::triggered, this, &MemWatchWidget::onAddGroup);
+    contextMenu->addAction(addGroup);
+    QAction* const addWatch{new QAction(tr("Add &watch"), this)};
+    connect(addWatch, &QAction::triggered, this, &MemWatchWidget::onAddWatchEntry);
+    contextMenu->addAction(addWatch);
+    contextMenu->addSeparator();
+  }
+
   QAction* cut = new QAction(tr("Cu&t"), this);
   connect(cut, &QAction::triggered, this, [this] { cutSelectedWatchesToClipBoard(); });
   contextMenu->addAction(cut);
