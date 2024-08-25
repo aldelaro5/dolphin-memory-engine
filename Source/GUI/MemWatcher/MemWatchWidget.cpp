@@ -267,8 +267,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
     contextMenu->addSeparator();
   }
 
-  MemWatchEntry* const entry{MemWatchModel::getEntryFromIndex(index)};
-  if (!entry || node->isGroup()) {
+  if (!node || node->isGroup()) {
     QAction* const addGroup{new QAction(tr("Add &group"), this)};
     connect(addGroup, &QAction::triggered, this, &MemWatchWidget::onAddGroup);
     contextMenu->addAction(addGroup);
@@ -285,6 +284,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   connect(copy, &QAction::triggered, this, [this] { copySelectedWatchesToClipBoard(); });
   contextMenu->addAction(copy);
 
+  MemWatchEntry* const entry{MemWatchModel::getEntryFromIndex(index)};
   if (entry)
   {
     if (entry->isBoundToPointer())
