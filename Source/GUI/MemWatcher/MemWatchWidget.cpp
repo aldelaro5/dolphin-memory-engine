@@ -268,7 +268,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   }
 
   MemWatchEntry* const entry{MemWatchModel::getEntryFromIndex(index)};
-  if (!entry) {
+  if (!entry || node->isGroup()) {
     QAction* const addGroup{new QAction(tr("Add &group"), this)};
     connect(addGroup, &QAction::triggered, this, &MemWatchWidget::onAddGroup);
     contextMenu->addAction(addGroup);
