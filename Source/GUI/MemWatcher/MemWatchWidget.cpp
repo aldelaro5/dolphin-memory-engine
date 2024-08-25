@@ -268,7 +268,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   }
 
   if (!node || node->isGroup()) {
-    QAction* const addGroup{new QAction(tr("Add &group"), this)};
+    QAction* const addGroup{new QAction(tr("Add gro&up"), this)};
     connect(addGroup, &QAction::triggered, this, &MemWatchWidget::onAddGroup);
     contextMenu->addAction(addGroup);
     QAction* const addWatch{new QAction(tr("Add &watch"), this)};
