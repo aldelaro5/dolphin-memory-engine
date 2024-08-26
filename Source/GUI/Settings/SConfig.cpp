@@ -63,6 +63,11 @@ QString SConfig::getSettingsFilepath() const
   return m_settings->fileName();
 }
 
+QString SConfig::getWatchFile() const
+{
+  return value("watchFile", QString{}).toString();
+}
+
 QString SConfig::getWatchModel() const
 {
   return value("watchModel", QString{}).toString();
@@ -131,6 +136,11 @@ u32 SConfig::getMEM1Size() const
 u32 SConfig::getMEM2Size() const
 {
   return value("memorySettings/MEM2Size", 64u * 1024 * 1024).toUInt();
+}
+
+void SConfig::setWatchFile(const QString& path)
+{
+  setValue("watchFile", path);
 }
 
 void SConfig::setWatchModel(const QString& json)

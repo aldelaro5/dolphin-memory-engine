@@ -41,6 +41,7 @@ MainWindow::MainWindow()
   GUICommon::changeApplicationStyle(
       static_cast<GUICommon::ApplicationStyle>(SConfig::getInstance().getTheme()));
 
+  m_watcher->setWatchFile(SConfig::getInstance().getWatchFile());
   m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
@@ -63,7 +64,7 @@ void MainWindow::makeMenus()
   m_actOpenWatchList = new QAction(tr("&Open..."), this);
   m_actSaveWatchList = new QAction(tr("&Save"), this);
   m_actSaveAsWatchList = new QAction(tr("&Save as..."), this);
-  m_actClearWatchList = new QAction(tr("&Clear the watch list"), this);
+  m_actClearWatchList = new QAction(tr("&Reset watch list"), this);
   m_actImportFromCT = new QAction(tr("&Import from Cheat Engine's CT file..."), this);
   m_actExportAsCSV = new QAction(tr("&Export as CSV..."), this);
   QAction* const actOpenConfigDir{new QAction(tr("Open Configuration Directory..."), this)};
@@ -545,6 +546,7 @@ void MainWindow::onQuit()
 void MainWindow::closeEvent(QCloseEvent* event)
 {
   SConfig::getInstance().setAutoHook(m_actAutoHook->isChecked());
+  SConfig::getInstance().setWatchFile(m_watcher->getWatchFile());
   SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
   SConfig::getInstance().setMainWindowGeometry(saveGeometry());
   SConfig::getInstance().setMainWindowState(saveState());

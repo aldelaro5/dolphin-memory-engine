@@ -853,6 +853,7 @@ void MemWatchWidget::clearWatchList()
     return;
 
   m_watchModel->clearRoot();
+  m_watchListFile = "";
 }
 
 void MemWatchWidget::importFromCTFile()
@@ -982,6 +983,16 @@ QString MemWatchWidget::saveWatchModel()
   m_watchModel->writeRootToJsonRecursive(root);
   QJsonDocument saveDoc(root);
   return saveDoc.toJson();
+}
+
+QString MemWatchWidget::getWatchFile() const
+{
+  return m_watchListFile;
+}
+
+void MemWatchWidget::setWatchFile(const QString& path)
+{
+  m_watchListFile = path;
 }
 
 void MemWatchWidget::updateExpansionState(const MemWatchTreeNode* const node)
