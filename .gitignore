@@ -18,3 +18,4 @@ Source/.vscode/
 .vscode/
 .idea/*
 .DS_Store
+.cache

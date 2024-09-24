@@ -49,6 +49,8 @@ public:
   bool warnIfUnsavedChanges();
   void restoreWatchModel(const QString& json);
   QString saveWatchModel();
+  QString getWatchFile() const;
+  void setWatchFile(const QString& path);
 
 signals:
   void mustUnhook();

@@ -28,6 +28,7 @@ public:
   QByteArray getMainWindowState() const;
   QByteArray getSplitterState() const;
 
+  QString getWatchFile() const;
   QString getWatchModel() const;
   bool getAutoHook() const;
 
@@ -47,6 +48,7 @@ public:
   void setMainWindowState(QByteArray const&);
   void setSplitterState(QByteArray const&);
 
+  void setWatchFile(const QString& path);
   void setWatchModel(const QString& json);
   void setAutoHook(bool enabled);
 
