@@ -170,8 +170,8 @@ void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* p
     m_isGroup = false;
     m_entry = new MemWatchEntry();
     m_entry->readFromJson(json);
-    }
   }
+}
 
 void MemWatchTreeNode::writeToJson(QJsonObject& json, const bool writeExpandedState) const
 {
