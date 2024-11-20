@@ -34,6 +34,7 @@ enum class MemType
   type_double,
   type_string,
   type_byteArray,
+  type_struct,
 };
 
 enum class MemBase
