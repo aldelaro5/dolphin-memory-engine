@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <QString>
+#include <QJsonObject>
 
 #include "../Common/CommonTypes.h"
 #include "../Common/MemoryCommon.h"
@@ -54,6 +55,9 @@ public:
 
   std::string getStringFromMemory() const;
   Common::MemOperationReturnCode writeMemoryFromString(const std::string& inputString);
+
+  void readFromJson(const QJsonObject& json);
+  void writeToJson(const QJsonObject& json);
 
 private:
   Common::MemOperationReturnCode writeMemoryToRAM(const char* memory, size_t size);

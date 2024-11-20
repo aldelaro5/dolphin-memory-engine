@@ -169,35 +169,9 @@ void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* p
   {
     m_isGroup = false;
     m_entry = new MemWatchEntry();
-    m_entry->setLabel(json["label"].toString());
-    std::stringstream ss(json["address"].toString().toStdString());
-    u32 address = 0;
-    ss >> std::hex >> std::uppercase >> address;
-    m_entry->setConsoleAddress(address);
-    size_t length = 1;
-    if (json["length"] != QJsonValue::Undefined)
-      length = static_cast<size_t>(json["length"].toDouble());
-    m_entry->setTypeAndLength(static_cast<Common::MemType>(json["typeIndex"].toInt()), length);
-    m_entry->setSignedUnsigned(json["unsigned"].toBool());
-    m_entry->setBase(static_cast<Common::MemBase>(json["baseIndex"].toInt()));
-    if (json["pointerOffsets"] != QJsonValue::Undefined)
-    {
-      m_entry->setBoundToPointer(true);
-      QJsonArray pointerOffsets = json["pointerOffsets"].toArray();
-      for (auto i : pointerOffsets)
-      {
-        std::stringstream ssOffset(i.toString().toStdString());
-        int offset = 0;
-        ssOffset >> std::hex >> std::uppercase >> offset;
-        m_entry->addOffset(offset);
-      }
-    }
-    else
-    {
-      m_entry->setBoundToPointer(false);
+    m_entry->readFromJson(json);
     }
   }
-}
 
 void MemWatchTreeNode::writeToJson(QJsonObject& json, const bool writeExpandedState) const
 {
@@ -232,28 +206,7 @@ void MemWatchTreeNode::writeToJson(QJsonObject& json, const bool writeExpandedSt
     }
     else
     {
-      json["label"] = m_entry->getLabel();
-      std::stringstream ss;
-      ss << std::hex << std::uppercase << m_entry->getConsoleAddress();
-      json["address"] = QString::fromStdString(ss.str());
-      json["typeIndex"] = static_cast<double>(m_entry->getType());
-      json["unsigned"] = m_entry->isUnsigned();
-      if (m_entry->getType() == Common::MemType::type_string ||
-          m_entry->getType() == Common::MemType::type_byteArray)
-        json["length"] = static_cast<double>(m_entry->getLength());
-
-      json["baseIndex"] = static_cast<double>(m_entry->getBase());
-      if (m_entry->isBoundToPointer())
-      {
-        QJsonArray offsets;
-        for (int i{0}; i < static_cast<int>(m_entry->getPointerOffsets().size()); ++i)
-        {
-          std::stringstream ssOffset;
-          ssOffset << std::hex << std::uppercase << m_entry->getPointerOffset(i);
-          offsets.append(QString::fromStdString(ssOffset.str()));
-        }
-        json["pointerOffsets"] = offsets;
-      }
+      m_entry->writeToJson(json);
     }
   }
 }
