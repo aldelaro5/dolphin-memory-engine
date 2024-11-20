@@ -73,6 +73,8 @@ size_t getSizeForType(const MemType type, const size_t length)
     return length;
   case MemType::type_byteArray:
     return length;
+  case MemType::type_struct:
+    return length;
   default:
     return 0;
   }
@@ -96,6 +98,8 @@ bool shouldBeBSwappedForType(const MemType type)
     return false;
   case MemType::type_byteArray:
     return false;
+  case MemType::type_struct:
+    return false;
   default:
     return false;
   }
@@ -118,6 +122,8 @@ int getNbrBytesAlignmentForType(const MemType type)
   case MemType::type_string:
     return 1;
   case MemType::type_byteArray:
+    return 1;
+  case MemType::type_struct:
     return 1;
   default:
     return 1;
@@ -455,6 +461,12 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       index++;
     }
     actualLength = bytes.size();
+    break;
+  }
+
+  default:
+  {
+    break;
   }
   }
   return buffer;

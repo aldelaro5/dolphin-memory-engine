@@ -13,6 +13,7 @@
 #include "MemScanner/MemScanWidget.h"
 #include "MemViewer/MemViewerWidget.h"
 #include "MemWatcher/MemWatchWidget.h"
+#include "StructEditor/StructEditorWidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -56,12 +57,15 @@ public:
   void onAbout();
   void onQuit();
 
+  void onOpenStructEditor();
+
 private:
   void makeMenus();
   void initialiseWidgets();
   void makeLayouts();
   void makeMemViewer();
   void updateStatusBar();
+  void makeStructEditor();
 
   QSplitter* m_splitter{};
 
@@ -69,6 +73,7 @@ private:
   MemScanWidget* m_scanner{};
   MemViewerWidget* m_viewer{};
   DlgCopy* m_copier{};
+  StructEditorWidget* m_structEditor{};
 
   QTimer m_autoHookTimer;
 
@@ -90,6 +95,7 @@ private:
   QAction* m_actMemoryViewer{};
   QAction* m_actCopyMemory{};
   QAction* m_actScanner{};
+  QAction* m_actStructEditor{};
   QAction* m_actQuit{};
   QAction* m_actAbout{};
   QLabel* m_statusIcon{};

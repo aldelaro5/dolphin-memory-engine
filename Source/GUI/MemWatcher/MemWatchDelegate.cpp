@@ -53,7 +53,7 @@ void MemWatchDelegate::paint(QPainter* const painter, const QStyleOptionViewItem
   {
     MemWatchTreeNode* const node{MemWatchModel::getTreeNodeFromIndex(index)};
     MemWatchEntry* const entry{node->getEntry()};
-    if (entry)
+    if (entry && !GUICommon::isContainerType(entry->getType()))
     {
       QStyleOptionButton checkboxstyle;
       QRect checkbox_rect =
