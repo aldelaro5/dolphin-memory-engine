@@ -66,6 +66,12 @@ set(SRCS ${DolphinProcessSrc}
          GUI/MemViewer/MemViewerWidget.cpp
          GUI/MainWindow.cpp
          GUI/Widgets/AddressInputWidget.cpp
+				 GUI/StructEditor/StructEditorWidget.cpp
+				 GUI/StructEditor/StructDetailModel.cpp
+				 GUI/StructEditor/StructSelectModel.cpp
+				 Structs/StructTreeNode.cpp
+				 Structs/StructDef.cpp
+				 Structs/FieldDef.cpp
          Resources/resource.qrc
          ${ExeIconSrc}
          main.cpp)

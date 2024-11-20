@@ -16,9 +16,13 @@
 #include "../../GUICommon.h"
 
 DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const entry,
-                                   QWidget* const parent)
+                                   QVector<QString> const structs, QWidget* const parent,
+                                   bool isForStructField)
     : QDialog(parent)
 {
+  m_isForStructField = isForStructField;
+  m_structNames = structs;
+  m_structNames.push_front(QString(""));
   setWindowTitle(newEntry ? "Add Watch" : "Edit Watch");
   initialiseWidgets();
   makeLayouts();
@@ -47,14 +51,17 @@ void DlgAddWatchEntry::initialiseWidgets()
           &DlgAddWatchEntry::onIsPointerChanged);
 #endif
 
-  m_lblValuePreview = new QLineEdit("", this);
-  m_lblValuePreview->setReadOnly(true);
+  if (!m_isForStructField)
+  {
+    m_lblValuePreview = new QLineEdit("", this);
+    m_lblValuePreview->setReadOnly(true);
 
-  m_txbAddress = new AddressInputWidget(this);
-  connect(m_txbAddress, &QLineEdit::textEdited, this, &DlgAddWatchEntry::onAddressChanged);
+    m_txbAddress = new AddressInputWidget(this);
+    connect(m_txbAddress, &QLineEdit::textEdited, this, &DlgAddWatchEntry::onAddressChanged);
 
-  const QFont fixedFont{QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
-  m_lblValuePreview->setFont(fixedFont);
+    const QFont fixedFont{QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
+    m_lblValuePreview->setFont(fixedFont);
+  }
 
   m_offsetsLayout = new QGridLayout;
 
@@ -77,20 +84,27 @@ void DlgAddWatchEntry::initialiseWidgets()
   m_spnLength->setPrefix("Length: ");
   m_spnLength->setMinimum(1);
   m_spnLength->setMaximum(9999);
+
+  m_structSelect = new QComboBox(this);
+  m_structSelect->addItems(m_structNames);
 }
 
 void DlgAddWatchEntry::makeLayouts()
 {
   QFormLayout* formLayout = new QFormLayout;
   formLayout->setLabelAlignment(Qt::AlignRight);
-  formLayout->addRow("Preview:", m_lblValuePreview);
-  formLayout->addRow("Address:", m_txbAddress);
+  if (!m_isForStructField)
+  {
+    formLayout->addRow("Preview:", m_lblValuePreview);
+    formLayout->addRow("Address:", m_txbAddress);
+  }
   formLayout->addRow("Label:", m_txbLabel);
 
   QHBoxLayout* layout_type = new QHBoxLayout;
   layout_type->setContentsMargins(0, 0, 0, 0);
   layout_type->addWidget(m_cmbTypes, 1);
   layout_type->addWidget(m_spnLength);
+  layout_type->addWidget(m_structSelect);
   QWidget* widget_type = new QWidget;
   widget_type->setLayout(layout_type);
   widget_type->setContentsMargins(0, 0, 0, 0);
@@ -139,9 +153,12 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_cmbTypes->setCurrentIndex(0);
     m_spnLength->setValue(1);
     m_spnLength->hide();
-    m_lblValuePreview->setText("???");
+    if (!m_isForStructField)
+      m_lblValuePreview->setText("???");
     m_chkBoundToPointer->setChecked(false);
     m_pointerWidget->hide();
+    m_structSelect->setCurrentIndex(0);
+    m_structSelect->hide();
   }
   else
   {
@@ -151,13 +168,31 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_cmbTypes->setCurrentIndex(static_cast<int>(m_entry->getType()));
     if (m_entry->getType() == Common::MemType::type_string ||
         m_entry->getType() == Common::MemType::type_byteArray)
+    {
       m_spnLength->show();
-    else
+      m_structSelect->hide();
+    }
+    else if (m_entry->getType() == Common::MemType::type_struct)
+    {
+      if (m_structNames.contains(m_entry->getStructName()))
+        m_structSelect->setCurrentIndex(
+            static_cast<int>(m_structNames.indexOf(m_entry->getStructName())));
+
+      m_structSelect->show();
       m_spnLength->hide();
+    }
+    else
+    {
+      m_spnLength->hide();
+      m_structSelect->hide();
+    }
     m_txbLabel->setText(m_entry->getLabel());
-    std::stringstream ssAddress;
-    ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
-    m_txbAddress->setText(QString::fromStdString(ssAddress.str()));
+    if (!m_isForStructField)
+    {
+      std::stringstream ssAddress;
+      ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
+      m_txbAddress->setText(QString::fromStdString(ssAddress.str()));
+    }
     if (m_entry->isBoundToPointer())
     {
       m_pointerWidget->show();
@@ -192,7 +227,8 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     }
 
     m_chkBoundToPointer->setChecked(m_entry->isBoundToPointer());
-    updatePreview();
+    if (!m_isForStructField)
+      updatePreview();
   }
 }
 
@@ -243,7 +279,8 @@ void DlgAddWatchEntry::removePointerOffset()
   m_offsets.removeLast();
   m_addressPath.removeLast();
   m_entry->removeOffset();
-  updatePreview();
+  if (!m_isForStructField)
+    updatePreview();
   if (m_entry->getPointerLevel() == 1)
   {
     m_btnRemoveOffset->setDisabled(true);
@@ -274,7 +311,8 @@ void DlgAddWatchEntry::removeAllPointerOffset()
     level--;
   }
 
-  updatePreview();
+  if (!m_isForStructField)
+    updatePreview();
 }
 
 void DlgAddWatchEntry::onOffsetChanged()
@@ -287,7 +325,7 @@ void DlgAddWatchEntry::onOffsetChanged()
   int columnSpan{};
   m_offsetsLayout->getItemPosition(m_offsetsLayout->indexOf(theLineEdit), &index, &column, &rowSpan,
                                    &columnSpan);
-  if (validateAndSetOffset(index))
+  if (!m_isForStructField && validateAndSetOffset(index))
     updatePreview();
 }
 
@@ -295,17 +333,28 @@ void DlgAddWatchEntry::onTypeChange(int index)
 {
   Common::MemType theType = static_cast<Common::MemType>(index);
   if (theType == Common::MemType::type_string || theType == Common::MemType::type_byteArray)
+  {
     m_spnLength->show();
-  else
+    m_structSelect->hide();
+  }
+  else if (theType == Common::MemType::type_struct)
+  {
     m_spnLength->hide();
+    m_structSelect->show();
+  }
+  else
+  {
+    m_spnLength->hide();
+    m_structSelect->hide();
+  }
   m_entry->setTypeAndLength(theType, m_spnLength->value());
-  if (validateAndSetAddress())
+  if (!m_isForStructField && validateAndSetAddress())
     updatePreview();
 }
 
 void DlgAddWatchEntry::accept()
 {
-  if (!validateAndSetAddress())
+  if (!m_isForStructField && !validateAndSetAddress())
   {
     QString errorMsg = tr("The address you entered is invalid, make sure it is an "
                           "hexadecimal number between 0x%1 and 0x%2")
@@ -319,8 +368,19 @@ void DlgAddWatchEntry::accept()
                                             QMessageBox::Ok, this);
     errorBox->exec();
   }
+  else if (m_entry->getType() == Common::MemType::type_struct &&
+           m_structSelect->currentIndex() == 0)
+  {
+    QString errorMsg =
+        tr("A struct name must be selected with the struct type, it cannot be an empty string");
+    QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid Struct Type"),
+                                            errorMsg, QMessageBox::Ok, this);
+    errorBox->exec();
+  }
   else
   {
+    if (m_isForStructField)
+      m_entry->setConsoleAddress(0);
     if (m_chkBoundToPointer->isChecked())
     {
       bool allOffsetsValid = true;
@@ -349,6 +409,10 @@ void DlgAddWatchEntry::accept()
       m_entry->setLabel(m_txbLabel->text());
     m_entry->setBase(Common::MemBase::base_decimal);
     m_entry->setSignedUnsigned(false);
+    if (m_entry->getType() == Common::MemType::type_struct)
+      m_entry->setStructName(m_structNames[m_structSelect->currentIndex()]);
+    else
+      m_entry->setStructName(QString(""));
     setResult(QDialog::Accepted);
     hide();
   }
@@ -397,6 +461,13 @@ void DlgAddWatchEntry::onAddressChanged()
 
 void DlgAddWatchEntry::updatePreview()
 {
+  if (GUICommon::isContainerType(m_entry->getType()))
+  {
+    if (!m_isForStructField)
+      m_lblValuePreview->setText("???");
+    return;
+  }
+
   m_entry->readMemoryFromRAM();
   m_lblValuePreview->setText(QString::fromStdString(m_entry->getStringFromMemory()));
   if (m_entry->isBoundToPointer())
@@ -417,7 +488,7 @@ void DlgAddWatchEntry::onLengthChanged()
 {
   Common::MemType theType = static_cast<Common::MemType>(m_cmbTypes->currentIndex());
   m_entry->setTypeAndLength(theType, m_spnLength->value());
-  if (validateAndSetAddress())
+  if (!m_isForStructField && validateAndSetAddress())
     updatePreview();
 }
 
@@ -436,7 +507,8 @@ void DlgAddWatchEntry::onIsPointerChanged()
   }
   adjustSize();
   m_entry->setBoundToPointer(m_chkBoundToPointer->isChecked());
-  updatePreview();
+  if (!m_isForStructField && !GUICommon::isContainerType(m_entry->getType()))
+    updatePreview();
 }
 
 MemWatchEntry* DlgAddWatchEntry::stealEntry()

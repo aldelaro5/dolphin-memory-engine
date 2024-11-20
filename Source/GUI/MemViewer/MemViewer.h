@@ -12,6 +12,7 @@
 #include "../../Common/CommonTypes.h"
 #include "../../Common/MemoryCommon.h"
 #include "../../MemoryWatch/MemWatchEntry.h"
+#include "../../Structs/StructTreeNode.h"
 
 class MemViewer : public QAbstractScrollArea
 {
@@ -38,6 +39,7 @@ public:
   void jumpToAddress(u32 address);
   void updateViewer();
   void memoryValidityChanged(bool valid);
+  void setStructDefs(StructTreeNode* baseNode);
 
 signals:
   void memErrorOccured();
@@ -119,4 +121,6 @@ private:
   QRect* m_curosrRect{};
   QShortcut* m_copyShortcut{};
   QElapsedTimer m_elapsedTimer;
+
+  StructTreeNode* m_structDefs;
 };

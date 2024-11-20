@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QTreeView>
 
+#include "../../Structs/StructTreeNode.h"
 #include "MemWatchDelegate.h"
 #include "MemWatchModel.h"
 
@@ -51,9 +52,16 @@ public:
   QString saveWatchModel();
   QString m_watchListFile;
 
+  void setStructDefs(StructTreeNode* structDefs, QMap<QString, StructDef*> structMap);
+  void onUpdateStructDetails(QString structName);
+  void onUpdateStructName(QString oldName, QString newName);
+  void onStructDefAddRemove(QString structName, StructDef* structDef = nullptr) const;
+
 signals:
   void mustUnhook();
   void goToAddressInViewer(u32 address);
+  void loadStructDefsFromJson(const QJsonObject& json, QMap<QString, QString>& map);
+  void writeStructDefsToJson(QJsonObject& json, const QStringList& desiredStructs);
 
 private:
   void initialiseWidgets();
@@ -71,4 +79,6 @@ private:
 
   bool isAnyAncestorSelected(const QModelIndex& index) const;
   QModelIndexList simplifySelection() const;
+
+  StructTreeNode* m_structDefs;
 };

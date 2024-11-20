@@ -29,6 +29,7 @@ MainWindow::MainWindow()
   makeMenus();
   DolphinComm::DolphinAccessor::init();
   makeMemViewer();
+  makeStructEditor();
 
   m_autoHookTimer.setInterval(1000);
   connect(&m_autoHookTimer, &QTimer::timeout, this, &MainWindow::onHookIfNotHooked);
@@ -41,6 +42,9 @@ MainWindow::MainWindow()
   GUICommon::changeApplicationStyle(
       static_cast<GUICommon::ApplicationStyle>(SConfig::getInstance().getTheme()));
 
+  m_structEditor->restoreStructTree(SConfig::getInstance().getStructDefs());
+  m_watcher->setStructDefs(m_structEditor->getStructDefs(), m_structEditor->getStructMap());
+  m_viewer->setStructDefs(m_structEditor->getStructDefs());
   m_actAutoloadLastFile->setChecked(SConfig::getInstance().getAutoloadLastFile());
 
   if (m_actAutoloadLastFile->isChecked() && !SConfig::getInstance().getLastLoadedFile().isEmpty())
@@ -56,6 +60,20 @@ MainWindow::MainWindow()
 
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
+  // Connect struct updates to mem watch widget
+  connect(m_structEditor, &StructEditorWidget::updateStructName, m_watcher,
+          &MemWatchWidget::onUpdateStructName);
+  connect(m_structEditor, &StructEditorWidget::updateStructDetails, m_watcher,
+          &MemWatchWidget::onUpdateStructDetails);
+  connect(m_structEditor, &StructEditorWidget::structAddedRemoved, m_watcher,
+          &MemWatchWidget::onStructDefAddRemove);
+
+  // Connect load/save structs on load/save watch file
+  connect(m_watcher, &MemWatchWidget::loadStructDefsFromJson, m_structEditor,
+          &StructEditorWidget::readStructDefMapFromJson);
+  connect(m_watcher, &MemWatchWidget::writeStructDefsToJson, m_structEditor,
+          &StructEditorWidget::writeStructDefMapToJson);
+
   if (m_actAutoHook->isChecked())
     onHookAttempt();
   else
@@ -67,6 +85,7 @@ MainWindow::~MainWindow()
   delete m_copier;
   delete m_viewer;
   delete m_watcher;
+  delete m_structEditor;
   DolphinComm::DolphinAccessor::free();
 }
 
@@ -105,6 +124,7 @@ void MainWindow::makeMenus()
     QSignalBlocker signalBlocker(m_actScanner);
     m_actScanner->setChecked(m_splitter->sizes()[0] > 0);
   });
+  m_actStructEditor = new QAction(tr("Struct &Editor"), this);
 
   m_actQuit = new QAction(tr("&Quit"), this);
   m_actAbout = new QAction(tr("&About"), this);
@@ -136,6 +156,7 @@ void MainWindow::makeMenus()
   connect(m_actMemoryViewer, &QAction::triggered, this, &MainWindow::onOpenMenViewer);
   connect(m_actCopyMemory, &QAction::triggered, this, &MainWindow::onCopyMemory);
   connect(m_actScanner, &QAction::toggled, this, &MainWindow::onScannerActionToggled);
+  connect(m_actStructEditor, &QAction::triggered, this, &MainWindow::onOpenStructEditor);
 
   connect(m_actQuit, &QAction::triggered, this, &MainWindow::onQuit);
   connect(m_actAbout, &QAction::triggered, this, &MainWindow::onAbout);
@@ -169,6 +190,7 @@ void MainWindow::makeMenus()
   m_menuView->addAction(m_actMemoryViewer);
   m_menuView->addAction(m_actCopyMemory);
   m_menuView->addAction(m_actScanner);
+  m_menuView->addAction(m_actStructEditor);
 
   m_menuHelp = menuBar()->addMenu(tr("&Help"));
   m_menuHelp->addAction(m_actAbout);
@@ -587,6 +609,12 @@ void MainWindow::onQuit()
   close();
 }
 
+void MainWindow::onOpenStructEditor()
+{
+  m_structEditor->show();
+  m_structEditor->raise();
+}
+
 void MainWindow::closeEvent(QCloseEvent* event)
 {
   SConfig::getInstance().setAutoHook(m_actAutoHook->isChecked());
@@ -597,6 +625,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
   {
     SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
   }
+  SConfig::getInstance().setStructDefs(m_structEditor->saveStructTree());
   SConfig::getInstance().setMainWindowGeometry(saveGeometry());
   SConfig::getInstance().setMainWindowState(saveState());
 
@@ -612,6 +641,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
   }
 
   m_viewer->close();
+  m_structEditor->close();
   event->accept();
 }
 
@@ -718,4 +748,10 @@ void MainWindow::updateStatusBar()
 
   const QString toolTip{toolTipLines.join("\n\n")};
   m_statusLabel->parentWidget()->setToolTip(toolTip);
+}
+
+void MainWindow::makeStructEditor()
+{
+  m_structEditor = new StructEditorWidget(nullptr);
+  m_structEditor->setWindowIcon(windowIcon());
 }
