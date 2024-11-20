@@ -9,6 +9,8 @@
 #include <sstream>
 #include <utility>
 
+#include <QJsonArray>
+
 #include "../Common/CommonUtils.h"
 #include "../DolphinProcess/DolphinAccessor.h"
 
@@ -341,4 +343,61 @@ Common::MemOperationReturnCode MemWatchEntry::writeMemoryFromString(const std::s
   }
   delete[] buffer;
   return writeReturn;
+}
+
+void MemWatchEntry::readFromJson(const QJsonObject& json)
+{
+  setLabel(json["label"].toString());
+  std::stringstream ss(json["address"].toString().toStdString());
+  u32 address = 0;
+  ss >> std::hex >> std::uppercase >> address;
+  setConsoleAddress(address);
+  size_t length = 1;
+  if (json["length"] != QJsonValue::Undefined)
+    length = static_cast<size_t>(json["length"].toDouble());
+  setTypeAndLength(static_cast<Common::MemType>(json["typeIndex"].toInt()), length);
+  setSignedUnsigned(json["unsigned"].toBool());
+  setBase(static_cast<Common::MemBase>(json["baseIndex"].toInt()));
+  if (json["pointerOffsets"] != QJsonValue::Undefined)
+  {
+    setBoundToPointer(true);
+    QJsonArray pointerOffsets = json["pointerOffsets"].toArray();
+    for (auto i : pointerOffsets)
+    {
+      std::stringstream ssOffset(i.toString().toStdString());
+      int offset = 0;
+      ssOffset >> std::hex >> std::uppercase >> offset;
+      addOffset(offset);
+    }
+  }
+  else
+  {
+    setBoundToPointer(false);
+  }
+}
+
+void MemWatchEntry::writeToJson(const QJsonObject& json)
+{
+  json["label"] = getLabel();
+  std::stringstream ss;
+  ss << std::hex << std::uppercase << getConsoleAddress();
+  json["address"] = QString::fromStdString(ss.str());
+  json["typeIndex"] = static_cast<double>(getType());
+  json["unsigned"] = isUnsigned();
+  if (getType() == Common::MemType::type_string ||
+      getType() == Common::MemType::type_byteArray)
+    json["length"] = static_cast<double>(getLength());
+
+  json["baseIndex"] = static_cast<double>(getBase());
+  if (isBoundToPointer())
+  {
+    QJsonArray offsets;
+    for (int i{0}; i < static_cast<int>(getPointerOffsets().size()); ++i)
+    {
+      std::stringstream ssOffset;
+      ssOffset << std::hex << std::uppercase << getPointerOffset(i);
+      offsets.append(QString::fromStdString(ssOffset.str()));
+    }
+    json["pointerOffsets"] = offsets;
+  }
 }
