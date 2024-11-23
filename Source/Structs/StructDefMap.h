@@ -21,8 +21,6 @@ public:
   StructDefMap& operator=(const StructDefMap&) = delete;
   StructDefMap& operator=(StructDefMap&&) = delete;
 
-  QMap<QString, StructDef*> m_structs;
-
   void addStructDef(QString label, StructDef* structDef);
   void removeStructDef(QString label);
   void changeStructKey(QString oldLabel, QString newLabel);
@@ -33,5 +31,6 @@ public:
   void writeToJson(QJsonObject& json);
 
 private:
+  QMap<QString, StructDef*> m_structs;
   StructTreeNode* m_rootNode;
 };
