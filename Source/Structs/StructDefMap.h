@@ -7,6 +7,7 @@
 #include "../Common/CommonTypes.h"
 #include "../Common/MemoryCommon.h"
 #include "../Structs/StructDef.h"
+#include "StructTreeNode.h"
 
 class StructDefMap
 {
@@ -25,6 +26,9 @@ class StructDefMap
   void removeStructDef(QString label);
   void changeStructKey(QString oldLabel, QString newLabel);
 
+  StructTreeNode* getRootNode();
+
   void readFromJson(QJsonObject& json);
   void writeToJson(QJsonObject& json);
+  StructTreeNode* m_rootNode;
 };

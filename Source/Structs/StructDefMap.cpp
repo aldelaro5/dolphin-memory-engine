@@ -40,6 +40,11 @@ void StructDefMap::changeStructKey(QString oldLabel, QString newLabel)
   m_structs.remove(oldLabel);
 }
 
+StructTreeNode* StructDefMap::getRootNode()
+{
+  return m_rootNode;
+}
+
 void StructDefMap::readFromJson(QJsonObject& json)
 {
   QJsonArray map = json["map"].toArray();
@@ -60,6 +65,9 @@ void StructDefMap::readFromJson(QJsonObject& json)
 
     m_structs.insert(key, value);
   }
+
+  QJsonObject tree = json["structTree"].toObject();
+  m_rootNode->readFromJson(tree, nullptr, m_structs.keys());
 }
 
 void StructDefMap::writeToJson(QJsonObject& json)
@@ -82,5 +90,9 @@ void StructDefMap::writeToJson(QJsonObject& json)
       structJson["value"] = valueJson;
     }
   }
-  json["map"] = structArr;
+  json["structMap"] = structArr;
+
+  QJsonObject structTree;
+  m_rootNode->writeToJson(structTree, m_structs.keys());
+  json["structTree"] = structTree;
 }
