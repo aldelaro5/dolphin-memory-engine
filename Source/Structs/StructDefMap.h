@@ -11,6 +11,7 @@
 
 class StructDefMap
 {
+public:
   StructDefMap();
 
   ~StructDefMap();
@@ -30,5 +31,7 @@ class StructDefMap
 
   void readFromJson(QJsonObject& json);
   void writeToJson(QJsonObject& json);
+
+private:
   StructTreeNode* m_rootNode;
 };
