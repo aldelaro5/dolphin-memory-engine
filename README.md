@@ -9,6 +9,7 @@ The GUI is aimed for convenience, without disrupting the performance of the emul
 For binary releases of this program, refer to [the "releases" page](https://github.com/aldelaro5/dolphin-memory-engine/releases) on [the Github repository](https://github.com/aldelaro5/dolphin-memory-engine).
 
 ## Build Status
+
 ### Linux:
 [![Build](https://github.com/aldelaro5/dolphin-memory-engine/actions/workflows/build.yml/badge.svg)](https://github.com/aldelaro5/dolphin-memory-engine/actions/workflows/build.yml)
 
@@ -21,6 +22,8 @@ For binary releases of this program, refer to [the "releases" page](https://gith
 
 ## System requirements
 Any x86_64 based system should work.
+
+This repository uses CMake for all platforms.
 
 At least 250 MB of free memory is required.
 
@@ -38,16 +41,15 @@ Linux/macOS: `~/.config/dolphin-memory-engine`
 Create a empty file `portable.txt` in the same directory as Dolphin Memory Engine and the configuration will instead be saved in the same folder as the program.
 
 ## How to Build
+
 ### Microsoft Windows
-This repository provides a solution file for Visual Studio 2022 and later. The Windows SDK Version 10.0.22621.0 is required*.
+Visual Studio 2022 and later is recommended. The Windows SDK Version 10.0.22621.0 is required.
+
+The Windows SDK version 10.0.22621.0 comes with the C++ Desktop Development Workload of Visual Studio 2022 — other versions may work but are untested.
 
 Before proceeding, ensure the Qt submodule is initialized by running `git submodule update --init` at the repository's root. The files should appear at the `Externals\Qt` directory.
 
-Once complete, open the solution file `dolphin-memory-engine.sln` located in the `Source` directory with Visual Studio. Select the build configuration and build it.
-
-#### Windows SDK
-The Windows SDK version 10.0.22621.0 comes with the C++ Desktop Development Workload of Visual Studio 2022 — other versions may work but are untested. To use a different Windows SDK you'll need to select it in the project properties window. Please note that this will change the `vcxproj` file, so if you plan to submit a Pull Request, make sure to not stage this change.
-
+Once complete, open the `Source` directory with Visual Studio's `Open a local folder` option.
 
 ### Linux
 > _CMake and Qt 6 are required. Please refer to your distribution's documentation for specific instructions on how to install them._
@@ -117,15 +119,15 @@ Options:
 
 ## Troubleshooting
 
-On Linux, the program may require additional kernel permissions to be able to read and write memory to external processes (which is required to read and write the memory of Dolphin).  If nothing happens to Dolphin, but the program frequently unhooks itself, the program is missing the required permissions.  Grant these permissions by running the following command as root:
+On Linux, the program may require additional kernel permissions to be able to read and write memory to external processes (which is required to read and write the memory of Dolphin). If nothing happens to Dolphin, but the program frequently unhooks itself, the program is missing the required permissions. Grant these permissions by running the following command as root:
 
-	setcap cap_sys_ptrace=eip DME
+	setcap cap_sys_ptrace=eip dolphin-memory-engine
 
-Where `DME` is the path of the Dolphin Memory Engine executable.  This should fix the permission problem for future executions.
+Where `dolphin-memory-engine` is the path of the Dolphin Memory Engine executable. This sets the permission for future executions.
 
 If it doesn't work, verify that you do not have the `nosuid` mount flag on your `/etc/fstab` as it can cause this command to silently fail.
 
 On macOS, Dolphin (upon install or after an update) must be signed with specific entitlements to permit memory access. Follow the instructions [above](#macos-code-signing).
 
 ## License
-This program is licensed under the MIT license which grants you the permission to do anything you wish to with the software, as long as you preserve all copyright notices. (See the file LICENSE for the legal text.)
+This program is licensed under the MIT license which grants you the permission to do anything you wish to with the software, as long as you preserve all copyright notices. See the file LICENSE for the legal text.
