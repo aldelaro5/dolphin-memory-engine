@@ -324,7 +324,9 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       }
       case WATCH_COL_VALUE:
       {
+        if (!GUICommon::isContainerType(entry->getType()))
         return QString::fromStdString(entry->getStringFromMemory());
+        break;
       }
       default:
         break;
