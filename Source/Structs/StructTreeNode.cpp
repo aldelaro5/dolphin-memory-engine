@@ -1,11 +1,14 @@
-#include "StructDefTreeNode.h"
+#include "StructTreeNode.h"
 
 #include <QJsonArray>
 
-StructTreeNode::StructTreeNode(StructDef* structDef, StructTreeNode* parent, bool isGroup,
-                                     bool isAuto, QString groupName)
+StructTreeNode::StructTreeNode(StructDef* const structDef, StructTreeNode* const parent, bool isGroup, QString name)
 {
-  QVector<StructTreeNode*> m_children;
+  m_parent = parent;
+  m_isGroup = isGroup;
+  m_nodeName = std::move(name);
+  m_structDef = structDef;
+  updateName();
 }
 
 StructTreeNode::~StructTreeNode()
@@ -29,24 +32,32 @@ void StructTreeNode::setExpanded(const bool expanded)
   m_expanded = expanded;
 }
 
-const QString& StructTreeNode::getGroupName() const
+const QString& StructTreeNode::getName()
 {
-  return m_groupName;
+  updateName();
+  return m_nodeName;
 }
 
-void StructTreeNode::setGroupName(const QString& groupName)
+void StructTreeNode::setName(const QString& name)
 {
-  m_groupName = groupName;
+  if (m_structDef != nullptr)
+    m_structDef->setLabel(name);
+  m_nodeName = name;
 }
 
-QString StructTreeNode::getStructName() const
+bool StructTreeNode::isNameAvailable(QString name) const
 {
-  return m_structName;
-}
 
-void StructTreeNode::setStructName( QString structName)
+
+  if (m_children.isEmpty())
+    return true;
+
+  for (StructTreeNode* child : m_children)
 {
-  m_structName = structName;
+    if (name == child->getName())
+      return false;
+}
+  return true;
 }
 
 StructTreeNode* StructTreeNode::getParent() const
@@ -125,7 +136,7 @@ void StructTreeNode::deleteChildren()
   m_children.clear();
 }
 
-void StructTreeNode::readFromJson(const QJsonObject& json, StructTreeNode* parent, QStringList structNames)
+void StructTreeNode::readFromJson(const QJsonObject& json, StructTreeNode* parent)
 {
   m_parent = parent;
   if (json["rootNode"] != QJsonValue::Undefined)
@@ -135,7 +146,7 @@ void StructTreeNode::readFromJson(const QJsonObject& json, StructTreeNode* paren
     for (auto i : structTree)
     {
       QJsonObject node = i.toObject();
-      StructTreeNode* childNode = new StructTreeNode(nullptr);
+      StructTreeNode* childNode = new StructTreeNode(nullptr, nullptr);
       childNode->readFromJson(node, this);
       m_children.append(childNode);
     }
@@ -143,53 +154,61 @@ void StructTreeNode::readFromJson(const QJsonObject& json, StructTreeNode* paren
   else if (json["groupName"] != QJsonValue::Undefined)
   {
     m_isGroup = true;
-    m_groupName = json["groupName"].toString();
+    m_nodeName = json["groupName"].toString();
     m_expanded = json["expanded"].toBool();
     QJsonArray groupChildren = json["groupChildren"].toArray();
     for (auto i : groupChildren)
     {
       QJsonObject node = i.toObject();
-      StructTreeNode* childNode = new StructTreeNode(nullptr);
+      StructTreeNode* childNode = new StructTreeNode(nullptr, nullptr);
       childNode->readFromJson(node, this);
+      if (isNameAvailable(childNode->getName()))
       m_children.append(childNode);
     }
   }
   else
   {
     m_isGroup = false;
-    m_structName = json["structName"].toString();
+    m_nodeName = json["structName"].toString();
+    m_structDef = new StructDef();
+    m_structDef->readFromJson(json["struct"].toObject());
   }
 }
 
-void StructTreeNode::writeToJson(QJsonObject& json, QStringList structNames) const
+void StructTreeNode::writeToJson(QJsonObject& json) const
 {
   if (isGroup())
   {
-    json["groupName"] = m_groupName;
+    json["groupName"] = m_nodeName;
     json["expanded"] = m_expanded;
     QJsonArray entries;
     for (StructTreeNode* const child : m_children)
     {
       QJsonObject nextNode;
-      child->writeToJson(nextNode, structNames);
+      child->writeToJson(nextNode);
       entries.append(nextNode);
     }
     json["groupChildren"] = entries;
   }
-  else
-  {
-    if (m_parent == nullptr)
+  else if (m_parent == nullptr)
     {
       QJsonArray rootNode;
       for (StructTreeNode* const child : m_children)
       {
         QJsonObject nextNode;
-        child->writeToJson(nextNode, structNames);
+      child->writeToJson(nextNode);
         rootNode.append(nextNode);
       }
       json["rootNode"] = rootNode;
     }
-    else if (structNames.contains(m_structName))
+  else
+  {
+    json["structName"] = m_nodeName;
+    QJsonObject structDefJson;
+    m_structDef->writeToJson(structDefJson);
+    json["struct"] = structDefJson;
+  }
+}
     {
       json["structName"] = m_structName;
     }

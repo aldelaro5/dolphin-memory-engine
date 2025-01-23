@@ -9,8 +9,7 @@
 class StructTreeNode
 {
 public:
-  explicit StructTreeNode(StructDef* structDef, StructTreeNode* parent = nullptr,
-                             bool isGroup = false, bool isAuto = false, QString groupName = {});
+  explicit StructTreeNode(StructDef* const structDef, StructTreeNode* const parent, bool isGroup = false, QString name = {});
   ~StructTreeNode();
 
   StructTreeNode(const StructTreeNode&) = delete;
@@ -21,10 +20,9 @@ public:
   bool isGroup() const;
   bool isExpanded() const;
   void setExpanded(const bool expanded);
-  const QString& getGroupName() const;
-  void setGroupName(const QString& groupName);
-  QString getStructName() const;
-  void setStructName(QString structDef);
+  const QString& getName();
+  void setName(const QString& name);
+  bool isNameAvailable(const QString name) const;
   StructTreeNode* getParent() const;
   void setParent(StructTreeNode* parent);
   int getRow() const;
@@ -40,15 +38,15 @@ public:
   void removeChildren();
   void deleteChildren();
 
-  void readFromJson(const QJsonObject& json, StructTreeNode* parent = nullptr, QStringList structNames);
-  void writeToJson(QJsonObject& json, QStringList structNames) const;
+  void readFromJson(const QJsonObject& json, StructTreeNode* parent = nullptr);
+  void writeToJson(QJsonObject& json) const;
 
 private:
   bool m_isGroup;
-  QString m_groupName;
+  QString m_nodeName;
   bool m_expanded{};
 
-  QString m_structName;
+  QVector<StructTreeNode*> m_children{};
   QVector<StructTreeNode*> m_children;
   StructTreeNode* m_parent;
   
