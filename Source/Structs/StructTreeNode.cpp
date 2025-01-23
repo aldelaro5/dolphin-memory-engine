@@ -53,10 +53,10 @@ bool StructTreeNode::isNameAvailable(QString name) const
     return true;
 
   for (StructTreeNode* child : m_children)
-{
+  {
     if (name == child->getName())
       return false;
-}
+  }
   return true;
 }
 
@@ -95,7 +95,26 @@ const QVector<StructTreeNode*>& StructTreeNode::getChildren() const
 
 void StructTreeNode::setChildren(QVector<StructTreeNode*> children)
 {
+  deleteChildren();
   m_children = children;
+}
+
+QVector<QString> StructTreeNode::getChildNames()
+{
+  if (m_children.isEmpty())
+    return QVector<QString>();
+
+  QVector<QString> names = QVector<QString>();
+  for (StructTreeNode* child : m_children)
+  {
+    names.push_back(child->getName());
+  }
+  return names;
+}
+
+StructDef* StructTreeNode::getStructDef() const
+{
+  return m_structDef;
 }
 
 void StructTreeNode::appendChild(StructTreeNode* node)
@@ -163,7 +182,7 @@ void StructTreeNode::readFromJson(const QJsonObject& json, StructTreeNode* paren
       StructTreeNode* childNode = new StructTreeNode(nullptr, nullptr);
       childNode->readFromJson(node, this);
       if (isNameAvailable(childNode->getName()))
-      m_children.append(childNode);
+        m_children.append(childNode);
     }
   }
   else
@@ -191,16 +210,16 @@ void StructTreeNode::writeToJson(QJsonObject& json) const
     json["groupChildren"] = entries;
   }
   else if (m_parent == nullptr)
+  {
+    QJsonArray rootNode;
+    for (StructTreeNode* const child : m_children)
     {
-      QJsonArray rootNode;
-      for (StructTreeNode* const child : m_children)
-      {
-        QJsonObject nextNode;
+      QJsonObject nextNode;
       child->writeToJson(nextNode);
-        rootNode.append(nextNode);
-      }
-      json["rootNode"] = rootNode;
+      rootNode.append(nextNode);
     }
+    json["rootNode"] = rootNode;
+  }
   else
   {
     json["structName"] = m_nodeName;
@@ -209,8 +228,49 @@ void StructTreeNode::writeToJson(QJsonObject& json) const
     json["struct"] = structDefJson;
   }
 }
+
+QVector<QString> StructTreeNode::getStructNames(bool includeGroups, QString prefix)
+{
+  updateName();
+
+  QVector<QString> names;
+
+  if (prefix == QString("") && m_parent)
+    prefix = m_parent->getNameSpace();
+
+  QString nodeName = appendNameToNameSpace(prefix);
+  if (!m_isGroup || includeGroups)
+    names.push_back(nodeName);
+
+  for (StructTreeNode* child : m_children)
+  {
+    QVector<QString> childNames = child->getStructNames(includeGroups, nodeName);
+    for (QString name : childNames)
     {
-      json["structName"] = m_structName;
+      names.push_back(name);
     }
   }
+
+  return names;
+}
+
+QString StructTreeNode::getNameSpace()
+{
+  updateName();
+
+  if (m_parent != nullptr)
+    return m_parent->getNameSpace() + QString("::") + m_nodeName;
+
+  return QString("");
+}
+
+QString StructTreeNode::appendNameToNameSpace(QString nameSpace) const
+{
+  return nameSpace + QString("::") + m_nodeName;
+}
+
+void StructTreeNode::updateName()
+{
+  if (m_structDef != nullptr)
+    m_nodeName = m_structDef->getLabel();
 }

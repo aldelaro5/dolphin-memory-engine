@@ -13,7 +13,8 @@ class StructDef
 {
 public:
   StructDef();
-  StructDef(QString label, size_t length, QVector<FieldDef*> entries, bool isPacked);
+  StructDef(QString label);
+  StructDef(QString label, u32 length, QVector<FieldDef*> entries, bool isPacked);
 
   ~StructDef();
 
@@ -23,13 +24,16 @@ public:
   StructDef& operator=(StructDef&&) = delete;
 
   QString getLabel();
-  size_t getLength();
+  u32 getLength();
+  QVector<FieldDef*> getFields();
+  bool isValidFieldLayout(u32 length, QVector<FieldDef*> fields);
   bool isValidStruct();
-  void setLength(size_t length);
+  void setLength(u32 length);
   void setLabel(const QString& label);
   void addFields(FieldDef* entry, size_t index = -1);
   void clearFields();
   void setFields(QVector<FieldDef*> entries);
+  void updateStructTypeLabel(const QString& oldLabel, QString newLabel);
 
   void readFromJson(const QJsonObject& json);
   void writeToJson(QJsonObject& json);
@@ -37,7 +41,7 @@ public:
 private:
   void calculateLength();
   QString m_label;
-  size_t m_length;
+  u32 m_length;
   QVector<FieldDef*> m_fields;
-  bool m_isPacked;
+  bool m_isValid;
 };
