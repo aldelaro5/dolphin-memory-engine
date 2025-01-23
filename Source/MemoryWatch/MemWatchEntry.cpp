@@ -178,6 +178,16 @@ void MemWatchEntry::removeOffset()
   m_pointerOffsets.pop_back();
 }
 
+QString MemWatchEntry::getStructName() const
+{
+  return m_structName;
+}
+
+void MemWatchEntry::setStructName(QString structName)
+{
+  m_structName = structName;
+}
+
 void MemWatchEntry::addOffset(const int offset)
 {
   m_pointerOffsets.push_back(offset);
