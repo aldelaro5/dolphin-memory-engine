@@ -376,7 +376,7 @@ void MemWatchEntry::readFromJson(const QJsonObject& json)
   }
 }
 
-void MemWatchEntry::writeToJson(const QJsonObject& json)
+void MemWatchEntry::writeToJson(QJsonObject& json) const
 {
   json["label"] = getLabel();
   std::stringstream ss;
