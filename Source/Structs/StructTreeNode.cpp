@@ -32,24 +32,32 @@ void StructTreeNode::setExpanded(const bool expanded)
   m_expanded = expanded;
 }
 
-const QString& StructTreeNode::getGroupName() const
+const QString& StructTreeNode::getName()
 {
-  return m_groupName;
+  updateName();
+  return m_nodeName;
 }
 
-void StructTreeNode::setGroupName(const QString& groupName)
+void StructTreeNode::setName(const QString& name)
 {
-  m_groupName = groupName;
+  if (m_structDef != nullptr)
+    m_structDef->setLabel(name);
+  m_nodeName = name;
 }
 
-QString StructTreeNode::getStructName() const
+bool StructTreeNode::isNameAvailable(QString name) const
 {
-  return m_structName;
-}
 
-void StructTreeNode::setStructName( QString structName)
+
+  if (m_children.isEmpty())
+    return true;
+
+  for (StructTreeNode* child : m_children)
 {
-  m_structName = structName;
+    if (name == child->getName())
+      return false;
+}
+  return true;
 }
 
 StructTreeNode* StructTreeNode::getParent() const

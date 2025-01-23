@@ -20,10 +20,9 @@ public:
   bool isGroup() const;
   bool isExpanded() const;
   void setExpanded(const bool expanded);
-  const QString& getGroupName() const;
-  void setGroupName(const QString& groupName);
-  QString getStructName() const;
-  void setStructName(QString structDef);
+  const QString& getName();
+  void setName(const QString& name);
+  bool isNameAvailable(const QString name) const;
   StructTreeNode* getParent() const;
   void setParent(StructTreeNode* parent);
   int getRow() const;
@@ -44,10 +43,10 @@ public:
 
 private:
   bool m_isGroup;
-  QString m_groupName;
+  QString m_nodeName;
   bool m_expanded{};
 
-  QString m_structName;
+  QVector<StructTreeNode*> m_children{};
   QVector<StructTreeNode*> m_children;
   StructTreeNode* m_parent;
   
