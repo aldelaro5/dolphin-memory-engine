@@ -43,6 +43,7 @@ MainWindow::MainWindow()
       static_cast<GUICommon::ApplicationStyle>(SConfig::getInstance().getTheme()));
 
   m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
+  m_structEditor->restoreStructDefs(SConfig::getInstance().getStructDefs());
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
   if (m_actAutoHook->isChecked())
@@ -557,6 +558,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
   SConfig::getInstance().setAutoHook(m_actAutoHook->isChecked());
   SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
+  SConfig::getInstance().setStructDefs(m_structEditor->saveStructDefs());
   SConfig::getInstance().setMainWindowGeometry(saveGeometry());
   SConfig::getInstance().setMainWindowState(saveState());
 
