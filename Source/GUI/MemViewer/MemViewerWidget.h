@@ -7,6 +7,7 @@
 #include "MemViewer.h"
 
 #include "../Widgets/AddressInputWidget.h"
+#include "../../Structs/StructTreeNode.h"
 
 class MemViewerWidget : public QWidget
 {
@@ -28,6 +29,7 @@ public:
   void hookStatusChanged(bool hook);
   void onMEM2StatusChanged(bool enabled);
   void goToAddress(u32 address);
+  void setStructDefs(StructTreeNode* baseNode);
 
 signals:
   void mustUnhook();
