@@ -7,15 +7,23 @@ StructDef::StructDef()
   m_label = QString("");
   m_length = 0;
   m_fields = QVector<FieldDef*>();
-  m_isPacked = false;
+  m_isValid = true;
 }
 
-StructDef::StructDef(QString label, size_t length, QVector<FieldDef*> entries, bool isPacked)
+StructDef::StructDef(QString label)
+{
+  m_label = label;
+  m_length = 0;
+  m_fields = QVector<FieldDef*>();
+  m_isValid = true;
+}
+
+StructDef::StructDef(QString label, u32 length, QVector<FieldDef*> entries, bool isPacked)
 {
   m_label = label;
   m_length = length;
   m_fields = entries;
-  m_isPacked = isPacked;
+  m_isValid = isValidStruct();
 }
 
 StructDef::~StructDef()
@@ -28,28 +36,31 @@ QString StructDef::getLabel()
   return m_label;
 }
 
-size_t StructDef::getLength()
+u32 StructDef::getLength()
 {
   return m_length;
 }
 
-bool StructDef::isValidStruct()
+QVector<FieldDef*> StructDef::getFields()
 {
-  if (m_isPacked)
-    return true;
+  return m_fields;
+}
 
-  size_t structSegments = ceil(m_length / sizeof(uint64_t));
+
+bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
+{
+  size_t structSegments = ceil(length / sizeof(uint64_t));
   uint64_t* structBytes = new uint64_t[structSegments];
   for (size_t i = 0; i < structSegments; i++)
   {
     structBytes[i] = 0;
   }
 
-  for (FieldDef* field : m_fields)
+  for (FieldDef* field : fields)
   {
     size_t fieldOffset = field->getOffset();
     size_t fieldLength = field->getEntry()->getLength();
-    if (fieldOffset + fieldLength > m_length)
+    if (fieldOffset + fieldLength > length)
     {
       return false;
     }
@@ -92,7 +103,12 @@ bool StructDef::isValidStruct()
   return true;
 }
 
-void StructDef::setLength(size_t length)
+bool StructDef::isValidStruct()
+{
+  return isValidFieldLayout(m_length, m_fields);
+}
+
+void StructDef::setLength(u32 length)
 {
   m_length = length;
 }
@@ -108,9 +124,6 @@ void StructDef::addFields(FieldDef* field, size_t index)
     m_fields.append(field);
 
   m_fields.insert(index, field);
-
-  if (m_isPacked)
-    calculateLength();
 }
 
 void StructDef::clearFields()
@@ -122,18 +135,29 @@ void StructDef::clearFields()
 
 void StructDef::setFields(QVector<FieldDef*> fields)
 {
+  if (!isValidFieldLayout(m_length, fields))
+  {
+    qDebug("Attempted to set invalid vector of fields to a StructDef");
+    return;
+  }
   qDeleteAll(m_fields);
   m_fields = fields;
+}
 
-  if (m_isPacked)
-    calculateLength();
+void StructDef::updateStructTypeLabel(const QString& oldLabel, QString newLabel)
+{
+  for (FieldDef* field : m_fields)
+  {
+    if (field->getEntry()->getType() == Common::MemType::type_struct &&
+        field->getEntry()->getStructName() == oldLabel)
+      field->getEntry()->setStructName(newLabel);
+  }
 }
 
 void StructDef::readFromJson(const QJsonObject& json)
 {
   m_label = json["label"].toString();
   m_length = json["length"].toInt();
-  m_isPacked = json["isPacked"].toBool();
   QJsonArray entry_list = json["entryList"].toArray();
   for (auto i : entry_list)
   {
@@ -148,7 +172,6 @@ void StructDef::writeToJson(QJsonObject& json)
 {
   json["label"] = m_label;
   json["length"] = static_cast<double>(m_length);
-  json["isPacked"] = m_isPacked;
 
   QJsonArray entryArray;
   for (FieldDef* const entry : m_fields)
@@ -162,10 +185,13 @@ void StructDef::writeToJson(QJsonObject& json)
 
 void StructDef::calculateLength()
 {
-  size_t max_length = 0;
+  u32 max_length = 0;
+  u32 cur_length = 0;
   for (FieldDef* field : m_fields)
   {
-    max_length = fmax(max_length, field->getOffset() + field->getEntry()->getLength());
+    u32 field_length = field->getEntry()->getLength();
+    max_length = fmax(max_length, field->getOffset() + field_length);
+    cur_length += field_length;
   }
-  m_length = max_length;
+  m_length = fmax(max_length, m_length);
 }

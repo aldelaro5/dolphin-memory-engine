@@ -14,7 +14,9 @@ class FieldDef
 {
 public:
   FieldDef();
-  FieldDef(size_t offset, bool isPropagated, MemWatchEntry* entry);
+  FieldDef(size_t offset, size_t size = -1, bool is_padding = false);
+  FieldDef(size_t offset, MemWatchEntry* entry);
+  explicit FieldDef(FieldDef* field);
 
   ~FieldDef();
 
@@ -24,16 +26,21 @@ public:
   FieldDef& operator=(FieldDef&&) = delete;
 
   size_t getOffset() const;
-  bool getIsPropagated() const;
-  void setOffset() const;
-  void setIsPropagated() const;
+  void setOffset(size_t offset);
   MemWatchEntry* getEntry() const;
+  void setEntry(MemWatchEntry* entry);
+  size_t getSize() const;
+  void setSize(size_t size);
+  QString getLabel() const;
+  void setLabel(QString label);
+  bool isPadding() const;
+  void convertToPadding();
 
   void readFromJSON(const QJsonObject& json);
   void writeToJson(QJsonObject& json);
 
 private:
   size_t m_structOffset;
-  bool m_isPropagated;
+  size_t m_size;
   MemWatchEntry* m_entry;
 };

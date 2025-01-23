@@ -5,15 +5,31 @@
 FieldDef::FieldDef()
 {
   m_structOffset = 0;
-  m_isPropagated = true;
+  m_size = -1;
   m_entry = new MemWatchEntry();
 }
 
-FieldDef::FieldDef(size_t offset, bool isPropagated, MemWatchEntry* entry)
+FieldDef::FieldDef(size_t offset, size_t size, bool is_padding)
 {
   m_structOffset = offset;
-  m_isPropagated = isPropagated;
+  m_size = size;
+  if (is_padding)
+    m_entry = nullptr;
+  else
+    m_entry = new MemWatchEntry();
+}
+
+FieldDef::FieldDef(size_t offset, MemWatchEntry* entry)
+{
+  m_structOffset = offset;
+  m_size = -1;
   m_entry = entry;
+}
+
+FieldDef::FieldDef(FieldDef* field)
+    : m_structOffset(field->m_structOffset), m_size(-1),
+      m_entry(new MemWatchEntry(field->m_entry))
+{
 }
 
 FieldDef::~FieldDef()
@@ -27,17 +43,9 @@ size_t FieldDef::getOffset() const
   return m_structOffset;
 }
 
-bool FieldDef::getIsPropagated() const
+void FieldDef::setOffset(size_t offset)
 {
-  return m_isPropagated;
-}
-
-void FieldDef::setOffset() const
-{
-}
-
-void FieldDef::setIsPropagated() const
-{
+  m_structOffset = offset;
 }
 
 MemWatchEntry* FieldDef::getEntry() const
@@ -45,10 +53,56 @@ MemWatchEntry* FieldDef::getEntry() const
   return m_entry;
 }
 
+void FieldDef::setEntry(MemWatchEntry* entry)
+{
+  if (m_entry != nullptr)
+    delete (m_entry);
+  if (entry != nullptr)
+    m_entry = entry;
+}
+
+size_t FieldDef::getSize() const
+{
+  if (!m_entry)
+    return m_size;
+  return m_entry->getLength();
+}
+
+void FieldDef::setSize(size_t size)
+{
+  if (!m_entry)
+    m_size = size;
+}
+
+QString FieldDef::getLabel() const
+{
+  if (!m_entry)
+    return QString("");
+  return m_entry->getLabel();
+}
+
+void FieldDef::setLabel(QString label)
+{
+  if (m_entry)
+    m_entry->setLabel(label);
+}
+
+bool FieldDef::isPadding() const
+{
+  return m_entry == nullptr;
+}
+
+void FieldDef::convertToPadding()
+{
+  if (m_entry != nullptr)
+    delete m_entry;
+  m_entry = nullptr;
+  m_size = 1;
+}
+
 void FieldDef::readFromJSON(const QJsonObject& json)
 {
   m_structOffset = json["offset"].toInt();
-  m_isPropagated = json["isPropagated"].toBool();
 
   MemWatchEntry* entry = new MemWatchEntry();
 
@@ -59,7 +113,6 @@ void FieldDef::readFromJSON(const QJsonObject& json)
 void FieldDef::writeToJson(QJsonObject& json)
 {
   json["offset"] = static_cast<double>(m_structOffset);
-  json["isPropagated"] = m_isPropagated;
 
   if (!m_entry)
     return;

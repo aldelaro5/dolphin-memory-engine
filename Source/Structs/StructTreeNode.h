@@ -30,6 +30,8 @@ public:
   int childrenCount() const;
   const QVector<StructTreeNode*>& getChildren() const;
   void setChildren(QVector<StructTreeNode*> children);
+  QVector<QString> getChildNames();
+  StructDef* getStructDef() const;
 
   void appendChild(StructTreeNode* node);
   void insertChild(int row, StructTreeNode* node);
@@ -41,13 +43,19 @@ public:
   void readFromJson(const QJsonObject& json, StructTreeNode* parent = nullptr);
   void writeToJson(QJsonObject& json) const;
 
+  QVector<QString> getStructNames(bool includeGroups = false, QString prefix = QString(""));
+  QString getNameSpace();
+  QString appendNameToNameSpace(QString nameSpace) const;
+
 private:
+  void updateName();
+
   bool m_isGroup;
   QString m_nodeName;
   bool m_expanded{};
+  StructDef* m_structDef;
 
   QVector<StructTreeNode*> m_children{};
-  QVector<StructTreeNode*> m_children;
   StructTreeNode* m_parent;
   
 };
