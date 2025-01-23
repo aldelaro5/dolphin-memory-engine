@@ -20,6 +20,7 @@ DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const ent
     : QDialog(parent)
 {
   m_structNames = structs;
+  m_structNames.push_front(QString(""));
   setWindowTitle(newEntry ? "Add Watch" : "Edit Watch");
   initialiseWidgets();
   makeLayouts();
@@ -80,7 +81,6 @@ void DlgAddWatchEntry::initialiseWidgets()
   m_spnLength->setMaximum(9999);
 
   m_structSelect = new QComboBox(this);
-  m_structSelect->addItem(QString(""));
   m_structSelect->addItems(m_structNames);
 }
 
@@ -162,9 +162,9 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
       m_spnLength->show();
     else if (m_entry->getType() == Common::MemType::type_struct)
     {
-      m_structSelect->show();
       if (m_structNames.contains(m_entry->getStructName()))
-        m_structSelect->setCurrentIndex(m_structNames.indexOf(m_entry->getStructName()) + 1);
+      m_structSelect->setCurrentIndex(m_structNames.indexOf(m_entry->getStructName()));
+      m_structSelect->show();
     }
     else
     {
@@ -377,6 +377,10 @@ void DlgAddWatchEntry::accept()
       m_entry->setLabel(m_txbLabel->text());
     m_entry->setBase(Common::MemBase::base_decimal);
     m_entry->setSignedUnsigned(false);
+    if (m_entry->getType() == Common::MemType::type_struct)
+      m_entry->setStructName(m_structNames[m_structSelect->currentIndex()]);
+    else
+      m_entry->setStructName(QString(""));
     setResult(QDialog::Accepted);
     hide();
   }
@@ -492,4 +496,23 @@ void DlgAddWatchEntry::onPointerOffsetContextMenuRequested(const QPoint& pos)
   }
 
   contextMenu->popup(lbl->mapToGlobal(pos));
+}
+
+void DlgAddWatchEntry::onUpdateStructNames(QVector<QString> structNames)
+{
+  QString curStructName = m_structSelect->currentIndex() == 0 ? QString("") : structNames[m_structSelect->currentIndex() - 1];
+
+  m_structNames = structNames;
+  m_structNames.push_front(QString(""));
+
+  m_structSelect->clear();
+  m_structSelect->addItems(structNames);
+
+  if (m_structNames.contains(curStructName))
+    m_structSelect->setCurrentIndex(m_structNames.indexOf(curStructName));
+}
+
+void DlgAddWatchEntry::onUpdateStructName(QString oldName, QString newName)
+{
+  m_structSelect->setItemText(m_structNames.indexOf(oldName), newName);
 }

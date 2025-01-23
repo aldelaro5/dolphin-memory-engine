@@ -8,12 +8,17 @@
 
 #include "../../GUICommon.h"
 
-DlgChangeType::DlgChangeType(QWidget* parent, const int typeIndex, const size_t length)
-    : QDialog(parent), m_typeIndex(typeIndex), m_length(length)
+DlgChangeType::DlgChangeType(QWidget* parent, const int typeIndex, const size_t length,
+                             QVector<QString> structNames, QString curStructName)
+    : QDialog(parent), m_typeIndex(typeIndex), m_length(length), m_structNames(structNames)
 {
+  m_structNames.push_front(QString(""));
   setWindowTitle("Change Type");
   initialiseWidgets();
   makeLayouts();
+
+  if (m_structNames.contains(curStructName))
+    m_structSelect->setCurrentIndex(m_structNames.indexOf(curStructName));
 }
 
 void DlgChangeType::initialiseWidgets()
@@ -28,6 +33,10 @@ void DlgChangeType::initialiseWidgets()
   m_spnLength->setMaximum(9999);
   m_spnLength->setValue(static_cast<int>(m_length));
 
+  m_structSelect = new QComboBox(this);
+  m_structSelect->addItems(m_structNames);
+  m_structSelect->setCurrentIndex(0);
+
   connect(m_cmbTypes, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
           &DlgChangeType::onTypeChange);
 }
@@ -39,6 +48,7 @@ void DlgChangeType::makeLayouts()
   layout_type->setContentsMargins(0, 0, 0, 0);
   layout_type->addWidget(m_cmbTypes, 1);
   layout_type->addWidget(m_spnLength);
+  layout_type->addWidget(m_structSelect);
   QWidget* widget_type = new QWidget;
   widget_type->setLayout(layout_type);
   widget_type->setContentsMargins(0, 0, 0, 0);
@@ -73,6 +83,11 @@ size_t DlgChangeType::getLength() const
   return m_length;
 }
 
+QString DlgChangeType::getStructName() const
+{
+  return m_structNames[m_structSelect->currentIndex()];
+}
+
 void DlgChangeType::accept()
 {
   m_typeIndex = m_cmbTypes->currentIndex();
@@ -85,8 +100,40 @@ void DlgChangeType::onTypeChange(int index)
 {
   Common::MemType theType = static_cast<Common::MemType>(index);
   if (theType == Common::MemType::type_string || theType == Common::MemType::type_byteArray)
+  {
+    m_structSelect->hide();
     m_spnLength->show();
-  else
+  }
+  else if (theType == Common::MemType::type_struct)
+  {
+    m_structSelect->show();
     m_spnLength->hide();
+  }
+  else
+  {
+    m_structSelect->hide();
+    m_spnLength->hide();
+  }
   adjustSize();
+}
+
+void DlgChangeType::onUpdateStructNames(QVector<QString> structNames)
+{
+  QString curStructName = m_structSelect->currentIndex() == 0 ?
+                              QString("") :
+                              structNames[m_structSelect->currentIndex() - 1];
+
+  m_structNames = structNames;
+  m_structNames.push_front(QString(""));
+
+  m_structSelect->clear();
+  m_structSelect->addItems(structNames);
+
+  if (m_structNames.contains(curStructName))
+    m_structSelect->setCurrentIndex(m_structNames.indexOf(curStructName));
+}
+
+void DlgChangeType::onUpdateStructName(QString oldName, QString newName)
+{
+  m_structSelect->setItemText(m_structNames.indexOf(oldName), newName);
 }

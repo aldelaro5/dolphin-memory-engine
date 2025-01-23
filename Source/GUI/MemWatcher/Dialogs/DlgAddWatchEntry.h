@@ -33,6 +33,9 @@ public:
   void onOffsetChanged();
   MemWatchEntry* stealEntry();
 
+  void onUpdateStructNames(QVector<QString> structNames);
+  void onUpdateStructName(QString oldName, QString newName);
+
 private:
   void initialiseWidgets();
   void makeLayouts();
