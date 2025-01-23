@@ -6,6 +6,7 @@
 
 #include "MemWatchDelegate.h"
 #include "MemWatchModel.h"
+#include "../../Structs/StructTreeNode.h"
 
 class MemWatchWidget : public QWidget
 {
@@ -49,6 +50,8 @@ public:
   bool warnIfUnsavedChanges();
   void restoreWatchModel(const QString& json);
   QString saveWatchModel();
+  void setStructDefs(StructTreeNode* structDefs);
+  
   QString m_watchListFile;
 
 signals:
@@ -71,4 +74,6 @@ private:
 
   bool isAnyAncestorSelected(const QModelIndex& index) const;
   QModelIndexList simplifySelection() const;
+
+  StructTreeNode* m_structDefs;
 };

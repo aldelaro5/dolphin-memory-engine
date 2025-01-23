@@ -41,7 +41,6 @@ MainWindow::MainWindow()
 
   GUICommon::changeApplicationStyle(
       static_cast<GUICommon::ApplicationStyle>(SConfig::getInstance().getTheme()));
-
   m_actAutoloadLastFile->setChecked(SConfig::getInstance().getAutoloadLastFile());
 
   if (m_actAutoloadLastFile->isChecked() && !SConfig::getInstance().getLastLoadedFile().isEmpty())
@@ -51,10 +50,12 @@ MainWindow::MainWindow()
   else
   {
     m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
+    m_structEditor->restoreStructDefs(SConfig::getInstance().getStructDefs());
   }
 
   m_actCollapseGroupsOnSave->setChecked(SConfig::getInstance().getCollapseGroupsOnSave());
-
+  m_watcher->setStructDefs(m_structEditor->getStructDefs());
+  m_viewer->setStructDefs(m_structEditor->getStructDefs());
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
   if (m_actAutoHook->isChecked())
@@ -607,6 +608,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
   if (!m_actAutoloadLastFile->isChecked() || m_watcher->m_watchListFile.isEmpty())
   {
     SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
+    SConfig::getInstance().setStructDefs(m_structEditor->saveStructDefs());
   }
   SConfig::getInstance().setMainWindowGeometry(saveGeometry());
   SConfig::getInstance().setMainWindowState(saveState());

@@ -95,6 +95,11 @@ void MemViewer::memoryValidityChanged(const bool valid)
   viewport()->update();
 }
 
+void MemViewer::setStructDefs(StructTreeNode* baseNode)
+{
+  m_structDefs = baseNode;
+}
+
 void MemViewer::updateMemoryData()
 {
   std::swap(m_updatedRawMemoryData, m_lastRawMemoryData);
