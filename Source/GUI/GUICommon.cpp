@@ -75,6 +75,17 @@ QString getNameFromBase(const Common::MemBase base)
   }
 }
 
+bool isContainerType(const Common::MemType type)
+{
+  switch (type)
+  {
+  case Common::MemType::type_struct:
+    return true;
+  default:
+    return false;
+  }
+}
+
 void changeApplicationStyle(const ApplicationStyle style)
 {
   QApplication::setStyle(QStringLiteral("fusion"));
