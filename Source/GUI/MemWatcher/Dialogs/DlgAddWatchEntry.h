@@ -45,6 +45,8 @@ private:
   void removePointerOffset();
   void removeAllPointerOffset();
   void onPointerOffsetContextMenuRequested(const QPoint& pos);
+  void onUpdateStructNames(QVector<QString> structNames);
+  void onUpdateStructName(QString oldName, QString newName);
 
   MemWatchEntry* m_entry{};
   AddressInputWidget* m_txbAddress{};
