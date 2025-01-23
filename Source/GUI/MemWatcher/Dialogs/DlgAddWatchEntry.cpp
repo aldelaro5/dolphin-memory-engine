@@ -14,10 +14,11 @@
 #include "../../../DolphinProcess/DolphinAccessor.h"
 #include "../../GUICommon.h"
 
-DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const entry,
+DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const entry, QVector<QString> const structs,
                                    QWidget* const parent)
     : QDialog(parent)
 {
+  m_structNames = structs;
   setWindowTitle(newEntry ? "Add Watch" : "Edit Watch");
   initialiseWidgets();
   makeLayouts();
@@ -71,6 +72,10 @@ void DlgAddWatchEntry::initialiseWidgets()
   m_spnLength->setPrefix("Length: ");
   m_spnLength->setMinimum(1);
   m_spnLength->setMaximum(9999);
+
+  m_structSelect = new QComboBox(this);
+  m_structSelect->addItem(QString(""));
+  m_structSelect->addItems(m_structNames);
 }
 
 void DlgAddWatchEntry::makeLayouts()
@@ -85,6 +90,7 @@ void DlgAddWatchEntry::makeLayouts()
   layout_type->setContentsMargins(0, 0, 0, 0);
   layout_type->addWidget(m_cmbTypes, 1);
   layout_type->addWidget(m_spnLength);
+  layout_type->addWidget(m_structSelect);
   QWidget* widget_type = new QWidget;
   widget_type->setLayout(layout_type);
   widget_type->setContentsMargins(0, 0, 0, 0);
@@ -136,6 +142,8 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_lblValuePreview->setText("???");
     m_chkBoundToPointer->setChecked(false);
     m_pointerWidget->hide();
+    m_structSelect->setCurrentIndex(0);
+    m_structSelect->hide();
   }
   else
   {
@@ -146,8 +154,17 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     if (m_entry->getType() == Common::MemType::type_string ||
         m_entry->getType() == Common::MemType::type_byteArray)
       m_spnLength->show();
+    else if (m_entry->getType() == Common::MemType::type_struct)
+    {
+      m_structSelect->show();
+      if (m_structNames.contains(m_entry->getStructName()))
+        m_structSelect->setCurrentIndex(m_structNames.indexOf(m_entry->getStructName()) + 1);
+    }
     else
+    {
       m_spnLength->hide();
+      m_structSelect->hide();
+    }
     m_txbLabel->setText(m_entry->getLabel());
     std::stringstream ssAddress;
     ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
@@ -289,9 +306,20 @@ void DlgAddWatchEntry::onTypeChange(int index)
 {
   Common::MemType theType = static_cast<Common::MemType>(index);
   if (theType == Common::MemType::type_string || theType == Common::MemType::type_byteArray)
+  {
     m_spnLength->show();
-  else
+    m_structSelect->hide();
+  }
+  else if (theType == Common::MemType::type_struct)
+  {
     m_spnLength->hide();
+    m_structSelect->show();
+  }
+  else
+  {
+    m_spnLength->hide();
+    m_structSelect->hide();
+  }
   m_entry->setTypeAndLength(theType, m_spnLength->value());
   if (validateAndSetAddress())
     updatePreview();
