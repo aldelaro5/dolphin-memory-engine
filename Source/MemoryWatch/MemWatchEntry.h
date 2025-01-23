@@ -57,7 +57,7 @@ public:
   Common::MemOperationReturnCode writeMemoryFromString(const std::string& inputString);
 
   void readFromJson(const QJsonObject& json);
-  void writeToJson(const QJsonObject& json);
+  void writeToJson(QJsonObject& json) const;
 
 private:
   Common::MemOperationReturnCode writeMemoryToRAM(const char* memory, size_t size);
