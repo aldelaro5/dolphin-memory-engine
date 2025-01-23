@@ -19,6 +19,7 @@ DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const ent
     : QDialog(parent)
 {
   m_structNames = structs;
+  m_structNames.push_front(QString(""));
   setWindowTitle(newEntry ? "Add Watch" : "Edit Watch");
   initialiseWidgets();
   makeLayouts();
@@ -74,7 +75,6 @@ void DlgAddWatchEntry::initialiseWidgets()
   m_spnLength->setMaximum(9999);
 
   m_structSelect = new QComboBox(this);
-  m_structSelect->addItem(QString(""));
   m_structSelect->addItems(m_structNames);
 }
 
@@ -156,9 +156,8 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
       m_spnLength->show();
     else if (m_entry->getType() == Common::MemType::type_struct)
     {
+      m_structSelect->setCurrentIndex(m_structNames.indexOf(m_entry->getStructName()));
       m_structSelect->show();
-      if (m_structNames.contains(m_entry->getStructName()))
-        m_structSelect->setCurrentIndex(m_structNames.indexOf(m_entry->getStructName()) + 1);
     }
     else
     {
