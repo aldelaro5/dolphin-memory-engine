@@ -370,6 +370,10 @@ void DlgAddWatchEntry::accept()
       m_entry->setLabel(m_txbLabel->text());
     m_entry->setBase(Common::MemBase::base_decimal);
     m_entry->setSignedUnsigned(false);
+    if (m_entry->getType() == Common::MemType::type_struct)
+      m_entry->setStructName(m_structNames[m_structSelect->currentIndex()]);
+    else
+      m_entry->setStructName(QString(""));
     setResult(QDialog::Accepted);
     hide();
   }
