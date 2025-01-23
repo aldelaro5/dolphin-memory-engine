@@ -38,8 +38,8 @@ public:
   void removeChildren();
   void deleteChildren();
 
-  void readFromJson(const QJsonObject& json, StructTreeNode* parent = nullptr, QStringList structNames);
-  void writeToJson(QJsonObject& json, QStringList structNames) const;
+  void readFromJson(const QJsonObject& json, StructTreeNode* parent = nullptr);
+  void writeToJson(QJsonObject& json) const;
 
 private:
   bool m_isGroup;

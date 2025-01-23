@@ -136,7 +136,7 @@ void StructTreeNode::deleteChildren()
   m_children.clear();
 }
 
-void StructTreeNode::readFromJson(const QJsonObject& json, StructTreeNode* parent, QStringList structNames)
+void StructTreeNode::readFromJson(const QJsonObject& json, StructTreeNode* parent)
 {
   m_parent = parent;
   if (json["rootNode"] != QJsonValue::Undefined)
@@ -146,7 +146,7 @@ void StructTreeNode::readFromJson(const QJsonObject& json, StructTreeNode* paren
     for (auto i : structTree)
     {
       QJsonObject node = i.toObject();
-      StructTreeNode* childNode = new StructTreeNode(nullptr);
+      StructTreeNode* childNode = new StructTreeNode(nullptr, nullptr);
       childNode->readFromJson(node, this);
       m_children.append(childNode);
     }
@@ -154,53 +154,61 @@ void StructTreeNode::readFromJson(const QJsonObject& json, StructTreeNode* paren
   else if (json["groupName"] != QJsonValue::Undefined)
   {
     m_isGroup = true;
-    m_groupName = json["groupName"].toString();
+    m_nodeName = json["groupName"].toString();
     m_expanded = json["expanded"].toBool();
     QJsonArray groupChildren = json["groupChildren"].toArray();
     for (auto i : groupChildren)
     {
       QJsonObject node = i.toObject();
-      StructTreeNode* childNode = new StructTreeNode(nullptr);
+      StructTreeNode* childNode = new StructTreeNode(nullptr, nullptr);
       childNode->readFromJson(node, this);
+      if (isNameAvailable(childNode->getName()))
       m_children.append(childNode);
     }
   }
   else
   {
     m_isGroup = false;
-    m_structName = json["structName"].toString();
+    m_nodeName = json["structName"].toString();
+    m_structDef = new StructDef();
+    m_structDef->readFromJson(json["struct"].toObject());
   }
 }
 
-void StructTreeNode::writeToJson(QJsonObject& json, QStringList structNames) const
+void StructTreeNode::writeToJson(QJsonObject& json) const
 {
   if (isGroup())
   {
-    json["groupName"] = m_groupName;
+    json["groupName"] = m_nodeName;
     json["expanded"] = m_expanded;
     QJsonArray entries;
     for (StructTreeNode* const child : m_children)
     {
       QJsonObject nextNode;
-      child->writeToJson(nextNode, structNames);
+      child->writeToJson(nextNode);
       entries.append(nextNode);
     }
     json["groupChildren"] = entries;
   }
-  else
-  {
-    if (m_parent == nullptr)
+  else if (m_parent == nullptr)
     {
       QJsonArray rootNode;
       for (StructTreeNode* const child : m_children)
       {
         QJsonObject nextNode;
-        child->writeToJson(nextNode, structNames);
+      child->writeToJson(nextNode);
         rootNode.append(nextNode);
       }
       json["rootNode"] = rootNode;
     }
-    else if (structNames.contains(m_structName))
+  else
+  {
+    json["structName"] = m_nodeName;
+    QJsonObject structDefJson;
+    m_structDef->writeToJson(structDefJson);
+    json["struct"] = structDefJson;
+  }
+}
     {
       json["structName"] = m_structName;
     }
