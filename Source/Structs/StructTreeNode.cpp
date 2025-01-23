@@ -1,11 +1,14 @@
-#include "StructDefTreeNode.h"
+#include "StructTreeNode.h"
 
 #include <QJsonArray>
 
-StructTreeNode::StructTreeNode(StructDef* structDef, StructTreeNode* parent, bool isGroup,
-                                     bool isAuto, QString groupName)
+StructTreeNode::StructTreeNode(StructDef* const structDef, StructTreeNode* const parent, bool isGroup, QString name)
 {
-  QVector<StructTreeNode*> m_children;
+  m_parent = parent;
+  m_isGroup = isGroup;
+  m_nodeName = std::move(name);
+  m_structDef = structDef;
+  updateName();
 }
 
 StructTreeNode::~StructTreeNode()

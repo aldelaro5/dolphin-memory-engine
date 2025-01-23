@@ -9,8 +9,7 @@
 class StructTreeNode
 {
 public:
-  explicit StructTreeNode(StructDef* structDef, StructTreeNode* parent = nullptr,
-                             bool isGroup = false, bool isAuto = false, QString groupName = {});
+  explicit StructTreeNode(StructDef* const structDef, StructTreeNode* const parent, bool isGroup = false, QString name = {});
   ~StructTreeNode();
 
   StructTreeNode(const StructTreeNode&) = delete;
