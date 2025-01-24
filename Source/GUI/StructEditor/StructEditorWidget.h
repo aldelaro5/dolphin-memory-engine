@@ -42,6 +42,7 @@ public:
 
 signals:
   void updateStructList(QVector<QString> structs);
+  void updateDlgStructList(QVector<QString> structs);
   void updateStructName(QString old_name, QString new_name);
   void updateStructDetails(QString fullName, StructDef* structDef);
 

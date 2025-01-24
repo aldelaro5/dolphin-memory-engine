@@ -30,10 +30,14 @@ public:
   void onMEM2StatusChanged(bool enabled);
   void goToAddress(u32 address);
   void setStructDefs(StructTreeNode* baseNode);
+  void onUpdateDlgStructNames(QVector<QString> structNames);
+  void onUpdateDlgStructName(QString oldName, QString newName);
 
 signals:
   void mustUnhook();
   void addWatchRequested(MemWatchEntry* entry);
+  void updateDlgStructNames(QVector<QString> structNames);
+  void updateDlgStructName(QString oldName, QString newName);
 
 private:
   void initialiseWidgets();
