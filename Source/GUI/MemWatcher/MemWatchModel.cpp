@@ -37,11 +37,15 @@ QString getAddressString(const MemWatchEntry* const entry)
 MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
 {
   m_rootNode = new MemWatchTreeNode(nullptr);
+  m_structDefs = QMap<QString, StructDef*>();
+  m_structNodes = QMap <QString, QVector<MemWatchTreeNode*>>();
 }
 
 MemWatchModel::~MemWatchModel()
 {
   delete m_rootNode;
+  qDeleteAll(m_structDefs);
+  qDeleteAll(m_structNodes);
 }
 
 void MemWatchModel::onUpdateTimer()
@@ -59,6 +63,8 @@ void MemWatchModel::onFreezeTimer()
 bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QModelIndex& parent,
                                              bool readSucess)
 {
+  node->updateChildAddresses();
+
   QVector<MemWatchTreeNode*> children = node->getChildren();
   if (children.count() > 0)
   {
@@ -706,4 +712,37 @@ QModelIndex MemWatchModel::getIndexFromTreeNode(const MemWatchTreeNode* const no
   const MemWatchTreeNode* const parent{node->getParent()};
   return index(static_cast<int>(parent->getChildren().indexOf(node)), 0,
                getIndexFromTreeNode(parent));
+}
+
+void MemWatchModel::setStructDefs(QMap<QString, StructDef*> structDefs)
+{
+  m_structDefs = structDefs;
+}
+
+void MemWatchModel::onStructNameChanged(const QString old_name, const QString new_name)
+{
+  StructDef* changedStruct = m_structDefs[old_name];
+  m_structDefs.remove(old_name);
+  m_structDefs.insert(new_name, changedStruct);
+
+  if (!m_structNodes.keys().contains(old_name))
+    return;
+
+  for (MemWatchTreeNode* node : m_structNodes[old_name])
+    node->getEntry()->setStructName(new_name);
+}
+
+void MemWatchModel::onStructDefAddRemove(QString structName, StructDef* structDef)
+{
+  if (structDef == nullptr)
+    m_structDefs.remove(structName);
+  else
+    m_structDefs.insert(structName, structDef);
+
+  updateStructEntries(structName);
+}
+
+void MemWatchModel::updateStructEntries(const QString structName)
+{
+  
 }

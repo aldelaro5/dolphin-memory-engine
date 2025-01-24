@@ -455,6 +455,9 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
       if (dlg->exec() == QDialog::Accepted)
       {
         Common::MemType theType = static_cast<Common::MemType>(dlg->getTypeIndex());
+        if (theType == Common::MemType::type_struct && dlg->getStructName() != QString(""))
+          entry->setStructName(dlg->getStructName());
+
         m_watchModel->changeType(index, theType, dlg->getLength());
         m_hasUnsavedChanges = true;
       }
@@ -1000,6 +1003,11 @@ QString MemWatchWidget::saveWatchModel()
   return saveDoc.toJson();
 }
 
+void MemWatchWidget::onUpdateStructDetails(QString structName)
+{
+  m_watchModel->updateStructEntries(structName);
+}
+
 void MemWatchWidget::onUpdateDlgStructNames(QVector<QString> structNames)
 {
   emit updateDlgStructNames(structNames);
@@ -1009,6 +1017,11 @@ void MemWatchWidget::onUpdateStructName(QString oldName, QString newName)
 {
   m_watchModel->onStructNameChanged(oldName, newName);
   emit updateDlgStructName(oldName, newName);
+}
+
+void MemWatchWidget::onStructDefAddRemove(QString structName, StructDef* structDef) const
+{
+  m_watchModel->onStructDefAddRemove(structName, structDef);
 }
 
 void MemWatchWidget::updateExpansionState(const MemWatchTreeNode* const node)

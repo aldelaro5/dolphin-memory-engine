@@ -8,6 +8,7 @@
 
 #include "../../MemoryWatch/MemWatchEntry.h"
 #include "../../MemoryWatch/MemWatchTreeNode.h"
+#include "../../Structs/StructDef.h"
 
 class MemWatchModel : public QAbstractItemModel
 {
@@ -75,6 +76,11 @@ public:
   QModelIndex getIndexFromTreeNode(const MemWatchTreeNode* node);
   bool editData(const QModelIndex& index, const QVariant& value, int role, bool emitEdit = false);
 
+  void setStructDefs(QMap<QString, StructDef*> structDefs);
+  void onStructNameChanged(const QString old_name, const QString new_name);
+  void onStructDefAddRemove(QString structName, StructDef* structDef);
+  void updateStructEntries(QString structName);
+
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& value, int role);
   void writeFailed(const QModelIndex& index, Common::MemOperationReturnCode writeReturn);
@@ -90,4 +96,6 @@ private:
   int getNodeDeepness(const MemWatchTreeNode* node) const;
 
   MemWatchTreeNode* m_rootNode;
+  QMap<QString, StructDef*> m_structDefs{};
+  QMap<QString, QVector<MemWatchTreeNode*>> m_structNodes{};
 };
