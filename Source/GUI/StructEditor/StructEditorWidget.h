@@ -23,7 +23,6 @@ public:
   StructEditorWidget& operator=(StructEditorWidget&&) = delete;
 
   void onSelectContextMenuRequested(const QPoint& pos);
-  void onSelectDoubleClicked();
   void onSelectDataEdited(const QModelIndex& index, const QVariant& value, int role);
   void onSelectDropSucceeded();
 
@@ -41,10 +40,10 @@ public:
   QString saveStructDefs();
 
 signals:
-  void updateStructList(QVector<QString> structs);
+  void structAddedRemoved(QString fullName, StructDef* structDef);
   void updateDlgStructList(QVector<QString> structs);
   void updateStructName(QString old_name, QString new_name);
-  void updateStructDetails(QString fullName, StructDef* structDef);
+  void updateStructDetails(QString fullName);
 
 private:
   void initialiseWidgets();

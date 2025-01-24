@@ -63,8 +63,6 @@ void StructEditorWidget::initialiseWidgets()
   m_structSelectView->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(m_structSelectView, &QWidget::customContextMenuRequested, this,
           &StructEditorWidget::onSelectContextMenuRequested);
-  connect(m_structSelectView, &QAbstractItemView::doubleClicked, this,
-          &StructEditorWidget::onSelectDoubleClicked);
   m_structSelectView->setDragEnabled(true);
   m_structSelectView->setAcceptDrops(true);
   m_structSelectView->setDragDropMode(QAbstractItemView::InternalMove);
@@ -314,10 +312,6 @@ void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)
   }
   
   contextMenu->popup(m_structSelectView->viewport()->mapToGlobal(pos));
-}
-
-void StructEditorWidget::onSelectDoubleClicked()
-{
 }
 
 void StructEditorWidget::onSelectDataEdited(const QModelIndex& index, const QVariant& value,
