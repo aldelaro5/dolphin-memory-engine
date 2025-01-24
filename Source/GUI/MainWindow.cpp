@@ -56,6 +56,7 @@ MainWindow::MainWindow()
   m_actCollapseGroupsOnSave->setChecked(SConfig::getInstance().getCollapseGroupsOnSave());
   m_watcher->setStructDefs(m_structEditor->getStructDefs());
   m_viewer->setStructDefs(m_structEditor->getStructDefs());
+  m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
   // Connect struct updates to mem watch widget
