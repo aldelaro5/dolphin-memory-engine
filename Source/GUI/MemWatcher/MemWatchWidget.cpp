@@ -448,7 +448,10 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
     {
       MemWatchEntry* entry = node->getEntry();
       int typeIndex = static_cast<int>(entry->getType());
-      DlgChangeType* dlg = new DlgChangeType(this, typeIndex, entry->getLength());
+      DlgChangeType* dlg =
+          new DlgChangeType(this, typeIndex, entry->getLength(), m_structDefs->getStructNames(), entry->getStructName());
+      connect(this, &MemWatchWidget::updateDlgStructNames, dlg, &DlgChangeType::onUpdateStructNames);
+      connect(this, &MemWatchWidget::updateDlgStructName, dlg, &DlgChangeType::onUpdateStructName);
       if (dlg->exec() == QDialog::Accepted)
       {
         Common::MemType theType = static_cast<Common::MemType>(dlg->getTypeIndex());
@@ -459,7 +462,9 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
     else if (index.column() == MemWatchModel::WATCH_COL_ADDRESS && !node->isGroup())
     {
       MemWatchEntry* entryCopy = new MemWatchEntry(node->getEntry());
-      DlgAddWatchEntry dlg(false, entryCopy, this);
+      DlgAddWatchEntry dlg(false, entryCopy, m_structDefs->getStructNames(), this);
+      connect(this, &MemWatchWidget::updateDlgStructNames, &dlg, &DlgAddWatchEntry::onUpdateStructNames);
+      connect(this, &MemWatchWidget::updateDlgStructName, &dlg, &DlgAddWatchEntry::onUpdateStructName);
       if (dlg.exec() == QDialog::Accepted)
       {
         m_watchModel->editEntry(dlg.stealEntry(), index);
@@ -583,7 +588,9 @@ void MemWatchWidget::onAddGroup()
 
 void MemWatchWidget::onAddWatchEntry()
 {
-  DlgAddWatchEntry dlg(true, nullptr, this);
+  DlgAddWatchEntry dlg(true, nullptr, m_structDefs->getStructNames(), this);
+  connect(this, &MemWatchWidget::updateDlgStructNames, &dlg, &DlgAddWatchEntry::onUpdateStructNames);
+  connect(this, &MemWatchWidget::updateDlgStructName, &dlg, &DlgAddWatchEntry::onUpdateStructName);
   if (dlg.exec() == QDialog::Accepted)
   {
     addWatchEntry(dlg.stealEntry());
@@ -991,6 +998,17 @@ QString MemWatchWidget::saveWatchModel()
   m_watchModel->writeRootToJsonRecursive(root);
   QJsonDocument saveDoc(root);
   return saveDoc.toJson();
+}
+
+void MemWatchWidget::onUpdateDlgStructNames(QVector<QString> structNames)
+{
+  emit updateDlgStructNames(structNames);
+}
+
+void MemWatchWidget::onUpdateStructName(QString oldName, QString newName)
+{
+  m_watchModel->onStructNameChanged(oldName, newName);
+  emit updateDlgStructName(oldName, newName);
 }
 
 void MemWatchWidget::updateExpansionState(const MemWatchTreeNode* const node)

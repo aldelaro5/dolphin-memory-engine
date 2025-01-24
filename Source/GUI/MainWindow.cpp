@@ -58,6 +58,22 @@ MainWindow::MainWindow()
   m_viewer->setStructDefs(m_structEditor->getStructDefs());
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
+  // Connect struct updates to mem watch widget
+  connect(m_structEditor, &StructEditorWidget::updateDlgStructList,
+          &MemWatchWidget::onUpdateDlgStructNames);
+  connect(m_structEditor, &StructEditorWidget::updateStructName,
+          &MemWatchWidget::onUpdateStructName);
+  connect(m_structEditor, &StructEditorWidget::updateStructDetails,
+          &MemWatchWidget::onUpdateStructDetails);
+  connect(m_structEditor, &StructEditorWidget::structAddedRemoved,
+          &MemWatchWidget::onStructDefAddRemove);
+
+  // connect struct updates to mem viewer widget
+  connect(m_structEditor, &StructEditorWidget::updateStructName,
+          &MemViewerWidget::onUpdateDlgStructName);
+  connect(m_structEditor, &StructEditorWidget::updateDlgStructList,
+          &MemViewerWidget::onUpdateDlgStructNames);
+
   if (m_actAutoHook->isChecked())
     onHookAttempt();
   else

@@ -40,10 +40,14 @@ public:
   void updateViewer();
   void memoryValidityChanged(bool valid);
   void setStructDefs(StructTreeNode* baseNode);
+  void onUpdateDlgStructNames(QVector<QString> structNames);
+  void onUpdateDlgStructName(QString oldName, QString newName);
 
 signals:
   void memErrorOccured();
   void addWatch(MemWatchEntry* entry);
+  void updateDlgStructNames(QVector<QString> structNames);
+  void updateDlgStructName(QString oldName, QString newName);
 
 private:
   enum class SelectionType

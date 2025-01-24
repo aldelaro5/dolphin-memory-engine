@@ -51,12 +51,16 @@ public:
   void restoreWatchModel(const QString& json);
   QString saveWatchModel();
   void setStructDefs(StructTreeNode* structDefs);
+  void onUpdateDlgStructNames(QVector<QString> structNames);
+  void onUpdateStructName(QString oldName, QString newName);
   
   QString m_watchListFile;
 
 signals:
   void mustUnhook();
   void goToAddressInViewer(u32 address);
+  void updateDlgStructNames(QVector<QString> structNames);
+  void updateDlgStructName(QString oldName, QString newName);
 
 private:
   void initialiseWidgets();
