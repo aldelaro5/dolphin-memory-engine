@@ -42,10 +42,10 @@ MainWindow::MainWindow()
   GUICommon::changeApplicationStyle(
       static_cast<GUICommon::ApplicationStyle>(SConfig::getInstance().getTheme()));
 
-  m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
   m_structEditor->restoreStructDefs(SConfig::getInstance().getStructDefs());
   m_watcher->setStructDefs(m_structEditor->getStructDefs());
   m_viewer->setStructDefs(m_structEditor->getStructDefs());
+  m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
   // Connect struct updates to mem watch widget
