@@ -116,3 +116,24 @@ void DlgChangeType::onTypeChange(int index)
   }
   adjustSize();
 }
+
+void DlgChangeType::onUpdateStructNames(QVector<QString> structNames)
+{
+  QString curStructName = m_structSelect->currentIndex() == 0 ?
+                              QString("") :
+                              structNames[m_structSelect->currentIndex() - 1];
+
+  m_structNames = structNames;
+  m_structNames.push_front(QString(""));
+
+  m_structSelect->clear();
+  m_structSelect->addItems(structNames);
+
+  if (m_structNames.contains(curStructName))
+    m_structSelect->setCurrentIndex(m_structNames.indexOf(curStructName));
+}
+
+void DlgChangeType::onUpdateStructName(QString oldName, QString newName)
+{
+  m_structSelect->setItemText(m_structNames.indexOf(oldName), newName);
+}

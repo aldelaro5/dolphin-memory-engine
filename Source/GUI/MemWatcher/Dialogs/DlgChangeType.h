@@ -16,6 +16,8 @@ public:
   QString getStructName() const;
   void accept() override;
   void onTypeChange(int index);
+  void onUpdateStructNames(QVector<QString> structNames);
+  void onUpdateStructName(QString oldName, QString newName);
 
 private:
   void initialiseWidgets();
