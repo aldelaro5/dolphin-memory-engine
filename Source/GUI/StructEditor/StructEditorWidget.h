@@ -27,7 +27,7 @@ public:
   void onSelectDropSucceeded();
 
   void onDetailContextMenuRequested(const QPoint& pos);
-  void onDetailDoubleClicked();
+  void onDetailDoubleClicked(const QModelIndex& index);
   void onDetailDataEdited(const QModelIndex& index, const QVariant& value, int role);
 
   void onAddGroup();

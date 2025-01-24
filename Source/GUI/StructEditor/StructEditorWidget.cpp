@@ -405,7 +405,7 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
   contextMenu->popup(m_structDetailView->viewport()->mapToGlobal(pos));
 }
 
-void StructEditorWidget::onDetailDoubleClicked()
+void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
 {
 }
 
