@@ -33,6 +33,9 @@ public:
   void onOffsetChanged();
   MemWatchEntry* stealEntry();
 
+  void onUpdateStructNames(QVector<QString> structNames);
+  void onUpdateStructName(QString oldName, QString newName);
+
 private:
   void initialiseWidgets();
   void makeLayouts();
@@ -45,8 +48,6 @@ private:
   void removePointerOffset();
   void removeAllPointerOffset();
   void onPointerOffsetContextMenuRequested(const QPoint& pos);
-  void onUpdateStructNames(QVector<QString> structNames);
-  void onUpdateStructName(QString oldName, QString newName);
 
   MemWatchEntry* m_entry{};
   AddressInputWidget* m_txbAddress{};
