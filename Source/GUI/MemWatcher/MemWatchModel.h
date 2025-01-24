@@ -8,6 +8,7 @@
 
 #include "../../MemoryWatch/MemWatchEntry.h"
 #include "../../MemoryWatch/MemWatchTreeNode.h"
+#include "../../Structs/StructDef.h"
 
 class MemWatchModel : public QAbstractItemModel
 {
@@ -90,4 +91,6 @@ private:
   int getNodeDeepness(const MemWatchTreeNode* node) const;
 
   MemWatchTreeNode* m_rootNode;
+  QMap<QString, StructDef*> m_structDefs{};
+  QMap<QString, QVector<MemWatchTreeNode*>> m_structNodes{};
 };

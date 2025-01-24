@@ -36,11 +36,15 @@ QString getAddressString(const MemWatchEntry* const entry)
 MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
 {
   m_rootNode = new MemWatchTreeNode(nullptr);
+  m_structDefs = QMap<QString, StructDef*>();
+  m_structNodes = QMap <QString, QVector<MemWatchTreeNode*>>();
 }
 
 MemWatchModel::~MemWatchModel()
 {
   delete m_rootNode;
+  qDeleteAll(m_structDefs);
+  qDeleteAll(m_structNodes);
 }
 
 void MemWatchModel::onUpdateTimer()
@@ -58,6 +62,8 @@ void MemWatchModel::onFreezeTimer()
 bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QModelIndex& parent,
                                              bool readSucess)
 {
+  node->updateChildAddresses();
+
   QVector<MemWatchTreeNode*> children = node->getChildren();
   if (children.count() > 0)
   {
