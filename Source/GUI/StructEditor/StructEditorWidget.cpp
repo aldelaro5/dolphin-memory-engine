@@ -112,6 +112,10 @@ void StructEditorWidget::initialiseWidgets()
   m_structDetailView->setModel(m_structDetailModel);
   //m_watchView->setItemDelegate(m_watchDelegate);
 
+  m_btnSaveStructs = new QPushButton(tr("S"), this);
+  connect(m_btnSaveStructs, &QPushButton::clicked, this, &StructEditorWidget::onSaveStruct);
+  m_btnSaveStructs->setToolTip("Add fields and update struct length.");
+
   m_btnAddField = new QPushButton(tr("+"), this);
   connect(m_btnAddField, &QPushButton::clicked, this, &StructEditorWidget::onAddField);
   m_btnAddField->setToolTip("Add fields and update struct length.");
@@ -160,6 +164,7 @@ void StructEditorWidget::makeLayouts()
   QWidget* structEditButtons = new QWidget;
   QHBoxLayout* structEditButtonLayout = new QHBoxLayout;
 
+  structEditButtonLayout->addWidget(m_btnSaveStructs);
   structEditButtonLayout->addWidget(m_btnAddField);
   structEditButtonLayout->addWidget(m_btnDeleteFields);
   structEditButtonLayout->addWidget(m_btnClearFields);
@@ -274,6 +279,12 @@ void StructEditorWidget::onClearFields()
   if (selection.isEmpty())
     return;
   m_structDetailModel->clearFields(selection);
+}
+
+void StructEditorWidget::onSaveStruct()
+{
+  m_structDetailModel->saveStruct();
+  emit updateStructDetails(m_structDetailModel->getLoadedStructNode()->getNameSpace());
 }
 
 void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)
@@ -394,7 +405,7 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
   contextMenu->popup(m_structDetailView->viewport()->mapToGlobal(pos));
 }
 
-void StructEditorWidget::onDetailDoubleClicked()
+void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
 {
 }
 
@@ -465,7 +476,7 @@ void StructEditorWidget::onAddStruct()
   m_structSelectModel->addStruct(text, lastIndex);
   m_unsavedChanges = true;
 
-  emit updateStructList(m_structDefs->getStructNames());
+  emit updateDlgStructList(m_structDefs->getStructNames());
 
 }
 
@@ -506,7 +517,7 @@ void StructEditorWidget::onDeleteNodes()
     m_structSelectModel->deleteNode(index);
   }
 
-  emit updateStructList(m_structDefs->getStructNames());
+  emit updateDlgStructList(m_structDefs->getStructNames());
 }
 
 void StructEditorWidget::onEditStruct(StructTreeNode* node)

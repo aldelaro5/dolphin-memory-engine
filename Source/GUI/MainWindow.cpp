@@ -60,19 +60,19 @@ MainWindow::MainWindow()
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
   // Connect struct updates to mem watch widget
-  connect(m_structEditor, &StructEditorWidget::updateDlgStructList,
+  connect(m_structEditor, &StructEditorWidget::updateDlgStructList, m_watcher,
           &MemWatchWidget::onUpdateDlgStructNames);
-  connect(m_structEditor, &StructEditorWidget::updateStructName,
+  connect(m_structEditor, &StructEditorWidget::updateStructName, m_watcher,
           &MemWatchWidget::onUpdateStructName);
-  connect(m_structEditor, &StructEditorWidget::updateStructDetails,
+  connect(m_structEditor, &StructEditorWidget::updateStructDetails, m_watcher,
           &MemWatchWidget::onUpdateStructDetails);
-  connect(m_structEditor, &StructEditorWidget::structAddedRemoved,
+  connect(m_structEditor, &StructEditorWidget::structAddedRemoved, m_watcher,
           &MemWatchWidget::onStructDefAddRemove);
 
   // connect struct updates to mem viewer widget
-  connect(m_structEditor, &StructEditorWidget::updateStructName,
+  connect(m_structEditor, &StructEditorWidget::updateStructName, m_viewer,
           &MemViewerWidget::onUpdateDlgStructName);
-  connect(m_structEditor, &StructEditorWidget::updateDlgStructList,
+  connect(m_structEditor, &StructEditorWidget::updateDlgStructList, m_viewer,
           &MemViewerWidget::onUpdateDlgStructNames);
 
   if (m_actAutoHook->isChecked())

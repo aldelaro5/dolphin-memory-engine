@@ -27,7 +27,7 @@ public:
   void onSelectDropSucceeded();
 
   void onDetailContextMenuRequested(const QPoint& pos);
-  void onDetailDoubleClicked();
+  void onDetailDoubleClicked(const QModelIndex& index);
   void onDetailDataEdited(const QModelIndex& index, const QVariant& value, int role);
 
   void onAddGroup();
@@ -57,6 +57,7 @@ private:
   void onAddField();
   void onDeleteFields();
   void onClearFields();
+  void onSaveStruct();
 
   bool isAnyAncestorSelected(const QModelIndex& index) const;
   QModelIndexList simplifiedSelection() const;
@@ -77,6 +78,7 @@ private:
   QPushButton* m_btnDeleteNodes{};
 
   // For Struct Details
+  QPushButton* m_btnSaveStructs{};
   QPushButton* m_btnAddField{};
   QPushButton* m_btnDeleteFields{};
   QPushButton* m_btnClearFields{};
