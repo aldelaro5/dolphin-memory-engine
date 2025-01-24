@@ -991,6 +991,11 @@ QString MemWatchWidget::saveWatchModel()
   return saveDoc.toJson();
 }
 
+void MemWatchWidget::onUpdateStructDetails(QString structName)
+{
+  m_watchModel->updateStructEntries(structName);
+}
+
 void MemWatchWidget::onUpdateDlgStructNames(QVector<QString> structNames)
 {
   emit updateDlgStructNames(structNames);
@@ -1000,6 +1005,11 @@ void MemWatchWidget::onUpdateStructName(QString oldName, QString newName)
 {
   m_watchModel->onStructNameChanged(oldName, newName);
   emit updateDlgStructName(oldName, newName);
+}
+
+void MemWatchWidget::onStructDefAddRemove(QString structName, StructDef* structDef) const
+{
+  m_watchModel->onStructDefAddRemove(structName, structDef);
 }
 
 void MemWatchWidget::updateExpansionState(const MemWatchTreeNode* const node)
