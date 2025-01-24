@@ -712,3 +712,36 @@ QModelIndex MemWatchModel::getIndexFromTreeNode(const MemWatchTreeNode* const no
   return index(static_cast<int>(parent->getChildren().indexOf(node)), 0,
                getIndexFromTreeNode(parent));
 }
+
+void MemWatchModel::setStructDefs(QMap<QString, StructDef*> structDefs)
+{
+  m_structDefs = structDefs;
+}
+
+void MemWatchModel::onStructNameChanged(const QString old_name, const QString new_name)
+{
+  StructDef* changedStruct = m_structDefs[old_name];
+  m_structDefs.remove(old_name);
+  m_structDefs.insert(new_name, changedStruct);
+
+  if (!m_structNodes.keys().contains(old_name))
+    return;
+
+  for (MemWatchTreeNode* node : m_structNodes[old_name])
+    node->getEntry()->setStructName(new_name);
+}
+
+void MemWatchModel::onStructDefAddRemove(QString structName, StructDef* structDef)
+{
+  if (structDef == nullptr)
+    m_structDefs.remove(structName);
+  else
+    m_structDefs.insert(structName, structDef);
+
+  updateStructEntries(structName);
+}
+
+void MemWatchModel::updateStructEntries(const QString structName)
+{
+  
+}
