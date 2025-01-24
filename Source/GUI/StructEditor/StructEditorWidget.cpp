@@ -476,7 +476,7 @@ void StructEditorWidget::onAddStruct()
   m_structSelectModel->addStruct(text, lastIndex);
   m_unsavedChanges = true;
 
-  emit updateStructList(m_structDefs->getStructNames());
+  emit updateDlgStructList(m_structDefs->getStructNames());
 
 }
 
@@ -517,7 +517,7 @@ void StructEditorWidget::onDeleteNodes()
     m_structSelectModel->deleteNode(index);
   }
 
-  emit updateStructList(m_structDefs->getStructNames());
+  emit updateDlgStructList(m_structDefs->getStructNames());
 }
 
 void StructEditorWidget::onEditStruct(StructTreeNode* node)
