@@ -50,7 +50,6 @@ public:
   bool warnIfUnsavedChanges();
   void restoreWatchModel(const QString& json);
   QString saveWatchModel();
-  void setStructDefs(StructTreeNode* structDefs);
   void onUpdateStructDetails(QString structName);
   void onUpdateDlgStructNames(QVector<QString> structNames);
   void onUpdateStructName(QString oldName, QString newName);
