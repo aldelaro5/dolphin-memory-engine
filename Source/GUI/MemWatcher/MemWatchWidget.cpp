@@ -455,6 +455,9 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
       if (dlg->exec() == QDialog::Accepted)
       {
         Common::MemType theType = static_cast<Common::MemType>(dlg->getTypeIndex());
+        if (theType == Common::MemType::type_struct && dlg->getStructName() != QString(""))
+          entry->setStructName(dlg->getStructName());
+
         m_watchModel->changeType(index, theType, dlg->getLength());
         m_hasUnsavedChanges = true;
       }
