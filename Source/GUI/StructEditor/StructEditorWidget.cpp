@@ -274,7 +274,9 @@ void StructEditorWidget::onDeleteFields()
     m_structDetailModel->removeFields(selection);
   }
 
-  m_txtStructLength->setText(QString::number(m_structDetailModel->getLoadedStructNode()->getStructDef()->getLength(), 16));
+  m_txtStructLength->setText(
+      QString::number(m_structDetailModel->getLoadedStructNode()->getStructDef()->getLength(), 16));
+
   m_btnSaveStructs->setEnabled(true);
 }
 
