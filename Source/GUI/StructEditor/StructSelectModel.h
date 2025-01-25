@@ -59,5 +59,4 @@ private:
   int getNodeDeepness(const StructTreeNode* node) const;
 
   StructTreeNode* m_rootNode;
-  MemWatchEntry* m_dummyEntry;
 };
