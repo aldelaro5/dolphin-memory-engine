@@ -223,6 +223,11 @@ void MemWatchModel::editEntry(MemWatchEntry* entry, const QModelIndex& index)
       expandContainerNode(node);
     }
   }
+  else if (GUICommon::isContainerType(oldEntry->getType()))
+  {
+    for (MemWatchTreeNode* child : node->getChildren())
+      deleteNode(getIndexFromTreeNode(child));
+}
 }
 
 void MemWatchModel::clearRoot()
