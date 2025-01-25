@@ -406,8 +406,17 @@ void StructDetailModel::clearFields(QModelIndexList indices)
 void StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex& index)
 {
   FieldDef* field = static_cast<FieldDef*>(index.internalPointer());
+
+  int oldFieldLen = field->getSize();
+  int fieldLen = entry->getLength();
+
   field->setEntry(entry);
   emit dataChanged(index.siblingAtColumn(0), index.siblingAtColumn(columnCount({}) - 1));
+
+  if (oldFieldLen < fieldLen)
+    removePaddingFields(fieldLen - 1, index.row() + 1);
+
+  updateFieldOffsets();
 }
 
 FieldDef* StructDetailModel::getFieldByRow(int row)
