@@ -36,14 +36,14 @@ QString getAddressString(const MemWatchEntry* const entry)
 MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
 {
   m_rootNode = new MemWatchTreeNode(nullptr);
-  m_structDefs = QMap<QString, StructDef*>();
+  m_structDefMap = QMap<QString, StructDef*>();
   m_structNodes = QMap <QString, QVector<MemWatchTreeNode*>>();
 }
 
 MemWatchModel::~MemWatchModel()
 {
   delete m_rootNode;
-  qDeleteAll(m_structDefs);
+  qDeleteAll(m_structDefMap);
   qDeleteAll(m_structNodes);
 }
 
