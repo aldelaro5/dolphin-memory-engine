@@ -63,7 +63,8 @@ void MemWatchModel::onFreezeTimer()
 bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QModelIndex& parent,
                                              bool readSucess)
 {
-  node->updateChildAddresses();
+  if (!node->isGroup() && GUICommon::isContainerType(node->getEntry()->getType()))
+    updateContainerAddresses(node);
 
   QVector<MemWatchTreeNode*> children = node->getChildren();
   if (children.count() > 0)
@@ -202,8 +203,32 @@ void MemWatchModel::addEntry(MemWatchEntry* const entry, const QModelIndex& refe
 void MemWatchModel::editEntry(MemWatchEntry* entry, const QModelIndex& index)
 {
   MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
+  MemWatchEntry* oldEntry = node->getEntry();
+
+  // Check if entry has children to delete, create tree of expansion, delete all nodes
+  if (GUICommon::isContainerType(oldEntry->getType()))
+  {
+    collapseContainerNode(node);
+  }
+
   node->setEntry(entry);
   emit dataChanged(index.siblingAtColumn(0), index.siblingAtColumn(columnCount({}) - 1));
+
+  if (GUICommon::isContainerType(entry->getType()))
+  {
+    if (!GUICommon::isContainerType(oldEntry->getType()))
+      if (entry->getType() == Common::MemType::type_struct)
+        setupStructNode(node);
+    else if (node->isExpanded())
+    {
+      expandContainerNode(node);
+    }
+  }
+  else if (GUICommon::isContainerType(oldEntry->getType()))
+  {
+    for (MemWatchTreeNode* child : node->getChildren())
+      deleteNode(getIndexFromTreeNode(child));
+}
 }
 
 void MemWatchModel::clearRoot()
@@ -820,6 +845,16 @@ void MemWatchModel::updateStructEntries(const QString structName)
 
 void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
 {
+
+  if (node->isExpanded())
+    collapseStructNode(node, true); // Shortcut for deleting all children and adding the placeholder child
+
+  if (!m_structDefMap.contains(node->getEntry()->getStructName()))
+    for (MemWatchTreeNode* child : node->getChildren()) // Removes all children, of which there should only be the place holder one though
+      deleteNode(getIndexFromTreeNode(child));
+
+  else if (node->isExpanded())
+    expandStructNode(node);
 }
 
 void MemWatchModel::expandContainerNode(MemWatchTreeNode* node)
@@ -898,5 +933,39 @@ void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
   {
     removeNodeFromStructNodeMap(node);
     deleteNode(getIndexFromTreeNode(node));
+  }
+}
+
+void MemWatchModel::updateContainerAddresses(MemWatchTreeNode* node)
+{
+  if (node->isGroup() || !GUICommon::isContainerType(node->getEntry()->getType()) ||
+      !node->isExpanded())
+    return;
+
+  if (node->getEntry()->getType() == Common::MemType::type_struct)
+    updateStructAddresses(node);
+}
+
+void MemWatchModel::updateStructAddresses(MemWatchTreeNode* node)
+{
+  if (!m_structDefMap.contains(node->getEntry()->getStructName()))
+    return;
+
+  StructDef* def = m_structDefMap[node->getEntry()->getStructName()];
+
+  if (def->getFields().count() != node->getChildren().count())
+    updateStructNode(node);
+  else
+  {
+    u32 addr = node->getEntry()->getActualAddress();
+    QVector<FieldDef*> fields = def->getFields();
+    QVector<MemWatchTreeNode*> children = node->getChildren();
+
+    for (int i = 0; i < def->getFields().count(); ++i)
+    {
+      children[i]->getEntry()->setConsoleAddress(addr + fields[i]->getOffset());
+      if (GUICommon::isContainerType(children[i]->getEntry()->getType()))
+        updateContainerAddresses(children[i]);
+    }
   }
 }

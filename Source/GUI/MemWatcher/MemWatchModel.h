@@ -98,6 +98,8 @@ private:
   MemWatchTreeNode* getLeastDeepNodeFromList(const QList<MemWatchTreeNode*>& nodes) const;
   int getNodeDeepness(const MemWatchTreeNode* node) const;
 
+  void updateContainerAddresses(MemWatchTreeNode* node);
+  void updateStructAddresses(MemWatchTreeNode* node);
   void setupStructNode(MemWatchTreeNode* node);
   void addNodeToStructNodeMap(MemWatchTreeNode* node);
   void removeNodeFromStructNodeMap(MemWatchTreeNode* node);
