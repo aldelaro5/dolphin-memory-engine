@@ -186,7 +186,16 @@ void MemWatchModel::addGroup(const QString& name, const QModelIndex& referenceIn
 
 void MemWatchModel::addEntry(MemWatchEntry* const entry, const QModelIndex& referenceIndex)
 {
-  addNodes({new MemWatchTreeNode(entry)}, referenceIndex);
+  MemWatchTreeNode* node = new MemWatchTreeNode(entry);
+  addNodes({node}, referenceIndex);
+
+  // Check if entry is a container: set isGroup to true, add a placeholder node as a child, make sure it is not expanded
+  if (!GUICommon::isContainerType(entry->getType()))
+    return;
+
+  node->setExpanded(false);
+  if (entry->getType() == Common::MemType::type_struct)
+    setupStructNode(node);
 }
 
 void MemWatchModel::editEntry(MemWatchEntry* entry, const QModelIndex& index)
@@ -539,6 +548,26 @@ int MemWatchModel::getNodeDeepness(const MemWatchTreeNode* node) const
   return getNodeDeepness(node->getParent()) + 1;
 }
 
+void MemWatchModel::setupStructNode(MemWatchTreeNode* node)
+{
+  if (m_structDefMap.contains(node->getEntry()->getStructName()) &&
+      !m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
+  {
+    addNodeToStructNodeMap(node);
+    addNodes({new MemWatchTreeNode(nullptr)}, getIndexFromTreeNode(node), true);
+  }
+}
+
+void MemWatchModel::addNodeToStructNodeMap(MemWatchTreeNode* node)
+{
+  QString name = node->getEntry()->getStructName();
+  if (name.isEmpty())
+    return;
+  if (!m_structNodes.contains(name))
+    m_structNodes.insert(name, {node});
+  else
+    m_structNodes[name].push_back(node);
+}
 MemWatchTreeNode*
 MemWatchModel::getLeastDeepNodeFromList(const QList<MemWatchTreeNode*>& nodes) const
 {
