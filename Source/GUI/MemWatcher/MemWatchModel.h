@@ -76,7 +76,7 @@ public:
   QModelIndex getIndexFromTreeNode(const MemWatchTreeNode* node);
   bool editData(const QModelIndex& index, const QVariant& value, int role, bool emitEdit = false);
 
-  void setStructDefs(QMap<QString, StructDef*> structDefs);
+  void setStructMap(QMap<QString, StructDef*> structDefmap);
   void onStructNameChanged(const QString old_name, const QString new_name);
   void onStructDefAddRemove(QString structName, StructDef* structDef);
   void updateStructEntries(QString structName);

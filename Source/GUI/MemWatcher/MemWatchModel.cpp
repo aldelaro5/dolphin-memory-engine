@@ -719,9 +719,9 @@ QModelIndex MemWatchModel::getIndexFromTreeNode(const MemWatchTreeNode* const no
                getIndexFromTreeNode(parent));
 }
 
-void MemWatchModel::setStructDefs(QMap<QString, StructDef*> structDefs)
+void MemWatchModel::setStructMap(QMap<QString, StructDef*> structDefMap)
 {
-  m_structDefs = structDefs;
+  m_structDefMap = structDefMap;
 }
 
 void MemWatchModel::onStructNameChanged(const QString old_name, const QString new_name)
