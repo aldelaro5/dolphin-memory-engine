@@ -202,8 +202,27 @@ void MemWatchModel::addEntry(MemWatchEntry* const entry, const QModelIndex& refe
 void MemWatchModel::editEntry(MemWatchEntry* entry, const QModelIndex& index)
 {
   MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
+  MemWatchEntry* oldEntry = node->getEntry();
+
+  // Check if entry has children to delete, create tree of expansion, delete all nodes
+  if (GUICommon::isContainerType(oldEntry->getType()))
+  {
+    collapseContainerNode(node);
+  }
+
   node->setEntry(entry);
   emit dataChanged(index.siblingAtColumn(0), index.siblingAtColumn(columnCount({}) - 1));
+
+  if (GUICommon::isContainerType(entry->getType()))
+  {
+    if (!GUICommon::isContainerType(oldEntry->getType()))
+      if (entry->getType() == Common::MemType::type_struct)
+        setupStructNode(node);
+    else if (node->isExpanded())
+    {
+      expandContainerNode(node);
+    }
+  }
 }
 
 void MemWatchModel::clearRoot()
