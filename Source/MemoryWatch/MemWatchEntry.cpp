@@ -226,6 +226,11 @@ u32 MemWatchEntry::getAddressForPointerLevel(const int level) const
   return address;
 }
 
+u32 MemWatchEntry::getActualAddress() const
+{
+  return getPointerLevel() == 0 ? m_consoleAddress : getAddressForPointerLevel(getPointerLevel());
+}
+
 std::string MemWatchEntry::getAddressStringForPointerLevel(const int level) const
 {
   u32 address = getAddressForPointerLevel(level);
