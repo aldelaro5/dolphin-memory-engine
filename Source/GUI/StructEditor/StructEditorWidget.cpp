@@ -476,6 +476,10 @@ void StructEditorWidget::onAddStruct()
   m_structSelectModel->addStruct(text, lastIndex);
   m_unsavedChanges = true;
 
+  StructTreeNode* addedNode =
+      m_structSelectModel->getTreeNodeFromIndex(lastIndex.siblingAtRow(lastIndex.row() + 1));
+
+  emit structAddedRemoved(addedNode->getNameSpace(), addedNode->getStructDef());
   emit updateDlgStructList(m_structDefs->getStructNames());
 
 }
