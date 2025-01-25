@@ -53,6 +53,7 @@ public:
   Common::MemOperationReturnCode freeze();
 
   u32 getAddressForPointerLevel(int level) const;
+  u32 getActualAddress() const;
   std::string getAddressStringForPointerLevel(int level) const;
   Common::MemOperationReturnCode readMemoryFromRAM();
 

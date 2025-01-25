@@ -347,10 +347,30 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       {
         if (!GUICommon::isContainerType(entry->getType()))
         return QString::fromStdString(entry->getStringFromMemory());
+        else if (entry->getType() == Common::MemType::type_struct)
+        {
+          if (entry->getStructName().isEmpty())
+            return QString("No Struct type assigned");
+          else if (!m_structDefMap.contains(entry->getStructName()))
+            return QString("%1 not found").arg(entry->getStructName());
+          else if (!DolphinComm::DolphinAccessor::isValidConsoleAddress(entry->getActualAddress()))
+            return QString("???");
+          else
+            return QString("%1 definition loaded").arg(entry->getStructName());
+        }
         break;
       }
       default:
         break;
+      }
+    }
+
+    if (index.column() == 0 && role == Qt::DecorationRole && entry != nullptr && GUICommon::isContainerType(entry->getType()))
+    {
+      if (entry->getType() == Common::MemType::type_struct)
+      {
+        static const QIcon s_structIcon(":/struct.svg");
+        return s_structIcon;
       }
     }
   }
@@ -569,6 +589,17 @@ void MemWatchModel::addNodeToStructNodeMap(MemWatchTreeNode* node)
   else
     m_structNodes[name].push_back(node);
 }
+
+void MemWatchModel::removeNodeFromStructNodeMap(MemWatchTreeNode* node)
+{
+  QString name = node->getEntry()->getStructName();
+  if (name.isEmpty() || m_structNodes.isEmpty() || !m_structNodes.contains(name) || m_structNodes[name].isEmpty() || !m_structNodes[name].contains(node))
+    return;
+  m_structNodes[name].remove(m_structNodes[name].indexOf(node));
+  if (m_structNodes[name].isEmpty())
+    m_structNodes.remove(name);
+}
+
 MemWatchTreeNode*
 MemWatchModel::getLeastDeepNodeFromList(const QList<MemWatchTreeNode*>& nodes) const
 {
@@ -781,5 +812,91 @@ void MemWatchModel::onStructDefAddRemove(QString structName, StructDef* structDe
 
 void MemWatchModel::updateStructEntries(const QString structName)
 {
+  if (!m_structNodes.contains(structName))
+    return;
+  for (MemWatchTreeNode* node : m_structNodes[structName])
+    updateStructNode(node);
+}
+
+void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
+{
+}
+
+void MemWatchModel::expandContainerNode(MemWatchTreeNode* node)
+{
+  if (node->isGroup() || node->getEntry() == nullptr ||
+      !GUICommon::isContainerType(node->getEntry()->getType()))
+    return;
+
+  if (node->getEntry()->getType() == Common::MemType::type_struct)
+    expandStructNode(node);
+}
+
+void MemWatchModel::expandStructNode(MemWatchTreeNode* node)
+{
+  MemWatchEntry* entry = node->getEntry();
+  u32 addr = entry->getActualAddress();
+
+  if (!m_structDefMap.contains(entry->getStructName()))
+    return;
+
+  for (MemWatchTreeNode* child : node->getChildren())
+    deleteNode(getIndexFromTreeNode(child));
+
+  StructDef* def = m_structDefMap[entry->getStructName()];
+
+  entry->setTypeAndLength(entry->getType(), def->getLength());
+  node->setExpanded(true);
+
+  std::vector<MemWatchTreeNode*> childNodes{};
+  for (FieldDef* field : def->getFields())
+  {
+    MemWatchTreeNode* nextNode = new MemWatchTreeNode(new MemWatchEntry(field->getEntry()));
+    nextNode->getEntry()->setConsoleAddress(addr + field->getOffset());
+    childNodes.push_back(nextNode);
+  }
+
+  addNodes(childNodes, getIndexFromTreeNode(node));
+
+  for(MemWatchTreeNode* childNode : childNodes)
+  {
+    if (GUICommon::isContainerType(childNode->getEntry()->getType()))
+      if (childNode->getEntry()->getType() == Common::MemType::type_struct)
+        setupStructNode(childNode);
+  }
+}
   
+void MemWatchModel::collapseContainerNode(MemWatchTreeNode* node)
+{
+  if (node->isGroup() || node->getEntry() == nullptr ||
+      !GUICommon::isContainerType(node->getEntry()->getType()))
+    return;
+
+  if (node->getEntry()->getType() == Common::MemType::type_struct)
+    collapseStructNode(node, true);
+
+}
+
+void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
+{
+  for (MemWatchTreeNode* child : node->getChildren())
+  {
+    if (child->getEntry() != nullptr && GUICommon::isContainerType(child->getEntry()->getType()))
+      if (child->getEntry()->getType() == Common::MemType::type_struct)
+        collapseStructNode(child);
+
+    if (isTopLevel)
+      deleteNode(getIndexFromTreeNode(child));
+  }
+    
+  if (isTopLevel)
+  {
+    addNodes({new MemWatchTreeNode(nullptr)}, getIndexFromTreeNode(node));
+    node->setExpanded(false);
+  }
+  else
+  {
+    removeNodeFromStructNodeMap(node);
+    deleteNode(getIndexFromTreeNode(node));
+  }
 }

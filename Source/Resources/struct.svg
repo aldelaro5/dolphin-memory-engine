@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="24"
+   height="24"
+   version="1"
+   id="svg14"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs18">
+    <marker
+       style="overflow:visible"
+       id="marker6"
+       refX="0"
+       refY="0"
+       orient="auto"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+         id="path6" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker5"
+       refX="0"
+       refY="0"
+       orient="auto"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+         id="path5" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Dot"
+       refX="0"
+       refY="0"
+       orient="auto"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+         id="path17" />
+    </marker>
+  </defs>
+  <g
+     id="g4354"
+     transform="translate(-0.00123735,-0.80749883)">
+    <circle
+       id="path1"
+       cx="4.8394728"
+       cy="4.2339687"
+       r="2.3676472"
+       style="fill:#000000;stroke:#000000;stroke-opacity:1;fill-opacity:1" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker5)"
+       d="M 6.9718256,4.1604405 H 16.854178"
+       id="path2" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Dot)"
+       d="m 8.70712,4.1898462 c 3.705883,0 -1.323575,11.6764708 8.117648,11.6764708"
+       id="path3" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker6)"
+       d="M 8.913002,4.1639515 C 12.648295,4.105128 6.5012368,21.546304 16.824766,21.634539"
+       id="path4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Dot)"
+       d="m 8.6188847,4.1604344 c 3.2941173,0 -1.2647057,5.8235301 8.2058823,5.9117656"
+       id="path7" />
+  </g>
+  <path
+     style="opacity:0.1;fill:#ffffff"
+     d="m -22.842318,-10.549449 c -0.554,0 -1,0.446 -1,0.9999997 v 0.5 c 0,-0.554 0.446,-0.9999997 1,-0.9999997 h 5.5 c 1.5,0 2,1.9999997 3.5,1.9999997 h 9.0000005 c 0.554,0 1,0.446 1,1 v -0.5 c 0,-0.554 -0.446,-1 -1,-1 h -9.0000005 c -1.5,0 -2,-1.9999997 -3.5,-1.9999997 z"
+     id="path12" />
+</svg>

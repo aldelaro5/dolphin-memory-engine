@@ -80,6 +80,9 @@ public:
   void onStructNameChanged(const QString old_name, const QString new_name);
   void onStructDefAddRemove(QString structName, StructDef* structDef);
   void updateStructEntries(QString structName);
+  void updateStructNode(MemWatchTreeNode* node);
+  void expandContainerNode(MemWatchTreeNode* node);
+  void collapseContainerNode(MemWatchTreeNode* node);
 
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& value, int role);
@@ -97,6 +100,10 @@ private:
 
   void setupStructNode(MemWatchTreeNode* node);
   void addNodeToStructNodeMap(MemWatchTreeNode* node);
+  void removeNodeFromStructNodeMap(MemWatchTreeNode* node);
+  void expandStructNode(MemWatchTreeNode* node);
+  void collapseStructNode(MemWatchTreeNode* node, bool isTopLevel = false);
+
   MemWatchTreeNode* m_rootNode;
   QMap<QString, StructDef*> m_structDefMap{};
   QMap<QString, QVector<MemWatchTreeNode*>> m_structNodes{};
