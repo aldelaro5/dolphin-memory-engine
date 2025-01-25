@@ -726,15 +726,17 @@ void MemWatchModel::setStructMap(QMap<QString, StructDef*> structDefMap)
 
 void MemWatchModel::onStructNameChanged(const QString old_name, const QString new_name)
 {
-  StructDef* changedStruct = m_structDefs[old_name];
-  m_structDefs.remove(old_name);
-  m_structDefs.insert(new_name, changedStruct);
+  StructDef* changedStruct = m_structDefMap.take(old_name);
+  m_structDefMap.insert(new_name, changedStruct);
 
   if (!m_structNodes.keys().contains(old_name))
     return;
 
   for (MemWatchTreeNode* node : m_structNodes[old_name])
     node->getEntry()->setStructName(new_name);
+
+  QVector<MemWatchTreeNode*> nodes = m_structNodes.take(old_name);
+  m_structNodes.insert(new_name, nodes);
 }
 
 void MemWatchModel::onStructDefAddRemove(QString structName, StructDef* structDef)
