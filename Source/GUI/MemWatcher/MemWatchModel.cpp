@@ -791,6 +791,14 @@ void MemWatchModel::onStructDefAddRemove(QString structName, StructDef* structDe
 
 void MemWatchModel::updateStructEntries(const QString structName)
 {
+  if (!m_structNodes.contains(structName))
+    return;
+  for (MemWatchTreeNode* node : m_structNodes[structName])
+    updateStructNode(node);
+}
+
+void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
+{
 }
 
 void MemWatchModel::expandContainerNode(MemWatchTreeNode* node)
