@@ -131,7 +131,8 @@ MemWatchEntry* MemWatchModel::getEntryFromIndex(const QModelIndex& index)
 }
 
 void MemWatchModel::addNodes(const std::vector<MemWatchTreeNode*>& nodes,
-                             const QModelIndex& referenceIndex)
+                             const QModelIndex& referenceIndex,
+                             const bool insertInContainer = false)
 {
   if (nodes.empty())
     return;
@@ -144,6 +145,11 @@ void MemWatchModel::addNodes(const std::vector<MemWatchTreeNode*>& nodes,
   {
     parentNode = static_cast<MemWatchTreeNode*>(referenceIndex.internalPointer());
     if (parentNode->isGroup())
+    {
+      targetIndex = referenceIndex.siblingAtColumn(0);
+      rowIndex = parentNode->childrenCount();
+    }
+    else if (insertInContainer && GUICommon::isContainerType(parentNode->getEntry()->getType()))
     {
       targetIndex = referenceIndex.siblingAtColumn(0);
       rowIndex = parentNode->childrenCount();

@@ -57,7 +57,7 @@ public:
   void changeType(const QModelIndex& index, Common::MemType type, size_t length);
   static MemWatchEntry* getEntryFromIndex(const QModelIndex& index);
   void addNodes(const std::vector<MemWatchTreeNode*>& nodes,
-                const QModelIndex& referenceIndex = QModelIndex{});
+                const QModelIndex& referenceIndex = QModelIndex{}, const bool insertInContainer = false);
   void addGroup(const QString& name, const QModelIndex& referenceIndex = QModelIndex{});
   void addEntry(MemWatchEntry* entry, const QModelIndex& referenceIndex = QModelIndex{});
   void editEntry(MemWatchEntry* entry, const QModelIndex& index);
