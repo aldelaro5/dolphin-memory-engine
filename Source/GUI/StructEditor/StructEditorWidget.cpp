@@ -571,7 +571,6 @@ void StructEditorWidget::restoreStructDefs(const QString& json)
 {
   const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));
   m_structDefs->readFromJson(loadDoc.object());
-  //updateExpansionState();
 }
 
 QString StructEditorWidget::saveStructDefs()
