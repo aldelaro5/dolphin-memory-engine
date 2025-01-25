@@ -516,8 +516,30 @@ void StructEditorWidget::onDeleteNodes()
   const QModelIndexList selection = m_structSelectView->selectionModel()->selectedIndexes();
   if (selection.isEmpty())
     return;
+
   for (const auto& index : simplifiedSelection())
   {
+    StructTreeNode* curNode = m_structSelectModel->getTreeNodeFromIndex(index);
+    if (curNode->isGroup())
+    {
+      QVector<StructTreeNode*> queue = curNode->getChildren();
+
+      while (!queue.isEmpty())
+      {
+        curNode = queue.takeFirst();
+
+        if (curNode->isGroup())
+          for (StructTreeNode* node : curNode->getChildren())
+            queue.push_front(node);
+        else
+          emit structAddedRemoved(curNode->getNameSpace());
+      }
+    }
+    else
+    {
+      emit structAddedRemoved(curNode->getNameSpace());
+    }
+
     m_structSelectModel->deleteNode(index);
   }
 
