@@ -414,6 +414,18 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
 
 void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
 {
+  FieldDef* field = static_cast<FieldDef*>(index.internalPointer());
+
+  if (field->isPadding())
+    return onConvertPaddingToEntry(index);
+
+  DlgAddWatchEntry dlg(false, field->getEntry(), m_structDefs->getStructNames(), this);
+  if (dlg.exec() == QDialog::Accepted)
+  {
+    m_structDetailModel->updateFieldEntry(dlg.stealEntry(), index);
+    m_unsavedChanges = true;
+  }
+
   m_btnSaveStructs->setEnabled(true);
 }
 
