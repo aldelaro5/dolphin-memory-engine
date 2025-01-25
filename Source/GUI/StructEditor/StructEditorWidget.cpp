@@ -246,8 +246,6 @@ void StructEditorWidget::onDetailLengthChanged()
       return;
     }
   }
-
-  node->getStructDef()->setLength(new_length);
   m_structDetailModel->updateFieldsWithNewLength();
   m_btnSaveStructs->setEnabled(true);
 }
