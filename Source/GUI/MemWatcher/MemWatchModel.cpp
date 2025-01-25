@@ -346,6 +346,17 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       {
         if (!GUICommon::isContainerType(entry->getType()))
         return QString::fromStdString(entry->getStringFromMemory());
+        else if (entry->getType() == Common::MemType::type_struct)
+        {
+          if (entry->getStructName().isEmpty())
+            return QString("No Struct type assigned");
+          else if (!m_structDefMap.contains(entry->getStructName()))
+            return QString("%1 not found").arg(entry->getStructName());
+          else if (!DolphinComm::DolphinAccessor::isValidConsoleAddress(entry->getActualAddress()))
+            return QString("???");
+          else
+            return QString("%1 definition loaded").arg(entry->getStructName());
+        }
         break;
       }
       default:
