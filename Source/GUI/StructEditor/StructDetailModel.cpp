@@ -169,6 +169,23 @@ void StructDetailModel::addPaddingFields(int count, int start)
     updateFieldOffsets();
 }
 
+void StructDetailModel::removePaddingFields(int count, int start)
+{
+  if (start >= m_fields.count())
+    return;
+
+  int toRemove = 0;
+  while (toRemove < count)
+  {
+    if (start + toRemove >= m_fields.count() || !m_fields[start + toRemove]->isPadding())
+      break;
+    ++toRemove;
+  }
+
+  if (count > 0)
+    removeFields(start, toRemove);
+}
+
 void StructDetailModel::removeFields(int start, int count)
 {
   beginRemoveRows(QModelIndex(), start, start + count - 1);
