@@ -199,6 +199,7 @@ void StructEditorWidget::onConvertPaddingToEntry(const QModelIndex& index)
     m_unsavedChanges = true;
   }
 
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onDetailNameChanged()
@@ -245,9 +246,8 @@ void StructEditorWidget::onDetailLengthChanged()
       return;
     }
   }
-
-  node->getStructDef()->setLength(new_length);
   m_structDetailModel->updateFieldsWithNewLength();
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onAddField()
@@ -256,6 +256,8 @@ void StructEditorWidget::onAddField()
   m_structDetailModel->getLoadedStructNode()->getStructDef()->setLength(cur_length + 1);
   m_structDetailModel->updateFieldsWithNewLength();
   m_txtStructLength->setText(QString::number(cur_length + 1, 16));
+
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onDeleteFields()
@@ -270,7 +272,10 @@ void StructEditorWidget::onDeleteFields()
     m_structDetailModel->removeFields(selection);
   }
 
-  m_txtStructLength->setText(QString::number(m_structDetailModel->getLoadedStructNode()->getStructDef()->getLength(), 16));
+  m_txtStructLength->setText(
+      QString::number(m_structDetailModel->getLoadedStructNode()->getStructDef()->getLength(), 16));
+
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onClearFields()
@@ -279,12 +284,18 @@ void StructEditorWidget::onClearFields()
   if (selection.isEmpty())
     return;
   m_structDetailModel->clearFields(selection);
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onSaveStruct()
 {
+  bool lengthSet = false;
+  m_structDetailModel->getLoadedStructNode()
+      ->getStructDef()
+      ->setLength(m_txtStructLength->text().toUInt(&lengthSet, 16));
   m_structDetailModel->saveStruct();
   emit updateStructDetails(m_structDetailModel->getLoadedStructNode()->getNameSpace());
+  m_btnSaveStructs->setDisabled(true);
 }
 
 void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)
@@ -407,6 +418,19 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
 
 void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
 {
+  FieldDef* field = static_cast<FieldDef*>(index.internalPointer());
+
+  if (field->isPadding())
+    return onConvertPaddingToEntry(index);
+
+  DlgAddWatchEntry dlg(false, field->getEntry(), m_structDefs->getStructNames(), this);
+  if (dlg.exec() == QDialog::Accepted)
+  {
+    m_structDetailModel->updateFieldEntry(dlg.stealEntry(), index);
+    m_unsavedChanges = true;
+  }
+
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onDetailDataEdited(const QModelIndex& index, const QVariant& value,
@@ -476,6 +500,10 @@ void StructEditorWidget::onAddStruct()
   m_structSelectModel->addStruct(text, lastIndex);
   m_unsavedChanges = true;
 
+  StructTreeNode* addedNode =
+      m_structSelectModel->getTreeNodeFromIndex(lastIndex.siblingAtRow(lastIndex.row() + 1));
+
+  emit structAddedRemoved(addedNode->getNameSpace(), addedNode->getStructDef());
   emit updateDlgStructList(m_structDefs->getStructNames());
 
 }
@@ -512,8 +540,30 @@ void StructEditorWidget::onDeleteNodes()
   const QModelIndexList selection = m_structSelectView->selectionModel()->selectedIndexes();
   if (selection.isEmpty())
     return;
+
   for (const auto& index : simplifiedSelection())
   {
+    StructTreeNode* curNode = m_structSelectModel->getTreeNodeFromIndex(index);
+    if (curNode->isGroup())
+    {
+      QVector<StructTreeNode*> queue = curNode->getChildren();
+
+      while (!queue.isEmpty())
+      {
+        curNode = queue.takeFirst();
+
+        if (curNode->isGroup())
+          for (StructTreeNode* node : curNode->getChildren())
+            queue.push_front(node);
+        else
+          emit structAddedRemoved(curNode->getNameSpace());
+      }
+    }
+    else
+    {
+      emit structAddedRemoved(curNode->getNameSpace());
+    }
+
     m_structSelectModel->deleteNode(index);
   }
 
@@ -529,7 +579,7 @@ void StructEditorWidget::onEditStruct(StructTreeNode* node)
     QMessageBox::StandardButton response = QMessageBox::question(this, "Save Changes?", "You have unsaved changes to this struct.\nWould you like to save them?");
     if (response == QMessageBox::StandardButton::Yes)
     {
-      m_structDetailModel->saveStruct();
+      onSaveStruct();
     }
   }
   m_structDetailModel->loadStruct(node);
@@ -545,7 +595,6 @@ void StructEditorWidget::restoreStructDefs(const QString& json)
 {
   const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));
   m_structDefs->readFromJson(loadDoc.object());
-  //updateExpansionState();
 }
 
 QString StructEditorWidget::saveStructDefs()

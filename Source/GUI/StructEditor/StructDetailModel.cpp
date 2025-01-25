@@ -169,6 +169,23 @@ void StructDetailModel::addPaddingFields(int count, int start)
     updateFieldOffsets();
 }
 
+void StructDetailModel::removePaddingFields(int count, int start)
+{
+  if (start >= m_fields.count())
+    return;
+
+  int toRemove = 0;
+  while (toRemove < count)
+  {
+    if (start + toRemove >= m_fields.count() || !m_fields[start + toRemove]->isPadding())
+      break;
+    ++toRemove;
+  }
+
+  if (count > 0)
+    removeFields(start, toRemove);
+}
+
 void StructDetailModel::removeFields(int start, int count)
 {
   beginRemoveRows(QModelIndex(), start, start + count - 1);
@@ -389,8 +406,17 @@ void StructDetailModel::clearFields(QModelIndexList indices)
 void StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex& index)
 {
   FieldDef* field = static_cast<FieldDef*>(index.internalPointer());
+
+  int oldFieldLen = field->getSize();
+  int fieldLen = entry->getLength();
+
   field->setEntry(entry);
   emit dataChanged(index.siblingAtColumn(0), index.siblingAtColumn(columnCount({}) - 1));
+
+  if (oldFieldLen < fieldLen)
+    removePaddingFields(fieldLen - 1, index.row() + 1);
+
+  updateFieldOffsets();
 }
 
 FieldDef* StructDetailModel::getFieldByRow(int row)
