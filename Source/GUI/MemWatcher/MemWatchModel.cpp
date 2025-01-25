@@ -363,6 +363,15 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
         break;
       }
     }
+
+    if (index.column() == 0 && role == Qt::DecorationRole && entry != nullptr && GUICommon::isContainerType(entry->getType()))
+    {
+      if (entry->getType() == Common::MemType::type_struct)
+      {
+        static const QIcon s_structIcon(":/struct.svg");
+        return s_structIcon;
+      }
+    }
   }
   else
   {
