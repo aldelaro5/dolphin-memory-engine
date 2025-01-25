@@ -37,14 +37,14 @@ QString getAddressString(const MemWatchEntry* const entry)
 MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
 {
   m_rootNode = new MemWatchTreeNode(nullptr);
-  m_structDefs = QMap<QString, StructDef*>();
+  m_structDefMap = QMap<QString, StructDef*>();
   m_structNodes = QMap <QString, QVector<MemWatchTreeNode*>>();
 }
 
 MemWatchModel::~MemWatchModel()
 {
   delete m_rootNode;
-  qDeleteAll(m_structDefs);
+  qDeleteAll(m_structDefMap);
   qDeleteAll(m_structNodes);
 }
 
@@ -132,7 +132,8 @@ MemWatchEntry* MemWatchModel::getEntryFromIndex(const QModelIndex& index)
 }
 
 void MemWatchModel::addNodes(const std::vector<MemWatchTreeNode*>& nodes,
-                             const QModelIndex& referenceIndex)
+                             const QModelIndex& referenceIndex,
+                             const bool insertInContainer = false)
 {
   if (nodes.empty())
     return;
@@ -145,6 +146,11 @@ void MemWatchModel::addNodes(const std::vector<MemWatchTreeNode*>& nodes,
   {
     parentNode = static_cast<MemWatchTreeNode*>(referenceIndex.internalPointer());
     if (parentNode->isGroup())
+    {
+      targetIndex = referenceIndex.siblingAtColumn(0);
+      rowIndex = parentNode->childrenCount();
+    }
+    else if (insertInContainer && GUICommon::isContainerType(parentNode->getEntry()->getType()))
     {
       targetIndex = referenceIndex.siblingAtColumn(0);
       rowIndex = parentNode->childrenCount();
@@ -181,7 +187,16 @@ void MemWatchModel::addGroup(const QString& name, const QModelIndex& referenceIn
 
 void MemWatchModel::addEntry(MemWatchEntry* const entry, const QModelIndex& referenceIndex)
 {
-  addNodes({new MemWatchTreeNode(entry)}, referenceIndex);
+  MemWatchTreeNode* node = new MemWatchTreeNode(entry);
+  addNodes({node}, referenceIndex);
+
+  // Check if entry is a container: set isGroup to true, add a placeholder node as a child, make sure it is not expanded
+  if (!GUICommon::isContainerType(entry->getType()))
+    return;
+
+  node->setExpanded(false);
+  if (entry->getType() == Common::MemType::type_struct)
+    setupStructNode(node);
 }
 
 void MemWatchModel::editEntry(MemWatchEntry* entry, const QModelIndex& index)
@@ -534,6 +549,26 @@ int MemWatchModel::getNodeDeepness(const MemWatchTreeNode* node) const
   return getNodeDeepness(node->getParent()) + 1;
 }
 
+void MemWatchModel::setupStructNode(MemWatchTreeNode* node)
+{
+  if (m_structDefMap.contains(node->getEntry()->getStructName()) &&
+      !m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
+  {
+    addNodeToStructNodeMap(node);
+    addNodes({new MemWatchTreeNode(nullptr)}, getIndexFromTreeNode(node), true);
+  }
+}
+
+void MemWatchModel::addNodeToStructNodeMap(MemWatchTreeNode* node)
+{
+  QString name = node->getEntry()->getStructName();
+  if (name.isEmpty())
+    return;
+  if (!m_structNodes.contains(name))
+    m_structNodes.insert(name, {node});
+  else
+    m_structNodes[name].push_back(node);
+}
 MemWatchTreeNode*
 MemWatchModel::getLeastDeepNodeFromList(const QList<MemWatchTreeNode*>& nodes) const
 {
@@ -714,30 +749,32 @@ QModelIndex MemWatchModel::getIndexFromTreeNode(const MemWatchTreeNode* const no
                getIndexFromTreeNode(parent));
 }
 
-void MemWatchModel::setStructDefs(QMap<QString, StructDef*> structDefs)
+void MemWatchModel::setStructMap(QMap<QString, StructDef*> structDefMap)
 {
-  m_structDefs = structDefs;
+  m_structDefMap = structDefMap;
 }
 
 void MemWatchModel::onStructNameChanged(const QString old_name, const QString new_name)
 {
-  StructDef* changedStruct = m_structDefs[old_name];
-  m_structDefs.remove(old_name);
-  m_structDefs.insert(new_name, changedStruct);
+  StructDef* changedStruct = m_structDefMap.take(old_name);
+  m_structDefMap.insert(new_name, changedStruct);
 
   if (!m_structNodes.keys().contains(old_name))
     return;
 
   for (MemWatchTreeNode* node : m_structNodes[old_name])
     node->getEntry()->setStructName(new_name);
+
+  QVector<MemWatchTreeNode*> nodes = m_structNodes.take(old_name);
+  m_structNodes.insert(new_name, nodes);
 }
 
 void MemWatchModel::onStructDefAddRemove(QString structName, StructDef* structDef)
 {
   if (structDef == nullptr)
-    m_structDefs.remove(structName);
+    m_structDefMap.remove(structName);
   else
-    m_structDefs.insert(structName, structDef);
+    m_structDefMap.insert(structName, structDef);
 
   updateStructEntries(structName);
 }
