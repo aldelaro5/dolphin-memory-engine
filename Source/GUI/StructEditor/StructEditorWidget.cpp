@@ -556,6 +556,12 @@ QString StructEditorWidget::saveStructDefs()
   return saveDoc.toJson();
 }
 
+QMap<QString, StructDef*> StructEditorWidget::getStructMap()
+{
+
+  return m_structSelectModel->getStructMap();
+}
+
 StructTreeNode* StructEditorWidget::getStructDefs()
 {
   return m_structDefs;

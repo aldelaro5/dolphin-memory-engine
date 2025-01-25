@@ -409,3 +409,22 @@ QModelIndex StructSelectModel::getIndexFromTreeNode(const StructTreeNode* node)
   return index(static_cast<int>(parent->getChildren().indexOf(node)), 0,
                getIndexFromTreeNode(parent));
 }
+
+QMap<QString, StructDef*> StructSelectModel::getStructMap()
+{
+  QMap<QString, StructDef*> structMap = {};
+  StructTreeNode* curNode = m_rootNode;
+  QVector<StructTreeNode*> queue = {curNode->getChildren()};
+
+  while (!queue.isEmpty())
+  {
+    curNode = queue.takeFirst();
+    if (curNode->isGroup())
+      for (int i = curNode->getChildren().count() - 1; i >= 0; --i)
+        queue.push_front(curNode->getChildren()[i]);
+    else
+      structMap.insert(curNode->getNameSpace(), curNode->getStructDef());
+  }
+
+  return structMap;
+}

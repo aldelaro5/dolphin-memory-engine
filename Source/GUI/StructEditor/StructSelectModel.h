@@ -48,6 +48,8 @@ public:
   static StructTreeNode* getTreeNodeFromIndex(const QModelIndex& index);
   QModelIndex getIndexFromTreeNode(const StructTreeNode* node);
 
+  QMap<QString, StructDef*> getStructMap();
+
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& value, int role);
   void dropSucceeded();

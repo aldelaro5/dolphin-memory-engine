@@ -38,6 +38,7 @@ public:
   StructTreeNode* getStructDefs();
   void restoreStructDefs(const QString& json);
   QString saveStructDefs();
+  QMap<QString, StructDef*> getStructMap();
 
 signals:
   void structAddedRemoved(QString fullName, StructDef* structDef);
