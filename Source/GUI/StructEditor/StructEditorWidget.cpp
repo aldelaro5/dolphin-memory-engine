@@ -289,6 +289,10 @@ void StructEditorWidget::onClearFields()
 
 void StructEditorWidget::onSaveStruct()
 {
+  bool lengthSet = false;
+  m_structDetailModel->getLoadedStructNode()
+      ->getStructDef()
+      ->setLength(m_txtStructLength->text().toUInt(&lengthSet, 16));
   m_structDetailModel->saveStruct();
   emit updateStructDetails(m_structDetailModel->getLoadedStructNode()->getNameSpace());
   m_btnSaveStructs->setDisabled(true);
