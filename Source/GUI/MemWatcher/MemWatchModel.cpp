@@ -844,6 +844,16 @@ void MemWatchModel::updateStructEntries(const QString structName)
 
 void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
 {
+
+  if (node->isExpanded())
+    collapseStructNode(node, true); // Shortcut for deleting all children and adding the placeholder child
+
+  if (!m_structDefMap.contains(node->getEntry()->getStructName()))
+    for (MemWatchTreeNode* child : node->getChildren()) // Removes all children, of which there should only be the place holder one though
+      deleteNode(getIndexFromTreeNode(child));
+
+  else if (node->isExpanded())
+    expandStructNode(node);
 }
 
 void MemWatchModel::expandContainerNode(MemWatchTreeNode* node)
