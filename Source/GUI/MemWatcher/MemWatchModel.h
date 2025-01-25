@@ -97,6 +97,7 @@ private:
 
   void setupStructNode(MemWatchTreeNode* node);
   void addNodeToStructNodeMap(MemWatchTreeNode* node);
+  void removeNodeFromStructNodeMap(MemWatchTreeNode* node);
   MemWatchTreeNode* m_rootNode;
   QMap<QString, StructDef*> m_structDefMap{};
   QMap<QString, QVector<MemWatchTreeNode*>> m_structNodes{};

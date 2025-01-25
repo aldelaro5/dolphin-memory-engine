@@ -568,6 +568,17 @@ void MemWatchModel::addNodeToStructNodeMap(MemWatchTreeNode* node)
   else
     m_structNodes[name].push_back(node);
 }
+
+void MemWatchModel::removeNodeFromStructNodeMap(MemWatchTreeNode* node)
+{
+  QString name = node->getEntry()->getStructName();
+  if (name.isEmpty() || m_structNodes.isEmpty() || !m_structNodes.contains(name) || m_structNodes[name].isEmpty() || !m_structNodes[name].contains(node))
+    return;
+  m_structNodes[name].remove(m_structNodes[name].indexOf(node));
+  if (m_structNodes[name].isEmpty())
+    m_structNodes.remove(name);
+}
+
 MemWatchTreeNode*
 MemWatchModel::getLeastDeepNodeFromList(const QList<MemWatchTreeNode*>& nodes) const
 {
