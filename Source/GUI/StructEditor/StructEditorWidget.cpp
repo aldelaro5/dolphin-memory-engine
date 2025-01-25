@@ -563,7 +563,7 @@ void StructEditorWidget::onEditStruct(StructTreeNode* node)
     QMessageBox::StandardButton response = QMessageBox::question(this, "Save Changes?", "You have unsaved changes to this struct.\nWould you like to save them?");
     if (response == QMessageBox::StandardButton::Yes)
     {
-      m_structDetailModel->saveStruct();
+      onSaveStruct();
     }
   }
   m_structDetailModel->loadStruct(node);
