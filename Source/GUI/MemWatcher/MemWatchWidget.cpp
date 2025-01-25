@@ -728,6 +728,9 @@ void MemWatchWidget::onCollapsed(const QModelIndex& index)
     return;
   node->setExpanded(false);
   m_hasUnsavedChanges = true;
+
+  if (!node->isGroup() && GUICommon::isContainerType(node->getEntry()->getType()))
+    m_watchModel->collapseContainerNode(node);
 }
 
 void MemWatchWidget::onExpanded(const QModelIndex& index)
@@ -737,6 +740,9 @@ void MemWatchWidget::onExpanded(const QModelIndex& index)
     return;
   node->setExpanded(true);
   m_hasUnsavedChanges = true;
+
+  if (!node->isGroup() && GUICommon::isContainerType(node->getEntry()->getType()))
+    m_watchModel->expandContainerNode(node);
 }
 
 QTimer* MemWatchWidget::getUpdateTimer() const
