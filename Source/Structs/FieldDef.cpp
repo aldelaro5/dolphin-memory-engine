@@ -65,6 +65,8 @@ size_t FieldDef::getSize() const
 {
   if (!m_entry)
     return m_size;
+  if (m_entry->isBoundToPointer())
+    return 4;
   return m_entry->getLength();
 }
 
