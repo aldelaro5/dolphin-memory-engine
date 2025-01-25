@@ -199,6 +199,7 @@ void StructEditorWidget::onConvertPaddingToEntry(const QModelIndex& index)
     m_unsavedChanges = true;
   }
 
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onDetailNameChanged()
@@ -248,6 +249,7 @@ void StructEditorWidget::onDetailLengthChanged()
 
   node->getStructDef()->setLength(new_length);
   m_structDetailModel->updateFieldsWithNewLength();
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onAddField()
@@ -256,6 +258,8 @@ void StructEditorWidget::onAddField()
   m_structDetailModel->getLoadedStructNode()->getStructDef()->setLength(cur_length + 1);
   m_structDetailModel->updateFieldsWithNewLength();
   m_txtStructLength->setText(QString::number(cur_length + 1, 16));
+
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onDeleteFields()
@@ -271,6 +275,7 @@ void StructEditorWidget::onDeleteFields()
   }
 
   m_txtStructLength->setText(QString::number(m_structDetailModel->getLoadedStructNode()->getStructDef()->getLength(), 16));
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onClearFields()
@@ -279,12 +284,14 @@ void StructEditorWidget::onClearFields()
   if (selection.isEmpty())
     return;
   m_structDetailModel->clearFields(selection);
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onSaveStruct()
 {
   m_structDetailModel->saveStruct();
   emit updateStructDetails(m_structDetailModel->getLoadedStructNode()->getNameSpace());
+  m_btnSaveStructs->setDisabled(true);
 }
 
 void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)
@@ -407,6 +414,7 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
 
 void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
 {
+  m_btnSaveStructs->setEnabled(true);
 }
 
 void StructEditorWidget::onDetailDataEdited(const QModelIndex& index, const QVariant& value,
