@@ -80,6 +80,8 @@ public:
   void onStructNameChanged(const QString old_name, const QString new_name);
   void onStructDefAddRemove(QString structName, StructDef* structDef);
   void updateStructEntries(QString structName);
+  void expandContainerNode(MemWatchTreeNode* node);
+  void collapseContainerNode(MemWatchTreeNode* node);
 
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& value, int role);

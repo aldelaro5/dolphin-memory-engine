@@ -793,6 +793,16 @@ void MemWatchModel::updateStructEntries(const QString structName)
 {
 }
 
+void MemWatchModel::expandContainerNode(MemWatchTreeNode* node)
+{
+  if (node->isGroup() || node->getEntry() == nullptr ||
+      !GUICommon::isContainerType(node->getEntry()->getType()))
+    return;
+
+  if (node->getEntry()->getType() == Common::MemType::type_struct)
+    expandStructNode(node);
+}
+
 void MemWatchModel::expandStructNode(MemWatchTreeNode* node)
 {
   MemWatchEntry* entry = node->getEntry();
@@ -827,6 +837,16 @@ void MemWatchModel::expandStructNode(MemWatchTreeNode* node)
   }
 }
   
+void MemWatchModel::collapseContainerNode(MemWatchTreeNode* node)
+{
+  if (node->isGroup() || node->getEntry() == nullptr ||
+      !GUICommon::isContainerType(node->getEntry()->getType()))
+    return;
+
+  if (node->getEntry()->getType() == Common::MemType::type_struct)
+    collapseStructNode(node, true);
+
+}
 
 void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
 {
