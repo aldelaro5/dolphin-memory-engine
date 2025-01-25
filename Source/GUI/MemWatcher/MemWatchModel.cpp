@@ -742,9 +742,9 @@ void MemWatchModel::onStructNameChanged(const QString old_name, const QString ne
 void MemWatchModel::onStructDefAddRemove(QString structName, StructDef* structDef)
 {
   if (structDef == nullptr)
-    m_structDefs.remove(structName);
+    m_structDefMap.remove(structName);
   else
-    m_structDefs.insert(structName, structDef);
+    m_structDefMap.insert(structName, structDef);
 
   updateStructEntries(structName);
 }

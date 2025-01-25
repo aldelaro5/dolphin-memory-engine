@@ -96,6 +96,6 @@ private:
   int getNodeDeepness(const MemWatchTreeNode* node) const;
 
   MemWatchTreeNode* m_rootNode;
-  QMap<QString, StructDef*> m_structDefs{};
+  QMap<QString, StructDef*> m_structDefMap{};
   QMap<QString, QVector<MemWatchTreeNode*>> m_structNodes{};
 };
