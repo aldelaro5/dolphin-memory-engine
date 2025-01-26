@@ -251,7 +251,11 @@ void StructEditorWidget::onDetailLengthChanged()
 
 void StructEditorWidget::onAddField()
 {
-  m_structDetailModel->addPaddingFields(1);
+  const QModelIndexList selection = m_structDetailView->selectionModel()->selectedIndexes();
+  if (selection.isEmpty())
+    m_structDetailModel->addPaddingFields(1);
+  else
+    m_structDetailModel->addPaddingFields(1, selection.last().row() + 1);
 
   m_btnSaveStructs->setEnabled(true);
 }
@@ -260,13 +264,9 @@ void StructEditorWidget::onDeleteFields()
 {
   const QModelIndexList selection = m_structDetailView->selectionModel()->selectedIndexes();
   if (selection.isEmpty())
-  {
     m_structDetailModel->removeLastField();
-  }
   else
-  {
     m_structDetailModel->removeFields(selection);
-  }
 
   m_txtStructLength->setText(
       QString::number(m_structDetailModel->getLoadedStructNode()->getStructDef()->getLength(), 16));
