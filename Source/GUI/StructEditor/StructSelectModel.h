@@ -53,6 +53,7 @@ public:
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& value, int role);
   void dropSucceeded();
+  void nameChangeFailed(StructTreeNode* node, QString name);
 
 private:
   StructTreeNode* getLeastDeepNodeFromList(const QList<StructTreeNode*>& nodes) const;

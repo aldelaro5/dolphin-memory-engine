@@ -140,7 +140,10 @@ bool StructSelectModel::setData(const QModelIndex& index, const QVariant& value,
       node->setName(newName);
     }
     else
+    {
+      emit nameChangeFailed(node, newName);
       return false;
+    }
     emit dataChanged(index, index);
     emit dataEdited(index, value, role);
     return true;
