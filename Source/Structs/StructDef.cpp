@@ -167,13 +167,13 @@ void StructDef::readFromJson(const QJsonObject& json)
 {
   m_label = json["label"].toString();
   m_length = json["length"].toInt();
-  QJsonArray entry_list = json["entryList"].toArray();
-  for (auto i : entry_list)
+  QJsonArray fieldList = json["fieldList"].toArray();
+  for (auto i : fieldList)
   {
-    QJsonObject entry = i.toObject();
-    FieldDef* childEntry = new FieldDef();
-    childEntry->readFromJSON(entry);
-    m_fields.append(childEntry);
+    QJsonObject fieldJson = i.toObject();
+    FieldDef* field = new FieldDef();
+    field->readFromJSON(fieldJson);
+    m_fields.append(field);
   }
 }
 
@@ -182,14 +182,14 @@ void StructDef::writeToJson(QJsonObject& json)
   json["label"] = m_label;
   json["length"] = static_cast<double>(m_length);
 
-  QJsonArray entryArray;
-  for (FieldDef* const entry : m_fields)
+  QJsonArray fieldArray;
+  for (FieldDef* const field : m_fields)
   {
     QJsonObject node;
-    entry->writeToJson(node);
-    entryArray.append(node);
+    field->writeToJson(node);
+    fieldArray.append(node);
   }
-  json["entryList"] = entryArray;
+  json["fieldList"] = fieldArray;
 }
 
 void StructDef::calculateLength()

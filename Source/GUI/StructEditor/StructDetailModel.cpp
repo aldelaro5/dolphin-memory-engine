@@ -39,7 +39,7 @@ QVariant StructDetailModel::data(const QModelIndex& index, int role) const
     case STRUCT_COL_OFFSET:
       return QString("0x%1").arg(m_fields[index.row()]->getOffset());
     case STRUCT_COL_SIZE:
-      return m_fields[index.row()]->getSize();
+      return m_fields[index.row()]->getFieldSize();
     case STRUCT_COL_LABEL:
       if (m_fields[index.row()]->isPadding())
         return QString("-- Padding --");
@@ -61,7 +61,7 @@ bool StructDetailModel::setData(const QModelIndex& index, const QVariant& value,
   if (~role == Qt::EditRole || !index.isValid())
     return false;
 
-  FieldDef* field = static_cast<FieldDef*>(index.internalPointer());
+  FieldDef* field = getFieldByRow(index.row());
 
   switch (index.column())
   {
@@ -150,11 +150,11 @@ void StructDetailModel::addPaddingFields(int count, int start)
   else if (start < 0 || start >= m_fields.count())
   {
     start = m_fields.count();
-    starting_offset = m_fields.last()->getOffset() + m_fields.last()->getSize();
+    starting_offset = m_fields.last()->getOffset() + m_fields.last()->getFieldSize();
   }
   else
   {
-    starting_offset = m_fields[start]->getOffset() + m_fields[start]->getSize();
+    starting_offset = m_fields[start]->getOffset() + m_fields[start]->getFieldSize();
   }
 
   beginInsertRows(QModelIndex(), start, start + count - 1);
@@ -182,7 +182,7 @@ void StructDetailModel::removePaddingFields(int count, int start)
     ++toRemove;
   }
 
-  if (count > 0)
+  if (toRemove > 0)
     removeFields(start, toRemove);
 }
 
@@ -213,9 +213,9 @@ void StructDetailModel::updateFieldOffsets()
       QModelIndex index = createIndex(i, i, field);
       dataChanged(index, index);
     }
-    cur_offset += field->getSize();
+    cur_offset += field->getFieldSize();
   }
-  u32 newLength = m_fields.last()->getOffset() + m_fields.last()->getSize();
+  u32 newLength = m_fields.last()->getOffset() + m_fields.last()->getFieldSize();
   m_baseNode->getStructDef()->setLength(newLength);
   emit lengthChanged(newLength);
 }
@@ -267,7 +267,7 @@ void StructDetailModel::loadStruct(StructTreeNode* baseNode)
     }
     FieldDef* newField = new FieldDef(field);
     m_fields.push_back(newField);
-    cur_offset = field->getOffset() + field->getSize();
+    cur_offset = field->getOffset() + field->getFieldSize();
   }
   while (cur_offset < m_curSize)
   {
@@ -300,7 +300,7 @@ bool StructDetailModel::willRemoveFields(u32 newLength)
 {
   for (int i = m_fields.count() - 1; i >= 0; --i)
   {
-    if (m_fields[i]->getOffset() + m_fields[i]->getSize() <= newLength)
+    if (m_fields[i]->getOffset() + m_fields[i]->getFieldSize() <= newLength)
       break;
     if (m_fields[i]->isPadding())
       continue;
@@ -314,10 +314,10 @@ QString StructDetailModel::getRemovedFieldDescriptions(u32 newLength)
   QVector<QString> field_strings;
   for (FieldDef* field : m_fields)
   {
-    if (field->isPadding() || field->getOffset() + field->getSize() <= newLength)
+    if (field->isPadding() || field->getOffset() + field->getFieldSize() <= newLength)
       continue;
     QString f_string = QString("0x%1").arg(field->getOffset()) + " - " +
-                       QString("0x%1").arg(field->getSize()) + " - " + getFieldDetails(field);
+                       QString("0x%1").arg(field->getFieldSize()) + " - " + getFieldDetails(field);
     field_strings.push_back(f_string);
   }
   return field_strings.join("\n");
@@ -327,7 +327,7 @@ void StructDetailModel::updateFieldsWithNewLength()
 {
   u32 old_length = 0;
   if (m_fields.count() != 0)
-    old_length = m_fields.last()->getOffset() + m_fields.last()->getSize();
+    old_length = m_fields.last()->getOffset() + m_fields.last()->getFieldSize();
   u32 new_length = m_baseNode->getStructDef()->getLength();
 
   if (old_length == new_length)
@@ -351,12 +351,12 @@ void StructDetailModel::updateFieldsWithNewLength()
   {
     for (int i = m_fields.count() - 1; i >= 0; --i)
     {
-      if (m_fields[i]->getOffset() + m_fields[i]->getSize() > new_length)
+      if (m_fields[i]->getOffset() + m_fields[i]->getFieldSize() > new_length)
         continue;
       removeFields(i, m_fields.count() - i);
       break;
     }
-    u32 cur_length = m_fields.last()->getOffset() + m_fields.last()->getSize();
+    u32 cur_length = m_fields.last()->getOffset() + m_fields.last()->getFieldSize();
     if (cur_length < new_length)
     {
       addPaddingFields(new_length - cur_length);
@@ -411,7 +411,7 @@ void StructDetailModel::clearFields(QModelIndexList indices)
   {
     if (!m_fields[i]->isPadding())
     {
-      int new_field_count = m_fields[i]->getSize() - 1;
+      int new_field_count = m_fields[i]->getFieldSize() - 1;
       FieldDef* cur_field = m_fields[i];
       cur_field->convertToPadding();
       QModelIndex field_index = createIndex(i, 0, cur_field);
@@ -426,7 +426,7 @@ void StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
 {
   FieldDef* field = getFieldByRow(index.row());
 
-  int oldFieldLen = field->getSize();
+  int oldFieldLen = field->getFieldSize();
 
   int fieldLen = 0;
   if (entry->isBoundToPointer())
@@ -442,6 +442,7 @@ void StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
     fieldLen = Common::getSizeForType(entry->getType(), entry->getLength());
 
   field->setEntry(entry);
+  field->setFieldSize(fieldLen);
   emit dataChanged(index.siblingAtColumn(0), index.siblingAtColumn(columnCount({}) - 1));
 
   if (oldFieldLen < fieldLen)

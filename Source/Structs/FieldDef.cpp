@@ -27,7 +27,7 @@ FieldDef::FieldDef(size_t offset, MemWatchEntry* entry)
 }
 
 FieldDef::FieldDef(FieldDef* field)
-    : m_structOffset(field->m_structOffset), m_size(-1),
+    : m_structOffset(field->m_structOffset), m_size(field->m_size),
       m_entry(new MemWatchEntry(field->m_entry))
 {
 }
@@ -38,12 +38,12 @@ FieldDef::~FieldDef()
   m_entry = nullptr;
 }
 
-size_t FieldDef::getOffset() const
+u32 FieldDef::getOffset() const
 {
   return m_structOffset;
 }
 
-void FieldDef::setOffset(size_t offset)
+void FieldDef::setOffset(u32 offset)
 {
   m_structOffset = offset;
 }
@@ -100,16 +100,18 @@ void FieldDef::convertToPadding()
 void FieldDef::readFromJSON(const QJsonObject& json)
 {
   m_structOffset = json["offset"].toInt();
+  m_size = json["length"].toInt();
 
-  MemWatchEntry* entry = new MemWatchEntry();
-
-  if (json["entry"] != QJsonValue::Undefined)
-    entry->readFromJson(json["entry"].toObject());
+  if (json["entry"] == QJsonValue::Undefined)
+    m_entry == nullptr;
+  else
+    m_entry->readFromJson(json["entry"].toObject());
 }
 
 void FieldDef::writeToJson(QJsonObject& json)
 {
   json["offset"] = static_cast<double>(m_structOffset);
+  json["length"] = static_cast<double>(m_size);
 
   if (!m_entry)
     return;
