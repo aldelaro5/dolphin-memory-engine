@@ -29,8 +29,8 @@ public:
   void setOffset(size_t offset);
   MemWatchEntry* getEntry() const;
   void setEntry(MemWatchEntry* entry);
-  size_t getSize() const;
-  void setSize(size_t size);
+  size_t getFieldSize() const;
+  void setFieldSize(size_t size);
   QString getLabel() const;
   void setLabel(QString label);
   bool isPadding() const;
