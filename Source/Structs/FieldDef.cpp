@@ -61,19 +61,14 @@ void FieldDef::setEntry(MemWatchEntry* entry)
     m_entry = entry;
 }
 
-size_t FieldDef::getSize() const
+size_t FieldDef::getFieldSize() const
 {
-  if (!m_entry)
-    return m_size;
-  if (m_entry->isBoundToPointer())
-    return 4;
-  return m_entry->getLength();
+ return m_size;
 }
 
-void FieldDef::setSize(size_t size)
+void FieldDef::setFieldSize(size_t size)
 {
-  if (!m_entry)
-    m_size = size;
+ m_size = size;
 }
 
 QString FieldDef::getLabel() const
