@@ -11,6 +11,12 @@ StructTreeNode::StructTreeNode(StructDef* const structDef, StructTreeNode* const
   updateName();
 }
 
+StructTreeNode::StructTreeNode(StructTreeNode* node)
+    : m_parent(node->getParent()), m_isGroup(node->isGroup()), m_nodeName(QString(node->getName())),
+      m_structDef(new StructDef(node->getStructDef()))
+{
+}
+
 StructTreeNode::~StructTreeNode()
 {
   deleteChildren();

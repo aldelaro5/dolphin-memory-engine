@@ -10,6 +10,7 @@ class StructTreeNode
 {
 public:
   explicit StructTreeNode(StructDef* const structDef, StructTreeNode* const parent, bool isGroup = false, QString name = {});
+  explicit StructTreeNode(StructTreeNode* node);
   ~StructTreeNode();
 
   StructTreeNode(const StructTreeNode&) = delete;
