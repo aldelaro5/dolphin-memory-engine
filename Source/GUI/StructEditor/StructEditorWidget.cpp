@@ -88,6 +88,8 @@ void StructEditorWidget::initialiseWidgets()
   m_structDetailModel = new StructDetailModel(this);
   connect(m_structDetailModel, &StructDetailModel::dataEdited, this,
           &StructEditorWidget::onDetailDataEdited);
+  connect(m_structDetailModel, &StructDetailModel::lengthChanged, this,
+          &StructEditorWidget::onLengthChange);
 
   //connect as neeeded
   /* Example from MemWatchWidget
