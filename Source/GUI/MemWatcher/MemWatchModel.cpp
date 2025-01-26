@@ -137,7 +137,7 @@ MemWatchEntry* MemWatchModel::getEntryFromIndex(const QModelIndex& index)
 
 void MemWatchModel::addNodes(const std::vector<MemWatchTreeNode*>& nodes,
                              const QModelIndex& referenceIndex,
-                             const bool insertInContainer = false)
+                             const bool insertInContainer)
 {
   if (nodes.empty())
     return;
