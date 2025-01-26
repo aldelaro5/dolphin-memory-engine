@@ -44,7 +44,11 @@ MemWatchModel::~MemWatchModel()
 {
   delete m_rootNode;
   qDeleteAll(m_structDefMap);
-  qDeleteAll(m_structNodes);
+  for (QString key : m_structNodes.keys())
+  {
+    qDeleteAll(m_structNodes[key]);
+  }
+  m_structNodes.clear();
 }
 
 void MemWatchModel::onUpdateTimer()
