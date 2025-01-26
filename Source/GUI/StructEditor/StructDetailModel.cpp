@@ -219,6 +219,22 @@ void StructDetailModel::updateFieldOffsets()
   }
 }
 
+void StructDetailModel::reduceIndicesToRows(QModelIndexList& indices)
+{
+  QVector<int> rowsSeen{};
+  int i = 0;
+  while (i < indices.count())
+  {
+    if (rowsSeen.contains(indices[i].row()))
+      indices.removeAt(i);
+    else
+    {
+      rowsSeen.push_back(indices[i].row());
+      ++i;
+    }
+  }
+}
+
 bool StructDetailModel::hasStructLoaded() const
 {
   return m_baseNode != nullptr;
