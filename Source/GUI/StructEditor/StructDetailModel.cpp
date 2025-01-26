@@ -307,12 +307,11 @@ bool StructDetailModel::willRemoveFields(u32 newLength)
   {
     if (m_fields[i]->getOffset() + m_fields[i]->getFieldSize() <= newLength)
       break;
-    if (m_fields[i]->isPadding())
-      continue;
+    if (!m_fields[i]->isPadding())
+      return true;
+  }
     return false;
   }
-  return true;
-}
 
 QString StructDetailModel::getRemovedFieldDescriptions(u32 newLength)
 {
