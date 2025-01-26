@@ -54,6 +54,10 @@ QVariant StructDetailModel::data(const QModelIndex& index, int role) const
       break;
     }
   }
+
+  if (role == Qt::EditRole && index.column() == STRUCT_COL_LABEL)
+    return m_fields[index.row()]->getEntry()->getLabel();
+
   return {};
 }
 
