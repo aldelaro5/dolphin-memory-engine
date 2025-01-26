@@ -197,7 +197,7 @@ void StructEditorWidget::onConvertPaddingToEntry(const QModelIndex& index)
   DlgAddWatchEntry dlg(true, nullptr, m_structDefs->getStructNames(), this);
   if (dlg.exec() == QDialog::Accepted)
   {
-    m_structDetailModel->updateFieldEntry(dlg.stealEntry(), index);
+    m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index);
     m_unsavedChanges = true;
   }
 
@@ -438,7 +438,7 @@ void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
   DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()), m_structDefs->getStructNames(), this);
   if (dlg.exec() == QDialog::Accepted)
   {
-    m_structDetailModel->updateFieldEntry(dlg.stealEntry(), index);
+    m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index);
     m_unsavedChanges = true;
   }
 
