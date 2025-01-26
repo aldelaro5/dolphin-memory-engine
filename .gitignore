@@ -1,9 +1,11 @@
 Source/[Bb]uild*/
 Source/[Bb]inary/
 Source/bin/
+Source/CMakeSettings.json
 Source/obj/
 Source/GeneratedFiles/
 Source/cmake-build-debug/*
+Source/out/
 Source/*.ipch
 Source/*.opensdf
 Source/*.sdf
@@ -18,3 +20,5 @@ Source/.vscode/
 .vscode/
 .idea/*
 .DS_Store
+.vs/
+.vscode/
