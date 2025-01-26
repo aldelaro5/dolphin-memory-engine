@@ -217,6 +217,7 @@ void StructEditorWidget::onDetailNameChanged()
 
   if (!node->getParent()->isNameAvailable(m_txtStructName->text()))
   {
+    m_txtStructName->clearFocus();
     return nameChangeFailed(node, m_txtStructName->text());
   }
 
@@ -226,6 +227,7 @@ void StructEditorWidget::onDetailNameChanged()
   node->setName(m_txtStructName->text());
 
   emit updateStructName(oldFullName, node->appendNameToNameSpace(oldNameSpace));
+  m_txtStructName->clearFocus();
 }
 
 void StructEditorWidget::onDetailLengthChanged()
@@ -236,7 +238,10 @@ void StructEditorWidget::onDetailLengthChanged()
   u32 new_length = m_txtStructLength->text().toInt(&ok, 16);
 
   if (new_length == old_length)
+  {
+    m_txtStructLength->clearFocus();
     return;
+  }
 
   if (new_length < old_length && m_structDetailModel->willRemoveFields(new_length))
   {
@@ -248,6 +253,7 @@ void StructEditorWidget::onDetailLengthChanged()
                                                 QMessageBox::Yes, QMessageBox::No))
     {
       m_txtStructLength->setText(QString::number(old_length, 16));
+      m_txtStructLength->clearFocus();
       return;
     }
   }
@@ -255,6 +261,7 @@ void StructEditorWidget::onDetailLengthChanged()
   node->getStructDef()->setLength(new_length);
   m_structDetailModel->updateFieldsWithNewLength();
   m_btnSaveStructs->setEnabled(true);
+  m_txtStructLength->clearFocus();
 }
 
 void StructEditorWidget::onAddField()
@@ -445,12 +452,11 @@ void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
   {
     DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()),
                          m_structDefs->getStructNames(), this);
-  if (dlg.exec() == QDialog::Accepted)
-  {
-    m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index);
+    if (dlg.exec() == QDialog::Accepted)
+    {
+      m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index);
     }
   }
-
   m_btnSaveStructs->setEnabled(true);
 }
 
