@@ -38,7 +38,7 @@ QVariant StructDetailModel::data(const QModelIndex& index, int role) const
     switch (index.column())
     {
     case STRUCT_COL_OFFSET:
-      return QString("0x%1").arg(m_fields[index.row()]->getOffset());
+      return QString("0x%1").arg(m_fields[index.row()]->getOffset(), 0, 16);
     case STRUCT_COL_SIZE:
       return m_fields[index.row()]->getFieldSize();
     case STRUCT_COL_LABEL:
