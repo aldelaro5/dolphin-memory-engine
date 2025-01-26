@@ -283,8 +283,43 @@ QString StructTreeNode::appendNameToNameSpace(QString nameSpace) const
   return nameSpace + QString("::") + m_nodeName;
 }
 
+u32 StructTreeNode::getSizeOfStruct(QString nameSpace)
+{
+  StructTreeNode* targetStructNode = findNode(nameSpace);
+  if (targetStructNode == nullptr || targetStructNode->isGroup())
+    return 0;
+  else
+    return targetStructNode->getStructDef()->getLength();
+}
+
 void StructTreeNode::updateName()
 {
   if (m_structDef != nullptr)
     m_nodeName = m_structDef->getLabel();
+}
+
+StructTreeNode* StructTreeNode::findNode(QString nameSpace)
+{
+  StructTreeNode* cur_node = this;
+  while (cur_node->getParent() != nullptr)
+    cur_node = cur_node->getParent();
+
+  QStringList names = nameSpace.split("::");
+  for (QString name : names)
+  {
+    bool childFound = false;
+    for (StructTreeNode* child : cur_node->getChildren())
+    {
+      if (child->getName() == name)
+      {
+        childFound = true;
+        cur_node = child;
+        break;
+      }
+    }
+    if (!childFound)
+      return nullptr;
+  }
+
+  return cur_node;
 }
