@@ -111,6 +111,7 @@ void StructEditorWidget::initialiseWidgets()
   m_structDetailView->setAcceptDrops(false);
   m_structDetailView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_structDetailView->setSelectionMode(QAbstractItemView::ContiguousSelection);
+  m_structDetailView->setEditTriggers(QAbstractItemView::NoEditTriggers);
   m_structDetailView->setModel(m_structDetailModel);
   //m_watchView->setItemDelegate(m_watchDelegate);
 
@@ -435,15 +436,17 @@ void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
   FieldDef* field = m_structDetailModel->getFieldByRow(index.row());
 
   if (field->isPadding())
-    return onConvertPaddingToEntry(index);
+    onConvertPaddingToEntry(index);
   else if (index.column() == StructDetailModel::STRUCT_COL_LABEL)
-    return m_structDetailView->edit(index);
-
-  DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()), m_structDefs->getStructNames(), this);
+    m_structDetailView->edit(index);
+  else
+  {
+    DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()),
+                         m_structDefs->getStructNames(), this);
   if (dlg.exec() == QDialog::Accepted)
   {
     m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index);
-    m_unsavedChanges = true;
+    }
   }
 
   m_btnSaveStructs->setEnabled(true);
