@@ -182,7 +182,7 @@ void StructDetailModel::removePaddingFields(int count, int start)
     ++toRemove;
   }
 
-  if (count > 0)
+  if (toRemove > 0)
     removeFields(start, toRemove);
 }
 
