@@ -61,7 +61,7 @@ bool StructDetailModel::setData(const QModelIndex& index, const QVariant& value,
   if (~role == Qt::EditRole || !index.isValid())
     return false;
 
-  FieldDef* field = static_cast<FieldDef*>(index.internalPointer());
+  FieldDef* field = getFieldByRow(index.row());
 
   switch (index.column())
   {
