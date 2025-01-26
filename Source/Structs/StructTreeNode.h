@@ -48,9 +48,11 @@ public:
   QVector<QString> getStructNames(bool includeGroups = false, QString prefix = QString(""));
   QString getNameSpace();
   QString appendNameToNameSpace(QString nameSpace) const;
+  u32 getSizeOfStruct(QString nameSpace);
 
 private:
   void updateName();
+  StructTreeNode* findNode(QString nameSpace);
 
   bool m_isGroup;
   QString m_nodeName;

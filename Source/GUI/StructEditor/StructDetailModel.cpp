@@ -427,7 +427,19 @@ void StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
   FieldDef* field = getFieldByRow(index.row());
 
   int oldFieldLen = field->getSize();
-  int fieldLen = entry->getLength();
+
+  int fieldLen = 0;
+  if (entry->isBoundToPointer())
+    fieldLen = 4;
+  else if (entry->getType() == Common::MemType::type_struct)
+  {
+    if (entry->getStructName() == m_baseNode->getName())
+      fieldLen = 0;
+    else
+      fieldLen = m_baseNode->getParent()->getSizeOfStruct(m_baseNode->getNameSpace()); // dependent on if the parent doesn't change when copying the node to edit - check this
+  }
+  else
+    fieldLen = Common::getSizeForType(entry->getType(), entry->getLength());
 
   field->setEntry(entry);
   emit dataChanged(index.siblingAtColumn(0), index.siblingAtColumn(columnCount({}) - 1));
