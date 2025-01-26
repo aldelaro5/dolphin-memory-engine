@@ -14,6 +14,7 @@ StructDetailModel::StructDetailModel(QObject* parent) : QAbstractListModel(paren
 
 StructDetailModel::~StructDetailModel()
 {
+  delete m_baseNode;
   qDeleteAll(m_fields);
 }
 
