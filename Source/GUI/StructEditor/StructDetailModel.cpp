@@ -389,6 +389,7 @@ QString StructDetailModel::getFieldDetails(FieldDef* field) const
 
 void StructDetailModel::removeFields(QModelIndexList indices)
 {
+  reduceIndicesToRows(indices);
   u32 start = indices[0].row();
   u32 count = indices.count();
   removeFields(start, count);
