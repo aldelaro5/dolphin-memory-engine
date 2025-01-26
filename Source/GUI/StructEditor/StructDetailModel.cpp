@@ -147,7 +147,7 @@ void StructDetailModel::addPaddingFields(int count, int start)
     start = 0;
     starting_offset = 0;
   }
-  else if (start < 0)
+  else if (start < 0 || start >= m_fields.count())
   {
     start = m_fields.count();
     starting_offset = m_fields.last()->getOffset() + m_fields.last()->getSize();
