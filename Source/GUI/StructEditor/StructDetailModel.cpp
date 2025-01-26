@@ -290,6 +290,7 @@ void StructDetailModel::saveStruct()
 
 void StructDetailModel::unloadStruct()
 {
+  delete m_baseNode;
   m_baseNode = nullptr;
   qDeleteAll(m_fields);
   m_fields = QVector<FieldDef*>();
