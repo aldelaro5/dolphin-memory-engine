@@ -371,6 +371,10 @@ void MemWatchEntry::readFromJson(const QJsonObject& json)
   if (json["length"] != QJsonValue::Undefined)
     length = static_cast<size_t>(json["length"].toDouble());
   setTypeAndLength(static_cast<Common::MemType>(json["typeIndex"].toInt()), length);
+
+ if (json["structName"] != QJsonValue::Undefined) 
+    setStructName(json["structName"].toString());
+
   setSignedUnsigned(json["unsigned"].toBool());
   setBase(static_cast<Common::MemBase>(json["baseIndex"].toInt()));
   if (json["pointerOffsets"] != QJsonValue::Undefined)
@@ -402,6 +406,8 @@ void MemWatchEntry::writeToJson(QJsonObject& json) const
   if (getType() == Common::MemType::type_string ||
       getType() == Common::MemType::type_byteArray)
     json["length"] = static_cast<double>(getLength());
+  else if (getType() == Common::MemType::type_struct)
+    json["structName"] = getStructName();
 
   json["baseIndex"] = static_cast<double>(getBase());
   if (isBoundToPointer())
