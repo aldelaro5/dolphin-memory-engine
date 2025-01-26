@@ -25,8 +25,8 @@ public:
   FieldDef& operator=(const FieldDef&) = delete;
   FieldDef& operator=(FieldDef&&) = delete;
 
-  size_t getOffset() const;
-  void setOffset(size_t offset);
+  u32 getOffset() const;
+  void setOffset(u32 offset);
   MemWatchEntry* getEntry() const;
   void setEntry(MemWatchEntry* entry);
   size_t getFieldSize() const;
@@ -40,7 +40,7 @@ public:
   void writeToJson(QJsonObject& json);
 
 private:
-  size_t m_structOffset;
+  u32 m_structOffset;
   size_t m_size;
   MemWatchEntry* m_entry;
 };

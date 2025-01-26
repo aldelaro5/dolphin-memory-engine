@@ -38,12 +38,12 @@ FieldDef::~FieldDef()
   m_entry = nullptr;
 }
 
-size_t FieldDef::getOffset() const
+u32 FieldDef::getOffset() const
 {
   return m_structOffset;
 }
 
-void FieldDef::setOffset(size_t offset)
+void FieldDef::setOffset(u32 offset)
 {
   m_structOffset = offset;
 }
