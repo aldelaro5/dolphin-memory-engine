@@ -27,7 +27,7 @@ FieldDef::FieldDef(size_t offset, MemWatchEntry* entry)
 }
 
 FieldDef::FieldDef(FieldDef* field)
-    : m_structOffset(field->m_structOffset), m_size(-1),
+    : m_structOffset(field->m_structOffset), m_size(field->m_size),
       m_entry(new MemWatchEntry(field->m_entry))
 {
 }
