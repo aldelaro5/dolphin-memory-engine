@@ -220,6 +220,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     }
 
     m_chkBoundToPointer->setChecked(m_entry->isBoundToPointer());
+    if (m_showAddress)
     updatePreview();
   }
 }
