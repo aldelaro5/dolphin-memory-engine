@@ -432,6 +432,8 @@ void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
 
   if (field->isPadding())
     return onConvertPaddingToEntry(index);
+  else if (index.column() == StructDetailModel::STRUCT_COL_LABEL)
+    return m_structDetailView->edit(index);
 
   DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()), m_structDefs->getStructNames(), this);
   if (dlg.exec() == QDialog::Accepted)
