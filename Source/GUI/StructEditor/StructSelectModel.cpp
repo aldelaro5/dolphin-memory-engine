@@ -44,8 +44,6 @@ QVariant StructSelectModel::data(const QModelIndex& index, int role) const
   if (!index.isValid())
     return {};
 
-  const int column{index.column()};
-
   StructTreeNode* item = static_cast<StructTreeNode*>(index.internalPointer());
 
   if (!item->isGroup())
