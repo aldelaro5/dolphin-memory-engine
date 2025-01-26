@@ -44,11 +44,7 @@ MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
 MemWatchModel::~MemWatchModel()
 {
   delete m_rootNode;
-  qDeleteAll(m_structDefMap);
-  for (QString key : m_structNodes.keys())
-  {
-    qDeleteAll(m_structNodes[key]);
-  }
+  m_structDefMap.clear();
   m_structNodes.clear();
 }
 
