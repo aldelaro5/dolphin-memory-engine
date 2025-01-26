@@ -642,6 +642,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
   }
 
   m_viewer->close();
+  m_structEditor->close();
   event->accept();
 }
 
