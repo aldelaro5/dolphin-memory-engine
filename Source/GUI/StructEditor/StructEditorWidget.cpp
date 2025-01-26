@@ -460,7 +460,7 @@ void StructEditorWidget::onDetailDataEdited(const QModelIndex& index, const QVar
 
   if (index.column() == StructDetailModel::STRUCT_COL_LABEL)
   {
-    m_unsavedChanges = true;
+    m_btnSaveStructs->setEnabled(true);
   }
 }
 
@@ -590,7 +590,7 @@ void StructEditorWidget::onEditStruct(StructTreeNode* node)
 {
   if (node->isGroup())
     return;
-  if (m_structDetailModel->hasStructLoaded() && m_unsavedChanges)
+  if (m_structDetailModel->hasStructLoaded() && unsavedStructDetails())
   {
     QMessageBox::StandardButton response = QMessageBox::question(this, "Save Changes?", "You have unsaved changes to this struct.\nWould you like to save them?");
     if (response == QMessageBox::StandardButton::Yes)
