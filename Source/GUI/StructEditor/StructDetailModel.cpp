@@ -407,7 +407,7 @@ void StructDetailModel::clearFields(QModelIndexList indices)
 
 void StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex& index)
 {
-  FieldDef* field = static_cast<FieldDef*>(index.internalPointer());
+  FieldDef* field = getFieldByRow(index.row());
 
   int oldFieldLen = field->getSize();
   int fieldLen = entry->getLength();

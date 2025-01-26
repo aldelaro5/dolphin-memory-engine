@@ -423,7 +423,7 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
 
 void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
 {
-  FieldDef* field = static_cast<FieldDef*>(index.internalPointer());
+  FieldDef* field = m_structDetailModel->getFieldByRow(index.row());
 
   if (field->isPadding())
     return onConvertPaddingToEntry(index);
