@@ -140,7 +140,6 @@ bool StructDetailModel::editData(const QModelIndex& index, const QVariant& value
 
 void StructDetailModel::addPaddingFields(int count, int start)
 {
-  bool updateOffsets = start >= 0;
   u32 starting_offset;
 
   if (m_fields.isEmpty())
@@ -167,8 +166,7 @@ void StructDetailModel::addPaddingFields(int count, int start)
 
   endInsertRows();
 
-  if (updateOffsets)
-    updateFieldOffsets();
+  updateFieldOffsets();
 }
 
 void StructDetailModel::removePaddingFields(int count, int start)
