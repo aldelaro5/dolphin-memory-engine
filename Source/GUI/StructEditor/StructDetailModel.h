@@ -56,11 +56,13 @@ public:
 
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& value, int role);
+  void lengthChanged(u32 newLength);
 
 private:
   QString getFieldDetails(FieldDef* field) const;
   void removeFields(int start, int count = 1);
   void updateFieldOffsets();
+  void reduceIndicesToRows(QModelIndexList& indices);
 
   StructTreeNode* m_baseNode = nullptr;
   QVector<FieldDef*> m_fields{};

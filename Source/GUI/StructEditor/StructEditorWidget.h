@@ -60,11 +60,13 @@ private:
   void onClearFields();
   void onSaveStruct();
   void nameChangeFailed(StructTreeNode* node, QString name);
+  void onLengthChange(u32 newLength);
 
   bool isAnyAncestorSelected(const QModelIndex& index) const;
   QModelIndexList simplifiedSelection() const;
 
   StructTreeNode* m_structDefs;
+  StructTreeNode* m_nodeInDetailEditor{};
   bool m_unsavedChanges = false;
 
 

@@ -11,6 +11,12 @@ StructTreeNode::StructTreeNode(StructDef* const structDef, StructTreeNode* const
   updateName();
 }
 
+StructTreeNode::StructTreeNode(StructTreeNode* node)
+    : m_parent(node->getParent()), m_isGroup(node->isGroup()), m_nodeName(QString(node->getName())),
+      m_structDef(new StructDef(node->getStructDef()))
+{
+}
+
 StructTreeNode::~StructTreeNode()
 {
   deleteChildren();
@@ -115,6 +121,12 @@ QVector<QString> StructTreeNode::getChildNames()
 StructDef* StructTreeNode::getStructDef() const
 {
   return m_structDef;
+}
+
+void StructTreeNode::setStructDef(StructDef* structDef)
+{
+  delete m_structDef;
+  m_structDef = structDef;
 }
 
 void StructTreeNode::appendChild(StructTreeNode* node)
