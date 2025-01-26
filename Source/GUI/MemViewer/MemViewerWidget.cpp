@@ -15,10 +15,10 @@ MemViewerWidget::MemViewerWidget(QWidget* const parent) : QWidget(parent)
 
   connect(m_memViewer, &MemViewer::addWatch, this,
           [this](MemWatchEntry* entry) { emit addWatchRequested(entry); });
-  connect(this, MemViewerWidget::updateDlgStructNames, m_memViewer,
-          MemViewer::onUpdateDlgStructNames);
-  connect(this, MemViewerWidget::updateDlgStructName, m_memViewer,
-          MemViewer::onUpdateDlgStructName);
+  connect(this, &MemViewerWidget::updateDlgStructNames, m_memViewer,
+          &MemViewer::onUpdateDlgStructNames);
+  connect(this, &MemViewerWidget::updateDlgStructName, m_memViewer,
+          &MemViewer::onUpdateDlgStructName);
 }
 
 MemViewerWidget::~MemViewerWidget()

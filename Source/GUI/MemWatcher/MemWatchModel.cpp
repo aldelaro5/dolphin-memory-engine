@@ -45,7 +45,11 @@ MemWatchModel::~MemWatchModel()
 {
   delete m_rootNode;
   qDeleteAll(m_structDefMap);
-  qDeleteAll(m_structNodes);
+  for (QString key : m_structNodes.keys())
+  {
+    qDeleteAll(m_structNodes[key]);
+  }
+  m_structNodes.clear();
 }
 
 void MemWatchModel::onUpdateTimer()
@@ -134,7 +138,7 @@ MemWatchEntry* MemWatchModel::getEntryFromIndex(const QModelIndex& index)
 
 void MemWatchModel::addNodes(const std::vector<MemWatchTreeNode*>& nodes,
                              const QModelIndex& referenceIndex,
-                             const bool insertInContainer = false)
+                             const bool insertInContainer)
 {
   if (nodes.empty())
     return;
