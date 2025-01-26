@@ -16,9 +16,10 @@
 #include "../../GUICommon.h"
 
 DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const entry, QVector<QString> const structs,
-                                   QWidget* const parent)
+                                   QWidget* const parent, bool showAddress)
     : QDialog(parent)
 {
+  m_showAddress = showAddress;
   m_structNames = structs;
   m_structNames.push_front(QString(""));
   setWindowTitle(newEntry ? "Add Watch" : "Edit Watch");
@@ -49,14 +50,17 @@ void DlgAddWatchEntry::initialiseWidgets()
           &DlgAddWatchEntry::onIsPointerChanged);
 #endif
 
-  m_lblValuePreview = new QLineEdit("", this);
-  m_lblValuePreview->setReadOnly(true);
+  if (m_showAddress)
+  {
+    m_lblValuePreview = new QLineEdit("", this);
+    m_lblValuePreview->setReadOnly(true);
 
-  m_txbAddress = new AddressInputWidget(this);
-  connect(m_txbAddress, &QLineEdit::textEdited, this, &DlgAddWatchEntry::onAddressChanged);
+    m_txbAddress = new AddressInputWidget(this);
+    connect(m_txbAddress, &QLineEdit::textEdited, this, &DlgAddWatchEntry::onAddressChanged);
 
-  const QFont fixedFont{QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
-  m_lblValuePreview->setFont(fixedFont);
+    const QFont fixedFont{QFontDatabase::systemFont(QFontDatabase::SystemFont::FixedFont)};
+    m_lblValuePreview->setFont(fixedFont);
+  }
 
   m_offsetsLayout = new QGridLayout;
 
@@ -88,8 +92,11 @@ void DlgAddWatchEntry::makeLayouts()
 {
   QFormLayout* formLayout = new QFormLayout;
   formLayout->setLabelAlignment(Qt::AlignRight);
-  formLayout->addRow("Preview:", m_lblValuePreview);
-  formLayout->addRow("Address:", m_txbAddress);
+  if (m_showAddress)
+  {
+    formLayout->addRow("Preview:", m_lblValuePreview);
+    formLayout->addRow("Address:", m_txbAddress);
+  }
   formLayout->addRow("Label:", m_txbLabel);
 
   QHBoxLayout* layout_type = new QHBoxLayout;
@@ -145,7 +152,8 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_cmbTypes->setCurrentIndex(0);
     m_spnLength->setValue(1);
     m_spnLength->hide();
-    m_lblValuePreview->setText("???");
+    if (m_showAddress)
+      m_lblValuePreview->setText("???");
     m_chkBoundToPointer->setChecked(false);
     m_pointerWidget->hide();
     m_structSelect->setCurrentIndex(0);
@@ -172,9 +180,12 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
       m_structSelect->hide();
     }
     m_txbLabel->setText(m_entry->getLabel());
-    std::stringstream ssAddress;
-    ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
-    m_txbAddress->setText(QString::fromStdString(ssAddress.str()));
+    if (m_showAddress)
+    {
+      std::stringstream ssAddress;
+      ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
+      m_txbAddress->setText(QString::fromStdString(ssAddress.str()));
+    }
     if (m_entry->isBoundToPointer())
     {
       m_pointerWidget->show();
@@ -327,13 +338,13 @@ void DlgAddWatchEntry::onTypeChange(int index)
     m_structSelect->hide();
   }
   m_entry->setTypeAndLength(theType, m_spnLength->value());
-  if (validateAndSetAddress())
+  if (m_showAddress && validateAndSetAddress())
     updatePreview();
 }
 
 void DlgAddWatchEntry::accept()
 {
-  if (!validateAndSetAddress())
+  if (m_showAddress && !validateAndSetAddress())
   {
     QString errorMsg = tr("The address you entered is invalid, make sure it is an "
                           "hexadecimal number between 0x%1 and 0x%2")
@@ -349,6 +360,8 @@ void DlgAddWatchEntry::accept()
   }
   else
   {
+    if (!m_showAddress)
+      m_entry->setConsoleAddress(0);
     if (m_chkBoundToPointer->isChecked())
     {
       bool allOffsetsValid = true;
@@ -421,7 +434,7 @@ bool DlgAddWatchEntry::validateAndSetOffset(int index)
 
 void DlgAddWatchEntry::onAddressChanged()
 {
-  if (validateAndSetAddress())
+  if (m_showAddress && validateAndSetAddress())
     updatePreview();
   else
     m_lblValuePreview->setText("???");
@@ -449,7 +462,7 @@ void DlgAddWatchEntry::onLengthChanged()
 {
   Common::MemType theType = static_cast<Common::MemType>(m_cmbTypes->currentIndex());
   m_entry->setTypeAndLength(theType, m_spnLength->value());
-  if (validateAndSetAddress())
+  if (m_showAddress && validateAndSetAddress())
     updatePreview();
 }
 
