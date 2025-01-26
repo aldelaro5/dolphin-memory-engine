@@ -26,6 +26,15 @@ StructDef::StructDef(QString label, u32 length, QVector<FieldDef*> entries, bool
   m_isValid = isValidStruct();
 }
 
+StructDef::StructDef(StructDef* structDef)
+    : m_label(structDef->getLabel()), m_length(structDef->getLength()), m_isValid(structDef->m_isValid)
+{
+  m_fields = QVector<FieldDef*>();
+  for (FieldDef* field : structDef->getFields())
+    m_fields.push_back(new FieldDef(field));
+}
+
+
 StructDef::~StructDef()
 {
   qDeleteAll(m_fields);

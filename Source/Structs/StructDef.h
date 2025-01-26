@@ -15,6 +15,7 @@ public:
   StructDef();
   StructDef(QString label);
   StructDef(QString label, u32 length, QVector<FieldDef*> entries, bool isPacked);
+  explicit StructDef(StructDef* structDef);
 
   ~StructDef();
 
