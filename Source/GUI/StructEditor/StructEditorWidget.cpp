@@ -616,6 +616,17 @@ void StructEditorWidget::restoreStructDefs(const QString& json)
 
 QString StructEditorWidget::saveStructDefs()
 {
+  if (m_structDetailModel->hasStructLoaded() && unsavedStructDetails())
+  {
+    QMessageBox::StandardButton response = QMessageBox::question(
+        this, "Save Changes?",
+        "You have unsaved changes to the current struct.\nWould you like to save them?");
+    if (response == QMessageBox::StandardButton::Yes)
+    {
+      onSaveStruct();
+    }
+  }
+
   QJsonObject root;
   m_structDefs->writeToJson(root);
   QJsonDocument saveDoc(root);
