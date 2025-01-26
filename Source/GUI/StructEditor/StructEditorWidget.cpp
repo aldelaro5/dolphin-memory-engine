@@ -215,7 +215,7 @@ void StructEditorWidget::onDetailNameChanged()
 
   QString oldNameSpace = node->getParent()->getNameSpace();
   QString oldFullName = node->getNameSpace();
-  m_structSelectModel->setNodeLabel(node, m_txtStructName->text());
+  m_nodeInDetailEditor->setName(m_txtStructName->text());
 
   emit updateStructName(oldFullName, node->appendNameToNameSpace(oldNameSpace));
 }
@@ -243,6 +243,8 @@ void StructEditorWidget::onDetailLengthChanged()
       return;
     }
   }
+
+  node->getStructDef()->setLength(new_length);
   m_structDetailModel->updateFieldsWithNewLength();
   m_btnSaveStructs->setEnabled(true);
 }
@@ -286,11 +288,8 @@ void StructEditorWidget::onClearFields()
 
 void StructEditorWidget::onSaveStruct()
 {
-  bool lengthSet = false;
-  m_structDetailModel->getLoadedStructNode()
-      ->getStructDef()
-      ->setLength(m_txtStructLength->text().toUInt(&lengthSet, 16));
   m_structDetailModel->saveStruct();
+  m_nodeInDetailEditor->setStructDef(m_structDetailModel->getLoadedStructNode()->getStructDef());
   emit updateStructDetails(m_structDetailModel->getLoadedStructNode()->getNameSpace());
   m_btnSaveStructs->setDisabled(true);
 }
@@ -585,13 +584,16 @@ void StructEditorWidget::onEditStruct(StructTreeNode* node)
       onSaveStruct();
     }
   }
-  m_structDetailModel->loadStruct(node);
+  m_nodeInDetailEditor = node;
+  StructTreeNode* nodeForDetailEditor = new StructTreeNode(node);
+  m_structDetailModel->loadStruct(nodeForDetailEditor);
 
   m_txtStructName->setEnabled(true);
-  m_txtStructName->setText(node->getName());
+  m_txtStructName->setText(nodeForDetailEditor->getName());
 
   m_txtStructLength->setEnabled(true);
-  m_txtStructLength->setText(QString::number(node->getStructDef()->getLength(), 16).toUpper());
+  m_txtStructLength->setText(
+      QString::number(nodeForDetailEditor->getStructDef()->getLength(), 16).toUpper());
 }
 
 void StructEditorWidget::restoreStructDefs(const QString& json)

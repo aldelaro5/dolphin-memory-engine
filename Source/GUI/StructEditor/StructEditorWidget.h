@@ -65,6 +65,7 @@ private:
   QModelIndexList simplifiedSelection() const;
 
   StructTreeNode* m_structDefs;
+  StructTreeNode* m_nodeInDetailEditor{};
   bool m_unsavedChanges = false;
 
 
