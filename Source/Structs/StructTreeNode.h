@@ -33,6 +33,7 @@ public:
   void setChildren(QVector<StructTreeNode*> children);
   QVector<QString> getChildNames();
   StructDef* getStructDef() const;
+  void setStructDef(StructDef* structDef);
 
   void appendChild(StructTreeNode* node);
   void insertChild(int row, StructTreeNode* node);

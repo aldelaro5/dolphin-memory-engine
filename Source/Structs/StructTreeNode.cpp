@@ -123,6 +123,12 @@ StructDef* StructTreeNode::getStructDef() const
   return m_structDef;
 }
 
+void StructTreeNode::setStructDef(StructDef* structDef)
+{
+  delete m_structDef;
+  m_structDef = structDef;
+}
+
 void StructTreeNode::appendChild(StructTreeNode* node)
 {
   m_children.append(node);
