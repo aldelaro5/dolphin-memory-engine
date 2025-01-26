@@ -17,7 +17,8 @@
 class DlgAddWatchEntry : public QDialog
 {
 public:
-  DlgAddWatchEntry(bool newEntry, MemWatchEntry* entry, QVector<QString> structs, QWidget* parent);
+  DlgAddWatchEntry(bool newEntry, MemWatchEntry* entry, QVector<QString> structs, QWidget* parent,
+                   bool hideAddress = false);
   ~DlgAddWatchEntry() override;
 
   DlgAddWatchEntry(const DlgAddWatchEntry&) = delete;
@@ -64,4 +65,5 @@ private:
   QPushButton* m_btnRemoveOffset{};
   QComboBox* m_structSelect{};
   QVector<QString> m_structNames{};
+  bool m_showAddress;
 };
