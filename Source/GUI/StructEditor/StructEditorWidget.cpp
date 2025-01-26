@@ -117,18 +117,22 @@ void StructEditorWidget::initialiseWidgets()
   m_btnSaveStructs = new QPushButton(tr("S"), this);
   connect(m_btnSaveStructs, &QPushButton::clicked, this, &StructEditorWidget::onSaveStruct);
   m_btnSaveStructs->setToolTip("Add fields and update struct length.");
+  m_btnSaveStructs->setDisabled(true);
 
   m_btnAddField = new QPushButton(tr("+"), this);
   connect(m_btnAddField, &QPushButton::clicked, this, &StructEditorWidget::onAddField);
   m_btnAddField->setToolTip("Add fields and update struct length.");
+  m_btnAddField->setDisabled(true);
 
   m_btnDeleteFields = new QPushButton(tr("-"), this);
   connect(m_btnDeleteFields, &QPushButton::clicked, this, &StructEditorWidget::onDeleteFields);
   m_btnDeleteFields->setToolTip("Delete fields and update struct length.");
+  m_btnDeleteFields->setDisabled(true);
 
   m_btnClearFields = new QPushButton(tr("0"), this);
   connect(m_btnClearFields, &QPushButton::clicked, this, &StructEditorWidget::onClearFields);
   m_btnClearFields->setToolTip("Clear fields and replace with padding.");
+  m_btnClearFields->setDisabled(true);
 
   m_txtStructName = new QLineEdit(this);
   connect(m_txtStructName, &QLineEdit::editingFinished, this,
@@ -594,6 +598,10 @@ void StructEditorWidget::onEditStruct(StructTreeNode* node)
   m_nodeInDetailEditor = node;
   StructTreeNode* nodeForDetailEditor = new StructTreeNode(node);
   m_structDetailModel->loadStruct(nodeForDetailEditor);
+
+  m_btnAddField->setEnabled(true);
+  m_btnDeleteFields->setEnabled(true);
+  m_btnClearFields->setEnabled(true);
 
   m_txtStructName->setEnabled(true);
   m_txtStructName->setText(nodeForDetailEditor->getName());
