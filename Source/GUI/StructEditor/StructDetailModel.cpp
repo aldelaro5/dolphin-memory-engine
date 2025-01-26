@@ -217,6 +217,7 @@ void StructDetailModel::updateFieldOffsets()
     }
     cur_offset += field->getSize();
   }
+  m_baseNode->getStructDef()->setLength(m_fields.last()->getOffset() + m_fields.last()->getSize());
 }
 
 void StructDetailModel::reduceIndicesToRows(QModelIndexList& indices)
@@ -393,13 +394,11 @@ void StructDetailModel::removeFields(QModelIndexList indices)
   u32 start = indices[0].row();
   u32 count = indices.count();
   removeFields(start, count);
-  m_baseNode->getStructDef()->setLength(m_fields.last()->getOffset() + m_fields.last()->getSize());
 }
 
 void StructDetailModel::removeLastField()
 {
   removeFields(m_fields.count() - 1, 1);
-  m_baseNode->getStructDef()->setLength(m_fields.last()->getOffset() + m_fields.last()->getSize());
 }
 
 void StructDetailModel::clearFields(QModelIndexList indices)
