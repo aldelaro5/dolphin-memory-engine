@@ -56,6 +56,8 @@ void StructEditorWidget::initialiseWidgets()
           &StructEditorWidget::onSelectDataEdited);
   connect(m_structSelectModel, &StructSelectModel::dropSucceeded, this,
           &StructEditorWidget::onSelectDropSucceeded);
+  connect(m_structSelectModel, &StructSelectModel::nameChangeFailed, this,
+          &StructEditorWidget::nameChangeFailed);
 
   m_structSelectView = new QTreeView;
   m_structSelectView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
@@ -208,12 +210,7 @@ void StructEditorWidget::onDetailNameChanged()
 
   if (!node->getParent()->isNameAvailable(m_txtStructName->text()))
   {
-    QString msg = "There is already a node named " + m_txtStructName->text() +
-                  " in the namespace " + node->getParent()->getNameSpace() +
-                  ". Reverting name to " + node->getName();
-    m_txtStructName->setText(node->getName());
-    QMessageBox::critical(this, "Name in Use!", msg);
-    return;
+    return nameChangeFailed(node, m_txtStructName->text());
   }
 
   QString oldNameSpace = node->getParent()->getNameSpace();
@@ -296,6 +293,15 @@ void StructEditorWidget::onSaveStruct()
   m_structDetailModel->saveStruct();
   emit updateStructDetails(m_structDetailModel->getLoadedStructNode()->getNameSpace());
   m_btnSaveStructs->setDisabled(true);
+}
+
+void StructEditorWidget::nameChangeFailed(StructTreeNode* node, QString name)
+{
+  QString msg = "There is already a node named " + m_txtStructName->text() + " in the namespace " +
+                node->getParent()->getNameSpace() + ". Reverting name to " + node->getName();
+  m_txtStructName->setText(node->getName());
+  QMessageBox::critical(this, "Name in Use!", msg);
+  return;
 }
 
 void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)
@@ -497,11 +503,8 @@ void StructEditorWidget::onAddStruct()
     QMessageBox::critical(this, "Error - duplicate struct name", msg);
   }
 
-  m_structSelectModel->addStruct(text, lastIndex);
+  StructTreeNode* addedNode = m_structSelectModel->addStruct(text, lastIndex);
   m_unsavedChanges = true;
-
-  StructTreeNode* addedNode =
-      m_structSelectModel->getTreeNodeFromIndex(lastIndex.siblingAtRow(lastIndex.row() + 1));
 
   emit structAddedRemoved(addedNode->getNameSpace(), addedNode->getStructDef());
   emit updateDlgStructList(m_structDefs->getStructNames());

@@ -44,8 +44,6 @@ QVariant StructSelectModel::data(const QModelIndex& index, int role) const
   if (!index.isValid())
     return {};
 
-  const int column{index.column()};
-
   StructTreeNode* item = static_cast<StructTreeNode*>(index.internalPointer());
 
   if (!item->isGroup())
@@ -140,7 +138,10 @@ bool StructSelectModel::setData(const QModelIndex& index, const QVariant& value,
       node->setName(newName);
     }
     else
+    {
+      emit nameChangeFailed(node, newName);
       return false;
+    }
     emit dataChanged(index, index);
     emit dataEdited(index, value, role);
     return true;
@@ -363,9 +364,11 @@ void StructSelectModel::addGroup(const QString& name, const QModelIndex& referen
   addNodes({new StructTreeNode(NULL, m_rootNode, true, name)}, referenceIndex);
 }
 
-void StructSelectModel::addStruct(const QString& name, const QModelIndex& referenceIndex)
+StructTreeNode* StructSelectModel::addStruct(const QString& name, const QModelIndex& referenceIndex)
 {
-  addNodes({new StructTreeNode(new StructDef(name), m_rootNode, false, name)}, referenceIndex);
+  StructTreeNode* newNode = new StructTreeNode(new StructDef(name), m_rootNode, false, name);
+  addNodes({newNode}, referenceIndex);
+  return newNode;
 }
 
 void StructSelectModel::deleteNode(const QModelIndex& index)

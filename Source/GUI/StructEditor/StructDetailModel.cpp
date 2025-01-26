@@ -134,6 +134,8 @@ bool StructDetailModel::editData(const QModelIndex& index, const QVariant& value
     FieldDef* field = static_cast<FieldDef*>(index.internalPointer());
     field->setLabel(value.toString());
   }
+
+  return true;
 }
 
 void StructDetailModel::addPaddingFields(int count, int start)

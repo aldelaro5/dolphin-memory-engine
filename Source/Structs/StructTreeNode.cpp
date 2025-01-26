@@ -259,9 +259,11 @@ QString StructTreeNode::getNameSpace()
   updateName();
 
   if (m_parent != nullptr)
-    return m_parent->getNameSpace() + QString("::") + m_nodeName;
-
-  return QString("");
+  {
+    QString parentNamespace = m_parent->getNameSpace();
+    return parentNamespace.isEmpty() ? m_nodeName : parentNamespace + QString("::") + m_nodeName;
+  }
+  return QString();
 }
 
 QString StructTreeNode::appendNameToNameSpace(QString nameSpace) const
