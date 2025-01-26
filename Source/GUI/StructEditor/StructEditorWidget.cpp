@@ -251,10 +251,7 @@ void StructEditorWidget::onDetailLengthChanged()
 
 void StructEditorWidget::onAddField()
 {
-  u32 cur_length = m_structDetailModel->getLoadedStructNode()->getStructDef()->getLength();
-  m_structDetailModel->getLoadedStructNode()->getStructDef()->setLength(cur_length + 1);
-  m_structDetailModel->updateFieldsWithNewLength();
-  m_txtStructLength->setText(QString::number(cur_length + 1, 16));
+  m_structDetailModel->addPaddingFields(1);
 
   m_btnSaveStructs->setEnabled(true);
 }
