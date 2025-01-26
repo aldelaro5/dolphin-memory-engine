@@ -603,6 +603,11 @@ void StructEditorWidget::onEditStruct(StructTreeNode* node)
       QString::number(nodeForDetailEditor->getStructDef()->getLength(), 16).toUpper());
 }
 
+bool StructEditorWidget::unsavedStructDetails()
+{
+  return m_btnSaveStructs->isEnabled();
+}
+
 void StructEditorWidget::restoreStructDefs(const QString& json)
 {
   const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));

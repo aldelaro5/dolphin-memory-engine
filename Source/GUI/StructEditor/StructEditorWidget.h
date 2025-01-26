@@ -34,6 +34,7 @@ public:
   void onAddStruct();
   void onDeleteNodes();
   void onEditStruct(StructTreeNode* node);
+  bool unsavedStructDetails();
 
   StructTreeNode* getStructDefs();
   void restoreStructDefs(const QString& json);
