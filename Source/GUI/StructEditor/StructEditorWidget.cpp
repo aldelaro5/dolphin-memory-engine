@@ -216,6 +216,7 @@ void StructEditorWidget::onDetailNameChanged()
   QString oldNameSpace = node->getParent()->getNameSpace();
   QString oldFullName = node->getNameSpace();
   m_nodeInDetailEditor->setName(m_txtStructName->text());
+  node->setName(m_txtStructName->text());
 
   emit updateStructName(oldFullName, node->appendNameToNameSpace(oldNameSpace));
 }
@@ -360,6 +361,8 @@ void StructEditorWidget::onSelectDataEdited(const QModelIndex& index, const QVar
     if (!node->isGroup())
     {
       emit updateStructName(oldFullName, node->appendNameToNameSpace(oldNameSpace));
+      if (oldNameSpace == m_nodeInDetailEditor->getNameSpace())
+        m_structDetailModel->getLoadedStructNode()->setName(value.toString());
     }
     else
     {
