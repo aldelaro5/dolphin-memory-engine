@@ -303,6 +303,11 @@ void StructEditorWidget::nameChangeFailed(StructTreeNode* node, QString name)
   return;
 }
 
+void StructEditorWidget::onLengthChange(u32 newLength)
+{
+  m_txtStructLength->setText(QString::number(newLength, 16));
+}
+
 void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)
 {
   QModelIndex index = m_structSelectView->indexAt(pos);

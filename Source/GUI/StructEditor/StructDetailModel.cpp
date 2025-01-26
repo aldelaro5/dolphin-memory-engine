@@ -215,7 +215,9 @@ void StructDetailModel::updateFieldOffsets()
     }
     cur_offset += field->getSize();
   }
-  m_baseNode->getStructDef()->setLength(m_fields.last()->getOffset() + m_fields.last()->getSize());
+  u32 newLength = m_fields.last()->getOffset() + m_fields.last()->getSize();
+  m_baseNode->getStructDef()->setLength(newLength);
+  emit lengthChanged(newLength);
 }
 
 void StructDetailModel::reduceIndicesToRows(QModelIndexList& indices)
