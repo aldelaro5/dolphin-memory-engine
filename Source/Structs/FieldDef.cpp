@@ -100,6 +100,7 @@ void FieldDef::convertToPadding()
 void FieldDef::readFromJSON(const QJsonObject& json)
 {
   m_structOffset = json["offset"].toInt();
+  m_size = json["length"].toInt();
 
   MemWatchEntry* entry = new MemWatchEntry();
 
@@ -110,6 +111,7 @@ void FieldDef::readFromJSON(const QJsonObject& json)
 void FieldDef::writeToJson(QJsonObject& json)
 {
   json["offset"] = static_cast<double>(m_structOffset);
+  json["length"] = static_cast<double>(m_size);
 
   if (!m_entry)
     return;
