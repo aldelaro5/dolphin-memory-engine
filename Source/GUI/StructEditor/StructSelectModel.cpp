@@ -366,9 +366,11 @@ void StructSelectModel::addGroup(const QString& name, const QModelIndex& referen
   addNodes({new StructTreeNode(NULL, m_rootNode, true, name)}, referenceIndex);
 }
 
-void StructSelectModel::addStruct(const QString& name, const QModelIndex& referenceIndex)
+StructTreeNode* StructSelectModel::addStruct(const QString& name, const QModelIndex& referenceIndex)
 {
-  addNodes({new StructTreeNode(new StructDef(name), m_rootNode, false, name)}, referenceIndex);
+  StructTreeNode* newNode = new StructTreeNode(new StructDef(name), m_rootNode, false, name);
+  addNodes({newNode}, referenceIndex);
+  return newNode;
 }
 
 void StructSelectModel::deleteNode(const QModelIndex& index)
