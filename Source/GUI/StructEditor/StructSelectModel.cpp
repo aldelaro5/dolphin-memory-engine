@@ -133,6 +133,9 @@ bool StructSelectModel::setData(const QModelIndex& index, const QVariant& value,
       return false;
 
     StructTreeNode* node = static_cast<StructTreeNode*>(index.internalPointer());
+    if (newName == node->getName())
+      return false;
+
     if (node->getParent()->isNameAvailable(newName))
     {
       node->setName(newName);
