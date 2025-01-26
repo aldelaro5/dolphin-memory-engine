@@ -433,7 +433,7 @@ void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
   if (field->isPadding())
     return onConvertPaddingToEntry(index);
 
-  DlgAddWatchEntry dlg(false, field->getEntry(), m_structDefs->getStructNames(), this);
+  DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()), m_structDefs->getStructNames(), this);
   if (dlg.exec() == QDialog::Accepted)
   {
     m_structDetailModel->updateFieldEntry(dlg.stealEntry(), index);
