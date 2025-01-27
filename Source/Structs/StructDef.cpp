@@ -193,15 +193,16 @@ void StructDef::writeToJson(QJsonObject& json)
   json["fieldList"] = fieldArray;
 }
 
-void StructDef::calculateLength()
+void StructDef::recalculateOffsets()
 {
-  u32 max_length = 0;
-  u32 cur_length = 0;
-  for (FieldDef* field : m_fields)
+  int cur_offset = 0;
+  for (int i = 0; i < m_fields.count(); ++i)
   {
-    u32 field_length = field->getEntry()->getLength();
-    max_length = fmax(max_length, field->getOffset() + field_length);
-    cur_length += field_length;
+    if (m_fields[i]->getOffset() != cur_offset)
+      m_fields[i]->setOffset(cur_offset);
+    cur_offset += m_fields[i]->getFieldSize();
+  }
+  calculateLength();
   }
   m_length = fmax(max_length, m_length);
 }

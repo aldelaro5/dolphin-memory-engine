@@ -40,6 +40,7 @@ public:
   void writeToJson(QJsonObject& json);
 
 private:
+  void recalculateOffsets();
   void calculateLength();
   QString m_label;
   u32 m_length;
