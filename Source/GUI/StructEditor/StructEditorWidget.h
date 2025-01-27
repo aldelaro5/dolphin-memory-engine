@@ -34,7 +34,9 @@ public:
   void onAddStruct();
   void onDeleteNodes();
   void onEditStruct(StructTreeNode* node);
+  void onUnloadStruct();
   bool unsavedStructDetails();
+  void unloadStruct();
 
   StructTreeNode* getStructDefs();
   void restoreStructDefs(const QString& json);
@@ -82,7 +84,8 @@ private:
   QPushButton* m_btnDeleteNodes{};
 
   // For Struct Details
-  QPushButton* m_btnSaveStructs{};
+  QPushButton* m_btnUnloadStructDetails{};
+  QPushButton* m_btnSaveStructDetails{};
   QPushButton* m_btnAddField{};
   QPushButton* m_btnDeleteFields{};
   QPushButton* m_btnClearFields{};

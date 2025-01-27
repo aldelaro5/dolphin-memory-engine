@@ -117,10 +117,22 @@ void StructEditorWidget::initialiseWidgets()
   m_structDetailView->setModel(m_structDetailModel);
   //m_watchView->setItemDelegate(m_watchDelegate);
 
-  m_btnSaveStructs = new QPushButton(tr("S"), this);
-  connect(m_btnSaveStructs, &QPushButton::clicked, this, &StructEditorWidget::onSaveStruct);
-  m_btnSaveStructs->setToolTip("Add fields and update struct length.");
-  m_btnSaveStructs->setDisabled(true);
+  QHeaderView* header = m_structDetailView->horizontalHeader();
+  header->setStretchLastSection(true);
+  header->resizeSection(StructDetailModel::STRUCT_COL_OFFSET, 80);
+  header->resizeSection(StructDetailModel::STRUCT_COL_SIZE, 50);
+  header->resizeSection(StructDetailModel::STRUCT_COL_LABEL, 100);
+  header->resizeSection(StructDetailModel::STRUCT_COL_DETAIL, 300);
+
+  m_btnUnloadStructDetails = new QPushButton(tr("X"), this);
+  connect(m_btnUnloadStructDetails, &QPushButton::clicked, this, &StructEditorWidget::onUnloadStruct);
+  m_btnUnloadStructDetails->setToolTip("Close struct.");
+  m_btnUnloadStructDetails->setDisabled(true);
+
+  m_btnSaveStructDetails = new QPushButton(tr("S"), this);
+  connect(m_btnSaveStructDetails, &QPushButton::clicked, this, &StructEditorWidget::onSaveStruct);
+  m_btnSaveStructDetails->setToolTip("Save struct details.");
+  m_btnSaveStructDetails->setDisabled(true);
 
   m_btnAddField = new QPushButton(tr("+"), this);
   connect(m_btnAddField, &QPushButton::clicked, this, &StructEditorWidget::onAddField);
@@ -586,12 +598,18 @@ void StructEditorWidget::onDeleteNodes()
           for (StructTreeNode* node : curNode->getChildren())
             queue.push_front(node);
         else
+        {
           emit structAddedRemoved(curNode->getNameSpace());
+          if (curNode == m_nodeInDetailEditor)
+            unloadStruct();
+        }
       }
     }
     else
     {
       emit structAddedRemoved(curNode->getNameSpace());
+      if (curNode == m_nodeInDetailEditor)
+        unloadStruct();
     }
 
     m_structSelectModel->deleteNode(index);
@@ -626,9 +644,41 @@ void StructEditorWidget::onEditStruct(StructTreeNode* node)
       QString::number(nodeForDetailEditor->getStructDef()->getLength(), 16).toUpper());
 }
 
+void StructEditorWidget::onUnloadStruct()
+{
+  if (m_structDetailModel->hasStructLoaded() && unsavedStructDetails())
+  {
+    QMessageBox::StandardButton response = QMessageBox::question(
+        this, "Save Changes?",
+        "You have unsaved changes to the current struct.\nWould you like to save them?");
+    if (response == QMessageBox::StandardButton::Yes)
+    {
+      onSaveStruct();
+    }
+  }
+
+  unloadStruct();
+}
+
 bool StructEditorWidget::unsavedStructDetails()
 {
   return m_btnSaveStructs->isEnabled();
+}
+
+void StructEditorWidget::unloadStruct()
+{
+  m_structDetailModel->unloadStruct();
+  m_nodeInDetailEditor = nullptr;
+  m_btnUnloadStructDetails->setDisabled(true);
+  m_btnSaveStructDetails->setDisabled(true);
+  m_btnAddField->setDisabled(true);
+  m_btnDeleteFields->setDisabled(true);
+  m_btnClearFields->setDisabled(true);
+
+  m_txtStructName->setText({});
+  m_txtStructName->setDisabled(true);
+  m_txtStructLength->setText({});
+  m_txtStructLength->setDisabled(true);
 }
 
 void StructEditorWidget::restoreStructDefs(const QString& json)
