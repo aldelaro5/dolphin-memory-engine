@@ -926,9 +926,6 @@ void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
     if (child->getEntry() != nullptr && GUICommon::isContainerType(child->getEntry()->getType()))
       if (child->getEntry()->getType() == Common::MemType::type_struct)
         collapseStructNode(child);
-
-    if (isTopLevel)
-      deleteNode(getIndexFromTreeNode(child));
   }
     
   if (isTopLevel)
