@@ -4,6 +4,7 @@
 #include <QFontDatabase>
 #include <QIcon>
 #include <QMimeData>
+#include <QJsonArray>
 
 #include <cassert>
 #include <cstring>
@@ -739,6 +740,7 @@ MemWatchModel::CTParsingErrors MemWatchModel::importRootFromCTFile(QFile* const 
 void MemWatchModel::writeRootToJsonRecursive(QJsonObject& json) const
 {
   m_rootNode->writeToJson(json);
+  writeStructDefsToJson(json);
 }
 
 QString MemWatchModel::writeRootToCSVStringRecursive() const
@@ -938,6 +940,28 @@ void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
     removeNodeFromStructNodeMap(node);
     deleteNode(getIndexFromTreeNode(node));
   }
+}
+
+void MemWatchModel::writeStructDefsToJson(QJsonObject& json) const
+{
+  if (m_structNodes.keys().count() == 0)
+    return;
+
+  QJsonArray structs;
+
+  for (QString key : m_structNodes.keys())
+  {
+    if (!m_structDefMap.contains(key))
+      continue;
+    QJsonObject structDefObject{};
+    QJsonObject structDef{};
+    m_structDefMap[key]->writeToJson(structDef);
+    structDefObject["name"] = key;
+    structDefObject["def"] = structDef;
+    structs.append(structDefObject);
+  }
+
+  json["structDefs"] = structs;
 }
 
 void MemWatchModel::updateContainerAddresses(MemWatchTreeNode* node)

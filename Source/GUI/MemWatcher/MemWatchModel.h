@@ -106,6 +106,7 @@ private:
   void removeNodeFromStructNodeMap(MemWatchTreeNode* node);
   void expandStructNode(MemWatchTreeNode* node);
   void collapseStructNode(MemWatchTreeNode* node, bool isTopLevel = false);
+  void writeStructDefsToJson(QJsonObject& json) const;
 
   MemWatchTreeNode* m_rootNode;
   QMap<QString, StructDef*> m_structDefMap{};
