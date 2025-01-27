@@ -162,6 +162,13 @@ void StructDef::updateStructTypeLabel(const QString& oldLabel, QString newLabel)
         field->getEntry()->getStructName() == oldLabel)
       field->getEntry()->setStructName(newLabel);
   }
+
+void StructDef::updateStructFieldSize(QString structName, u32 newLength)
+{
+  for (FieldDef* field : m_fields)
+    if (field->getEntry()->getType() == Common::MemType::type_struct && field->getEntry()->getStructName() == structName)
+      field->setFieldSize(newLength);
+  recalculateOffsets();
 }
 
 void StructDef::readFromJson(const QJsonObject& json)

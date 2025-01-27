@@ -35,6 +35,7 @@ public:
   void clearFields();
   void setFields(QVector<FieldDef*> entries);
   void updateStructTypeLabel(const QString& oldLabel, QString newLabel);
+  void updateStructFieldSize(QString structName, u32 newLength);
 
   void readFromJson(const QJsonObject& json);
   void writeToJson(QJsonObject& json);
