@@ -58,7 +58,8 @@ QVector<FieldDef*> StructDef::getFields()
 
 bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
 {
-  size_t structSegments = ceil(length / sizeof(uint64_t));
+  const size_t segbitsize = sizeof(uint64_t) * 8;
+  const size_t structSegments = ceil(static_cast<float>(length) / segbitsize);
   uint64_t* structBytes = new uint64_t[structSegments];
   for (size_t i = 0; i < structSegments; i++)
   {
@@ -68,14 +69,14 @@ bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
   for (FieldDef* field : fields)
   {
     size_t fieldOffset = field->getOffset();
-    size_t fieldLength = field->getEntry()->getLength();
+    size_t fieldLength = field->getFieldSize();
     if (fieldOffset + fieldLength > length)
     {
       return false;
     }
 
-    size_t firstSegment = floor(fieldOffset / sizeof(uint64_t));
-    size_t lastSegment = floor((fieldOffset + fieldLength) / sizeof(uint64_t)) - firstSegment;
+    size_t firstSegment = floor(static_cast<float>(fieldOffset) / segbitsize);
+    size_t lastSegment = floor(static_cast<float>(fieldOffset + fieldLength) / segbitsize);
 
     size_t lengthChecked = 0;
     for (size_t i = firstSegment; i <= lastSegment; i++)
@@ -83,7 +84,7 @@ bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
       uint64_t entryByteMask = 0ULL;
       if (i == firstSegment)
       {
-        size_t maskLength = fmin(fieldLength, (sizeof(uint64_t) - fieldOffset % sizeof(uint64_t)));
+        size_t maskLength = fmin(fieldLength, (segbitsize - fieldOffset % segbitsize));
         entryByteMask = ((1ULL << maskLength) - 1) << fieldOffset;
         lengthChecked += maskLength;
       }
@@ -95,15 +96,15 @@ bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
       else
       {
         entryByteMask--;
-        lengthChecked += sizeof(uint64_t);
+        lengthChecked += segbitsize;
       }
 
-      if (structBytes[firstSegment] & entryByteMask)
+      if (structBytes[i] & entryByteMask)
       {
         return false;
       }
 
-      structBytes[firstSegment] ^= entryByteMask;
+      structBytes[i] ^= entryByteMask;
     }
 
     
