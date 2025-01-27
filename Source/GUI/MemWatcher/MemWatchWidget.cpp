@@ -710,12 +710,12 @@ void MemWatchWidget::onRowsInserted(const QModelIndex& parent, const int first, 
   selectionModel->setCurrentIndex(lastIndex, QItemSelectionModel::Current);
 
   QTimer::singleShot(0, [this, parent, first, last, lastIndex] {
-      for (int i{first}; i <= last; ++i)
-      {
-        const MemWatchTreeNode* const node{
-            MemWatchModel::getTreeNodeFromIndex(m_watchModel->index(i, 0, parent))};
-        updateExpansionState(node);
-      }
+    for (int i{first}; i <= last; ++i)
+    {
+      const MemWatchTreeNode* const node{
+          MemWatchModel::getTreeNodeFromIndex(m_watchModel->index(i, 0, parent))};
+      updateExpansionState(node);
+    }
 
     m_watchView->scrollTo(lastIndex);
   });
