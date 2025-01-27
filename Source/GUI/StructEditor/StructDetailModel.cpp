@@ -255,12 +255,12 @@ StructTreeNode* StructDetailModel::getLoadedStructNode() const
 
 void StructDetailModel::loadStruct(StructTreeNode* baseNode)
 {
-  beginResetModel();
   if (m_baseNode)
   {
     unloadStruct();
   }
 
+  beginResetModel();
   m_baseNode = baseNode;
   m_curSize = m_baseNode->getStructDef()->getLength();
 
@@ -297,10 +297,12 @@ void StructDetailModel::saveStruct()
 
 void StructDetailModel::unloadStruct()
 {
+  beginResetModel();
   delete m_baseNode;
   m_baseNode = nullptr;
   qDeleteAll(m_fields);
   m_fields = QVector<FieldDef*>();
+  endResetModel();
 }
 
 bool StructDetailModel::willRemoveFields(u32 newLength)
