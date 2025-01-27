@@ -38,6 +38,8 @@ public:
   bool unsavedStructDetails();
   void unloadStruct();
 
+  void readStructDefsFromJson(const QJsonObject& json, QMap<QString, QString>& map);
+
   StructTreeNode* getStructDefs();
   void restoreStructDefs(const QString& json);
   QString saveStructDefs();

@@ -362,9 +362,11 @@ void StructSelectModel::addNodes(const std::vector<StructTreeNode*>& nodes,
 
 }
 
-void StructSelectModel::addGroup(const QString& name, const QModelIndex& referenceIndex)
+StructTreeNode* StructSelectModel::addGroup(const QString& name, const QModelIndex& referenceIndex)
 {
-  addNodes({new StructTreeNode(NULL, m_rootNode, true, name)}, referenceIndex);
+  StructTreeNode* newNode = new StructTreeNode(nullptr, m_rootNode, true, name);
+  addNodes({newNode}, referenceIndex);
+  return newNode;
 }
 
 StructTreeNode* StructSelectModel::addStruct(const QString& name, const QModelIndex& referenceIndex)
@@ -391,6 +393,28 @@ void StructSelectModel::deleteNode(const QModelIndex& index)
     if (removeChildren)
       endRemoveRows();
     endRemoveRows();
+  }
+}
+
+void StructSelectModel::insertNewDef(const QString& name, StructDef* structDef)
+{
+  StructTreeNode* curNode = m_rootNode->findDeepestAvailableNode(name);
+  QStringList ids = name.split("::");
+
+  int levels = curNode->getNameSpace().split("::").count();
+  for (int i = 0; i < levels; ++i)
+    ids.removeFirst();
+
+  while (ids.count() > 0)
+  {
+    QString nextID = ids.takeFirst();
+    if (ids.count() > 0)
+      curNode = addGroup(nextID, getIndexFromTreeNode(curNode));
+    else
+    {
+      curNode = addStruct(nextID, getIndexFromTreeNode(curNode));
+      curNode->setStructDef(structDef);
+    }
   }
 }
 

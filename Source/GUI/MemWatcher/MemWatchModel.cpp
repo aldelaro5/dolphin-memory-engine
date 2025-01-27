@@ -710,10 +710,10 @@ bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, i
   return true;
 }
 
-void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json)
+void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json, const QMap<QString, QString> structNameReplacements)
 {
   beginResetModel();
-  m_rootNode->readFromJson(json);
+  m_rootNode->readFromJson(json, structNameReplacements);
   endResetModel();
   setupContainersRecursive(m_rootNode);
 }

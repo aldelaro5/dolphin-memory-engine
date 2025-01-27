@@ -56,6 +56,10 @@ MainWindow::MainWindow()
   connect(m_structEditor, &StructEditorWidget::structAddedRemoved, m_watcher,
           &MemWatchWidget::onStructDefAddRemove);
 
+  // Connect load structs on load watch file
+  connect(m_watcher, &MemWatchWidget::loadStructDefsFromJson, m_structEditor,
+          &StructEditorWidget::readStructDefsFromJson);
+
   if (m_actAutoHook->isChecked())
     onHookAttempt();
   else

@@ -798,7 +798,9 @@ void MemWatchWidget::openWatchFile()
     QByteArray bytes = watchFile.readAll();
     watchFile.close();
     QJsonDocument loadDoc(QJsonDocument::fromJson(bytes));
-    m_watchModel->loadRootFromJsonRecursive(loadDoc.object());
+    QMap<QString, QString> structReplacements = {};
+    emit loadStructDefsFromJson(loadDoc.object(), structReplacements);
+    m_watchModel->loadRootFromJsonRecursive(loadDoc.object(), structReplacements);
     updateExpansionState();
     m_watchListFile = fileName;
     m_hasUnsavedChanges = false;

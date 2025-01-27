@@ -39,9 +39,10 @@ public:
 
   void addNodes(const std::vector<StructTreeNode*>& nodes,
                 const QModelIndex& referenceIndex = QModelIndex{});
-  void addGroup(const QString& name, const QModelIndex& referenceIndex = QModelIndex{});
+  StructTreeNode* addGroup(const QString& name, const QModelIndex& referenceIndex = QModelIndex{});
   StructTreeNode* addStruct(const QString& name, const QModelIndex& referenceIndex = QModelIndex{});
   void deleteNode(const QModelIndex& index);
+  void insertNewDef(const QString& name, StructDef* structDef);
 
   void setNodeLabel(StructTreeNode* node, const QString name);
 

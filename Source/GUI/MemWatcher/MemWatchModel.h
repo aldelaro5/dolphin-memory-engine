@@ -66,7 +66,7 @@ public:
   void groupSelection(const QModelIndexList& indexes);
   void onUpdateTimer();
   void onFreezeTimer();
-  void loadRootFromJsonRecursive(const QJsonObject& json);
+  void loadRootFromJsonRecursive(const QJsonObject& jsonconst, QMap<QString, QString> structNameReplacements = {});
   CTParsingErrors importRootFromCTFile(QFile* CTFile, bool useDolphinPointer, u32 CEStart = 0);
   void writeRootToJsonRecursive(QJsonObject& json) const;
   QString writeRootToCSVStringRecursive() const;

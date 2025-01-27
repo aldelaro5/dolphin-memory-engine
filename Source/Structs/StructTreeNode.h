@@ -49,7 +49,8 @@ public:
   QString getNameSpace();
   QString appendNameToNameSpace(QString nameSpace) const;
   u32 getSizeOfStruct(QString nameSpace);
-  StructTreeNode* findNode(QString nameSpace);
+  StructTreeNode* findNode(QString nameSpace, bool returnDeepest = false);
+  StructTreeNode* findDeepestAvailableNode(QString nameSpace);
 
 private:
   void updateName();

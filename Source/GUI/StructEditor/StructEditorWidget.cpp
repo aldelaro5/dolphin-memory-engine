@@ -3,6 +3,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QJsonDocument>
+#include <QJsonArray>
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QMenu>
@@ -760,6 +761,43 @@ void StructEditorWidget::unloadStruct()
   m_txtStructLength->setDisabled(true);
 }
 
+void StructEditorWidget::readStructDefsFromJson(const QJsonObject& json, QMap<QString, QString>& map)
+{
+  QMap<QString, StructDef*> newStructDefs{};
+
+  QJsonArray newStructArray = json["structDefs"].toArray();
+
+  for (auto obj : newStructArray)
+  {
+    QJsonObject structDefObj = obj.toObject();
+    QString structName = structDefObj["name"].toString();
+    StructDef* def = new StructDef();
+    def->readFromJson(structDefObj["def"].toObject());
+
+    StructTreeNode* equivalentNode = m_structRootNode->findNode(structName);
+    if (equivalentNode != nullptr)
+    {
+      StructTreeNode* nodeParent = equivalentNode->getParent();
+      int i = 0;
+      QString newName = structName + QString::number(i);
+      while (!nodeParent->isNameAvailable(newName))
+      {
+        i++;
+        newName = structName + QString::number(i);
+      }
+
+      map.insert(structName, newName);
+      structName = newName;
+    }
+
+    newStructDefs.insert(structName, def);
+  }
+
+  for (QString key : newStructDefs.keys())
+  {
+    m_structSelectModel->insertNewDef(key, newStructDefs[key]);
+  }
+}
 void StructEditorWidget::restoreStructDefs(const QString& json)
 {
   const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));

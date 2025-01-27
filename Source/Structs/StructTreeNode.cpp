@@ -301,7 +301,7 @@ void StructTreeNode::updateName()
     m_nodeName = m_structDef->getLabel();
 }
 
-StructTreeNode* StructTreeNode::findNode(QString nameSpace)
+StructTreeNode* StructTreeNode::findNode(QString nameSpace, bool returnDeepest)
 {
   StructTreeNode* cur_node = this;
   while (cur_node->getParent() != nullptr)
@@ -321,8 +321,17 @@ StructTreeNode* StructTreeNode::findNode(QString nameSpace)
       }
     }
     if (!childFound)
-      return nullptr;
+    {
+      if (returnDeepest)
+        return cur_node;
+      else
+        return nullptr;
+    }
   }
-
   return cur_node;
+}
+
+StructTreeNode* StructTreeNode::findDeepestAvailableNode(QString nameSpace)
+{
+  return findNode(nameSpace, true);
 }
