@@ -434,7 +434,7 @@ bool DlgAddWatchEntry::validateAndSetOffset(int index)
 
 void DlgAddWatchEntry::onAddressChanged()
 {
-  if (m_showAddress && validateAndSetAddress())
+  if (validateAndSetAddress())
     updatePreview();
   else
     m_lblValuePreview->setText("???");
