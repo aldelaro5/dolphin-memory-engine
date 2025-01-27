@@ -247,8 +247,16 @@ QVector<QString> StructTreeNode::getStructNames(bool includeGroups, QString pref
   if (prefix == QString("") && m_parent)
     prefix = m_parent->getNameSpace();
 
-  QString nodeName = appendNameToNameSpace(prefix);
-  if (!m_isGroup || includeGroups)
+  QString nodeName = QString();
+  if (getParent() != nullptr)
+  {
+    if (prefix.isEmpty())
+      nodeName = getName();
+    else
+      nodeName = appendNameToNameSpace(prefix);
+  }
+                         
+  if (getParent() != nullptr && (!m_isGroup || includeGroups))
     names.push_back(nodeName);
 
   for (StructTreeNode* child : m_children)
