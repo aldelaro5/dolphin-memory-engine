@@ -135,18 +135,16 @@ bool StructSelectModel::setData(const QModelIndex& index, const QVariant& value,
     StructTreeNode* node = static_cast<StructTreeNode*>(index.internalPointer());
     if (newName == node->getName())
       return false;
+    QString oldNamespace = node->getNameSpace();
 
-    if (node->getParent()->isNameAvailable(newName))
-    {
-      node->setName(newName);
-    }
-    else
+    if (!node->getParent()->isNameAvailable(newName))
     {
       emit nameChangeFailed(node, newName);
       return false;
     }
+    node->setName(newName);
     emit dataChanged(index, index);
-    emit dataEdited(index, value, role);
+    emit dataEdited(index, oldNamespace, role);
     return true;
   }
 

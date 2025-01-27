@@ -438,7 +438,7 @@ void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)
   contextMenu->popup(m_structSelectView->viewport()->mapToGlobal(pos));
 }
 
-void StructEditorWidget::onSelectDataEdited(const QModelIndex& index, const QVariant& value,
+void StructEditorWidget::onSelectDataEdited(const QModelIndex& index, const QVariant& oldNamespace,
                                             int role)
 {
   if (role != Qt::EditRole)
@@ -449,18 +449,17 @@ void StructEditorWidget::onSelectDataEdited(const QModelIndex& index, const QVar
   if (index.column() == StructSelectModel::WATCH_COL_LABEL)
   {
     StructTreeNode* node = static_cast<StructTreeNode*>(index.internalPointer());
-    QString oldNameSpace = node->getParent()->getNameSpace();
-    QString oldFullName = node->getNameSpace();
+    QString oldFullName = oldNamespace.toString();
 
     if (!node->isGroup())
     {
-      emit updateStructName(oldFullName, node->appendNameToNameSpace(oldNameSpace));
-      if (oldNameSpace == m_nodeInDetailEditor->getNameSpace())
-        m_structDetailModel->getLoadedStructNode()->setName(value.toString());
+      emit updateStructName(oldFullName, node->getNameSpace());
+      if (m_nodeInDetailEditor != nullptr && oldFullName == m_nodeInDetailEditor->getNameSpace())
+        m_structDetailModel->getLoadedStructNode()->setName(node->getName());
     }
     else
     {
-      updateChildStructNames(node, node->appendNameToNameSpace(oldNameSpace));
+      updateChildStructNames(node, oldFullName);
     }
   }
 }

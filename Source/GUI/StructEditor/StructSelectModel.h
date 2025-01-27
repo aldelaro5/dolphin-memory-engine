@@ -51,7 +51,7 @@ public:
   QMap<QString, StructDef*> getStructMap();
 
 signals:
-  void dataEdited(const QModelIndex& index, const QVariant& value, int role);
+  void dataEdited(const QModelIndex& index, const QVariant& oldNamespace, int role);
   void dropSucceeded();
   void nameChangeFailed(StructTreeNode* node, QString name);
 

@@ -23,7 +23,7 @@ public:
   StructEditorWidget& operator=(StructEditorWidget&&) = delete;
 
   void onSelectContextMenuRequested(const QPoint& pos);
-  void onSelectDataEdited(const QModelIndex& index, const QVariant& value, int role);
+  void onSelectDataEdited(const QModelIndex& index, const QVariant& oldNamespace, int role);
   void onSelectDropSucceeded();
 
   void onDetailContextMenuRequested(const QPoint& pos);
