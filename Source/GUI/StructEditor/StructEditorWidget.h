@@ -69,7 +69,7 @@ private:
   bool isAnyAncestorSelected(const QModelIndex& index) const;
   QModelIndexList simplifiedSelection() const;
 
-  StructTreeNode* m_structDefs;
+  StructTreeNode* m_structRootNode;
   StructTreeNode* m_nodeInDetailEditor{};
   QMap<QString, QVector<QString>> m_structReferences{};
   bool m_unsavedChanges = false;

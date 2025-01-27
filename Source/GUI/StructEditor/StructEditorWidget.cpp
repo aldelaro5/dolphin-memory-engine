@@ -36,7 +36,7 @@ public:
 
 StructEditorWidget::StructEditorWidget(QWidget* parent)
 {
-  m_structDefs = new StructTreeNode(nullptr, nullptr);
+  m_structRootNode = new StructTreeNode(nullptr, nullptr);
   setAttribute(Qt::WA_AlwaysShowToolTips);
   setWindowTitle("DME - Struct Editor");
   initialiseWidgets();
@@ -51,7 +51,7 @@ void StructEditorWidget::initialiseWidgets()
 {
   // Initialize objects for the struct selector
 
-  m_structSelectModel = new StructSelectModel(this, m_structDefs);
+  m_structSelectModel = new StructSelectModel(this, m_structRootNode);
   connect(m_structSelectModel, &StructSelectModel::dataEdited, this,
           &StructEditorWidget::onSelectDataEdited);
   connect(m_structSelectModel, &StructSelectModel::dropSucceeded, this,
@@ -216,14 +216,14 @@ void StructEditorWidget::makeLayouts()
 
 void StructEditorWidget::onConvertPaddingToEntry(const QModelIndex& index)
 {
-  DlgAddWatchEntry dlg(true, nullptr, m_structDefs->getStructNames(), this, false);
+  DlgAddWatchEntry dlg(true, nullptr, m_structRootNode->getStructNames(), this, false);
   if (dlg.exec() == QDialog::Accepted)
   {
     if (!m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index))
       return;
   }
 
-  m_btnSaveStructs->setEnabled(true);
+  m_btnSaveStructDetails->setEnabled(true);
 }
 
 void StructEditorWidget::onDetailNameChanged()
@@ -281,7 +281,7 @@ void StructEditorWidget::onDetailLengthChanged()
 
   node->getStructDef()->setLength(new_length);
   m_structDetailModel->updateFieldsWithNewLength();
-  m_btnSaveStructs->setEnabled(true);
+  m_btnSaveStructDetails->setEnabled(true);
   m_txtStructLength->clearFocus();
 }
 
@@ -293,7 +293,7 @@ void StructEditorWidget::onAddField()
   else
     m_structDetailModel->addPaddingFields(1, selection.last().row() + 1);
 
-  m_btnSaveStructs->setEnabled(true);
+  m_btnSaveStructDetails->setEnabled(true);
 }
 
 void StructEditorWidget::onDeleteFields()
@@ -307,7 +307,7 @@ void StructEditorWidget::onDeleteFields()
   m_txtStructLength->setText(
       QString::number(m_structDetailModel->getLoadedStructNode()->getStructDef()->getLength(), 16));
 
-  m_btnSaveStructs->setEnabled(true);
+  m_btnSaveStructDetails->setEnabled(true);
 }
 
 void StructEditorWidget::onClearFields()
@@ -316,7 +316,7 @@ void StructEditorWidget::onClearFields()
   if (selection.isEmpty())
     return;
   m_structDetailModel->clearFields(selection);
-  m_btnSaveStructs->setEnabled(true);
+  m_btnSaveStructDetails->setEnabled(true);
 }
 
 void StructEditorWidget::onSaveStruct()
@@ -324,7 +324,7 @@ void StructEditorWidget::onSaveStruct()
   m_structDetailModel->saveStruct();
   m_nodeInDetailEditor->setStructDef(new StructDef(m_structDetailModel->getLoadedStructNode()->getStructDef()));
   emit updateStructDetails(m_structDetailModel->getLoadedStructNode()->getNameSpace());
-  m_btnSaveStructs->setDisabled(true);
+  m_btnSaveStructDetails->setDisabled(true);
 }
 
 void StructEditorWidget::nameChangeFailed(StructTreeNode* node, QString name)
@@ -505,14 +505,14 @@ void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
   else
   {
     DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()),
-                         m_structDefs->getStructNames(), this, false);
+                         m_structRootNode->getStructNames(), this, false);
     if (dlg.exec() == QDialog::Accepted)
     {
       if (!m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index))
         return;
     }
   }
-  m_btnSaveStructs->setEnabled(true);
+  m_btnSaveStructDetails->setEnabled(true);
 }
 
 void StructEditorWidget::onDetailDataEdited(const QModelIndex& index, const QVariant& value,
@@ -523,7 +523,7 @@ void StructEditorWidget::onDetailDataEdited(const QModelIndex& index, const QVar
 
   if (index.column() == StructDetailModel::STRUCT_COL_LABEL)
   {
-    m_btnSaveStructs->setEnabled(true);
+    m_btnSaveStructDetails->setEnabled(true);
   }
 }
 
@@ -531,7 +531,7 @@ void StructEditorWidget::onAddGroup()
 {
   const QModelIndexList selectedIndexes{m_structSelectView->selectionModel()->selectedIndexes()};
   const QModelIndex lastIndex = selectedIndexes.empty() ? QModelIndex{} : selectedIndexes.back();
-  const StructTreeNode* parentNode =  selectedIndexes.empty() ? m_structDefs : static_cast<StructTreeNode*>(lastIndex.internalPointer());
+  const StructTreeNode* parentNode =  selectedIndexes.empty() ? m_structRootNode : static_cast<StructTreeNode*>(lastIndex.internalPointer());
 
   bool ok = false;
   QString textIn;
@@ -560,7 +560,7 @@ void StructEditorWidget::onAddStruct()
 {
   const QModelIndexList selectedIndexes{m_structSelectView->selectionModel()->selectedIndexes()};
   const QModelIndex lastIndex = selectedIndexes.empty() ? QModelIndex{} : selectedIndexes.back();
-  const StructTreeNode* parentNode = selectedIndexes.empty() ? m_structDefs : static_cast<StructTreeNode*>(lastIndex.internalPointer());
+  const StructTreeNode* parentNode = selectedIndexes.empty() ? m_structRootNode : static_cast<StructTreeNode*>(lastIndex.internalPointer());
 
   bool ok = false;
   QString text;
@@ -698,7 +698,7 @@ void StructEditorWidget::onUnloadStruct()
 
 bool StructEditorWidget::unsavedStructDetails()
 {
-  return m_btnSaveStructs->isEnabled();
+  return m_btnSaveStructDetails->isEnabled();
 }
 
 void StructEditorWidget::unloadStruct()
@@ -720,7 +720,7 @@ void StructEditorWidget::unloadStruct()
 void StructEditorWidget::restoreStructDefs(const QString& json)
 {
   const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));
-  m_structDefs->readFromJson(loadDoc.object());
+  m_structRootNode->readFromJson(loadDoc.object());
 }
 
 QString StructEditorWidget::saveStructDefs()
@@ -737,7 +737,7 @@ QString StructEditorWidget::saveStructDefs()
   }
 
   QJsonObject root;
-  m_structDefs->writeToJson(root);
+  m_structRootNode->writeToJson(root);
   QJsonDocument saveDoc(root);
   return saveDoc.toJson();
 }
@@ -750,5 +750,5 @@ QMap<QString, StructDef*> StructEditorWidget::getStructMap()
 
 StructTreeNode* StructEditorWidget::getStructDefs()
 {
-  return m_structDefs;
+  return m_structRootNode;
 }
