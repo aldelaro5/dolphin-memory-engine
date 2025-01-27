@@ -40,8 +40,6 @@ public:
   void updateViewer();
   void memoryValidityChanged(bool valid);
   void setStructDefs(StructTreeNode* baseNode);
-  void onUpdateDlgStructNames(QVector<QString> structNames);
-  void onUpdateDlgStructName(QString oldName, QString newName);
 
 signals:
   void memErrorOccured();
