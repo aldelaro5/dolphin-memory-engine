@@ -213,6 +213,12 @@ void StructEditorWidget::onConvertPaddingToEntry(const QModelIndex& index)
 
 void StructEditorWidget::onDetailNameChanged()
 {
+  if (m_nodeInDetailEditor->getName() == m_txtStructName->text())
+  {
+    m_txtStructName->clearFocus();
+    return;
+  }
+
   StructTreeNode* node = m_structDetailModel->getLoadedStructNode();
 
   if (!node->getParent()->isNameAvailable(m_txtStructName->text()))
