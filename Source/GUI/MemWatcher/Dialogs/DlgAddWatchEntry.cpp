@@ -442,6 +442,13 @@ void DlgAddWatchEntry::onAddressChanged()
 
 void DlgAddWatchEntry::updatePreview()
 {
+  if (!GUICommon::isContainerType(m_entry->getType()))
+  {
+    if (m_showAddress)
+      m_lblValuePreview->setText("???");
+    return;
+  }
+
   m_entry->readMemoryFromRAM();
   m_lblValuePreview->setText(QString::fromStdString(m_entry->getStringFromMemory()));
   if (m_entry->isBoundToPointer())
