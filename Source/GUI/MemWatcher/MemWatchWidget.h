@@ -51,7 +51,7 @@ public:
   void restoreWatchModel(const QString& json);
   QString saveWatchModel();
 
-  void setStructDefs(QMap<QString, StructDef*> structMap);
+  void setStructDefs(StructTreeNode* structDefs, QMap<QString, StructDef*> structMap);
   void onUpdateStructDetails(QString structName);
   void onUpdateStructName(QString oldName, QString newName);
   void onStructDefAddRemove(QString structName, StructDef* structDef = nullptr) const;

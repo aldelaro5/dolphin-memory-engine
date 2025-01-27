@@ -43,7 +43,8 @@ MainWindow::MainWindow()
       static_cast<GUICommon::ApplicationStyle>(SConfig::getInstance().getTheme()));
 
   m_structEditor->restoreStructDefs(SConfig::getInstance().getStructDefs());
-  m_watcher->setStructDefs(m_structEditor->getStructMap());
+  m_watcher->setStructDefs(m_structEditor->getStructDefs(), m_structEditor->getStructMap());
+  m_viewer->setStructDefs(m_structEditor->getStructDefs());
   m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 

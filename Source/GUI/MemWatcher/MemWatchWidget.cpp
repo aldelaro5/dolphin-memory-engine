@@ -994,8 +994,9 @@ QString MemWatchWidget::saveWatchModel()
   return saveDoc.toJson();
 }
 
-void MemWatchWidget::setStructDefs(QMap<QString, StructDef*> structMap)
+void MemWatchWidget::setStructDefs(StructTreeNode* structDefs, QMap<QString, StructDef*> structMap)
 {
+  m_structDefs = structDefs;
   m_watchModel->setStructMap(structMap);
 }
 

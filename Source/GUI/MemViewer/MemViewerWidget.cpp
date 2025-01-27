@@ -105,3 +105,8 @@ void MemViewerWidget::goToAddress(u32 address)
 {
   m_memViewer->jumpToAddress(address);
 }
+
+void MemViewerWidget::setStructDefs(StructTreeNode* baseNode)
+{
+  m_memViewer->setStructDefs(baseNode);
+}
