@@ -204,5 +204,9 @@ void StructDef::recalculateOffsets()
   }
   calculateLength();
   }
-  m_length = fmax(max_length, m_length);
+
+void StructDef::calculateLength()
+{
+  if (!m_fields.isEmpty())
+    m_length = static_cast<u32>(fmax(m_fields.last()->getOffset() + m_fields.last()->getFieldSize(), m_length));
 }
