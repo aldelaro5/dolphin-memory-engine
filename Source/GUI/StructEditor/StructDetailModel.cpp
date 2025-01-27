@@ -408,6 +408,7 @@ void StructDetailModel::removeLastField()
 
 void StructDetailModel::clearFields(QModelIndexList indices)
 {
+  reduceIndicesToRows(indices);
   int start = indices[0].row();
   int count = indices.count();
 
