@@ -18,7 +18,7 @@ class DlgAddWatchEntry : public QDialog
 {
 public:
   DlgAddWatchEntry(bool newEntry, MemWatchEntry* entry, QVector<QString> structs, QWidget* parent,
-                   bool hideAddress = false);
+                   bool showAddress = true);
   ~DlgAddWatchEntry() override;
 
   DlgAddWatchEntry(const DlgAddWatchEntry&) = delete;
