@@ -488,6 +488,7 @@ void DlgAddWatchEntry::onIsPointerChanged()
   }
   adjustSize();
   m_entry->setBoundToPointer(m_chkBoundToPointer->isChecked());
+  if (!GUICommon::isContainerType(m_entry->getType()))
   updatePreview();
 }
 
