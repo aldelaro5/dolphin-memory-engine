@@ -699,6 +699,12 @@ void MemWatchWidget::onRowsInserted(const QModelIndex& parent, const int first, 
   const QItemSelection selection{firstIndex,
                                  lastIndex.siblingAtColumn(MemWatchModel::WATCH_COL_NUM - 1)};
 
+  // If the parent node is a container and it is not expanded, do not select the child node or expand it.
+  const MemWatchTreeNode* parentNode = MemWatchModel::getTreeNodeFromIndex(parent);
+  if (parentNode != nullptr && parentNode->getEntry() != nullptr &&
+      GUICommon::isContainerType(parentNode->getEntry()->getType()) && !parentNode->isExpanded())
+    return;
+
   QItemSelectionModel* const selectionModel{m_watchView->selectionModel()};
   selectionModel->select(selection, QItemSelectionModel::ClearAndSelect);
   selectionModel->setCurrentIndex(lastIndex, QItemSelectionModel::Current);
