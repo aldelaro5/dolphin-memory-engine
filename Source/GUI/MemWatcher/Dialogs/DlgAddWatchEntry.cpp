@@ -315,7 +315,7 @@ void DlgAddWatchEntry::onOffsetChanged()
   int columnSpan{};
   m_offsetsLayout->getItemPosition(m_offsetsLayout->indexOf(theLineEdit), &index, &column, &rowSpan,
                                    &columnSpan);
-  if (validateAndSetOffset(index))
+  if (m_showAddress && validateAndSetOffset(index))
     updatePreview();
 }
 
