@@ -15,10 +15,6 @@ MemViewerWidget::MemViewerWidget(QWidget* const parent) : QWidget(parent)
 
   connect(m_memViewer, &MemViewer::addWatch, this,
           [this](MemWatchEntry* entry) { emit addWatchRequested(entry); });
-  connect(this, &MemViewerWidget::updateDlgStructNames, m_memViewer,
-          &MemViewer::onUpdateDlgStructNames);
-  connect(this, &MemViewerWidget::updateDlgStructName, m_memViewer,
-          &MemViewer::onUpdateDlgStructName);
 }
 
 MemViewerWidget::~MemViewerWidget()
@@ -108,19 +104,4 @@ void MemViewerWidget::onMEM2StatusChanged(bool enabled)
 void MemViewerWidget::goToAddress(u32 address)
 {
   m_memViewer->jumpToAddress(address);
-}
-
-void MemViewerWidget::setStructDefs(StructTreeNode* baseNode)
-{
-  m_memViewer->setStructDefs(baseNode);
-}
-
-void MemViewerWidget::onUpdateDlgStructNames(QVector<QString> structNames)
-{
-  emit updateDlgStructNames(structNames);
-}
-
-void MemViewerWidget::onUpdateDlgStructName(QString oldName, QString newName)
-{
-  emit updateDlgStructName(oldName, newName);
 }

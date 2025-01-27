@@ -43,7 +43,6 @@ public:
 
 signals:
   void structAddedRemoved(QString fullName, StructDef* structDef = nullptr); //If a struct is added, it includes a pointer to the structDef, if it is removed, it is just a nullptr.
-  void updateDlgStructList(QVector<QString> structs);
   void updateStructName(QString old_name, QString new_name);
   void updateStructDetails(QString fullName);
 

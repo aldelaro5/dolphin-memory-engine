@@ -43,26 +43,17 @@ MainWindow::MainWindow()
       static_cast<GUICommon::ApplicationStyle>(SConfig::getInstance().getTheme()));
 
   m_structEditor->restoreStructDefs(SConfig::getInstance().getStructDefs());
-  m_watcher->setStructDefs(m_structEditor->getStructDefs(), m_structEditor->getStructMap());
-  m_viewer->setStructDefs(m_structEditor->getStructDefs());
+  m_watcher->setStructDefs(m_structEditor->getStructMap());
   m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
   // Connect struct updates to mem watch widget
-  connect(m_structEditor, &StructEditorWidget::updateDlgStructList, m_watcher,
-          &MemWatchWidget::onUpdateDlgStructNames);
   connect(m_structEditor, &StructEditorWidget::updateStructName, m_watcher,
           &MemWatchWidget::onUpdateStructName);
   connect(m_structEditor, &StructEditorWidget::updateStructDetails, m_watcher,
           &MemWatchWidget::onUpdateStructDetails);
   connect(m_structEditor, &StructEditorWidget::structAddedRemoved, m_watcher,
           &MemWatchWidget::onStructDefAddRemove);
-
-  // connect struct updates to mem viewer widget
-  connect(m_structEditor, &StructEditorWidget::updateStructName, m_viewer,
-          &MemViewerWidget::onUpdateDlgStructName);
-  connect(m_structEditor, &StructEditorWidget::updateDlgStructList, m_viewer,
-          &MemViewerWidget::onUpdateDlgStructNames);
 
   if (m_actAutoHook->isChecked())
     onHookAttempt();

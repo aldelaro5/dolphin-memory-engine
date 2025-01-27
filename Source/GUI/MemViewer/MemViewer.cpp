@@ -100,16 +100,6 @@ void MemViewer::setStructDefs(StructTreeNode* baseNode)
   m_structDefs = baseNode;
 }
 
-void MemViewer::onUpdateDlgStructNames(QVector<QString> structNames)
-{
-  emit updateDlgStructNames(structNames);
-}
-
-void MemViewer::onUpdateDlgStructName(QString oldName, QString newName)
-{
-  emit updateDlgStructName(oldName, newName);
-}
-
 void MemViewer::updateMemoryData()
 {
   std::swap(m_updatedRawMemoryData, m_lastRawMemoryData);
@@ -515,8 +505,6 @@ void MemViewer::addByteIndexAsWatch(int index)
   MemWatchEntry* entry = new MemWatchEntry();
   entry->setConsoleAddress(m_currentFirstAddress + index);
   DlgAddWatchEntry dlg(true, entry, m_structDefs->getStructNames(), this);
-  connect(this, &MemViewer::updateDlgStructNames, &dlg, &DlgAddWatchEntry::onUpdateStructNames);
-  connect(this, &MemViewer::updateDlgStructName, &dlg, &DlgAddWatchEntry::onUpdateStructName);
 
   if (dlg.exec() == QDialog::Accepted)
   {

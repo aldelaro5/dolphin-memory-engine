@@ -51,17 +51,14 @@ public:
   void restoreWatchModel(const QString& json);
   QString saveWatchModel();
 
-  void setStructDefs(StructTreeNode* structDefs, QMap<QString, StructDef*> structMap);
+  void setStructDefs(QMap<QString, StructDef*> structMap);
   void onUpdateStructDetails(QString structName);
-  void onUpdateDlgStructNames(QVector<QString> structNames);
   void onUpdateStructName(QString oldName, QString newName);
   void onStructDefAddRemove(QString structName, StructDef* structDef = nullptr) const;
 
 signals:
   void mustUnhook();
   void goToAddressInViewer(u32 address);
-  void updateDlgStructNames(QVector<QString> structNames);
-  void updateDlgStructName(QString oldName, QString newName);
 
 private:
   void initialiseWidgets();

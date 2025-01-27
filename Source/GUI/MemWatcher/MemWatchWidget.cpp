@@ -450,8 +450,6 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
       int typeIndex = static_cast<int>(entry->getType());
       DlgChangeType* dlg =
           new DlgChangeType(this, typeIndex, entry->getLength(), m_structDefs->getStructNames(), entry->getStructName());
-      connect(this, &MemWatchWidget::updateDlgStructNames, dlg, &DlgChangeType::onUpdateStructNames);
-      connect(this, &MemWatchWidget::updateDlgStructName, dlg, &DlgChangeType::onUpdateStructName);
       if (dlg->exec() == QDialog::Accepted)
       {
         Common::MemType theType = static_cast<Common::MemType>(dlg->getTypeIndex());
@@ -466,8 +464,6 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
     {
       MemWatchEntry* entryCopy = new MemWatchEntry(node->getEntry());
       DlgAddWatchEntry dlg(false, entryCopy, m_structDefs->getStructNames(), this);
-      connect(this, &MemWatchWidget::updateDlgStructNames, &dlg, &DlgAddWatchEntry::onUpdateStructNames);
-      connect(this, &MemWatchWidget::updateDlgStructName, &dlg, &DlgAddWatchEntry::onUpdateStructName);
       if (dlg.exec() == QDialog::Accepted)
       {
         m_watchModel->editEntry(dlg.stealEntry(), index);
@@ -592,8 +588,6 @@ void MemWatchWidget::onAddGroup()
 void MemWatchWidget::onAddWatchEntry()
 {
   DlgAddWatchEntry dlg(true, nullptr, m_structDefs->getStructNames(), this);
-  connect(this, &MemWatchWidget::updateDlgStructNames, &dlg, &DlgAddWatchEntry::onUpdateStructNames);
-  connect(this, &MemWatchWidget::updateDlgStructName, &dlg, &DlgAddWatchEntry::onUpdateStructName);
   if (dlg.exec() == QDialog::Accepted)
   {
     addWatchEntry(dlg.stealEntry());
@@ -1000,26 +994,9 @@ QString MemWatchWidget::saveWatchModel()
   return saveDoc.toJson();
 }
 
-void MemWatchWidget::setStructDefs(StructTreeNode* structDefs, QMap<QString, StructDef*> structMap)
+void MemWatchWidget::setStructDefs(QMap<QString, StructDef*> structMap)
 {
-  m_structDefs = structDefs;
   m_watchModel->setStructMap(structMap);
-}
-
-void MemWatchWidget::onUpdateStructDetails(QString structName)
-{
-  m_watchModel->updateStructEntries(structName);
-}
-
-void MemWatchWidget::onUpdateDlgStructNames(QVector<QString> structNames)
-{
-  emit updateDlgStructNames(structNames);
-}
-
-void MemWatchWidget::onUpdateStructName(QString oldName, QString newName)
-{
-  m_watchModel->onStructNameChanged(oldName, newName);
-  emit updateDlgStructName(oldName, newName);
 }
 
 void MemWatchWidget::onStructDefAddRemove(QString structName, StructDef* structDef) const

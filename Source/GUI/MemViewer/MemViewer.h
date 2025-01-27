@@ -46,8 +46,6 @@ public:
 signals:
   void memErrorOccured();
   void addWatch(MemWatchEntry* entry);
-  void updateDlgStructNames(QVector<QString> structNames);
-  void updateDlgStructName(QString oldName, QString newName);
 
 private:
   enum class SelectionType
