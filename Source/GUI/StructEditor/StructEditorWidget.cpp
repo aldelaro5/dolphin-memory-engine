@@ -325,6 +325,7 @@ void StructEditorWidget::onSaveStruct()
   m_nodeInDetailEditor->setStructDef(new StructDef(m_structDetailModel->getLoadedStructNode()->getStructDef()));
   emit updateStructDetails(m_structDetailModel->getLoadedStructNode()->getNameSpace());
   m_btnSaveStructDetails->setDisabled(true);
+  updateStructReferences(m_nodeInDetailEditor);
 }
 
 void StructEditorWidget::nameChangeFailed(StructTreeNode* node, QString name)
