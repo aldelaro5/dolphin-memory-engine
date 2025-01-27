@@ -59,6 +59,7 @@ public:
 signals:
   void mustUnhook();
   void goToAddressInViewer(u32 address);
+  void loadStructDefsFromJson(const QJsonObject& json, QMap<QString, QString>& map);
 
 private:
   void initialiseWidgets();
