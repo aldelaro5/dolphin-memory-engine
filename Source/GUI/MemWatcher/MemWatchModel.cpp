@@ -345,10 +345,13 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       }
     }
 
+    MemWatchEntry* entry = item->getEntry();
+    if (entry == nullptr)
+      return QString();
+
     if (role == Qt::EditRole && index.column() == WATCH_COL_TYPE)
       return {static_cast<int>(item->getEntry()->getType())};
 
-    MemWatchEntry* entry = item->getEntry();
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
       switch (index.column())
