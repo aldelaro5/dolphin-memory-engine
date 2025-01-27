@@ -62,7 +62,7 @@ void MemWatchModel::onFreezeTimer()
 bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QModelIndex& parent,
                                              bool readSucess)
 {
-  if (!node->isGroup() && GUICommon::isContainerType(node->getEntry()->getType()))
+  if (!node->isGroup() && node->getEntry() != nullptr && GUICommon::isContainerType(node->getEntry()->getType()))
     updateContainerAddresses(node);
 
   QVector<MemWatchTreeNode*> children = node->getChildren();
