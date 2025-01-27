@@ -307,7 +307,7 @@ void StructEditorWidget::onClearFields()
 void StructEditorWidget::onSaveStruct()
 {
   m_structDetailModel->saveStruct();
-  m_nodeInDetailEditor->setStructDef(m_structDetailModel->getLoadedStructNode()->getStructDef());
+  m_nodeInDetailEditor->setStructDef(new StructDef(m_structDetailModel->getLoadedStructNode()->getStructDef()));
   emit updateStructDetails(m_structDetailModel->getLoadedStructNode()->getNameSpace());
   m_btnSaveStructs->setDisabled(true);
 }
