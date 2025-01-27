@@ -6,6 +6,7 @@
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QMenu>
+#include <QHeaderView>
 
 #include "../../Common/MemoryCommon.h"
 #include "../MemWatcher/Dialogs/DlgAddWatchEntry.h"
@@ -41,6 +42,7 @@ StructEditorWidget::StructEditorWidget(QWidget* parent)
   setWindowTitle("DME - Struct Editor");
   initialiseWidgets();
   makeLayouts();
+  adjustSize();
 }
 
 StructEditorWidget::~StructEditorWidget()
@@ -72,7 +74,7 @@ void StructEditorWidget::initialiseWidgets()
   m_structSelectView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_structSelectView->setSelectionMode(QAbstractItemView::ContiguousSelection);
   m_structSelectView->setModel(m_structSelectModel);
-
+  m_structSelectView->setMinimumSize(0, 50);
 
   m_btnAddGroup = new QPushButton(tr("Add Struct Group"), this);
   connect(m_btnAddGroup, &QPushButton::clicked, this, &StructEditorWidget::onAddGroup);
@@ -118,6 +120,8 @@ void StructEditorWidget::initialiseWidgets()
   m_structDetailView->setSelectionMode(QAbstractItemView::ContiguousSelection);
   m_structDetailView->setEditTriggers(QAbstractItemView::NoEditTriggers);
   m_structDetailView->setModel(m_structDetailModel);
+  m_structDetailView->verticalHeader()->setDefaultSectionSize(15);
+  m_structDetailView->verticalHeader()->setMinimumSectionSize(15);
   //m_watchView->setItemDelegate(m_watchDelegate);
 
   QHeaderView* header = m_structDetailView->horizontalHeader();
@@ -180,19 +184,40 @@ void StructEditorWidget::makeLayouts()
   QWidget* structSelectPanel = new QWidget;
   QVBoxLayout* structSelectPanelLayout = new QVBoxLayout;
 
+  QSizePolicy selectTreePolicy = QSizePolicy();
+  selectTreePolicy.setHorizontalStretch(0);
+  selectTreePolicy.setHorizontalPolicy(QSizePolicy::Policy::Minimum);
+  selectTreePolicy.setVerticalStretch(1);
+  selectTreePolicy.setVerticalPolicy(QSizePolicy::Policy::Ignored);
+  m_structSelectView->setSizePolicy(selectTreePolicy);
   structSelectPanelLayout->addWidget(m_structSelectView);
   structSelectPanelLayout->addWidget(structDefButtons);
   structSelectPanelLayout->setContentsMargins(0, 0, 0, 0);
   structSelectPanel->setLayout(structSelectPanelLayout);
 
-  QWidget* structEditButtons = new QWidget;
-  QHBoxLayout* structEditButtonLayout = new QHBoxLayout;
+  QWidget* structDetailStructButtons = new QWidget;
+  QHBoxLayout* structDetailStructButtonLayout = new QHBoxLayout;
 
-  structEditButtonLayout->addWidget(m_btnSaveStructs);
-  structEditButtonLayout->addWidget(m_btnAddField);
-  structEditButtonLayout->addWidget(m_btnDeleteFields);
-  structEditButtonLayout->addWidget(m_btnClearFields);
-  structEditButtons->setLayout(structEditButtonLayout);
+  structDetailStructButtonLayout->addWidget(m_btnUnloadStructDetails);
+  structDetailStructButtonLayout->addWidget(m_btnSaveStructDetails);
+  structDetailStructButtons->setLayout(structDetailStructButtonLayout);
+
+  QWidget* structDetailFieldButtons = new QWidget;
+  QHBoxLayout* structDetailFieldButtonLayout = new QHBoxLayout;
+
+  structDetailFieldButtonLayout->addWidget(m_btnAddField);
+  structDetailFieldButtonLayout->addWidget(m_btnDeleteFields);
+  structDetailFieldButtonLayout->addWidget(m_btnClearFields);
+  structDetailFieldButtons->setLayout(structDetailFieldButtonLayout);
+
+  QWidget* structDetailButtons = new QWidget;
+  QHBoxLayout* structDetailButtonLayout = new QHBoxLayout;
+
+  structDetailButtonLayout->addWidget(structDetailStructButtons);
+  structDetailButtonLayout->addStretch();
+  structDetailButtonLayout->addWidget(structDetailFieldButtons);
+  structDetailButtonLayout->setContentsMargins(0, 0, 0, 0);
+  structDetailButtons->setLayout(structDetailButtonLayout);
 
   QFormLayout* structDetails = new QFormLayout;
   structDetails->addRow("Struct Name:", m_txtStructName);
@@ -201,7 +226,7 @@ void StructEditorWidget::makeLayouts()
   QWidget* structEditPanel = new QWidget;
   QVBoxLayout* structEditPanelLayout = new QVBoxLayout;
 
-  structEditPanelLayout->addWidget(structEditButtons);
+  structEditPanelLayout->addWidget(structDetailButtons);
   structEditPanelLayout->addWidget(m_structDetailView);
   structEditPanelLayout->addLayout(structDetails);
   structEditPanelLayout->setContentsMargins(0, 0, 0, 0);
@@ -210,7 +235,7 @@ void StructEditorWidget::makeLayouts()
   QHBoxLayout* widgetLayout = new QHBoxLayout;
   widgetLayout->addWidget(structSelectPanel);
   widgetLayout->addWidget(structEditPanel);
-  widgetLayout->setContentsMargins(3, 0, 3, 0);
+  widgetLayout->setContentsMargins(3, 3, 3, 3);
   setLayout(widgetLayout);
 }
 
