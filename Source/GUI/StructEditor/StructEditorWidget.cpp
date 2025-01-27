@@ -86,10 +86,13 @@ void StructEditorWidget::initialiseWidgets()
   // Initialize objects for the Struct Detail editor
 
   m_structDetailModel = new StructDetailModel(this);
+
   connect(m_structDetailModel, &StructDetailModel::dataEdited, this,
           &StructEditorWidget::onDetailDataEdited);
   connect(m_structDetailModel, &StructDetailModel::lengthChanged, this,
           &StructEditorWidget::onLengthChange);
+  connect(m_structDetailModel, &StructDetailModel::modifyStructReference, this,
+          &StructEditorWidget::onModifyStructReference);
 
   //connect as neeeded
   /* Example from MemWatchWidget
@@ -336,6 +339,39 @@ void StructEditorWidget::nameChangeFailed(StructTreeNode* node, QString name)
 void StructEditorWidget::onLengthChange(u32 newLength)
 {
   m_txtStructLength->setText(QString::number(newLength, 16));
+}
+
+void StructEditorWidget::onModifyStructReference(QString nodeName, QString target, bool addRef)
+{
+  if (addRef)
+  {
+    if (!m_structReferences.contains(target))
+      m_structReferences.insert(target, {nodeName});
+    else
+      m_structReferences[target].push_back(nodeName);
+  }
+  else if (m_structReferences.contains(target))
+  {
+    if (m_structReferences[target].contains(nodeName))
+      m_structReferences[target].removeAt(m_structReferences[target].indexOf(nodeName));
+    if (m_structReferences[target].isEmpty())
+      m_structReferences.remove(target);
+  }
+}
+
+void StructEditorWidget::updateStructReferences(StructTreeNode* node)
+{
+  u32 structLength = node->getStructDef()->getLength();
+  QString keyNameSpace = node->getNameSpace();
+
+  if (!m_structReferences.contains(keyNameSpace))
+    return;
+
+  for (QString target : m_structReferences[keyNameSpace])
+  {
+    m_structRootNode->findNode(target)->getStructDef()->updateStructFieldSize(keyNameSpace, structLength);
+    emit updateStructDetails(target);
+  }
 }
 
 void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)

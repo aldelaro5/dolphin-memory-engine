@@ -57,6 +57,7 @@ public:
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& value, int role);
   void lengthChanged(u32 newLength);
+  void modifyStructReference(QString nodeName, QString target, bool addIt);
 
 private:
   QString getFieldDetails(FieldDef* field) const;

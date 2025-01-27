@@ -63,12 +63,15 @@ private:
   void onSaveStruct();
   void nameChangeFailed(StructTreeNode* node, QString name);
   void onLengthChange(u32 newLength);
+  void onModifyStructReference(QString nodeName, QString target, bool addIt);
+  void updateStructReferences(StructTreeNode* node);
 
   bool isAnyAncestorSelected(const QModelIndex& index) const;
   QModelIndexList simplifiedSelection() const;
 
   StructTreeNode* m_structDefs;
   StructTreeNode* m_nodeInDetailEditor{};
+  QMap<QString, QVector<QString>> m_structReferences{};
   bool m_unsavedChanges = false;
 
 

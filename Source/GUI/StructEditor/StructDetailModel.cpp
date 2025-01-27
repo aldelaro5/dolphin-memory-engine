@@ -197,6 +197,8 @@ void StructDetailModel::removeFields(int start, int count)
 
   for (int i = start; i < start + count; ++i)
   {
+    if (m_fields[i]->getEntry() != nullptr && m_fields[i]->getEntry()->getType() == Common::MemType::type_struct)
+      emit modifyStructReference(m_baseNode->getNameSpace(), m_fields[i]->getEntry()->getStructName(), false);
     delete m_fields[i];
   }
   m_fields.remove(start, count);
@@ -417,7 +419,11 @@ void StructDetailModel::clearFields(QModelIndexList indices)
     if (!m_fields[i]->isPadding())
     {
       int new_field_count = m_fields[i]->getFieldSize() - 1;
+
       FieldDef* cur_field = m_fields[i];
+      if (cur_field->getEntry()->getType() == Common::MemType::type_struct)
+        emit modifyStructReference(m_baseNode->getNameSpace(), cur_field->getEntry()->getStructName(), false);
+
       cur_field->convertToPadding();
       QModelIndex field_index = createIndex(i, 0, cur_field);
       emit dataChanged(field_index, field_index.siblingAtColumn(columnCount({}) - 1));
@@ -432,6 +438,10 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
   FieldDef* field = getFieldByRow(index.row());
 
   int oldFieldLen = field->getFieldSize();
+  MemWatchEntry* oldEntry = field->getEntry();
+
+  if (oldEntry != nullptr && oldEntry->getType() == Common::MemType::type_struct)
+    emit modifyStructReference(m_baseNode->getNameSpace(), oldEntry->getStructName(), false);
 
   int fieldLen = 0;
   if (entry->isBoundToPointer())
@@ -443,7 +453,10 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
       return false;
     }
     else
-      fieldLen = m_baseNode->getParent()->getSizeOfStruct(m_baseNode->getNameSpace()); // dependent on if the parent doesn't change when copying the node to edit - check this
+    {
+      fieldLen = m_baseNode->getParent()->getSizeOfStruct(entry->getStructName());
+      emit modifyStructReference(m_baseNode->getNameSpace(), entry->getStructName(), true);
+    }
   }
   else
     fieldLen = Common::getSizeForType(entry->getType(), entry->getLength());
