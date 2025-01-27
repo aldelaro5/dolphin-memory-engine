@@ -668,6 +668,7 @@ void StructEditorWidget::onEditStruct(StructTreeNode* node)
   StructTreeNode* nodeForDetailEditor = new StructTreeNode(node);
   m_structDetailModel->loadStruct(nodeForDetailEditor);
 
+  m_btnUnloadStructDetails->setEnabled(true);
   m_btnAddField->setEnabled(true);
   m_btnDeleteFields->setEnabled(true);
   m_btnClearFields->setEnabled(true);
