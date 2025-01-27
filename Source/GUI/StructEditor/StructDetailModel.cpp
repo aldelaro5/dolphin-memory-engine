@@ -427,7 +427,7 @@ void StructDetailModel::clearFields(QModelIndexList indices)
   }
 }
 
-void StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex& index)
+bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex& index)
 {
   FieldDef* field = getFieldByRow(index.row());
 
@@ -438,8 +438,10 @@ void StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
     fieldLen = 4;
   else if (entry->getType() == Common::MemType::type_struct)
   {
-    if (entry->getStructName() == m_baseNode->getName())
-      fieldLen = 0;
+    if (entry->getStructName() == m_baseNode->getNameSpace())
+    {
+      return false;
+    }
     else
       fieldLen = m_baseNode->getParent()->getSizeOfStruct(m_baseNode->getNameSpace()); // dependent on if the parent doesn't change when copying the node to edit - check this
   }
@@ -454,6 +456,8 @@ void StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
     removePaddingFields(fieldLen - 1, index.row() + 1);
 
   updateFieldOffsets();
+
+  return true;
 }
 
 FieldDef* StructDetailModel::getFieldByRow(int row)

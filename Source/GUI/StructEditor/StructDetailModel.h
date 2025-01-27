@@ -41,7 +41,7 @@ public:
   void removeFields(QModelIndexList indices);
   void removeLastField();
   void clearFields(QModelIndexList indices);
-  void updateFieldEntry(MemWatchEntry* entry, const QModelIndex& index);
+  bool updateFieldEntry(MemWatchEntry* entry, const QModelIndex& index);
   FieldDef* getFieldByRow(int row);
 
   bool hasStructLoaded() const;
