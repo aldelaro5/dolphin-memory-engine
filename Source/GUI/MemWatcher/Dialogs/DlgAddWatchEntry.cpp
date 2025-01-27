@@ -168,7 +168,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     else if (m_entry->getType() == Common::MemType::type_struct)
     {
       if (m_structNames.contains(m_entry->getStructName()))
-      m_structSelect->setCurrentIndex(m_structNames.indexOf(m_entry->getStructName()));
+        m_structSelect->setCurrentIndex(m_structNames.indexOf(m_entry->getStructName()));
 
       m_structSelect->show();
       m_spnLength->hide();
