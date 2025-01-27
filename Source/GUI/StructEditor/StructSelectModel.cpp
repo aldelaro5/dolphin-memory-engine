@@ -289,6 +289,8 @@ bool StructSelectModel::dropMimeData(const QMimeData* data, Qt::DropAction actio
   int count;
   stream >> count;
 
+  StructTreeNode* oldParent = leastDeepNode->getParent();
+
   for (int i = 0; i < count; ++i)
   {
     qulonglong nodePtr{};
@@ -312,7 +314,7 @@ bool StructSelectModel::dropMimeData(const QMimeData* data, Qt::DropAction actio
 
     ++row;
   }
-  emit dropSucceeded();
+  emit dropSucceeded(oldParent, destParentNode);
   return true;
 }
 

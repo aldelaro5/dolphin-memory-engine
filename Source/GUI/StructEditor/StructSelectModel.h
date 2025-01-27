@@ -52,7 +52,7 @@ public:
 
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& oldNamespace, int role);
-  void dropSucceeded();
+  void dropSucceeded(StructTreeNode* oldParent, StructTreeNode* newParent);
   void nameChangeFailed(StructTreeNode* node, QString name);
 
 private:

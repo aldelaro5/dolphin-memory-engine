@@ -485,8 +485,9 @@ void StructEditorWidget::updateChildStructNames(StructTreeNode* node, QString ol
   }
 }
 
-void StructEditorWidget::onSelectDropSucceeded()
+void StructEditorWidget::onSelectDropSucceeded(StructTreeNode* oldParent, StructTreeNode* newParent)
 {
+  updateChildStructNames(newParent, oldParent->getNameSpace());
 }
 
 void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)

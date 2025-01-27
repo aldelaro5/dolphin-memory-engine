@@ -24,7 +24,7 @@ public:
 
   void onSelectContextMenuRequested(const QPoint& pos);
   void onSelectDataEdited(const QModelIndex& index, const QVariant& oldNamespace, int role);
-  void onSelectDropSucceeded();
+  void onSelectDropSucceeded(StructTreeNode* oldParent, StructTreeNode* newParent);
 
   void onDetailContextMenuRequested(const QPoint& pos);
   void onDetailDoubleClicked(const QModelIndex& index);
