@@ -822,7 +822,11 @@ void MemWatchModel::onStructNameChanged(const QString old_name, const QString ne
     return;
 
   for (MemWatchTreeNode* node : m_structNodes[old_name])
+  {
     node->getEntry()->setStructName(new_name);
+    QModelIndex index = getIndexFromTreeNode(node);
+    emit dataChanged(index, index.siblingAtColumn(WATCH_COL_NUM - 1));
+  }
 
   QVector<MemWatchTreeNode*> nodes = m_structNodes.take(old_name);
   m_structNodes.insert(new_name, nodes);
