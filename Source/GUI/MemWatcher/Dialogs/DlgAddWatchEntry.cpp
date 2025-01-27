@@ -161,12 +161,17 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_cmbTypes->setCurrentIndex(static_cast<int>(m_entry->getType()));
     if (m_entry->getType() == Common::MemType::type_string ||
         m_entry->getType() == Common::MemType::type_byteArray)
+    {
       m_spnLength->show();
+      m_structSelect->hide();
+    }
     else if (m_entry->getType() == Common::MemType::type_struct)
     {
       if (m_structNames.contains(m_entry->getStructName()))
       m_structSelect->setCurrentIndex(m_structNames.indexOf(m_entry->getStructName()));
+
       m_structSelect->show();
+      m_spnLength->hide();
     }
     else
     {
