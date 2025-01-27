@@ -157,11 +157,9 @@ void StructDef::setFields(QVector<FieldDef*> fields)
 void StructDef::updateStructTypeLabel(const QString& oldLabel, QString newLabel)
 {
   for (FieldDef* field : m_fields)
-  {
-    if (field->getEntry()->getType() == Common::MemType::type_struct &&
-        field->getEntry()->getStructName() == oldLabel)
+    if (field->getEntry()->getType() == Common::MemType::type_struct && field->getEntry()->getStructName() == oldLabel)
       field->getEntry()->setStructName(newLabel);
-  }
+}
 
 void StructDef::updateStructFieldSize(QString structName, u32 newLength)
 {
@@ -210,7 +208,7 @@ void StructDef::recalculateOffsets()
     cur_offset += m_fields[i]->getFieldSize();
   }
   calculateLength();
-  }
+}
 
 void StructDef::calculateLength()
 {
