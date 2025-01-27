@@ -798,6 +798,12 @@ void StructEditorWidget::readStructDefsFromJson(const QJsonObject& json, QMap<QS
     m_structSelectModel->insertNewDef(key, newStructDefs[key]);
   }
 }
+
+void StructEditorWidget::writeStructDefsToJson(QJsonObject& json) const
+{
+  m_structRootNode->writeToJson(json);
+}
+
 void StructEditorWidget::restoreStructDefs(const QString& json)
 {
   const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));
