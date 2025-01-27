@@ -712,6 +712,7 @@ void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json)
   beginResetModel();
   m_rootNode->readFromJson(json);
   endResetModel();
+  setupContainersRecursive(m_rootNode);
 }
 
 MemWatchModel::CTParsingErrors MemWatchModel::importRootFromCTFile(QFile* const CTFile,
@@ -966,5 +967,21 @@ void MemWatchModel::updateStructAddresses(MemWatchTreeNode* node)
       if (GUICommon::isContainerType(children[i]->getEntry()->getType()))
         updateContainerAddresses(children[i]);
     }
+  }
+}
+
+void MemWatchModel::setupContainersRecursive(MemWatchTreeNode* node)
+{
+  if (node->getChildren().isEmpty())
+    return;
+
+  for (MemWatchTreeNode* child : node->getChildren())
+  {
+    if (child->getParent() == nullptr || child->isGroup())
+      setupContainersRecursive(child);
+    else if (child->getEntry() != nullptr &&
+             GUICommon::isContainerType(child->getEntry()->getType()))
+      if (child->getEntry()->getType() == Common::MemType::type_struct)
+        setupStructNode(child);
   }
 }
