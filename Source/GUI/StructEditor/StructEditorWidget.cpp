@@ -475,8 +475,12 @@ void StructEditorWidget::updateChildStructNames(StructTreeNode* node, QString ol
     {
       if (newNameSpace.isEmpty())
         newNameSpace = node->getNameSpace();
-      emit updateStructName(child->appendNameToNameSpace(oldNameSpace),
-                            child->appendNameToNameSpace(newNameSpace));
+
+      QString oldName = oldNameSpace.isEmpty() ? child->getName() : child->appendNameToNameSpace(oldNameSpace);
+      QString newName = newNameSpace.isEmpty() ? child->getName() : child->appendNameToNameSpace(newNameSpace);
+
+      updateStructReferenceNames(oldName, newName);
+      emit updateStructName(oldName, newName);
     }
   }
 }
