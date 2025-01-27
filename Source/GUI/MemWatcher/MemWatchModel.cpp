@@ -890,7 +890,7 @@ void MemWatchModel::expandStructNode(MemWatchTreeNode* node)
     childNodes.push_back(nextNode);
   }
 
-  addNodes(childNodes, getIndexFromTreeNode(node));
+  addNodes(childNodes, getIndexFromTreeNode(node), true);
 
   for(MemWatchTreeNode* childNode : childNodes)
   {
@@ -925,7 +925,7 @@ void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
     
   if (isTopLevel)
   {
-    addNodes({new MemWatchTreeNode(nullptr)}, getIndexFromTreeNode(node));
+    addNodes({new MemWatchTreeNode(nullptr)}, getIndexFromTreeNode(node), true);
     node->setExpanded(false);
   }
   else
