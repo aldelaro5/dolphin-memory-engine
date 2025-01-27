@@ -40,7 +40,6 @@ void StructTreeNode::setExpanded(const bool expanded)
 
 const QString& StructTreeNode::getName()
 {
-  updateName();
   return m_nodeName;
 }
 
@@ -243,8 +242,6 @@ void StructTreeNode::writeToJson(QJsonObject& json) const
 
 QVector<QString> StructTreeNode::getStructNames(bool includeGroups, QString prefix)
 {
-  updateName();
-
   QVector<QString> names;
 
   if (prefix == QString("") && m_parent)
@@ -268,8 +265,6 @@ QVector<QString> StructTreeNode::getStructNames(bool includeGroups, QString pref
 
 QString StructTreeNode::getNameSpace()
 {
-  updateName();
-
   if (m_parent != nullptr)
   {
     QString parentNamespace = m_parent->getNameSpace();
