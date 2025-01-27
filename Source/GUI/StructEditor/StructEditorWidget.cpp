@@ -272,7 +272,10 @@ void StructEditorWidget::onDetailNameChanged()
   m_nodeInDetailEditor->setName(m_txtStructName->text());
   node->setName(m_txtStructName->text());
 
-  emit updateStructName(oldFullName, node->appendNameToNameSpace(oldNameSpace));
+  QString newFullName = node->getNameSpace();
+
+  updateStructReferenceNames(oldFullName, newFullName);
+  emit updateStructName(oldFullName, newFullName);
   m_txtStructName->clearFocus();
 }
 
@@ -350,7 +353,7 @@ void StructEditorWidget::onSaveStruct()
   m_nodeInDetailEditor->setStructDef(new StructDef(m_structDetailModel->getLoadedStructNode()->getStructDef()));
   emit updateStructDetails(m_structDetailModel->getLoadedStructNode()->getNameSpace());
   m_btnSaveStructDetails->setDisabled(true);
-  updateStructReferences(m_nodeInDetailEditor);
+  updateStructReferenceLengths(m_nodeInDetailEditor);
 }
 
 void StructEditorWidget::nameChangeFailed(StructTreeNode* node, QString name)
@@ -385,7 +388,16 @@ void StructEditorWidget::onModifyStructReference(QString nodeName, QString targe
   }
 }
 
-void StructEditorWidget::updateStructReferences(StructTreeNode* node)
+void StructEditorWidget::updateStructReferenceNames(QString old_name, QString new_name)
+{
+  if (!m_structReferences.contains(old_name))
+    return;
+
+  for (QString target : m_structReferences[old_name])
+    m_structRootNode->findNode(target)->getStructDef()->updateStructTypeLabel(old_name, new_name);
+}
+
+void StructEditorWidget::updateStructReferenceLengths(StructTreeNode* node)
 {
   u32 structLength = node->getStructDef()->getLength();
   QString keyNameSpace = node->getNameSpace();
