@@ -198,7 +198,14 @@ void StructDetailModel::removeFields(int start, int count)
   for (int i = start; i < start + count; ++i)
   {
     if (m_fields[i]->getEntry() != nullptr && m_fields[i]->getEntry()->getType() == Common::MemType::type_struct)
-      emit modifyStructReference(m_baseNode->getNameSpace(), m_fields[i]->getEntry()->getStructName(), false);
+    {
+      if (m_fields[i]->getEntry()->isBoundToPointer())
+        emit modifyStructPointerReference(m_baseNode->getNameSpace(), m_fields[i]->getEntry()->getStructName(), false);
+      else
+      {
+      }
+
+    }
     delete m_fields[i];
   }
   m_fields.remove(start, count);
@@ -424,7 +431,14 @@ void StructDetailModel::clearFields(QModelIndexList indices)
 
       FieldDef* cur_field = m_fields[i];
       if (cur_field->getEntry()->getType() == Common::MemType::type_struct)
-        emit modifyStructReference(m_baseNode->getNameSpace(), cur_field->getEntry()->getStructName(), false);
+      {
+        if (m_fields[i]->getEntry()->isBoundToPointer())
+          emit modifyStructPointerReference(m_baseNode->getNameSpace(),
+                                            m_fields[i]->getEntry()->getStructName(), false);
+        else
+        {
+        }
+      }
 
       cur_field->convertToPadding();
       QModelIndex field_index = createIndex(i, 0, cur_field);
@@ -443,11 +457,23 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
   MemWatchEntry* oldEntry = field->getEntry();
 
   if (oldEntry != nullptr && oldEntry->getType() == Common::MemType::type_struct)
-    emit modifyStructReference(m_baseNode->getNameSpace(), oldEntry->getStructName(), false);
+  {
+    if (oldEntry->isBoundToPointer())
+      emit modifyStructPointerReference(m_baseNode->getNameSpace(), oldEntry->getStructName(), false);
+    else
+    {
+    }
+  }
 
   int fieldLen = 0;
   if (entry->isBoundToPointer())
+  {
     fieldLen = 4;
+    if (entry->getType() == Common::MemType::type_struct)
+    {
+      emit modifyStructPointerReference(m_baseNode->getNameSpace(), entry->getStructName(), true);
+    }
+  }
   else if (entry->getType() == Common::MemType::type_struct)
   {
     if (entry->getStructName() == m_baseNode->getNameSpace())

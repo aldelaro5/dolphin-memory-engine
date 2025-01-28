@@ -68,6 +68,7 @@ private:
   void nameChangeFailed(StructTreeNode* node, QString name);
   void onLengthChange(u32 newLength);
   void onModifyStructReference(QString nodeName, QString target, bool addIt);
+  void onModifyStructPointerReference(QString nodeName, QString target, bool addIt);
   void updateStructReferenceNames(QString old_name, QString new_name);
   void updateStructReferenceLengths(StructTreeNode* node);
 
@@ -77,6 +78,8 @@ private:
   StructTreeNode* m_structRootNode;
   StructTreeNode* m_nodeInDetailEditor{};
   QMap<QString, QVector<QString>> m_structReferences{};
+  QMap<QString, QVector<QString>> m_structPointerReferences{};
+
   bool m_unsavedChanges = false;
 
 

@@ -389,6 +389,25 @@ void StructEditorWidget::onModifyStructReference(QString nodeName, QString targe
   }
 }
 
+void StructEditorWidget::onModifyStructPointerReference(QString nodeName, QString target, bool addRef)
+{
+  if (addRef)
+  {
+    if (!m_structPointerReferences.contains(target))
+      m_structPointerReferences.insert(target, {nodeName});
+    else
+      m_structPointerReferences[target].push_back(nodeName);
+  }
+  else if (m_structPointerReferences.contains(target))
+  {
+    if (m_structPointerReferences[target].contains(nodeName))
+      m_structPointerReferences[target].removeAt(
+          m_structPointerReferences[target].indexOf(nodeName));
+    if (m_structPointerReferences[target].isEmpty())
+      m_structPointerReferences.remove(target);
+  }
+}
+
 void StructEditorWidget::updateStructReferenceNames(QString old_name, QString new_name)
 {
   if (!m_structReferences.contains(old_name))
