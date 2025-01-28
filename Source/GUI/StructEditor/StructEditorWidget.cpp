@@ -422,6 +422,51 @@ void StructEditorWidget::onModifyStructPointerReference(QString nodeName, QStrin
   }
 }
 
+void StructEditorWidget::setupStructReferences()
+{
+  m_structPointerReferences.clear();
+  m_structReferences.clear();
+  QVector<StructTreeNode*> queue{m_structRootNode};
+  QMap<QString, StructDef*> knownStructs = getStructMap();
+
+  while (!queue.isEmpty())
+  {
+    StructTreeNode* curNode = queue.takeFirst();
+    if (!curNode->getChildren().isEmpty())
+      queue.append(curNode->getChildren());
+
+    if (curNode->getStructDef() != nullptr && curNode->getStructDef()->getFields().count() > 0)
+    {
+      QString nameSpace = curNode->getNameSpace();
+
+      for (FieldDef* field : curNode->getStructDef()->getFields())
+      {
+        if (field->isPadding())
+          continue;
+
+        if (field->getEntry()->getType() == Common::MemType::type_struct)
+        {
+          if (!knownStructs.keys().contains(field->getEntry()->getStructName()))
+          {
+            // This is an error, should be reported to the user, maybe they can select another struct to use in this field?
+            continue;
+          }
+
+          if (field->getEntry()->isBoundToPointer())
+            onModifyStructPointerReference(nameSpace, field->getEntry()->getStructName(), true);
+
+          else
+          {
+            bool ok;
+            onModifyStructReference(nameSpace, field->getEntry()->getStructName(), true, ok);
+            //This is an error, should be reported to the user. field should be cleared to padding in this case.
+          }
+        }
+      }
+    }
+  }
+}
+
 void StructEditorWidget::updateStructReferenceNames(QString old_name, QString new_name)
 {
   if (!m_structReferences.contains(old_name))
@@ -909,6 +954,8 @@ void StructEditorWidget::restoreStructDefs(const QString& json)
 {
   const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));
   m_structRootNode->readFromJson(loadDoc.object());
+
+  setupStructReferences();
 }
 
 QString StructEditorWidget::saveStructDefs()
