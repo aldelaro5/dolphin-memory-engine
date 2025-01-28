@@ -444,7 +444,12 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
   if (index != QVariant())
   {
     MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
-    if (index.column() == MemWatchModel::WATCH_COL_TYPE && !node->isGroup())
+
+    if (node->isGroup() || (node->getParent() && node->getParent()->getEntry() &&
+      GUICommon::isContainerType(node->getParent()->getEntry()->getType())))
+      return;
+
+    if (index.column() == MemWatchModel::WATCH_COL_TYPE)
     {
       MemWatchEntry* entry = node->getEntry();
       int typeIndex = static_cast<int>(entry->getType());
@@ -460,7 +465,7 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
         m_hasUnsavedChanges = true;
       }
     }
-    else if (index.column() == MemWatchModel::WATCH_COL_ADDRESS && !node->isGroup())
+    else if (index.column() == MemWatchModel::WATCH_COL_ADDRESS)
     {
       MemWatchEntry* entryCopy = new MemWatchEntry(node->getEntry());
       DlgAddWatchEntry dlg(false, entryCopy, m_structDefs->getStructNames(), this);
