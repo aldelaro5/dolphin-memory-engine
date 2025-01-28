@@ -427,7 +427,7 @@ void MemWatchWidget::pasteWatchFromClipBoard(const QModelIndex& referenceIndex)
   {
     const QString nodeStr{QApplication::clipboard()->text()};
     const QJsonDocument loadDoc{QJsonDocument::fromJson(nodeStr.toUtf8())};
-    copiedRootNode.readFromJson(loadDoc.object(), nullptr);
+    copiedRootNode.readFromJson(loadDoc.object(), QMap<QString, QString>());
   }
 
   const QVector<MemWatchTreeNode*> children{copiedRootNode.getChildren()};
