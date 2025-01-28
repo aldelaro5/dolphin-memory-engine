@@ -432,6 +432,39 @@ void StructEditorWidget::updateStructReferenceLengths(StructTreeNode* node)
   }
 }
 
+QStringList StructEditorWidget::checkForMapCycles(QMap<QString, QStringList> map, QString curName, QString origName)
+{
+  QStringList cycle;
+
+  if (origName == nullptr)
+  {
+    for (QString name : map.keys())
+    {
+      cycle = checkForMapCycles(map, name, name);
+      if (!cycle.isEmpty())
+        return cycle;
+    }
+    return cycle;
+  }
+
+  if (!map.contains(curName))
+    return cycle;
+
+  for (QString name : map[curName])
+  {
+    if (name == origName)
+      return {name};
+
+    cycle = checkForMapCycles(map, name, origName);
+    if (!cycle.isEmpty())
+    {
+      cycle.push_front(name);
+        return cycle;
+    }
+  }
+    return cycle;
+}
+
 void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)
 {
   QModelIndex index = m_structSelectView->indexAt(pos);

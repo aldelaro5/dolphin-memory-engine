@@ -72,6 +72,8 @@ private:
   void updateStructReferenceNames(QString old_name, QString new_name);
   void updateStructReferenceLengths(StructTreeNode* node);
 
+  QStringList checkForMapCycles(QMap<QString, QStringList> map, QString curName = nullptr, QString origName = nullptr);
+
   bool isAnyAncestorSelected(const QModelIndex& index) const;
   QModelIndexList simplifiedSelection() const;
 
