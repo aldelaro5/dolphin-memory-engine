@@ -58,7 +58,7 @@ MainWindow::MainWindow()
 
   // Connect load structs on load watch file
   connect(m_watcher, &MemWatchWidget::loadStructDefsFromJson, m_structEditor,
-          &StructEditorWidget::readStructDefsFromJson);
+          &StructEditorWidget::readStructDefMapFromJson);
   connect(m_watcher, &MemWatchWidget::writeStructDefsToJson, m_structEditor,
           &StructEditorWidget::writeStructDefMapToJson);
 

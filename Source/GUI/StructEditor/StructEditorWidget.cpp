@@ -761,7 +761,7 @@ void StructEditorWidget::unloadStruct()
   m_txtStructLength->setDisabled(true);
 }
 
-void StructEditorWidget::readStructDefsFromJson(const QJsonObject& json, QMap<QString, QString>& map)
+void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<QString, QString>& map)
 {
   QMap<QString, StructDef*> newStructDefs{};
 
