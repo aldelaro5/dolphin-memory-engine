@@ -486,7 +486,7 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
     }
   }
   else
-    fieldLen = Common::getSizeForType(entry->getType(), entry->getLength());
+    fieldLen = static_cast<u32>(Common::getSizeForType(entry->getType(), entry->getLength()));
 
   field->setEntry(entry);
   field->setFieldSize(fieldLen);

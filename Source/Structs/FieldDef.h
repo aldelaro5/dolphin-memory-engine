@@ -14,8 +14,8 @@ class FieldDef
 {
 public:
   FieldDef();
-  FieldDef(size_t offset, size_t size = -1, bool is_padding = false);
-  FieldDef(size_t offset, MemWatchEntry* entry);
+  FieldDef(u32 offset, u32 size = 0, bool is_padding = false);
+  FieldDef(u32 offset, MemWatchEntry* entry);
   explicit FieldDef(FieldDef* field);
 
   ~FieldDef();

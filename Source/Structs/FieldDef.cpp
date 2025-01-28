@@ -5,11 +5,11 @@
 FieldDef::FieldDef()
 {
   m_structOffset = 0;
-  m_size = -1;
+  m_size = 0;
   m_entry = new MemWatchEntry();
 }
 
-FieldDef::FieldDef(size_t offset, size_t size, bool is_padding)
+FieldDef::FieldDef(u32 offset, u32 size, bool is_padding)
 {
   m_structOffset = offset;
   m_size = size;
@@ -19,10 +19,10 @@ FieldDef::FieldDef(size_t offset, size_t size, bool is_padding)
     m_entry = new MemWatchEntry();
 }
 
-FieldDef::FieldDef(size_t offset, MemWatchEntry* entry)
+FieldDef::FieldDef(u32 offset, MemWatchEntry* entry)
 {
   m_structOffset = offset;
-  m_size = -1;
+  m_size = 0;
   m_entry = entry;
 }
 
@@ -103,7 +103,7 @@ void FieldDef::readFromJSON(const QJsonObject& json)
   m_size = json["length"].toInt();
 
   if (json["entry"] == QJsonValue::Undefined)
-    m_entry == nullptr;
+    m_entry = nullptr;
   else
     m_entry->readFromJson(json["entry"].toObject());
 }
