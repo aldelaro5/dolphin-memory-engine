@@ -518,10 +518,10 @@ QStringList StructEditorWidget::checkForMapCycles(QMap<QString, QStringList> map
     if (!cycle.isEmpty())
     {
       cycle.push_front(name);
-        return cycle;
+      return cycle;
     }
   }
-    return cycle;
+  return cycle;
 }
 
 void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)
@@ -886,7 +886,7 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
     def->readFromJson(structDefObj["def"].toObject());
 
     StructTreeNode* equivalentNode = m_structRootNode->findNode(structName);
-    if (equivalentNode != nullptr)
+    if (equivalentNode != nullptr) // Check if the struct is the same here?
     {
       StructTreeNode* nodeParent = equivalentNode->getParent();
       int i = 0;
@@ -953,7 +953,7 @@ void StructEditorWidget::writeStructDefsToJson(QJsonObject& json) const
 void StructEditorWidget::restoreStructDefs(const QString& json)
 {
   const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));
-  m_structRootNode->readFromJson(loadDoc.object());
+  m_structRootNode->readFromJson(loadDoc.object()); // may need to reset model here?
 
   setupStructReferences();
 }
