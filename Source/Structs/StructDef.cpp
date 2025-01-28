@@ -18,7 +18,7 @@ StructDef::StructDef(QString label)
   m_isValid = true;
 }
 
-StructDef::StructDef(QString label, u32 length, QVector<FieldDef*> entries, bool isPacked)
+StructDef::StructDef(QString label, u32 length, QVector<FieldDef*> entries)
 {
   m_label = label;
   m_length = length;
