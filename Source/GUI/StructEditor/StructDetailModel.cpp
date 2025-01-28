@@ -204,7 +204,7 @@ void StructDetailModel::removeFields(int start, int count)
 
 void StructDetailModel::updateFieldOffsets()
 {
-  int cur_offset = 0;
+  u32 cur_offset = 0;
   for (int i = 0; i < m_fields.count(); ++i)
   {
     FieldDef* field = m_fields[i];
@@ -258,7 +258,7 @@ void StructDetailModel::loadStruct(StructTreeNode* baseNode)
   m_baseNode = baseNode;
   m_curSize = m_baseNode->getStructDef()->getLength();
 
-  size_t cur_offset = 0;
+  u32 cur_offset = 0;
   for (FieldDef* field : m_baseNode->getStructDef()->getFields())
   {
     while (cur_offset < field->getOffset())
@@ -414,7 +414,7 @@ void StructDetailModel::clearFields(QModelIndexList indices)
   {
     if (!m_fields[i]->isPadding())
     {
-      int new_field_count = m_fields[i]->getFieldSize() - 1;
+      u32 new_field_count = m_fields[i]->getFieldSize() - 1;
 
       FieldDef* cur_field = m_fields[i];
       if (cur_field->getEntry()->getType() == Common::MemType::type_struct)
@@ -443,7 +443,7 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
 {
   FieldDef* field = getFieldByRow(index.row());
 
-  int oldFieldLen = field->getFieldSize();
+  u32 oldFieldLen = field->getFieldSize();
   MemWatchEntry* oldEntry = field->getEntry();
 
   if (oldEntry != nullptr && oldEntry->getType() == Common::MemType::type_struct)
@@ -459,7 +459,7 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
     }
   }
 
-  int fieldLen = 0;
+  u32 fieldLen = 0;
   if (entry->isBoundToPointer())
   {
     fieldLen = 4;

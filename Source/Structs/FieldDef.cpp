@@ -61,12 +61,12 @@ void FieldDef::setEntry(MemWatchEntry* entry)
     m_entry = entry;
 }
 
-size_t FieldDef::getFieldSize() const
+u32 FieldDef::getFieldSize() const
 {
  return m_size;
 }
 
-void FieldDef::setFieldSize(size_t size)
+void FieldDef::setFieldSize(u32 size)
 {
  m_size = size;
 }

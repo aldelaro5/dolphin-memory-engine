@@ -29,8 +29,8 @@ public:
   void setOffset(u32 offset);
   MemWatchEntry* getEntry() const;
   void setEntry(MemWatchEntry* entry);
-  size_t getFieldSize() const;
-  void setFieldSize(size_t size);
+  u32 getFieldSize() const;
+  void setFieldSize(u32 size);
   QString getLabel() const;
   void setLabel(QString label);
   bool isPadding() const;
@@ -41,6 +41,6 @@ public:
 
 private:
   u32 m_structOffset;
-  size_t m_size;
+  u32 m_size;
   MemWatchEntry* m_entry;
 };

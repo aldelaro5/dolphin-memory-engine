@@ -69,7 +69,7 @@ bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
   for (FieldDef* field : fields)
   {
     size_t fieldOffset = field->getOffset();
-    size_t fieldLength = field->getFieldSize();
+    u32 fieldLength = field->getFieldSize();
     if (fieldOffset + fieldLength > length)
     {
       return false;
@@ -200,7 +200,7 @@ void StructDef::writeToJson(QJsonObject& json)
 
 void StructDef::recalculateOffsets()
 {
-  int cur_offset = 0;
+  u32 cur_offset = 0;
   for (int i = 0; i < m_fields.count(); ++i)
   {
     if (m_fields[i]->getOffset() != cur_offset)
