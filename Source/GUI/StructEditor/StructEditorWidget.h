@@ -67,7 +67,7 @@ private:
   void onSaveStruct();
   void nameChangeFailed(StructTreeNode* node, QString name);
   void onLengthChange(u32 newLength);
-  void onModifyStructReference(QString nodeName, QString target, bool addIt);
+  void onModifyStructReference(QString nodeName, QString target, bool addIt, bool &ok);
   void onModifyStructPointerReference(QString nodeName, QString target, bool addIt);
   void updateStructReferenceNames(QString old_name, QString new_name);
   void updateStructReferenceLengths(StructTreeNode* node);

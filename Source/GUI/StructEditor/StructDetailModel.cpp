@@ -203,6 +203,8 @@ void StructDetailModel::removeFields(int start, int count)
         emit modifyStructPointerReference(m_baseNode->getNameSpace(), m_fields[i]->getEntry()->getStructName(), false);
       else
       {
+        bool _;
+        emit modifyStructReference(m_baseNode->getNameSpace(), m_fields[i]->getEntry()->getStructName(), false, _);
       }
 
     }
@@ -437,6 +439,9 @@ void StructDetailModel::clearFields(QModelIndexList indices)
                                             m_fields[i]->getEntry()->getStructName(), false);
         else
         {
+          bool _;
+          emit modifyStructReference(m_baseNode->getNameSpace(),
+                                     m_fields[i]->getEntry()->getStructName(), false, _);
         }
       }
 
@@ -462,6 +467,10 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
       emit modifyStructPointerReference(m_baseNode->getNameSpace(), oldEntry->getStructName(), false);
     else
     {
+      bool ok = false;
+      emit modifyStructReference(m_baseNode->getNameSpace(), oldEntry->getStructName(), false, ok);
+      if (!ok)
+        return false;
     }
   }
 
@@ -483,7 +492,10 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
     else
     {
       fieldLen = m_baseNode->getParent()->getSizeOfStruct(entry->getStructName());
-      emit modifyStructReference(m_baseNode->getNameSpace(), entry->getStructName(), true);
+      bool ok = false;
+      emit modifyStructReference(m_baseNode->getNameSpace(), entry->getStructName(), true, ok);
+      if (!ok)
+        return false;
     }
   }
   else

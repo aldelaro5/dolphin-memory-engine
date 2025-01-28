@@ -371,7 +371,7 @@ void StructEditorWidget::onLengthChange(u32 newLength)
   m_txtStructLength->setText(QString::number(newLength, 16));
 }
 
-void StructEditorWidget::onModifyStructReference(QString nodeName, QString target, bool addRef)
+void StructEditorWidget::onModifyStructReference(QString nodeName, QString target, bool addRef, bool& ok)
 {
   if (addRef)
   {
@@ -399,6 +399,7 @@ void StructEditorWidget::onModifyStructReference(QString nodeName, QString targe
       m_structReferences[target].removeAt(m_structReferences[target].indexOf(nodeName));
     if (m_structReferences[target].isEmpty())
       m_structReferences.remove(target);
+    ok = true;
   }
 }
 
