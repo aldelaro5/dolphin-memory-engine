@@ -379,6 +379,19 @@ void StructEditorWidget::onModifyStructReference(QString nodeName, QString targe
       m_structReferences.insert(target, {nodeName});
     else
       m_structReferences[target].push_back(nodeName);
+
+    QStringList cycle = checkForMapCycles(m_structReferences);
+    ok = cycle.isEmpty();
+    if (ok)
+      return;
+
+    bool _;
+    onModifyStructReference(nodeName, target, false, _);
+    cycle.push_back(QString(" -- ") + cycle.takeLast());
+    cycle.push_front(QString(" -> ") + cycle.takeFirst());
+    QString msg = "Cyclic struct reference found:\n\n" + cycle.join("\n |\t|\n |\tV\n |  ") + "\n\nUnable to set field of " +
+                  nodeName + " to " + target;
+    QMessageBox::warning(this, "Struct - Cyclic Reference", msg);
   }
   else if (m_structReferences.contains(target))
   {
