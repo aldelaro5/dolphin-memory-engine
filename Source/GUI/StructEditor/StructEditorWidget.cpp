@@ -799,6 +799,41 @@ void StructEditorWidget::readStructDefsFromJson(const QJsonObject& json, QMap<QS
   }
 }
 
+void StructEditorWidget::writeStructDefMapToJson(QJsonObject& json, const QStringList desiredStructs) const
+{
+  QStringList structsWritten{};
+  QJsonArray structs;
+
+  QStringList queue{desiredStructs};
+  while (!queue.isEmpty())
+  {
+    QString nextStruct = queue.takeFirst();
+    if (structsWritten.contains(nextStruct))
+      continue;
+
+    StructTreeNode* node = m_structRootNode->findNode(nextStruct);
+    if (node == nullptr)
+      continue;
+
+    QJsonObject structDefObject{};
+    QJsonObject structDef;
+    node->getStructDef()->writeToJson(structDef);
+
+    structDefObject["name"] = nextStruct;
+    structDefObject["def"] = structDef;
+    structs.append(structDefObject);
+
+    structsWritten.push_back(nextStruct);
+    if (m_structReferences.contains(nextStruct))
+      queue.append(m_structReferences[nextStruct]);
+  }
+
+  json["structDefs"] = structs;
+
+  QJsonDocument saveDoc(json);
+  auto doc = saveDoc.toJson();
+}
+
 void StructEditorWidget::writeStructDefsToJson(QJsonObject& json) const
 {
   m_structRootNode->writeToJson(json);

@@ -60,6 +60,7 @@ signals:
   void mustUnhook();
   void goToAddressInViewer(u32 address);
   void loadStructDefsFromJson(const QJsonObject& json, QMap<QString, QString>& map);
+  void writeStructDefsToJson(QJsonObject& json, const QStringList& desiredStructs);
 
 private:
   void initialiseWidgets();

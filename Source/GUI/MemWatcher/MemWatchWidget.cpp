@@ -828,6 +828,7 @@ bool MemWatchWidget::saveWatchFile()
     }
     QJsonObject root;
     m_watchModel->writeRootToJsonRecursive(root);
+    emit writeStructDefsToJson(root, m_watchModel->getStructsInUse());
     QJsonDocument saveDoc(root);
     watchFile.write(saveDoc.toJson());
     watchFile.close();
@@ -857,6 +858,7 @@ bool MemWatchWidget::saveAsWatchFile()
     }
     QJsonObject root;
     m_watchModel->writeRootToJsonRecursive(root);
+    emit writeStructDefsToJson(root, m_watchModel->getStructsInUse());
     QJsonDocument saveDoc(root);
     watchFile.write(saveDoc.toJson());
     watchFile.close();

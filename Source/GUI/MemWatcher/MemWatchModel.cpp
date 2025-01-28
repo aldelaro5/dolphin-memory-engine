@@ -740,7 +740,6 @@ MemWatchModel::CTParsingErrors MemWatchModel::importRootFromCTFile(QFile* const 
 void MemWatchModel::writeRootToJsonRecursive(QJsonObject& json) const
 {
   m_rootNode->writeToJson(json);
-  writeStructDefsToJson(json);
 }
 
 QString MemWatchModel::writeRootToCSVStringRecursive() const
@@ -942,28 +941,6 @@ void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
   }
 }
 
-void MemWatchModel::writeStructDefsToJson(QJsonObject& json) const
-{
-  if (m_structNodes.keys().count() == 0)
-    return;
-
-  QJsonArray structs;
-
-  for (QString key : m_structNodes.keys())
-  {
-    if (!m_structDefMap.contains(key))
-      continue;
-    QJsonObject structDefObject{};
-    QJsonObject structDef{};
-    m_structDefMap[key]->writeToJson(structDef);
-    structDefObject["name"] = key;
-    structDefObject["def"] = structDef;
-    structs.append(structDefObject);
-  }
-
-  json["structDefs"] = structs;
-}
-
 void MemWatchModel::updateContainerAddresses(MemWatchTreeNode* node)
 {
   if (node->isGroup() || !GUICommon::isContainerType(node->getEntry()->getType()) ||
@@ -1012,4 +989,9 @@ void MemWatchModel::setupContainersRecursive(MemWatchTreeNode* node)
       if (child->getEntry()->getType() == Common::MemType::type_struct)
         setupStructNode(child);
   }
+}
+
+QStringList MemWatchModel::getStructsInUse()
+{
+  return m_structNodes.keys();
 }
