@@ -35,7 +35,6 @@ public:
   Qt::DropActions supportedDropActions() const override;
   Qt::DropActions supportedDragActions() const override;
 
-  bool editData(const QModelIndex& index, const QVariant& value, int role, bool emitEdit = false);
   void addPaddingFields(int count = 1, int start = -1);
   void removePaddingFields(int count, int start);
   void removeFields(QModelIndexList indices);

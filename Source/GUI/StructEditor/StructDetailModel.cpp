@@ -128,21 +128,6 @@ Qt::DropActions StructDetailModel::supportedDragActions() const
   return Qt::IgnoreAction;
 }
 
-bool StructDetailModel::editData(const QModelIndex& index, const QVariant& value, int role,
-                                 bool emitEdit)
-{
-  if (!index.isValid())
-    return false;
-
-  if (index.column() == STRUCT_COL_LABEL)
-  {
-    FieldDef* field = static_cast<FieldDef*>(index.internalPointer());
-    field->setLabel(value.toString());
-  }
-
-  return true;
-}
-
 void StructDetailModel::addPaddingFields(int count, int start)
 {
   u32 starting_offset;
