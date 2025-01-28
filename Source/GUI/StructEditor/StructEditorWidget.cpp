@@ -20,6 +20,7 @@ public:
   }
   QValidator::State validate(QString& input, int& pos) const override
   {
+    (void)pos;
     if (input.isEmpty())
       return Intermediate;
 
@@ -672,6 +673,7 @@ void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
 void StructEditorWidget::onDetailDataEdited(const QModelIndex& index, const QVariant& value,
                                             int role)
 {
+  (void)value;
   if (role != Qt::EditRole)
     return;
 

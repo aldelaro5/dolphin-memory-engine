@@ -20,11 +20,13 @@ StructDetailModel::~StructDetailModel()
 
 int StructDetailModel::columnCount(const QModelIndex& parent) const
 {
+  (void)parent;
   return STRUCT_COL_NUM;
 }
 
 int StructDetailModel::rowCount(const QModelIndex& parent) const
 {
+  (void)parent;
   return m_fields.count();
 }
 
