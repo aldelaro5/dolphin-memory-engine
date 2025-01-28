@@ -36,7 +36,7 @@ public:
   }
 };
 
-StructEditorWidget::StructEditorWidget(QWidget* parent)
+StructEditorWidget::StructEditorWidget(QWidget* parent) : QWidget(parent)
 {
   m_structRootNode = new StructTreeNode(nullptr, nullptr);
   setAttribute(Qt::WA_AlwaysShowToolTips);
