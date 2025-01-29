@@ -845,6 +845,8 @@ void MemWatchModel::onStructDefAddRemove(QString structName, StructDef* structDe
 {
   if (structDef == nullptr)
     m_structDefMap.remove(structName);
+  else if (m_structDefMap.contains(structName))
+    m_structDefMap[structName] = structDef;
   else
     m_structDefMap.insert(structName, structDef);
 
