@@ -68,7 +68,8 @@ void MemWatchModel::onFreezeTimer()
 bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QModelIndex& parent,
                                              bool readSucess)
 {
-  if (!node->isGroup() && GUICommon::isContainerType(node->getEntry()->getType()))
+  if (!node->isGroup() && node->getEntry() != nullptr &&
+      GUICommon::isContainerType(node->getEntry()->getType()))
     updateContainerAddresses(node);
 
   QVector<MemWatchTreeNode*> children = node->getChildren();
@@ -86,7 +87,7 @@ bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QMode
   }
 
   MemWatchEntry* entry = node->getEntry();
-  if (entry->getType() != Common::MemType::type_none)
+  if (entry != nullptr && entry->getType() != Common::MemType::type_none)
     if (entry->readMemoryFromRAM() == Common::MemOperationReturnCode::operationFailed)
       return false;
   return true;
@@ -108,7 +109,7 @@ bool MemWatchModel::freezeNodeValueRecursive(MemWatchTreeNode* node, const QMode
   }
 
   MemWatchEntry* entry = node->getEntry();
-  if (entry->isLocked())
+  if (entry != nullptr && entry->isLocked())
   {
     Common::MemOperationReturnCode writeReturn = entry->freeze();
     // Here we want to not care about invalid pointers, it won't write anyway
