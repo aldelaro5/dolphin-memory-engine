@@ -924,22 +924,22 @@ void MemWatchModel::collapseContainerNode(MemWatchTreeNode* node)
 
 void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
 {
-  for (MemWatchTreeNode* child : node->getChildren())
+  for (int i = node->getChildren().count() - 1; i >= 0; --i)
   {
+    MemWatchTreeNode* child = node->getChildren()[i];
     if (GUICommon::isContainerType(child->getEntry()->getType()))
       if (child->getEntry()->getType() == Common::MemType::type_struct)
+      {
         collapseStructNode(child);
+        removeNodeFromStructNodeMap(child);
+      }
+    deleteNode(getIndexFromTreeNode(child));
   }
     
   if (isTopLevel)
   {
     addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))}, getIndexFromTreeNode(node), true);
     node->setExpanded(false);
-  }
-  else
-  {
-    removeNodeFromStructNodeMap(node);
-    deleteNode(getIndexFromTreeNode(node));
   }
 }
 
