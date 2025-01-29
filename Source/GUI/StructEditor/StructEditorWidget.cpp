@@ -450,6 +450,7 @@ void StructEditorWidget::setupStructReferences()
           if (!knownStructs.keys().contains(field->getEntry()->getStructName()))
           {
             // This is an error, should be reported to the user, maybe they can select another struct to use in this field?
+            printf("error");
             continue;
           }
 
@@ -460,7 +461,10 @@ void StructEditorWidget::setupStructReferences()
           {
             bool ok;
             onModifyStructReference(nameSpace, field->getEntry()->getStructName(), true, ok);
-            //This is an error, should be reported to the user. field should be cleared to padding in this case.
+            if (!ok)
+            {
+              //This is an error, should be reported to the user. field should be cleared to padding in this case.
+            }
           }
         }
       }
