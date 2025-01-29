@@ -109,6 +109,7 @@ private:
   void collapseStructNode(MemWatchTreeNode* node, bool isTopLevel = false);
 
   MemWatchTreeNode* m_rootNode;
+  MemWatchEntry* m_placeholderEntry;
   QMap<QString, StructDef*> m_structDefMap{};
   QMap<QString, QVector<MemWatchTreeNode*>> m_structNodes{};
 };

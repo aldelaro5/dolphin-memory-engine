@@ -37,6 +37,10 @@ QString getAddressString(const MemWatchEntry* const entry)
 MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
 {
   m_rootNode = new MemWatchTreeNode(nullptr);
+  m_placeholderEntry = new MemWatchEntry();
+  m_placeholderEntry->setTypeAndLength(
+      Common::MemType::type_none,
+      Common::getSizeForType(Common::MemType::type_none, m_placeholderEntry->getLength()));
   m_structDefMap = QMap<QString, StructDef*>();
   m_structNodes = QMap <QString, QVector<MemWatchTreeNode*>>();
 }
@@ -44,6 +48,7 @@ MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
 MemWatchModel::~MemWatchModel()
 {
   delete m_rootNode;
+  delete m_placeholderEntry;
   m_structDefMap.clear();
   m_structNodes.clear();
 }
@@ -63,7 +68,7 @@ void MemWatchModel::onFreezeTimer()
 bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QModelIndex& parent,
                                              bool readSucess)
 {
-  if (!node->isGroup() && node->getEntry() != nullptr && GUICommon::isContainerType(node->getEntry()->getType()))
+  if (!node->isGroup() && GUICommon::isContainerType(node->getEntry()->getType()))
     updateContainerAddresses(node);
 
   QVector<MemWatchTreeNode*> children = node->getChildren();
@@ -81,7 +86,7 @@ bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QMode
   }
 
   MemWatchEntry* entry = node->getEntry();
-  if (entry != nullptr)
+  if (entry->getType() != Common::MemType::type_none)
     if (entry->readMemoryFromRAM() == Common::MemOperationReturnCode::operationFailed)
       return false;
   return true;
@@ -103,16 +108,13 @@ bool MemWatchModel::freezeNodeValueRecursive(MemWatchTreeNode* node, const QMode
   }
 
   MemWatchEntry* entry = node->getEntry();
-  if (entry != nullptr)
+  if (entry->isLocked())
   {
-    if (entry->isLocked())
-    {
-      Common::MemOperationReturnCode writeReturn = entry->freeze();
-      // Here we want to not care about invalid pointers, it won't write anyway
-      if (writeReturn == Common::MemOperationReturnCode::OK ||
-          writeReturn == Common::MemOperationReturnCode::invalidPointer)
-        return true;
-    }
+    Common::MemOperationReturnCode writeReturn = entry->freeze();
+    // Here we want to not care about invalid pointers, it won't write anyway
+    if (writeReturn == Common::MemOperationReturnCode::OK ||
+        writeReturn == Common::MemOperationReturnCode::invalidPointer)
+      return true;
   }
   return true;
 }
@@ -347,14 +349,14 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
     }
 
     MemWatchEntry* entry = item->getEntry();
-    if (entry == nullptr)
-      return QString();
-
     if (role == Qt::EditRole && index.column() == WATCH_COL_TYPE)
-      return {static_cast<int>(item->getEntry()->getType())};
+      return {static_cast<int>(entry->getType())};
 
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
+      if (entry->getType() == Common::MemType::type_none)
+        return QString();
+
       switch (index.column())
       {
       case WATCH_COL_LABEL:
@@ -393,7 +395,7 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       }
     }
 
-    if (index.column() == 0 && role == Qt::DecorationRole && entry != nullptr && GUICommon::isContainerType(entry->getType()))
+    if (index.column() == 0 && role == Qt::DecorationRole && GUICommon::isContainerType(entry->getType()))
     {
       if (entry->getType() == Common::MemType::type_struct)
       {
@@ -497,6 +499,8 @@ Qt::ItemFlags MemWatchModel::flags(const QModelIndex& index) const
       flags |= Qt::ItemIsEditable;
     return flags;
   }
+  else if (node->getEntry()->getType() == Common::MemType::type_none)
+    return Qt::ItemFlag::NoItemFlags;
 
   if (index.column() == WATCH_COL_LOCK)
     return flags;
@@ -784,7 +788,7 @@ void MemWatchModel::setupStructNode(MemWatchTreeNode* node)
       !m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
   {
     addNodeToStructNodeMap(node);
-    addNodes({new MemWatchTreeNode(nullptr)}, getIndexFromTreeNode(node), true);
+    addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))}, getIndexFromTreeNode(node), true);
   }
 }
 
@@ -867,8 +871,7 @@ void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
 
 void MemWatchModel::expandContainerNode(MemWatchTreeNode* node)
 {
-  if (node->isGroup() || node->getEntry() == nullptr ||
-      !GUICommon::isContainerType(node->getEntry()->getType()))
+  if (node->isGroup() || !GUICommon::isContainerType(node->getEntry()->getType()))
     return;
 
   if (node->getEntry()->getType() == Common::MemType::type_struct)
@@ -911,8 +914,7 @@ void MemWatchModel::expandStructNode(MemWatchTreeNode* node)
   
 void MemWatchModel::collapseContainerNode(MemWatchTreeNode* node)
 {
-  if (node->isGroup() || node->getEntry() == nullptr ||
-      !GUICommon::isContainerType(node->getEntry()->getType()))
+  if (node->isGroup() || !GUICommon::isContainerType(node->getEntry()->getType()))
     return;
 
   if (node->getEntry()->getType() == Common::MemType::type_struct)
@@ -924,14 +926,14 @@ void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
 {
   for (MemWatchTreeNode* child : node->getChildren())
   {
-    if (child->getEntry() != nullptr && GUICommon::isContainerType(child->getEntry()->getType()))
+    if (GUICommon::isContainerType(child->getEntry()->getType()))
       if (child->getEntry()->getType() == Common::MemType::type_struct)
         collapseStructNode(child);
   }
     
   if (isTopLevel)
   {
-    addNodes({new MemWatchTreeNode(nullptr)}, getIndexFromTreeNode(node), true);
+    addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))}, getIndexFromTreeNode(node), true);
     node->setExpanded(false);
   }
   else
@@ -984,8 +986,7 @@ void MemWatchModel::setupContainersRecursive(MemWatchTreeNode* node)
   {
     if (child->getParent() == nullptr || child->isGroup())
       setupContainersRecursive(child);
-    else if (child->getEntry() != nullptr &&
-             GUICommon::isContainerType(child->getEntry()->getType()))
+    else if (GUICommon::isContainerType(child->getEntry()->getType()))
       if (child->getEntry()->getType() == Common::MemType::type_struct)
         setupStructNode(child);
   }
