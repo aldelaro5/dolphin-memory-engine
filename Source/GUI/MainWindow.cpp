@@ -695,6 +695,6 @@ void MainWindow::updateStatusBar()
 
 void MainWindow::makeStructEditor()
 {
-  m_structEditor = new StructEditorWidget(this);
+  m_structEditor = new StructEditorWidget(nullptr);
   m_structEditor->setWindowIcon(windowIcon());
 }
