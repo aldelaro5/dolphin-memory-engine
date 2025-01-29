@@ -490,18 +490,21 @@ Qt::ItemFlags MemWatchModel::flags(const QModelIndex& index) const
   if (node == m_rootNode)
     return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 
+  MemWatchTreeNode* parent = node->getParent();
   // These flags are common to every node
-  Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled;
+  Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
   if (node->isGroup())
   {
-    flags |= Qt::ItemIsDropEnabled;
+    flags |= Qt::ItemIsDropEnabled | Qt::ItemIsDragEnabled;
     if (index.column() == WATCH_COL_LABEL)
       flags |= Qt::ItemIsEditable;
     return flags;
   }
   else if (node->getEntry()->getType() == Common::MemType::type_none)
     return Qt::ItemFlag::NoItemFlags;
+  else if (parent == m_rootNode || parent->isGroup())
+    flags |= Qt::ItemIsDragEnabled;
 
   if (index.column() == WATCH_COL_LOCK)
     return flags;
