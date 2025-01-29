@@ -442,7 +442,7 @@ void DlgAddWatchEntry::onAddressChanged()
 
 void DlgAddWatchEntry::updatePreview()
 {
-  if (!GUICommon::isContainerType(m_entry->getType()))
+  if (GUICommon::isContainerType(m_entry->getType()))
   {
     if (m_showAddress)
       m_lblValuePreview->setText("???");
