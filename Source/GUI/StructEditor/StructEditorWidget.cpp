@@ -353,8 +353,8 @@ void StructEditorWidget::onSaveStruct()
 {
   m_structDetailModel->saveStruct();
   m_nodeInDetailEditor->setStructDef(new StructDef(m_structDetailModel->getLoadedStructNode()->getStructDef()));
-  updateStructReferenceFieldSize(m_nodeInDetailEditor);
   emit structAddedRemoved(m_nodeInDetailEditor->getNameSpace(), m_nodeInDetailEditor->getStructDef());
+  updateStructReferenceFieldSize(m_nodeInDetailEditor);
   m_btnSaveStructDetails->setDisabled(true);
 }
 
