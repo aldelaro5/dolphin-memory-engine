@@ -85,7 +85,10 @@ bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
       if (i == firstSegment)
       {
         size_t maskLength = fmin(fieldLength, (segbitsize - fieldOffset % segbitsize));
-        entryByteMask = ((1ULL << maskLength) - 1) << fieldOffset;
+        if (maskLength == 0x40)
+          entryByteMask--;
+        else
+          entryByteMask = ((1ULL << (maskLength)) - 1) << fieldOffset;
         lengthChecked += maskLength;
       }
       else if (firstSegment != lastSegment && i == lastSegment)
