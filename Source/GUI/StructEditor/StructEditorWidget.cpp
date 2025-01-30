@@ -481,7 +481,7 @@ void StructEditorWidget::updateStructReferenceNames(QString old_name, QString ne
     m_structRootNode->findNode(target)->getStructDef()->updateStructTypeLabel(old_name, new_name);
 }
 
-void StructEditorWidget::updateStructReferenceLengths(StructTreeNode* node)
+void StructEditorWidget::updateStructReferenceFieldSize(StructTreeNode* node)
 {
   u32 structLength = node->getStructDef()->getLength();
   QString keyNameSpace = node->getNameSpace();

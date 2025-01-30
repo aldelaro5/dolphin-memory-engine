@@ -71,7 +71,7 @@ private:
   void onModifyStructPointerReference(QString nodeName, QString target, bool addIt);
   void setupStructReferences();
   void updateStructReferenceNames(QString old_name, QString new_name);
-  void updateStructReferenceLengths(StructTreeNode* node);
+  void updateStructReferenceFieldSize(StructTreeNode* node);
 
   QStringList checkForMapCycles(QMap<QString, QStringList> map, QString curName = nullptr, QString origName = nullptr);
 
