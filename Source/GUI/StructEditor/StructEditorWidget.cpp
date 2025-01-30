@@ -488,7 +488,7 @@ void StructEditorWidget::updateStructReferenceNames(QString old_name, QString ne
     if (m_structPointerReferences.contains(old_name))
   {
       for (QString target : m_structPointerReferences[old_name])
-    m_structRootNode->findNode(target)->getStructDef()->updateStructTypeLabel(old_name, new_name);
+      m_structRootNode->findNode(target)->getStructDef()->updateStructTypeLabel(old_name, new_name);
       QStringList refs = m_structPointerReferences.take(old_name);
       m_structPointerReferences.insert(new_name, refs);
       for (QString key : m_structPointerReferences.keys())
@@ -601,8 +601,8 @@ void StructEditorWidget::onSelectDataEdited(const QModelIndex& index, const QVar
     if (!node->isGroup())
       if (m_nodeInDetailEditor != nullptr && oldFullName == m_nodeInDetailEditor->getNameSpace())
         m_structDetailModel->getLoadedStructNode()->setName(node->getName());
-    }
   }
+}
 
 void StructEditorWidget::updateChildStructNames(StructTreeNode* node, QString oldNameSpace)
 {
