@@ -69,7 +69,7 @@ bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QMode
                                              bool readSucess)
 {
   if (!node->isGroup() && node->getEntry() != nullptr &&
-      GUICommon::isContainerType(node->getEntry()->getType()))
+      GUICommon::isContainerType(node->getEntry()->getType()) && node->getEntry()->hasAddressChanged())
     updateContainerAddresses(node);
 
   QVector<MemWatchTreeNode*> children = node->getChildren();
@@ -972,9 +972,12 @@ void MemWatchModel::updateStructAddresses(MemWatchTreeNode* node)
 
   if (def->getFields().count() != node->getChildren().count())
     updateStructNode(node);
+  else if (!node->getEntry()->hasAddressChanged())
+    return;
   else
   {
     u32 addr = node->getEntry()->getActualAddress();
+    node->getEntry()->updateActualAddress(addr);
     QVector<FieldDef*> fields = def->getFields();
     QVector<MemWatchTreeNode*> children = node->getChildren();
 
