@@ -91,7 +91,7 @@ bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
           entryByteMask = ((1ULL << (maskLength)) - 1) << fieldOffset;
         lengthChecked += maskLength;
       }
-      else if (firstSegment != lastSegment && i == lastSegment)
+      else if (i == lastSegment)
       {
         entryByteMask = ((1ULL << (fieldLength - lengthChecked)) - 1);
         lengthChecked += (fieldLength - lengthChecked);
