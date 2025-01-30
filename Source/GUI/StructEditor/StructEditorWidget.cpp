@@ -353,9 +353,9 @@ void StructEditorWidget::onSaveStruct()
 {
   m_structDetailModel->saveStruct();
   m_nodeInDetailEditor->setStructDef(new StructDef(m_structDetailModel->getLoadedStructNode()->getStructDef()));
-  emit updateStructDetails(m_structDetailModel->getLoadedStructNode()->getNameSpace());
+  updateStructReferenceFieldSize(m_nodeInDetailEditor);
+  emit structAddedRemoved(m_nodeInDetailEditor->getNameSpace(), m_nodeInDetailEditor->getStructDef());
   m_btnSaveStructDetails->setDisabled(true);
-  updateStructReferenceLengths(m_nodeInDetailEditor);
 }
 
 void StructEditorWidget::nameChangeFailed(StructTreeNode* node, QString name)
