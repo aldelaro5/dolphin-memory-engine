@@ -286,7 +286,7 @@ void StructDetailModel::saveStruct()
   for (FieldDef* field : m_fields)
   {
     if (field->getEntry())
-      new_fields.push_back(field);
+      new_fields.push_back(new FieldDef(field));
   }
   m_baseNode->getStructDef()->setFields(new_fields);
 }
