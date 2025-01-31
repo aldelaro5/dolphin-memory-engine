@@ -954,8 +954,12 @@ void StructEditorWidget::writeStructDefMapToJson(QJsonObject& json, const QStrin
     structs.append(structDefObject);
 
     structsWritten.push_back(nextStruct);
-    if (m_structReferences.contains(nextStruct))
-      queue.append(m_structReferences[nextStruct]);
+    for (QString key : m_structReferences.keys())
+      if (m_structReferences[key].contains(nextStruct))
+        queue.append(key);
+    for (QString key : m_structPointerReferences.keys())
+      if (m_structPointerReferences[key].contains(nextStruct))
+        queue.append(key);
   }
 
   json["structDefs"] = structs;
