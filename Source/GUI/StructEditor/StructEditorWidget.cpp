@@ -659,6 +659,11 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
     FieldDef* node = m_structDetailModel->getFieldByRow(index.row());
     if (node != nullptr)
     {
+
+      QAction* const deleteField{new QAction(tr("Delete field(s)"), this)};
+      connect(deleteField, &QAction::triggered, this, &StructEditorWidget::onDeleteFields);
+      contextMenu->addAction(deleteField);
+
       if (node->isPadding())
       {
         QAction* const createEntry{new QAction(tr("Create field entry"), this)};
