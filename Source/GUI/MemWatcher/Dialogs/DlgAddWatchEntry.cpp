@@ -14,11 +14,11 @@
 #include "../../../DolphinProcess/DolphinAccessor.h"
 #include "../../GUICommon.h"
 
-DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const entry, QVector<QString> const structs,
-                                   QWidget* const parent, bool showAddress)
+DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const entry, QVector<QString> const structs, QWidget* const parent,
+                                   bool isForStructField)
     : QDialog(parent)
 {
-  m_isForStructField = showAddress;
+  m_isForStructField = isForStructField;
   m_structNames = structs;
   m_structNames.push_front(QString(""));
   setWindowTitle(newEntry ? "Add Watch" : "Edit Watch");
