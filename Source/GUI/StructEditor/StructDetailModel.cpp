@@ -412,7 +412,7 @@ void StructDetailModel::clearFields(QModelIndexList indices)
   int start = indices[0].row();
   int count = indices.count();
 
-  for (int i = start + count; i > start; --i)
+  for (int i = start + count - 1; i >= start; --i)
   {
     if (!m_fields[i]->isPadding())
     {
