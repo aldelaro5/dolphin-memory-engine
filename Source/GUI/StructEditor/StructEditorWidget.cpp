@@ -253,6 +253,20 @@ void StructEditorWidget::createNewFieldEntry(const QModelIndex& index)
   m_btnSaveStructDetails->setEnabled(true);
 }
 
+void StructEditorWidget::editFieldEntry(const QModelIndex& index)
+{
+  FieldDef* field = m_structDetailModel->getFieldByRow(index.row());
+
+  DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()), m_structRootNode->getStructNames(), this, false);
+  if (dlg.exec() == QDialog::Accepted)
+  {
+    if (!m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index))
+      return;
+  }
+
+  m_btnSaveStructDetails->setEnabled(true);
+}
+
 void StructEditorWidget::onDetailNameChanged()
 {
   if (m_nodeInDetailEditor->getName() == m_txtStructName->text())
@@ -675,15 +689,7 @@ void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
   else if (index.column() == StructDetailModel::STRUCT_COL_LABEL)
     m_structDetailView->edit(index);
   else
-  {
-    DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()),
-                         m_structRootNode->getStructNames(), this, false);
-    if (dlg.exec() == QDialog::Accepted)
-    {
-      if (!m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index))
-        return;
-    }
-  }
+    editFieldEntry(index);
   m_btnSaveStructDetails->setEnabled(true);
 }
 

@@ -57,6 +57,7 @@ private:
   void makeLayouts();
 
   void createNewFieldEntry(const QModelIndex& index);
+  void editFieldEntry(const QModelIndex& index);
 
   void onDetailNameChanged();
   void updateChildStructNames(StructTreeNode* node, QString oldNameSpace);
