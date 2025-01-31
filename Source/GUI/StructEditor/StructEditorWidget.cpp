@@ -676,6 +676,13 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
         QAction* const clearField{new QAction(tr("Clear field"), this)};
         connect(clearField, &QAction::triggered, this, &StructEditorWidget::onClearFields);
         contextMenu->addAction(clearField);
+
+        contextMenu->addSeparator();
+
+        QAction* const editField{new QAction(tr("Edit field entry"), this)};
+        connect(editField, &QAction::triggered, this,
+                [this, index] { editFieldEntry(index); });
+        contextMenu->addAction(editField);
       }
     }
   }
