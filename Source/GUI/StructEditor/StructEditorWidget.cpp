@@ -656,9 +656,7 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
   contextMenu->addAction(addField);
   if (index != QModelIndex())
   {
-    FieldDef* node = static_cast<FieldDef*>(index.internalPointer());
-    if (node == nullptr)
-      node = m_structDetailModel->getFieldByRow(index.row());
+    FieldDef* node = m_structDetailModel->getFieldByRow(index.row());
     if (node != nullptr)
     {
       if (node->isPadding())
