@@ -241,7 +241,7 @@ void StructEditorWidget::makeLayouts()
   setLayout(widgetLayout);
 }
 
-void StructEditorWidget::onConvertPaddingToEntry(const QModelIndex& index)
+void StructEditorWidget::createNewFieldEntry(const QModelIndex& index)
 {
   DlgAddWatchEntry dlg(true, nullptr, m_structRootNode->getStructNames(), this, false);
   if (dlg.exec() == QDialog::Accepted)
@@ -671,7 +671,7 @@ void StructEditorWidget::onDetailDoubleClicked(const QModelIndex& index)
   FieldDef* field = m_structDetailModel->getFieldByRow(index.row());
 
   if (field->isPadding())
-    onConvertPaddingToEntry(index);
+    createNewFieldEntry(index);
   else if (index.column() == StructDetailModel::STRUCT_COL_LABEL)
     m_structDetailView->edit(index);
   else

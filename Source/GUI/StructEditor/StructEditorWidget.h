@@ -56,7 +56,7 @@ private:
   void initialiseWidgets();
   void makeLayouts();
 
-  void onConvertPaddingToEntry(const QModelIndex& index);
+  void createNewFieldEntry(const QModelIndex& index);
 
   void onDetailNameChanged();
   void updateChildStructNames(StructTreeNode* node, QString oldNameSpace);
