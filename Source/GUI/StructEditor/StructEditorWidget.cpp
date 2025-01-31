@@ -663,7 +663,7 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
       {
         QAction* const createEntry{new QAction(tr("Create field entry"), this)};
         connect(createEntry, &QAction::triggered, this,
-                [this, index] { onConvertPaddingToEntry(index); });
+                [this, index] { createNewFieldEntry(index); });
         contextMenu->addAction(createEntry);
       }
       else
