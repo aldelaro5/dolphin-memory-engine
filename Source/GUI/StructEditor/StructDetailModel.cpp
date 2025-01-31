@@ -416,8 +416,6 @@ void StructDetailModel::clearFields(QModelIndexList indices)
   {
     if (!m_fields[i]->isPadding())
     {
-      u32 new_field_count = m_fields[i]->getFieldSize() - 1;
-
       FieldDef* cur_field = m_fields[i];
       if (cur_field->getEntry()->getType() == Common::MemType::type_struct)
       {
@@ -432,6 +430,13 @@ void StructDetailModel::clearFields(QModelIndexList indices)
         }
       }
 
+      if (m_fields[i]->getFieldSize() == 0)
+      {
+        removeFields({createIndex(i, 0, cur_field)});
+        continue;
+      }
+
+      u32 new_field_count = cur_field->getFieldSize() - 1;
       cur_field->convertToPadding();
       QModelIndex field_index = createIndex(i, 0, cur_field);
       emit dataChanged(field_index, field_index.siblingAtColumn(columnCount({}) - 1));
