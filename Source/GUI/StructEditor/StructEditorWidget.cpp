@@ -378,8 +378,10 @@ void StructEditorWidget::onModifyStructReference(QString nodeName, QString targe
   {
     if (!m_structReferences.contains(target))
       m_structReferences.insert(target, {nodeName});
-    else
+    else if (!m_structReferences[target].contains(nodeName))
       m_structReferences[target].push_back(nodeName);
+    else
+      return;
 
     QStringList cycle = checkForMapCycles(m_structReferences);
     ok = cycle.isEmpty();
@@ -410,7 +412,7 @@ void StructEditorWidget::onModifyStructPointerReference(QString nodeName, QStrin
   {
     if (!m_structPointerReferences.contains(target))
       m_structPointerReferences.insert(target, {nodeName});
-    else
+    else if (!m_structPointerReferences[target].contains(nodeName))
       m_structPointerReferences[target].push_back(nodeName);
   }
   else if (m_structPointerReferences.contains(target))
