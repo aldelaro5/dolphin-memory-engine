@@ -18,7 +18,7 @@ DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const ent
                                    QWidget* const parent, bool showAddress)
     : QDialog(parent)
 {
-  m_showAddress = showAddress;
+  m_isForStructField = showAddress;
   m_structNames = structs;
   m_structNames.push_front(QString(""));
   setWindowTitle(newEntry ? "Add Watch" : "Edit Watch");
@@ -44,7 +44,7 @@ void DlgAddWatchEntry::initialiseWidgets()
   connect(m_chkBoundToPointer, &QCheckBox::stateChanged, this,
           &DlgAddWatchEntry::onIsPointerChanged);
 
-  if (m_showAddress)
+  if (!m_isForStructField)
   {
     m_lblValuePreview = new QLineEdit("", this);
     m_lblValuePreview->setReadOnly(true);
@@ -86,7 +86,7 @@ void DlgAddWatchEntry::makeLayouts()
 {
   QFormLayout* formLayout = new QFormLayout;
   formLayout->setLabelAlignment(Qt::AlignRight);
-  if (m_showAddress)
+  if (!m_isForStructField)
   {
     formLayout->addRow("Preview:", m_lblValuePreview);
     formLayout->addRow("Address:", m_txbAddress);
@@ -146,7 +146,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_cmbTypes->setCurrentIndex(0);
     m_spnLength->setValue(1);
     m_spnLength->hide();
-    if (m_showAddress)
+    if (!m_isForStructField)
       m_lblValuePreview->setText("???");
     m_chkBoundToPointer->setChecked(false);
     m_pointerWidget->hide();
@@ -179,7 +179,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
       m_structSelect->hide();
     }
     m_txbLabel->setText(m_entry->getLabel());
-    if (m_showAddress)
+    if (!m_isForStructField)
     {
       std::stringstream ssAddress;
       ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
@@ -219,7 +219,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     }
 
     m_chkBoundToPointer->setChecked(m_entry->isBoundToPointer());
-    if (m_showAddress)
+    if (!m_isForStructField)
       updatePreview();
   }
 }
@@ -315,7 +315,7 @@ void DlgAddWatchEntry::onOffsetChanged()
   int columnSpan{};
   m_offsetsLayout->getItemPosition(m_offsetsLayout->indexOf(theLineEdit), &index, &column, &rowSpan,
                                    &columnSpan);
-  if (m_showAddress && validateAndSetOffset(index))
+  if (!m_isForStructField && validateAndSetOffset(index))
     updatePreview();
 }
 
@@ -338,13 +338,13 @@ void DlgAddWatchEntry::onTypeChange(int index)
     m_structSelect->hide();
   }
   m_entry->setTypeAndLength(theType, m_spnLength->value());
-  if (m_showAddress && validateAndSetAddress())
+  if (!m_isForStructField && validateAndSetAddress())
     updatePreview();
 }
 
 void DlgAddWatchEntry::accept()
 {
-  if (m_showAddress && !validateAndSetAddress())
+  if (m_isForStructField && !validateAndSetAddress())
   {
     QString errorMsg = tr("The address you entered is invalid, make sure it is an "
                           "hexadecimal number between 0x%1 and 0x%2")
@@ -360,7 +360,7 @@ void DlgAddWatchEntry::accept()
   }
   else
   {
-    if (!m_showAddress)
+    if (m_isForStructField)
       m_entry->setConsoleAddress(0);
     if (m_chkBoundToPointer->isChecked())
     {
@@ -444,7 +444,7 @@ void DlgAddWatchEntry::updatePreview()
 {
   if (GUICommon::isContainerType(m_entry->getType()))
   {
-    if (m_showAddress)
+    if (!m_isForStructField)
       m_lblValuePreview->setText("???");
     return;
   }
@@ -469,7 +469,7 @@ void DlgAddWatchEntry::onLengthChanged()
 {
   Common::MemType theType = static_cast<Common::MemType>(m_cmbTypes->currentIndex());
   m_entry->setTypeAndLength(theType, m_spnLength->value());
-  if (m_showAddress && validateAndSetAddress())
+  if (!m_isForStructField && validateAndSetAddress())
     updatePreview();
 }
 

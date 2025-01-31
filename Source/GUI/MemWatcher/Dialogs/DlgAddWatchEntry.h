@@ -65,5 +65,5 @@ private:
   QPushButton* m_btnRemoveOffset{};
   QComboBox* m_structSelect{};
   QVector<QString> m_structNames{};
-  bool m_showAddress;
+  bool m_isForStructField;
 };
