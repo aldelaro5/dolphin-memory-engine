@@ -218,7 +218,11 @@ void StructDetailModel::updateFieldOffsets()
     }
     cur_offset += field->getFieldSize();
   }
-  u32 newLength = m_fields.last()->getOffset() + m_fields.last()->getFieldSize();
+
+  u32 newLength = 0;
+  if (!m_fields.isEmpty())
+    newLength = m_fields.last()->getOffset() + m_fields.last()->getFieldSize();
+
   m_baseNode->getStructDef()->setLength(newLength);
   emit lengthChanged(newLength);
 }
