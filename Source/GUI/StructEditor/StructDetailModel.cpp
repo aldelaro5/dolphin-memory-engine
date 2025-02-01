@@ -96,10 +96,10 @@ QVariant StructDetailModel::headerData(int section, Qt::Orientation orientation,
       return tr("Offset");
     case STRUCT_COL_SIZE:
       return tr("Size");
+    case STRUCT_COL_DETAIL:
+      return tr("Type");
     case STRUCT_COL_LABEL:
       return tr("Name");
-    case STRUCT_COL_DETAIL:
-      return tr("Value");
     default:
       break;
     }

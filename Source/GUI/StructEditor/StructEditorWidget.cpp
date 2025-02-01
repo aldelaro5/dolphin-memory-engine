@@ -130,8 +130,8 @@ void StructEditorWidget::initialiseWidgets()
   header->setStretchLastSection(true);
   header->resizeSection(StructDetailModel::STRUCT_COL_OFFSET, 80);
   header->resizeSection(StructDetailModel::STRUCT_COL_SIZE, 50);
-  header->resizeSection(StructDetailModel::STRUCT_COL_LABEL, 100);
-  header->resizeSection(StructDetailModel::STRUCT_COL_DETAIL, 300);
+  header->resizeSection(StructDetailModel::STRUCT_COL_LABEL, 150);
+  header->resizeSection(StructDetailModel::STRUCT_COL_DETAIL, 100);
 
   m_btnUnloadStructDetails = new QPushButton(tr("X"), this);
   connect(m_btnUnloadStructDetails, &QPushButton::clicked, this, &StructEditorWidget::onUnloadStruct);
