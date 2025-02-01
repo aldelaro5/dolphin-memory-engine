@@ -343,22 +343,24 @@ void StructEditorWidget::onDetailLengthChanged()
 
 void StructEditorWidget::onAddPaddingField(bool setSaveState)
 {
-  int targetRow = -1;
+  QModelIndex targetIndex = QModelIndex();
 
   const QModelIndexList selection = m_structDetailView->selectionModel()->selectedIndexes();
   if (selection.isEmpty())
     m_structDetailModel->addPaddingFields(1);
   else
   {
-    targetRow = selection.last().row() + 1;
+    int targetRow = selection.last().row() + 1;
     m_structDetailModel->addPaddingFields(1, targetRow);
+    targetIndex = m_structDetailModel->getIndexAt(targetRow);
   }
 
-  if (targetRow < 0)
-    targetRow = m_structDetailModel->getLastIndex().row();
+  if (!targetIndex.isValid())
+    targetIndex = m_structDetailModel->getLastIndex();
 
   m_structDetailView->selectionModel()->clearSelection();
-  m_structDetailView->selectionModel()->select(m_structDetailModel->getIndexAt(targetRow), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+  m_structDetailView->selectionModel()->select(targetIndex, QItemSelectionModel::Select |
+                                                                QItemSelectionModel::Rows);
   QCoreApplication::processEvents();
 
   if (setSaveState)
@@ -371,10 +373,9 @@ void StructEditorWidget::onAddField()
 
   bool ok;
   const QModelIndexList selection = m_structDetailView->selectionModel()->selectedIndexes();
-  if (selection.isEmpty())
-    ok = createNewFieldEntry(m_structDetailModel->getLastIndex());
-  else
-    ok = createNewFieldEntry(m_structDetailModel->getIndexAt(selection.last().row()));
+
+  Q_ASSERT(!selection.isEmpty());
+  ok = createNewFieldEntry(m_structDetailModel->getIndexAt(selection.last().row()));
 
   if (!ok)
     onDeleteFields();
