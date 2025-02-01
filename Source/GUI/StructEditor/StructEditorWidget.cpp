@@ -147,8 +147,7 @@ void StructEditorWidget::initialiseWidgets()
   m_btnSaveStructDetails->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   m_btnAddField = new QPushButton(tr("Add"), this);
-  connect(m_btnAddField, &QPushButton::clicked, this, &StructEditorWidget::onAddField);
-  m_btnAddField->setToolTip("Add fields and update struct length.");
+  m_btnAddField->setToolTip("Add field and update struct length.");
   m_btnAddField->setDisabled(true);
   m_btnAddField->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
