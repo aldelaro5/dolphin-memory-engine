@@ -138,16 +138,19 @@ void StructEditorWidget::initialiseWidgets()
   connect(m_btnUnloadStructDetails, &QPushButton::clicked, this, &StructEditorWidget::onUnloadStruct);
   m_btnUnloadStructDetails->setToolTip("Close struct.");
   m_btnUnloadStructDetails->setDisabled(true);
+  m_btnUnloadStructDetails->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   m_btnSaveStructDetails = new QPushButton(tr("Save"), this);
   connect(m_btnSaveStructDetails, &QPushButton::clicked, this, &StructEditorWidget::onSaveStruct);
   m_btnSaveStructDetails->setToolTip("Save struct details.");
   m_btnSaveStructDetails->setDisabled(true);
+  m_btnSaveStructDetails->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   m_btnAddField = new QPushButton(tr("Add"), this);
   connect(m_btnAddField, &QPushButton::clicked, this, &StructEditorWidget::onAddField);
   m_btnAddField->setToolTip("Add fields and update struct length.");
   m_btnAddField->setDisabled(true);
+  m_btnAddField->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QMenu* menu = new QMenu(this);
   menu->addAction("Field", this, &StructEditorWidget::onAddField);
@@ -158,11 +161,13 @@ void StructEditorWidget::initialiseWidgets()
   connect(m_btnDeleteFields, &QPushButton::clicked, this, &StructEditorWidget::onDeleteFields);
   m_btnDeleteFields->setToolTip("Delete fields and update struct length.");
   m_btnDeleteFields->setDisabled(true);
+  m_btnDeleteFields->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   m_btnClearFields = new QPushButton(tr("Clear"), this);
   connect(m_btnClearFields, &QPushButton::clicked, this, &StructEditorWidget::onClearFields);
   m_btnClearFields->setToolTip("Clear fields and replace with padding.");
   m_btnClearFields->setDisabled(true);
+  m_btnClearFields->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   m_txtStructName = new QLineEdit(this);
   connect(m_txtStructName, &QLineEdit::editingFinished, this,
