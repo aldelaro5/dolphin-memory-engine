@@ -358,6 +358,15 @@ void DlgAddWatchEntry::accept()
                                             QMessageBox::Ok, this);
     errorBox->exec();
   }
+  else if (m_entry->getType() == Common::MemType::type_struct &&
+           m_structSelect->currentIndex() == 0)
+  {
+    QString errorMsg =
+        tr("A struct name must be selected with the struct type, it cannot be an empty string");
+    QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid Struct Type"), errorMsg,
+                                            QMessageBox::Ok, this);
+    errorBox->exec();
+  }
   else
   {
     if (m_isForStructField)
