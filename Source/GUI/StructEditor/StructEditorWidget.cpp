@@ -8,6 +8,7 @@
 #include <QFormLayout>
 #include <QMenu>
 #include <QHeaderView>
+#include <QCoreApplication>
 
 #include "../../Common/MemoryCommon.h"
 #include "../MemWatcher/Dialogs/DlgAddWatchEntry.h"
@@ -148,7 +149,10 @@ void StructEditorWidget::initialiseWidgets()
   m_btnAddField->setToolTip("Add fields and update struct length.");
   m_btnAddField->setDisabled(true);
 
-  m_btnDeleteFields = new QPushButton(tr("-"), this);
+  QMenu* menu = new QMenu(this);
+  menu->addAction("Field", this, &StructEditorWidget::onAddField);
+  menu->addAction("Padding", this, &StructEditorWidget::onAddPaddingField);
+  m_btnAddField->setMenu(menu);
   connect(m_btnDeleteFields, &QPushButton::clicked, this, &StructEditorWidget::onDeleteFields);
   m_btnDeleteFields->setToolTip("Delete fields and update struct length.");
   m_btnDeleteFields->setDisabled(true);
@@ -241,14 +245,16 @@ void StructEditorWidget::makeLayouts()
   setLayout(widgetLayout);
 }
 
-void StructEditorWidget::createNewFieldEntry(const QModelIndex& index)
+bool StructEditorWidget::createNewFieldEntry(const QModelIndex& index)
 {
   DlgAddWatchEntry dlg(true, nullptr, m_structRootNode->getStructNames(), this, false);
   if (dlg.exec() == QDialog::Accepted)
   {
     if (!m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index))
-      return;
+      return false;
   }
+  else
+    return false;
 
   m_btnSaveStructDetails->setEnabled(true);
 }
@@ -329,14 +335,44 @@ void StructEditorWidget::onDetailLengthChanged()
   m_txtStructLength->clearFocus();
 }
 
-void StructEditorWidget::onAddField()
+void StructEditorWidget::onAddPaddingField(bool setSaveState)
 {
+  int targetRow = -1;
+
   const QModelIndexList selection = m_structDetailView->selectionModel()->selectedIndexes();
   if (selection.isEmpty())
     m_structDetailModel->addPaddingFields(1);
   else
-    m_structDetailModel->addPaddingFields(1, selection.last().row() + 1);
+  {
+    targetRow = selection.last().row() + 1;
+    m_structDetailModel->addPaddingFields(1, targetRow);
+  }
 
+  if (targetRow < 0)
+    targetRow = m_structDetailModel->getLastIndex().row();
+
+  m_structDetailView->selectionModel()->clearSelection();
+  m_structDetailView->selectionModel()->select(m_structDetailModel->getIndexAt(targetRow), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+  QCoreApplication::processEvents();
+
+  if (setSaveState)
+    m_btnSaveStructDetails->setEnabled(true);
+}
+
+void StructEditorWidget::onAddField()
+{
+  onAddPaddingField(false);
+
+  bool ok;
+  const QModelIndexList selection = m_structDetailView->selectionModel()->selectedIndexes();
+  if (selection.isEmpty())
+    ok = createNewFieldEntry(m_structDetailModel->getLastIndex());
+  else
+    ok = createNewFieldEntry(m_structDetailModel->getIndexAt(selection.last().row()));
+
+  if (!ok)
+    onDeleteFields();
+  else
   m_btnSaveStructDetails->setEnabled(true);
 }
 
@@ -652,7 +688,7 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
   QMenu* contextMenu = new QMenu(this);
   
   QAction* const addField{new QAction(tr("Add field"), this)};
-  connect(addField, &QAction::triggered, this, &StructEditorWidget::onAddField);
+  connect(addField, &QAction::triggered, this, &StructEditorWidget::onAddPaddingField);
   contextMenu->addAction(addField);
   if (index != QModelIndex())
   {

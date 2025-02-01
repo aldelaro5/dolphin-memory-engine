@@ -516,3 +516,13 @@ FieldDef* StructDetailModel::getFieldByRow(int row)
   return m_fields[row];
 }
 
+QModelIndex StructDetailModel::getLastIndex(int col)
+{
+  return createIndex(m_fields.count()-1, 0);
+}
+
+QModelIndex StructDetailModel::getIndexAt(int row, int col)
+{
+  return createIndex(row, col);
+}
+

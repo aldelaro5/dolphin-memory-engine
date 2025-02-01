@@ -42,6 +42,8 @@ public:
   void clearFields(QModelIndexList indices);
   bool updateFieldEntry(MemWatchEntry* entry, const QModelIndex& index);
   FieldDef* getFieldByRow(int row);
+  QModelIndex getLastIndex(int col = 0);
+  QModelIndex getIndexAt(int row, int col = 0);
 
   bool hasStructLoaded() const;
   StructTreeNode* getLoadedStructNode() const;

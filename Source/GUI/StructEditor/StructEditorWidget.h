@@ -56,12 +56,13 @@ private:
   void initialiseWidgets();
   void makeLayouts();
 
-  void createNewFieldEntry(const QModelIndex& index);
+  bool createNewFieldEntry(const QModelIndex& index);
   void editFieldEntry(const QModelIndex& index);
 
   void onDetailNameChanged();
   void updateChildStructNames(StructTreeNode* node, QString oldNameSpace);
   void onDetailLengthChanged();
+  void onAddPaddingField(bool setSaveState = true);
   void onAddField();
   void onDeleteFields();
   void onClearFields();
