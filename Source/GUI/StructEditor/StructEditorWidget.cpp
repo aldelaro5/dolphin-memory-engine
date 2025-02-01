@@ -379,7 +379,7 @@ void StructEditorWidget::onAddField()
   if (!ok)
     onDeleteFields();
   else
-  m_btnSaveStructDetails->setEnabled(true);
+    m_btnSaveStructDetails->setEnabled(true);
 }
 
 void StructEditorWidget::onDeleteFields()
