@@ -344,7 +344,7 @@ void DlgAddWatchEntry::onTypeChange(int index)
 
 void DlgAddWatchEntry::accept()
 {
-  if (m_isForStructField && !validateAndSetAddress())
+  if (!m_isForStructField && !validateAndSetAddress())
   {
     QString errorMsg = tr("The address you entered is invalid, make sure it is an "
                           "hexadecimal number between 0x%1 and 0x%2")
