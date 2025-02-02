@@ -253,7 +253,7 @@ void StructEditorWidget::makeLayouts()
 
 bool StructEditorWidget::createNewFieldEntry(const QModelIndex& index)
 {
-  DlgAddWatchEntry dlg(true, nullptr, m_structRootNode->getStructNames(), this, false);
+  DlgAddWatchEntry dlg(true, nullptr, m_structRootNode->getStructNames(), this, true);
   if (dlg.exec() == QDialog::Accepted)
   {
     if (!m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index))
@@ -269,7 +269,7 @@ void StructEditorWidget::editFieldEntry(const QModelIndex& index)
 {
   FieldDef* field = m_structDetailModel->getFieldByRow(index.row());
 
-  DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()), m_structRootNode->getStructNames(), this, false);
+  DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()), m_structRootNode->getStructNames(), this, true);
   if (dlg.exec() == QDialog::Accepted)
   {
     if (!m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index))
