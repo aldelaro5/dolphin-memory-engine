@@ -247,10 +247,15 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       connect(unlockSelection, &QAction::triggered, this, [this] { onLockSelection(false); });
       contextMenu->addAction(unlockSelection);
       contextMenu->addSeparator();
-      QAction* const editValue{new QAction(tr("Edit Value"), this)};
-      connect(editValue, &QAction::triggered, this, [this, index]() { m_watchView->edit(index); });
-      contextMenu->addAction(editValue);
-      contextMenu->addSeparator();
+
+      if (!GUICommon::isContainerType(entry->getType()))
+      {
+        QAction* const editValue{new QAction(tr("Edit Value"), this)};
+        connect(editValue, &QAction::triggered, this,
+                [this, index]() { m_watchView->edit(index); });
+        contextMenu->addAction(editValue);
+        contextMenu->addSeparator();
+      }
     }
   }
   else
@@ -259,7 +264,9 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   }
 
   const QModelIndexList simplifiedSelection{simplifySelection()};
-  if (!simplifiedSelection.empty())
+  if (!simplifiedSelection.empty() && node != nullptr && node->getParent() != nullptr &&
+      (node->getParent()->isGroup() || node->getParent() == m_watchModel->getRootNode() ||
+       !GUICommon::isContainerType(node->getParent()->getEntry()->getType())))
   {
     QAction* const groupAction{new QAction(tr("&Group"), this)};
     connect(groupAction, &QAction::triggered, this, &MemWatchWidget::groupCurrentSelection);
@@ -323,10 +330,14 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   connect(paste, &QAction::triggered, this, [this, index] { pasteWatchFromClipBoard(index); });
   contextMenu->addAction(paste);
 
-  contextMenu->addSeparator();
+
   QAction* deleteSelection = new QAction(tr("&Delete"), this);
-  connect(deleteSelection, &QAction::triggered, this, [this] { onDeleteSelection(); });
-  contextMenu->addAction(deleteSelection);
+  if (node != nullptr && (node->getParent() == nullptr || node->getParent()->isGroup()))
+  {
+    contextMenu->addSeparator();
+    connect(deleteSelection, &QAction::triggered, this, [this] { onDeleteSelection(); });
+    contextMenu->addAction(deleteSelection);
+  }
 
   QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
   if (selection.count() == 0)
