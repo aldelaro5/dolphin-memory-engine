@@ -43,8 +43,8 @@ public:
   void writeStructDefsToJson(QJsonObject& json) const;
 
   StructTreeNode* getStructDefs();
-  void restoreStructDefs(const QString& json);
-  QString saveStructDefs();
+  void restoreStructTree(const QString& json);
+  QString saveStructTree();
   QMap<QString, StructDef*> getStructMap();
 
 signals:

@@ -1032,7 +1032,7 @@ void StructEditorWidget::writeStructDefsToJson(QJsonObject& json) const
   m_structRootNode->writeToJson(json);
 }
 
-void StructEditorWidget::restoreStructDefs(const QString& json)
+void StructEditorWidget::restoreStructTree(const QString& json)
 {
   const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));
   m_structRootNode->readFromJson(loadDoc.object()); // may need to reset model here?
@@ -1040,7 +1040,7 @@ void StructEditorWidget::restoreStructDefs(const QString& json)
   setupStructReferences();
 }
 
-QString StructEditorWidget::saveStructDefs()
+QString StructEditorWidget::saveStructTree()
 {
   if (m_structDetailModel->hasStructLoaded() && unsavedStructDetails())
   {

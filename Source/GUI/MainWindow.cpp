@@ -42,7 +42,7 @@ MainWindow::MainWindow()
   GUICommon::changeApplicationStyle(
       static_cast<GUICommon::ApplicationStyle>(SConfig::getInstance().getTheme()));
 
-  m_structEditor->restoreStructDefs(SConfig::getInstance().getStructDefs());
+  m_structEditor->restoreStructTree(SConfig::getInstance().getStructDefs());
   m_watcher->setStructDefs(m_structEditor->getStructDefs(), m_structEditor->getStructMap());
   m_viewer->setStructDefs(m_structEditor->getStructDefs());
   m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
@@ -574,7 +574,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
   SConfig::getInstance().setAutoHook(m_actAutoHook->isChecked());
   SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
-  SConfig::getInstance().setStructDefs(m_structEditor->saveStructDefs());
+  SConfig::getInstance().setStructDefs(m_structEditor->saveStructTree());
   SConfig::getInstance().setMainWindowGeometry(saveGeometry());
   SConfig::getInstance().setMainWindowState(saveState());
 
