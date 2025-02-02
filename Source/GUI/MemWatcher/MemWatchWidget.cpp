@@ -264,14 +264,25 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   }
 
   const QModelIndexList simplifiedSelection{simplifySelection()};
-  if (!simplifiedSelection.empty() && node != nullptr && node->getParent() != nullptr &&
-      (node->getParent()->isGroup() || node->getParent() == m_watchModel->getRootNode() ||
-       !GUICommon::isContainerType(node->getParent()->getEntry()->getType())))
+  if (!simplifiedSelection.empty())
   {
-    QAction* const groupAction{new QAction(tr("&Group"), this)};
-    connect(groupAction, &QAction::triggered, this, &MemWatchWidget::groupCurrentSelection);
-    contextMenu->addAction(groupAction);
-    contextMenu->addSeparator();
+    bool canGroupSelection = true;
+    for (const QModelIndex& selectedIndex : simplifiedSelection)
+    {
+      const MemWatchTreeNode* selectedNode = m_watchModel->getTreeNodeFromIndex(selectedIndex);
+      if (selectedNode != nullptr && selectedNode->getParent() != nullptr &&
+          (!selectedNode->getParent()->isGroup() &&
+           selectedNode->getParent() != m_watchModel->getRootNode() &&
+           GUICommon::isContainerType(selectedNode->getParent()->getEntry()->getType())))
+        canGroupSelection = false;
+    }
+    if (canGroupSelection)
+    {
+      QAction* const groupAction{new QAction(tr("&Group"), this)};
+      connect(groupAction, &QAction::triggered, this, &MemWatchWidget::groupCurrentSelection);
+      contextMenu->addAction(groupAction);
+      contextMenu->addSeparator();
+    }
   }
 
   if (!node || node->isGroup())
