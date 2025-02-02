@@ -463,7 +463,7 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
       emit modifyStructPointerReference(m_baseNode->getNameSpace(), oldEntry->getStructName(), false);
     else
     {
-      bool ok = false;
+      bool ok = true;
       emit modifyStructReference(m_baseNode->getNameSpace(), oldEntry->getStructName(), false, ok);
       if (!ok)
         return false;
@@ -488,7 +488,7 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
     else
     {
       fieldLen = m_baseNode->getParent()->getSizeOfStruct(entry->getStructName());
-      bool ok = false;
+      bool ok = true;
       emit modifyStructReference(m_baseNode->getNameSpace(), entry->getStructName(), true, ok);
       if (!ok)
         return false;
