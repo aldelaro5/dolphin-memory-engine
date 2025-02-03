@@ -97,6 +97,32 @@ void FieldDef::convertToPadding()
   m_size = 1;
 }
 
+bool FieldDef::isSame(FieldDef* const other) const
+{
+  // May want to eventually include m_entry->m_base or m_entry->m_isUnsigned in this check.
+  if (
+    m_size != other->m_size || m_structOffset != other->m_structOffset ||
+    m_entry->getLabel() != other->m_entry->getLabel() ||
+    m_entry->getType() != other->m_entry->getType() ||
+    Common::getSizeForType(m_entry->getType(), m_entry->getLength()) != Common::getSizeForType(other->m_entry->getType(), other->m_entry->getLength()) ||
+    m_entry->isBoundToPointer() != other->m_entry->isBoundToPointer()
+    )
+    return false;
+  if (m_entry->isBoundToPointer())
+  {
+    if (m_entry->getPointerOffsets().size() != other->m_entry->getPointerOffsets().size())
+      return false;
+    else
+      for (int i = 0; i < m_entry->getPointerLevel(); i++)
+        if (m_entry->getPointerOffset(i) != other->m_entry->getPointerOffset(i))
+          return false;
+  }
+  if (m_entry->getType() == Common::MemType::type_struct &&
+      m_entry->getStructName() != other->m_entry->getStructName())
+    return false;
+  return true;
+}
+
 void FieldDef::readFromJSON(const QJsonObject& json)
 {
   m_structOffset = json["offset"].toInt();

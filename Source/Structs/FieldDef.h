@@ -36,6 +36,7 @@ public:
   bool isPadding() const;
   void convertToPadding();
 
+  bool isSame(FieldDef* const other) const;
   void readFromJSON(const QJsonObject& json);
   void writeToJson(QJsonObject& json);
 
