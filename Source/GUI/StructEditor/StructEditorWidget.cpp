@@ -970,6 +970,39 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
       if (equivalentNode->isGroup())
       {
         //ask user if they want to rename incoming struct or the group
+
+        StructTreeNode* nodeParent = equivalentNode->getParent();
+        int i = 0;
+        QString newName = structName + QString("(%1)").arg(i);
+        while (!nodeParent->isNameAvailable(newName))
+        {
+          i++;
+          newName = structName + QString("(%1)").arg(i);
+        }
+
+        QString msg = QString("There is already a group with the same name as the struct on file: %1.\nHow would you like to resolve this?").arg(structName);
+        QMessageBox msgBox = QMessageBox(QMessageBox::Icon::Question, "Group and struct with same name detected!",
+                                         msg, QMessageBox::StandardButton::NoButton, this);
+        msgBox.setDetailedText(equivalentNode->getStructDef()->getDiffString(def));
+        QPushButton* changeGroup = msgBox.addButton(tr("Rename Group"), QMessageBox::AcceptRole);
+        QPushButton* changeStruct = msgBox.addButton(tr("Rename Struct"), QMessageBox::AcceptRole);
+        msgBox.setDefaultButton(changeStruct);
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == changeStruct)
+        {
+          map.insert(structName, newName);
+          QString msg = QString("Struct %1 renamed to %2").arg(structName).arg(newName);
+          QMessageBox::warning(this, "Struct Renamed", msg);
+          structName = newName;
+        }
+        else
+        {
+          m_structSelectModel->setData(m_structSelectModel->getIndexFromTreeNode(equivalentNode),
+                                       newName, Qt::EditRole);
+          QString msg = QString("Group %1 renamed to %2").arg(structName).arg(newName);
+          QMessageBox::warning(this, "Group Renamed", msg);
+        }
       }
       else if (equivalentNode->getStructDef()->isSame(def)) // if structs are the same, no need to alert user and just use the one we have
         continue;
@@ -983,6 +1016,7 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
         QPushButton* useOld = msgBox.addButton(tr("Use Current Struct"), QMessageBox::AcceptRole);
         QPushButton* useNew = msgBox.addButton(tr("Use File Struct"), QMessageBox::AcceptRole);
         QPushButton* newName = msgBox.addButton(tr("Rename File Struct"), QMessageBox::AcceptRole);
+        msgBox.setDefaultButton(newName);
         msgBox.exec();
         if (msgBox.clickedButton() == useOld)
           continue;
