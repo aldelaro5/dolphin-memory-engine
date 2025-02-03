@@ -271,7 +271,8 @@ void DlgAddWatchEntry::removePointerOffset()
   m_offsets.removeLast();
   m_addressPath.removeLast();
   m_entry->removeOffset();
-  updatePreview();
+  if (!m_isForStructField)
+    updatePreview();
   if (m_entry->getPointerLevel() == 1)
   {
     m_btnRemoveOffset->setDisabled(true);
@@ -302,7 +303,8 @@ void DlgAddWatchEntry::removeAllPointerOffset()
     level--;
   }
 
-  updatePreview();
+  if (!m_isForStructField)
+    updatePreview();
 }
 
 void DlgAddWatchEntry::onOffsetChanged()
@@ -497,7 +499,7 @@ void DlgAddWatchEntry::onIsPointerChanged()
   }
   adjustSize();
   m_entry->setBoundToPointer(m_chkBoundToPointer->isChecked());
-  if (!GUICommon::isContainerType(m_entry->getType()))
+  if (!m_isForStructField && !GUICommon::isContainerType(m_entry->getType()))
     updatePreview();
 }
 
