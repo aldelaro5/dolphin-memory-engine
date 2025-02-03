@@ -145,7 +145,7 @@ QStringList FieldDef::diffList(FieldDef* const other) const
       diffs += QString("Struct Name: %1 -> %2")
                    .arg(m_entry->getStructName())
                    .arg(other->m_entry->getStructName());
-    else
+    else if (other->m_entry->getType() != Common::MemType::type_struct)
       diffs += QString("Struct Name: %1 -> N/A")
                    .arg(m_entry->getStructName());
   }
@@ -175,15 +175,16 @@ QStringList FieldDef::diffList(FieldDef* const other) const
     {
       if (m_entry->getPointerOffsets().size() > i)
       {
-        if (other->m_entry->getPointerOffsets().size() > i)
+        if (other->m_entry->getPointerOffsets().size() > i &&
+            m_entry->getPointerOffset(i) != other->m_entry->getPointerOffset(i))
           diffs += QString("%1: %2 -> %3")
                        .arg(i)
                        .arg(m_entry->getPointerOffset(i))
                        .arg(other->m_entry->getPointerOffset(i));
-        else
+        else if (!(other->m_entry->getPointerOffsets().size() > i))
           diffs += QString("%1: %2 -> N/A").arg(i).arg(m_entry->getPointerOffset(i));
       }
-      else
+      else if (other->m_entry->getPointerOffsets().size() > i)
         diffs += QString("%1: N/A -> %3").arg(i).arg(other->m_entry->getPointerOffset(i));
       i++;
     }
