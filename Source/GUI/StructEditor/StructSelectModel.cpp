@@ -418,6 +418,16 @@ void StructSelectModel::insertNewDef(const QString& name, StructDef* structDef)
   }
 }
 
+void StructSelectModel::replaceDef(const QString& name, StructDef* structDef)
+{
+  StructTreeNode* curNode = m_rootNode->findNode(name);
+  if (!curNode)
+    return insertNewDef(name, structDef);
+
+  curNode->setStructDef(structDef);
+  dataChanged(getIndexFromTreeNode(curNode), getIndexFromTreeNode(curNode));
+}
+
 void StructSelectModel::setNodeLabel(StructTreeNode* node, const QString name)
 {
   node->setName(name);

@@ -43,6 +43,7 @@ public:
   StructTreeNode* addStruct(const QString& name, const QModelIndex& referenceIndex = QModelIndex{});
   void deleteNode(const QModelIndex& index);
   void insertNewDef(const QString& name, StructDef* structDef);
+  void replaceDef(const QString& name, StructDef* structDef);
 
   void setNodeLabel(StructTreeNode* node, const QString name);
 
