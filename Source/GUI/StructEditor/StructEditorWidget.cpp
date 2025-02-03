@@ -295,7 +295,6 @@ void StructEditorWidget::onDetailNameChanged()
     return nameChangeFailed(node, m_txtStructName->text());
   }
 
-  QString oldNameSpace = node->getParent()->getNameSpace();
   QString oldFullName = node->getNameSpace();
   m_nodeInDetailEditor->setName(m_txtStructName->text());
   node->setName(m_txtStructName->text());
