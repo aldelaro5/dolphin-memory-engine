@@ -978,17 +978,18 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
 
         StructTreeNode* nodeParent = equivalentNode->getParent();
         int i = 0;
-        QString newName = structName + QString("(%1)").arg(i);
-        while (!nodeParent->isNameAvailable(newName))
+        QString oldPartialName = structName.split("::").last();
+        QString newPartialName = oldPartialName + QString("(%1)").arg(i);
+        while (!nodeParent->isNameAvailable(newPartialName))
         {
           i++;
-          newName = structName + QString("(%1)").arg(i);
+          newPartialName = oldPartialName + QString("(%1)").arg(i);
         }
+        QString newName = nodeParent->getNameSpace() + "::" + newPartialName;
 
         QString msg = QString("There is already a group with the same name as the struct on file: %1.\nHow would you like to resolve this?").arg(structName);
         QMessageBox msgBox = QMessageBox(QMessageBox::Icon::Question, "Group and struct with same name detected!",
                                          msg, QMessageBox::StandardButton::NoButton, this);
-        msgBox.setDetailedText(equivalentNode->getStructDef()->getDiffString(def));
         QPushButton* changeGroup = msgBox.addButton(tr("Rename Group"), QMessageBox::AcceptRole);
         QPushButton* changeStruct = msgBox.addButton(tr("Rename Struct"), QMessageBox::AcceptRole);
         msgBox.setDefaultButton(changeStruct);
@@ -1004,7 +1005,7 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
         else
         {
           m_structSelectModel->setData(m_structSelectModel->getIndexFromTreeNode(equivalentNode),
-                                       newName, Qt::EditRole);
+                                       newPartialName, Qt::EditRole);
           QString msg = QString("Group %1 renamed to %2").arg(structName).arg(newName);
           QMessageBox::warning(this, "Group Renamed", msg);
         }
@@ -1033,12 +1034,14 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
         {
           StructTreeNode* nodeParent = equivalentNode->getParent();
           int i = 0;
-          QString newName = structName + QString("(%1)").arg(i);
-          while (!nodeParent->isNameAvailable(newName))
+          QString oldPartialName = structName.split("::").last();
+          QString newPartialName = oldPartialName + QString("(%1)").arg(i);
+          while (!nodeParent->isNameAvailable(newPartialName))
           {
             i++;
-            newName = structName + QString("(%1)").arg(i);
+            newPartialName = oldPartialName + QString("(%1)").arg(i);
           }
+          QString newName = nodeParent->getNameSpace() + "::" + newPartialName;
           map.insert(structName, newName);
           QString msg = QString("%1 from file renamed to %2").arg(structName).arg(newName);
           QMessageBox::warning(this, "Struct Renamed", msg);
