@@ -239,6 +239,7 @@ void MemWatchModel::clearRoot()
   beginResetModel();
   m_rootNode->deleteChildren();
   endResetModel();
+  m_structNodes.clear();
 }
 
 void MemWatchModel::deleteNode(const QModelIndex& index)
