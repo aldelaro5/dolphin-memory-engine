@@ -965,7 +965,7 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
     def->readFromJson(structDefObj["def"].toObject());
 
     StructTreeNode* equivalentNode = m_structRootNode->findNode(structName);
-    if (equivalentNode != nullptr) // Check if the struct is the same here?
+    if (equivalentNode != nullptr)
     {
       if (equivalentNode->isGroup())
       {
