@@ -123,6 +123,72 @@ bool FieldDef::isSame(FieldDef* const other) const
   return true;
 }
 
+QStringList FieldDef::diffList(FieldDef* const other) const
+{
+  QStringList diffs{};
+  if (m_entry->getLabel() != other->m_entry->getLabel())
+    diffs += QString("Name: %1 -> %2").arg(m_entry->getLabel()).arg(other->m_entry->getLabel());
+  if (m_size != other->m_size)
+    diffs += QString("Field Size: %1 -> %2").arg(m_size).arg(other->m_size);
+  if (m_structOffset != other->m_structOffset)
+    diffs += QString("Struct Offset: %1 -> %2").arg(m_structOffset).arg(other->m_structOffset);
+  if (m_entry->getType() != other->m_entry->getType())
+    diffs += QString("Type: %1 -> %2")
+                 .arg(GUICommon::getStringFromType(m_entry->getType()))
+                 .arg(GUICommon::getStringFromType(other->m_entry->getType()));
+  if (m_entry->getType() == Common::MemType::type_struct)
+  {
+    if (other->m_entry->getType() == Common::MemType::type_struct &&
+        m_entry->getStructName() != other->m_entry->getStructName())
+      diffs += QString("Struct Name: %1 -> %2")
+                   .arg(m_entry->getStructName())
+                   .arg(other->m_entry->getStructName());
+    else
+      diffs += QString("Struct Name: %1 -> N/A")
+                   .arg(m_entry->getStructName());
+  }
+  else if (other->m_entry->getType() == Common::MemType::type_struct)
+    diffs += QString("Struct Name: N/A -> %1").arg(other->m_entry->getStructName());
+
+  size_t oldSize = Common::getSizeForType(m_entry->getType(), m_entry->getLength());
+  if (m_entry->isBoundToPointer())
+    oldSize = 4;
+
+  size_t newSize = Common::getSizeForType(other->m_entry->getType(), other->m_entry->getLength());
+  if (other->m_entry->isBoundToPointer())
+    newSize = 4;
+
+  if (oldSize != newSize)
+    diffs += QString("Entry Length: %1 -> %2").arg(oldSize).arg(newSize);
+
+  if (m_entry->isBoundToPointer() != other->m_entry->isBoundToPointer())
+    diffs += QString("Is Pointer: %1 -> %2")
+                 .arg(m_entry->isBoundToPointer() ? "Yes" : "No")
+                 .arg(other->m_entry->isBoundToPointer() ? "Yes" : "No");
+
+  if (m_entry->isBoundToPointer() || other->m_entry->isBoundToPointer())
+  {
+    int i = 0;
+    while (i < fmax(m_entry->getPointerLevel(), other->m_entry->getPointerLevel()))
+    {
+      if (m_entry->getPointerOffsets().size() > i)
+      {
+        if (other->m_entry->getPointerOffsets().size() > i)
+          diffs += QString("%1: %2 -> %3")
+                       .arg(i)
+                       .arg(m_entry->getPointerOffset(i))
+                       .arg(other->m_entry->getPointerOffset(i));
+        else
+          diffs += QString("%1: %2 -> N/A").arg(i).arg(m_entry->getPointerOffset(i));
+      }
+      else
+        diffs += QString("%1: N/A -> %3").arg(i).arg(other->m_entry->getPointerOffset(i));
+      i++;
+    }
+  }
+  return diffs;
+}
+
 void FieldDef::readFromJSON(const QJsonObject& json)
 {
   m_structOffset = json["offset"].toInt();

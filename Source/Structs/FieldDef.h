@@ -37,6 +37,7 @@ public:
   void convertToPadding();
 
   bool isSame(FieldDef* const other) const;
+  QStringList diffList(FieldDef* const other) const;
   void readFromJSON(const QJsonObject& json);
   void writeToJson(QJsonObject& json);
 
