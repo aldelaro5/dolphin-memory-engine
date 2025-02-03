@@ -2,6 +2,8 @@
 
 #include <QJsonArray>
 
+#include "../GUI/GUICommon.h"
+
 FieldDef::FieldDef()
 {
   m_structOffset = 0;
@@ -187,6 +189,30 @@ QStringList FieldDef::diffList(FieldDef* const other) const
     }
   }
   return diffs;
+}
+
+QStringList FieldDef::getFieldDescLines() const
+{
+  QStringList descLines{};
+  descLines += QString("Name: %1").arg(m_entry->getLabel());
+  descLines += QString("Field Size: %1").arg(m_size);
+  descLines += QString("Struct Offset: %1").arg(m_structOffset);
+  descLines += QString("Type: %1").arg(GUICommon::getStringFromType(m_entry->getType()));
+  if (m_entry->getType() == Common::MemType::type_struct)
+    descLines += QString("Struct Name: %1").arg(m_entry->getStructName());
+  size_t size = Common::getSizeForType(m_entry->getType(), m_entry->getLength());
+  descLines += QString("Entry Length: %1").arg(size);
+  descLines += QString("Is Pointer: %1").arg(m_entry->isBoundToPointer() ? "Yes" : "No");
+  if (m_entry->isBoundToPointer())
+  {
+    int i = 0;
+    while (i < m_entry->getPointerLevel())
+    {
+      descLines += QString("Pointer Offset %1: %2").arg(i).arg(m_entry->getPointerOffset(i));
+      i++;
+    }
+  }
+  return descLines;
 }
 
 void FieldDef::readFromJSON(const QJsonObject& json)

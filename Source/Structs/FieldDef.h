@@ -38,6 +38,8 @@ public:
 
   bool isSame(FieldDef* const other) const;
   QStringList diffList(FieldDef* const other) const;
+  QStringList getFieldDescLines() const;
+
   void readFromJSON(const QJsonObject& json);
   void writeToJson(QJsonObject& json);
 
