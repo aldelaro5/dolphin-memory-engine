@@ -217,9 +217,9 @@ QString StructDef::getDiffString(const StructDef* other) const
 {
   QString diffs = QString();
   if (m_label != other->m_label)
-    diffs += QString("\nLabel: %1 -> %2").arg(m_label).arg(other->m_label);
+    diffs += QString("\nStruct Label: %1 -> %2").arg(m_label).arg(other->m_label);
   if (m_length != other->m_length)
-    diffs += QString("\nLength: %1 -> %2").arg(m_length).arg(other->m_length);
+    diffs += QString("\nStruct Length: %1 -> %2").arg(m_length).arg(other->m_length);
   int i = 0;
   while (i < fmax(m_fields.count(), other->m_fields.count()))
   {
