@@ -132,7 +132,7 @@ void StructEditorWidget::initialiseWidgets()
   header->resizeSection(StructDetailModel::STRUCT_COL_OFFSET, 80);
   header->resizeSection(StructDetailModel::STRUCT_COL_SIZE, 50);
   header->resizeSection(StructDetailModel::STRUCT_COL_LABEL, 150);
-  header->resizeSection(StructDetailModel::STRUCT_COL_DETAIL, 100);
+  header->resizeSection(StructDetailModel::STRUCT_COL_DETAIL, 150);
 
   m_btnUnloadStructDetails = new QPushButton(tr("Close"), this);
   connect(m_btnUnloadStructDetails, &QPushButton::clicked, this, &StructEditorWidget::onUnloadStruct);
@@ -953,6 +953,7 @@ void StructEditorWidget::unloadStruct()
 void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<QString, QString>& map)
 {
   QMap<QString, StructDef*> newStructDefs{};
+  QMap<QString, StructDef*> replacementStructDefs{};
 
   QJsonArray newStructArray = json["structDefs"].toArray();
 
@@ -966,25 +967,59 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
     StructTreeNode* equivalentNode = m_structRootNode->findNode(structName);
     if (equivalentNode != nullptr) // Check if the struct is the same here?
     {
-      StructTreeNode* nodeParent = equivalentNode->getParent();
-      int i = 0;
-      QString newName = structName + QString::number(i);
-      while (!nodeParent->isNameAvailable(newName))
+      if (equivalentNode->isGroup())
       {
-        i++;
-        newName = structName + QString::number(i);
+        //ask user if they want to rename incoming struct or the group
       }
-
-      map.insert(structName, newName);
-      structName = newName;
+      else if (equivalentNode->getStructDef()->isSame(def)) // if structs are the same, no need to alert user and just use the one we have
+        continue;
+      else
+      {
+        //ask user if they want to just use the current struct, overwrite the current struct, or create a new struct
+        QString msg = QString("There is already a different struct named %1").arg(structName);
+        QMessageBox msgBox = QMessageBox(QMessageBox::Icon::Question, "Duplicate struct detected!",
+                                         msg, QMessageBox::StandardButton::NoButton, this);
+        msgBox.setDetailedText(equivalentNode->getStructDef()->getDiffString(def));
+        QPushButton* useOld = msgBox.addButton(tr("Use Current Struct"), QMessageBox::AcceptRole);
+        QPushButton* useNew = msgBox.addButton(tr("Use File Struct"), QMessageBox::AcceptRole);
+        QPushButton* newName = msgBox.addButton(tr("Rename File Struct"), QMessageBox::AcceptRole);
+        msgBox.exec();
+        if (msgBox.clickedButton() == useOld)
+          continue;
+        else if (msgBox.clickedButton() == useNew)
+        {
+          replacementStructDefs.insert(structName, def);
+        }
+        else if (msgBox.clickedButton() == newName)
+        {
+          StructTreeNode* nodeParent = equivalentNode->getParent();
+          int i = 0;
+          QString newName = structName + QString("(%1)").arg(i);
+          while (!nodeParent->isNameAvailable(newName))
+          {
+            i++;
+            newName = structName + QString("(%1)").arg(i);
+          }
+          map.insert(structName, newName);
+          QString msg = QString("%1 from file renamed to %2").arg(structName).arg(newName);
+          QMessageBox::warning(this, "Struct Renamed", msg);
+          structName = newName;
+        }
+      }
     }
-
     newStructDefs.insert(structName, def);
+  }
+
+  for (QString key : replacementStructDefs.keys())
+  {
+    m_structSelectModel->replaceDef(key, replacementStructDefs[key]);
+    emit structAddedRemoved(key, replacementStructDefs[key]);
   }
 
   for (QString key : newStructDefs.keys())
   {
     m_structSelectModel->insertNewDef(key, newStructDefs[key]);
+    emit structAddedRemoved(key, newStructDefs[key]);
   }
 }
 
