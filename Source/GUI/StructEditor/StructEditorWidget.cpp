@@ -655,11 +655,17 @@ void StructEditorWidget::onSelectDataEdited(const QModelIndex& index, const QVar
     StructTreeNode* node = static_cast<StructTreeNode*>(index.internalPointer());
     QString oldFullName = oldNamespace.toString();
 
-    updateChildStructNames(node, oldFullName);
+    
     if (!node->isGroup())
+    {
+      updateStructReferenceNames(oldFullName, node->getNameSpace());
+      emit updateStructName(oldFullName, node->getNameSpace());
       if (m_nodeInDetailEditor != nullptr && oldFullName == m_nodeInDetailEditor->getNameSpace())
         m_structDetailModel->getLoadedStructNode()->setName(node->getName());
   }
+    else
+      updateChildStructNames(node, oldFullName);
+}
 }
 
 void StructEditorWidget::updateChildStructNames(StructTreeNode* node, QString oldNameSpace)
