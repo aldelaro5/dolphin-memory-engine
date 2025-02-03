@@ -201,6 +201,18 @@ void StructDef::writeToJson(QJsonObject& json)
   json["fieldList"] = fieldArray;
 }
 
+bool StructDef::isSame(const StructDef* other) const
+{
+  if (m_label != other->m_label || m_length != other->m_length ||
+      m_fields.count() != other->m_fields.count())
+    return false;
+
+  for (int i = 0; i < m_fields.count(); i++)
+    if (!m_fields[i]->isSame(other->m_fields[i]))
+      return false;
+  return true;
+}
+
 void StructDef::recalculateOffsets()
 {
   u32 cur_offset = 0;
