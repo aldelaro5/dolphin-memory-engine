@@ -213,6 +213,34 @@ bool StructDef::isSame(const StructDef* other) const
   return true;
 }
 
+QString StructDef::getDiffString(const StructDef* other) const
+{
+  QString diffs = QString();
+  if (m_label != other->m_label)
+    diffs += QString("\nLabel: %1 -> %2").arg(m_label).arg(other->m_label);
+  if (m_length != other->m_length)
+    diffs += QString("\nLength: %1 -> %2").arg(m_length).arg(other->m_length);
+  int i = 0;
+  while (i < fmax(m_fields.count(), other->m_fields.count()))
+  {
+    if (m_fields.count() > i)
+    {
+      if (other->m_fields.count() > i)
+      {
+        QStringList fieldDiff = m_fields[i]->diffList(other->m_fields[i]);
+        diffs +=
+            fieldDiff.isEmpty() ? "" : QString("\n Field %1:\n\t%2").arg(i).arg(fieldDiff.join("\n\t"));
+      }
+      else
+        diffs += QString("\nField %1:\n\t").arg(i) + m_fields[i]->getFieldDescLines().join(" -> N/A\n\t") + " -> N/A";
+    }
+    else
+      diffs += QString("\nField %1:\n\tN/A -> ").arg(i) + other->m_fields[i]->getFieldDescLines().join("\n\tN/A -> ");
+    i++;
+  }
+  return diffs;
+}
+
 void StructDef::recalculateOffsets()
 {
   u32 cur_offset = 0;

@@ -41,6 +41,8 @@ public:
   void writeToJson(QJsonObject& json);
 
   bool isSame(const StructDef* other) const;
+  QString getDiffString(const StructDef* other) const;
+
 private:
   void recalculateOffsets();
   void calculateLength();
