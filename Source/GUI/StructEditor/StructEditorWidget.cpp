@@ -554,7 +554,7 @@ void StructEditorWidget::updateStructReferenceNames(QString old_name, QString ne
       for (QString target : m_structPointerReferences[old_name])
       {
         if (target != old_name)
-        m_structRootNode->findNode(target)->getStructDef()->updateStructTypeLabel(old_name, new_name);
+          m_structRootNode->findNode(target)->getStructDef()->updateStructTypeLabel(old_name, new_name);
         if (m_nodeInDetailEditor != nullptr)
           m_structDetailModel->updateStructTypeLabel(old_name, new_name);
       }
@@ -669,10 +669,15 @@ void StructEditorWidget::onSelectDataEdited(const QModelIndex& index, const QVar
     
     if (!node->isGroup())
     {
+      node->getStructDef()->updateStructTypeLabel(oldFullName, node->getNameSpace());
       updateStructReferenceNames(oldFullName, node->getNameSpace());
       emit updateStructName(oldFullName, node->getNameSpace());
-      if (m_nodeInDetailEditor != nullptr && oldFullName == m_nodeInDetailEditor->getNameSpace())
+      if (m_nodeInDetailEditor != nullptr)
+      {
+        if (oldFullName == m_structDetailModel->getLoadedStructNode()->getNameSpace())
           m_structDetailModel->getLoadedStructNode()->setName(node->getName());
+        m_structDetailModel->updateStructTypeLabel(oldFullName, node->getNameSpace());
+      }
     }
     else
       updateChildStructNames(node, oldFullName);
