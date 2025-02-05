@@ -54,6 +54,7 @@ public:
   bool willRemoveFields(u32 newLength);
   QString getRemovedFieldDescriptions(u32 newLength);
   void updateFieldsWithNewLength();
+  void updateStructTypeLabel(QString oldName, QString newName);
 
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& value, int role);

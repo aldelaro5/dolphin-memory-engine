@@ -372,6 +372,21 @@ void StructDetailModel::updateFieldsWithNewLength()
   }
 }
 
+void StructDetailModel::updateStructTypeLabel(QString oldName, QString newName)
+{
+  for (int i = 0; i < m_fields.count(); i++)
+  {
+    if (m_fields[i]->isPadding() ||
+      m_fields[i]->getEntry()->getType() != Common::MemType::type_struct ||
+      m_fields[i]->getEntry()->getStructName() != oldName)
+    {
+      continue;
+    }
+    m_fields[i]->getEntry()->setStructName(newName);
+    dataChanged(createIndex(i, 0), createIndex(i, STRUCT_COL_NUM - 1));
+  }
+}
+
 QString StructDetailModel::getFieldDetails(FieldDef* field) const
 {
   if (field->isPadding())
