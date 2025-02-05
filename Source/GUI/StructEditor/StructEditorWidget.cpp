@@ -301,6 +301,8 @@ void StructEditorWidget::onDetailNameChanged()
 
   QString newFullName = node->getNameSpace();
 
+  m_structDetailModel->updateStructTypeLabel(oldFullName, newFullName);
+  node->getStructDef()->updateStructTypeLabel(oldFullName, newFullName);
   updateStructReferenceNames(oldFullName, newFullName);
   emit updateStructName(oldFullName, newFullName);
   m_txtStructName->clearFocus();
