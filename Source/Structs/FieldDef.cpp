@@ -169,7 +169,8 @@ QStringList FieldDef::diffList(FieldDef* const other) const
   if (m_entry->isBoundToPointer() || other->m_entry->isBoundToPointer())
   {
     int i = 0;
-    while (i < static_cast<int>(std::max(m_entry->getPointerLevel(), other->m_entry->getPointerLevel())))
+    while (i < static_cast<int>(
+                   std::max(m_entry->getPointerLevel(), other->m_entry->getPointerLevel())))
     {
       if (static_cast<int>(m_entry->getPointerLevel()) > i)
       {
