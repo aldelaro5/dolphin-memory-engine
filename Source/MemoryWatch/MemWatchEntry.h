@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include <QString>
 #include <QJsonObject>
+#include <QString>
 
 #include "../Common/CommonTypes.h"
 #include "../Common/MemoryCommon.h"

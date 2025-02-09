@@ -6,8 +6,8 @@
 
 #include "MemViewer.h"
 
-#include "../Widgets/AddressInputWidget.h"
 #include "../../Structs/StructTreeNode.h"
+#include "../Widgets/AddressInputWidget.h"
 
 class MemViewerWidget : public QWidget
 {

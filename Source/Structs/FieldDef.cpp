@@ -65,12 +65,12 @@ void FieldDef::setEntry(MemWatchEntry* entry)
 
 u32 FieldDef::getFieldSize() const
 {
- return m_size;
+  return m_size;
 }
 
 void FieldDef::setFieldSize(u32 size)
 {
- m_size = size;
+  m_size = size;
 }
 
 QString FieldDef::getLabel() const
@@ -102,13 +102,12 @@ void FieldDef::convertToPadding()
 bool FieldDef::isSame(FieldDef* const other) const
 {
   // May want to eventually include m_entry->m_base or m_entry->m_isUnsigned in this check.
-  if (
-    m_size != other->m_size || m_structOffset != other->m_structOffset ||
-    m_entry->getLabel() != other->m_entry->getLabel() ||
-    m_entry->getType() != other->m_entry->getType() ||
-    Common::getSizeForType(m_entry->getType(), m_entry->getLength()) != Common::getSizeForType(other->m_entry->getType(), other->m_entry->getLength()) ||
-    m_entry->isBoundToPointer() != other->m_entry->isBoundToPointer()
-    )
+  if (m_size != other->m_size || m_structOffset != other->m_structOffset ||
+      m_entry->getLabel() != other->m_entry->getLabel() ||
+      m_entry->getType() != other->m_entry->getType() ||
+      Common::getSizeForType(m_entry->getType(), m_entry->getLength()) !=
+          Common::getSizeForType(other->m_entry->getType(), other->m_entry->getLength()) ||
+      m_entry->isBoundToPointer() != other->m_entry->isBoundToPointer())
     return false;
   if (m_entry->isBoundToPointer())
   {
@@ -146,8 +145,7 @@ QStringList FieldDef::diffList(FieldDef* const other) const
                    .arg(m_entry->getStructName())
                    .arg(other->m_entry->getStructName());
     else if (other->m_entry->getType() != Common::MemType::type_struct)
-      diffs += QString("Struct Name: %1 -> N/A")
-                   .arg(m_entry->getStructName());
+      diffs += QString("Struct Name: %1 -> N/A").arg(m_entry->getStructName());
   }
   else if (other->m_entry->getType() == Common::MemType::type_struct)
     diffs += QString("Struct Name: N/A -> %1").arg(other->m_entry->getStructName());

@@ -4,9 +4,9 @@
 #include <QTimer>
 #include <QTreeView>
 
+#include "../../Structs/StructTreeNode.h"
 #include "MemWatchDelegate.h"
 #include "MemWatchModel.h"
-#include "../../Structs/StructTreeNode.h"
 
 class MemWatchWidget : public QWidget
 {

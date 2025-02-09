@@ -1,10 +1,10 @@
 #pragma once
 
-#include <QWidget>
+#include <QLineEdit>
+#include <QPushButton>
 #include <QTableView>
 #include <QTreeView>
-#include <QPushButton>
-#include <QLineEdit>
+#include <QWidget>
 
 #include "StructDetailModel.h"
 #include "StructSelectModel.h"
@@ -39,7 +39,8 @@ public:
   void unloadStruct();
 
   void readStructDefMapFromJson(const QJsonObject& json, QMap<QString, QString>& map);
-  void writeStructDefMapToJson(QJsonObject& json, const QStringList desiredStructs = QStringList()) const;
+  void writeStructDefMapToJson(QJsonObject& json,
+                               const QStringList desiredStructs = QStringList()) const;
   void writeStructDefsToJson(QJsonObject& json) const;
 
   StructTreeNode* getStructDefs();
@@ -48,7 +49,10 @@ public:
   QMap<QString, StructDef*> getStructMap();
 
 signals:
-  void structAddedRemoved(QString fullName, StructDef* structDef = nullptr); //If a struct is added, it includes a pointer to the structDef, if it is removed, it is just a nullptr.
+  void structAddedRemoved(
+      QString fullName,
+      StructDef* structDef = nullptr);  // If a struct is added, it includes a pointer to the
+                                        // structDef, if it is removed, it is just a nullptr.
   void updateStructName(QString old_name, QString new_name);
   void updateStructDetails(QString fullName);
 
@@ -69,13 +73,14 @@ private:
   void onSaveStruct();
   void nameChangeFailed(StructTreeNode* node, QString name);
   void onLengthChange(u32 newLength);
-  void onModifyStructReference(QString nodeName, QString target, bool addIt, bool &ok);
+  void onModifyStructReference(QString nodeName, QString target, bool addIt, bool& ok);
   void onModifyStructPointerReference(QString nodeName, QString target, bool addIt);
   void setupStructReferences();
   void updateStructReferenceNames(QString old_name, QString new_name);
   void updateStructReferenceFieldSize(StructTreeNode* node);
 
-  QStringList checkForMapCycles(QMap<QString, QStringList> map, QString curName = nullptr, QString origName = nullptr);
+  QStringList checkForMapCycles(QMap<QString, QStringList> map, QString curName = nullptr,
+                                QString origName = nullptr);
 
   bool isAnyAncestorSelected(const QModelIndex& index) const;
   QModelIndexList simplifiedSelection() const;
@@ -86,7 +91,6 @@ private:
   QMap<QString, QVector<QString>> m_structPointerReferences{};
 
   bool m_unsavedChanges = false;
-
 
   StructDetailModel* m_structDetailModel{};
   QTableView* m_structDetailView;

@@ -27,13 +27,13 @@ StructDef::StructDef(QString label, u32 length, QVector<FieldDef*> entries)
 }
 
 StructDef::StructDef(StructDef* structDef)
-    : m_label(structDef->getLabel()), m_length(structDef->getLength()), m_isValid(structDef->m_isValid)
+    : m_label(structDef->getLabel()), m_length(structDef->getLength()),
+      m_isValid(structDef->m_isValid)
 {
   m_fields = QVector<FieldDef*>();
   for (FieldDef* field : structDef->getFields())
     m_fields.push_back(new FieldDef(field));
 }
-
 
 StructDef::~StructDef()
 {
@@ -54,7 +54,6 @@ QVector<FieldDef*> StructDef::getFields()
 {
   return m_fields;
 }
-
 
 bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
 {
@@ -109,8 +108,6 @@ bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
 
       structBytes[i] ^= entryByteMask;
     }
-
-    
   }
 
   return true;
@@ -160,14 +157,16 @@ void StructDef::setFields(QVector<FieldDef*> fields)
 void StructDef::updateStructTypeLabel(const QString& oldLabel, QString newLabel)
 {
   for (FieldDef* field : m_fields)
-    if (field->getEntry()->getType() == Common::MemType::type_struct && field->getEntry()->getStructName() == oldLabel)
+    if (field->getEntry()->getType() == Common::MemType::type_struct &&
+        field->getEntry()->getStructName() == oldLabel)
       field->getEntry()->setStructName(newLabel);
 }
 
 void StructDef::updateStructFieldSize(QString structName, u32 newLength)
 {
   for (FieldDef* field : m_fields)
-    if (field->getEntry()->getType() == Common::MemType::type_struct && field->getEntry()->getStructName() == structName)
+    if (field->getEntry()->getType() == Common::MemType::type_struct &&
+        field->getEntry()->getStructName() == structName)
       field->setFieldSize(newLength);
   recalculateOffsets();
 }
@@ -228,14 +227,17 @@ QString StructDef::getDiffString(const StructDef* other) const
       if (other->m_fields.count() > i)
       {
         QStringList fieldDiff = m_fields[i]->diffList(other->m_fields[i]);
-        diffs +=
-            fieldDiff.isEmpty() ? "" : QString("\n Field %1:\n\t%2").arg(i).arg(fieldDiff.join("\n\t"));
+        diffs += fieldDiff.isEmpty() ?
+                     "" :
+                     QString("\n Field %1:\n\t%2").arg(i).arg(fieldDiff.join("\n\t"));
       }
       else
-        diffs += QString("\nField %1:\n\t").arg(i) + m_fields[i]->getFieldDescLines().join(" -> N/A\n\t") + " -> N/A";
+        diffs += QString("\nField %1:\n\t").arg(i) +
+                 m_fields[i]->getFieldDescLines().join(" -> N/A\n\t") + " -> N/A";
     }
     else
-      diffs += QString("\nField %1:\n\tN/A -> ").arg(i) + other->m_fields[i]->getFieldDescLines().join("\n\tN/A -> ");
+      diffs += QString("\nField %1:\n\tN/A -> ").arg(i) +
+               other->m_fields[i]->getFieldDescLines().join("\n\tN/A -> ");
     i++;
   }
   return diffs;
@@ -256,5 +258,6 @@ void StructDef::recalculateOffsets()
 void StructDef::calculateLength()
 {
   if (!m_fields.isEmpty())
-    m_length = static_cast<u32>(fmax(m_fields.last()->getOffset() + m_fields.last()->getFieldSize(), m_length));
+    m_length = static_cast<u32>(
+        fmax(m_fields.last()->getOffset() + m_fields.last()->getFieldSize(), m_length));
 }

@@ -57,7 +57,8 @@ public:
   void changeType(const QModelIndex& index, Common::MemType type, size_t length);
   static MemWatchEntry* getEntryFromIndex(const QModelIndex& index);
   void addNodes(const std::vector<MemWatchTreeNode*>& nodes,
-                const QModelIndex& referenceIndex = QModelIndex{}, const bool insertInContainer = false);
+                const QModelIndex& referenceIndex = QModelIndex{},
+                const bool insertInContainer = false);
   void addGroup(const QString& name, const QModelIndex& referenceIndex = QModelIndex{});
   void addEntry(MemWatchEntry* entry, const QModelIndex& referenceIndex = QModelIndex{});
   void editEntry(MemWatchEntry* entry, const QModelIndex& index);
@@ -66,7 +67,8 @@ public:
   void groupSelection(const QModelIndexList& indexes);
   void onUpdateTimer();
   void onFreezeTimer();
-  void loadRootFromJsonRecursive(const QJsonObject& jsonconst, QMap<QString, QString> structNameReplacements = {});
+  void loadRootFromJsonRecursive(const QJsonObject& jsonconst,
+                                 QMap<QString, QString> structNameReplacements = {});
   CTParsingErrors importRootFromCTFile(QFile* CTFile, bool useDolphinPointer, u32 CEStart = 0);
   void writeRootToJsonRecursive(QJsonObject& json) const;
   QString writeRootToCSVStringRecursive() const;

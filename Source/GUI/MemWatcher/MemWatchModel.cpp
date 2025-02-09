@@ -3,8 +3,8 @@
 #include <QDataStream>
 #include <QFontDatabase>
 #include <QIcon>
-#include <QMimeData>
 #include <QJsonArray>
+#include <QMimeData>
 
 #include <cassert>
 #include <cstring>
@@ -42,7 +42,7 @@ MemWatchModel::MemWatchModel(QObject* parent) : QAbstractItemModel(parent)
       Common::MemType::type_none,
       Common::getSizeForType(Common::MemType::type_none, m_placeholderEntry->getLength()));
   m_structDefMap = QMap<QString, StructDef*>();
-  m_structNodes = QMap <QString, QVector<MemWatchTreeNode*>>();
+  m_structNodes = QMap<QString, QVector<MemWatchTreeNode*>>();
 }
 
 MemWatchModel::~MemWatchModel()
@@ -69,7 +69,8 @@ bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QMode
                                              bool readSucess)
 {
   if (!node->isGroup() && node->getEntry() != nullptr &&
-      GUICommon::isContainerType(node->getEntry()->getType()) && node->getEntry()->hasAddressChanged())
+      GUICommon::isContainerType(node->getEntry()->getType()) &&
+      node->getEntry()->hasAddressChanged())
     updateContainerAddresses(node);
 
   QVector<MemWatchTreeNode*> children = node->getChildren();
@@ -136,8 +137,7 @@ MemWatchEntry* MemWatchModel::getEntryFromIndex(const QModelIndex& index)
 }
 
 void MemWatchModel::addNodes(const std::vector<MemWatchTreeNode*>& nodes,
-                             const QModelIndex& referenceIndex,
-                             const bool insertInContainer)
+                             const QModelIndex& referenceIndex, const bool insertInContainer)
 {
   if (nodes.empty())
     return;
@@ -194,7 +194,8 @@ void MemWatchModel::addEntry(MemWatchEntry* const entry, const QModelIndex& refe
   MemWatchTreeNode* node = new MemWatchTreeNode(entry);
   addNodes({node}, referenceIndex);
 
-  // Check if entry is a container: set isGroup to true, add a placeholder node as a child, make sure it is not expanded
+  // Check if entry is a container: set isGroup to true, add a placeholder node as a child, make
+  // sure it is not expanded
   if (!GUICommon::isContainerType(entry->getType()))
     return;
 
@@ -222,16 +223,16 @@ void MemWatchModel::editEntry(MemWatchEntry* entry, const QModelIndex& index)
     if (!GUICommon::isContainerType(oldEntry->getType()))
       if (entry->getType() == Common::MemType::type_struct)
         setupStructNode(node);
-    else if (node->isExpanded())
-    {
-      expandContainerNode(node);
-    }
+      else if (node->isExpanded())
+      {
+        expandContainerNode(node);
+      }
   }
   else if (GUICommon::isContainerType(oldEntry->getType()))
   {
     for (MemWatchTreeNode* child : node->getChildren())
       deleteNode(getIndexFromTreeNode(child));
-}
+  }
 }
 
 void MemWatchModel::clearRoot()
@@ -378,7 +379,7 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       case WATCH_COL_VALUE:
       {
         if (!GUICommon::isContainerType(entry->getType()))
-        return QString::fromStdString(entry->getStringFromMemory());
+          return QString::fromStdString(entry->getStringFromMemory());
         else if (entry->getType() == Common::MemType::type_struct)
         {
           if (entry->getStructName().isEmpty())
@@ -397,7 +398,8 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       }
     }
 
-    if (index.column() == 0 && role == Qt::DecorationRole && GUICommon::isContainerType(entry->getType()))
+    if (index.column() == 0 && role == Qt::DecorationRole &&
+        GUICommon::isContainerType(entry->getType()))
     {
       if (entry->getType() == Common::MemType::type_struct)
       {
@@ -720,7 +722,8 @@ bool MemWatchModel::dropMimeData(const QMimeData* data, Qt::DropAction action, i
   return true;
 }
 
-void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json, const QMap<QString, QString> structNameReplacements)
+void MemWatchModel::loadRootFromJsonRecursive(const QJsonObject& json,
+                                              const QMap<QString, QString> structNameReplacements)
 {
   beginResetModel();
   m_rootNode->readFromJson(json, structNameReplacements);
@@ -793,7 +796,8 @@ void MemWatchModel::setupStructNode(MemWatchTreeNode* node)
       !m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
   {
     addNodeToStructNodeMap(node);
-    addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))}, getIndexFromTreeNode(node), true);
+    addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
+             getIndexFromTreeNode(node), true);
   }
 }
 
@@ -811,7 +815,8 @@ void MemWatchModel::addNodeToStructNodeMap(MemWatchTreeNode* node)
 void MemWatchModel::removeNodeFromStructNodeMap(MemWatchTreeNode* node)
 {
   QString name = node->getEntry()->getStructName();
-  if (name.isEmpty() || m_structNodes.isEmpty() || !m_structNodes.contains(name) || m_structNodes[name].isEmpty() || !m_structNodes[name].contains(node))
+  if (name.isEmpty() || m_structNodes.isEmpty() || !m_structNodes.contains(name) ||
+      m_structNodes[name].isEmpty() || !m_structNodes[name].contains(node))
     return;
   m_structNodes[name].remove(m_structNodes[name].indexOf(node));
   if (m_structNodes[name].isEmpty())
@@ -864,7 +869,6 @@ void MemWatchModel::updateStructEntries(const QString structName)
 
 void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
 {
-
   if (!m_structDefMap.contains(node->getEntry()->getStructName()))
   {
     for (MemWatchTreeNode* child : node->getChildren())
@@ -873,7 +877,8 @@ void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
 
   if (node->isExpanded())
   {
-    collapseStructNode(node, true);  // Shortcut for deleting all children and adding the placeholder child
+    collapseStructNode(
+        node, true);  // Shortcut for deleting all children and adding the placeholder child
 
     if (m_structDefMap.contains(node->getEntry()->getStructName()))
       expandStructNode(node);
@@ -915,14 +920,14 @@ void MemWatchModel::expandStructNode(MemWatchTreeNode* node)
 
   addNodes(childNodes, getIndexFromTreeNode(node), true);
 
-  for(MemWatchTreeNode* childNode : childNodes)
+  for (MemWatchTreeNode* childNode : childNodes)
   {
     if (GUICommon::isContainerType(childNode->getEntry()->getType()))
       if (childNode->getEntry()->getType() == Common::MemType::type_struct)
         setupStructNode(childNode);
   }
 }
-  
+
 void MemWatchModel::collapseContainerNode(MemWatchTreeNode* node)
 {
   if (node->isGroup() || !GUICommon::isContainerType(node->getEntry()->getType()))
@@ -930,7 +935,6 @@ void MemWatchModel::collapseContainerNode(MemWatchTreeNode* node)
 
   if (node->getEntry()->getType() == Common::MemType::type_struct)
     collapseStructNode(node, true);
-
 }
 
 void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
@@ -946,10 +950,11 @@ void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
       }
     deleteNode(getIndexFromTreeNode(child));
   }
-    
+
   if (isTopLevel)
   {
-    addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))}, getIndexFromTreeNode(node), true);
+    addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
+             getIndexFromTreeNode(node), true);
     node->setExpanded(false);
   }
 }

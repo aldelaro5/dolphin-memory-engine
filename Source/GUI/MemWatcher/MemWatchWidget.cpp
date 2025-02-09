@@ -341,7 +341,6 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   connect(paste, &QAction::triggered, this, [this, index] { pasteWatchFromClipBoard(index); });
   contextMenu->addAction(paste);
 
-
   QAction* deleteSelection = new QAction(tr("&Delete"), this);
   if (node != nullptr && (node->getParent() == nullptr || node->getParent()->isGroup()))
   {
@@ -468,7 +467,7 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
     MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
 
     if (node->isGroup() || (node->getParent() && node->getParent()->getEntry() &&
-      GUICommon::isContainerType(node->getParent()->getEntry()->getType())))
+                            GUICommon::isContainerType(node->getParent()->getEntry()->getType())))
       return;
 
     if (index.column() == MemWatchModel::WATCH_COL_TYPE)
@@ -476,7 +475,8 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
       MemWatchEntry* entry = node->getEntry();
       int typeIndex = static_cast<int>(entry->getType());
       DlgChangeType* dlg =
-          new DlgChangeType(this, typeIndex, entry->getLength(), m_structDefs->getStructNames(), entry->getStructName());
+          new DlgChangeType(this, typeIndex, entry->getLength(), m_structDefs->getStructNames(),
+                            entry->getStructName());
       if (dlg->exec() == QDialog::Accepted)
       {
         Common::MemType theType = static_cast<Common::MemType>(dlg->getTypeIndex());
@@ -726,11 +726,12 @@ void MemWatchWidget::onRowsInserted(const QModelIndex& parent, const int first, 
   const QItemSelection selection{firstIndex,
                                  lastIndex.siblingAtColumn(MemWatchModel::WATCH_COL_NUM - 1)};
 
-
   QItemSelectionModel* const selectionModel{m_watchView->selectionModel()};
-  // If the parent node is a container and it is not expanded, do not select the child node or expand it.
+  // If the parent node is a container and it is not expanded, do not select the child node or
+  // expand it.
   const MemWatchTreeNode* parentNode = MemWatchModel::getTreeNodeFromIndex(parent);
-  if (parentNode != nullptr && !parentNode->isGroup() && parentNode != m_watchModel->getRootNode() &&
+  if (parentNode != nullptr && !parentNode->isGroup() &&
+      parentNode != m_watchModel->getRootNode() &&
       GUICommon::isContainerType(parentNode->getEntry()->getType()))
   {
     selectionModel->clearSelection();

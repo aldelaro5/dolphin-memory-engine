@@ -1,14 +1,14 @@
 #include "StructEditorWidget.h"
 
-#include <QInputDialog>
-#include <QMessageBox>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QHBoxLayout>
-#include <QFormLayout>
-#include <QMenu>
-#include <QHeaderView>
 #include <QCoreApplication>
+#include <QFormLayout>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QInputDialog>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QMenu>
+#include <QMessageBox>
 
 #include "../../Common/MemoryCommon.h"
 #include "../MemWatcher/Dialogs/DlgAddWatchEntry.h"
@@ -16,9 +16,7 @@
 class LengthValidator : public QValidator
 {
 public:
-  LengthValidator(QObject* parent) : QValidator(parent) {
-
-  }
+  LengthValidator(QObject* parent) : QValidator(parent) {}
   QValidator::State validate(QString& input, int& pos) const override
   {
     (void)pos;
@@ -99,15 +97,15 @@ void StructEditorWidget::initialiseWidgets()
   connect(m_structDetailModel, &StructDetailModel::modifyStructReference, this,
           &StructEditorWidget::onModifyStructReference);
 
-  //connect as neeeded
+  // connect as neeeded
   /* Example from MemWatchWidget
   connect(m_watchModel, &MemWatchModel::writeFailed, this, &MemWatchWidget::onValueWriteError);
   connect(m_watchModel, &MemWatchModel::readFailed, this, &MemWatchWidget::mustUnhook);
   connect(m_watchModel, &MemWatchModel::rowsInserted, this, &MemWatchWidget::onRowsInserted);
    */
 
-  //Not sure if I will need this yet
-  //m_detailDelegate() = new StructDetailDelegate();
+  // Not sure if I will need this yet
+  // m_detailDelegate() = new StructDetailDelegate();
 
   m_structDetailView = new QTableView;
   m_structDetailView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
@@ -125,7 +123,7 @@ void StructEditorWidget::initialiseWidgets()
   m_structDetailView->setModel(m_structDetailModel);
   m_structDetailView->verticalHeader()->setDefaultSectionSize(15);
   m_structDetailView->verticalHeader()->setMinimumSectionSize(15);
-  //m_watchView->setItemDelegate(m_watchDelegate);
+  // m_watchView->setItemDelegate(m_watchDelegate);
 
   QHeaderView* header = m_structDetailView->horizontalHeader();
   header->setStretchLastSection(true);
@@ -135,7 +133,8 @@ void StructEditorWidget::initialiseWidgets()
   header->resizeSection(StructDetailModel::STRUCT_COL_DETAIL, 150);
 
   m_btnUnloadStructDetails = new QPushButton(tr("Close"), this);
-  connect(m_btnUnloadStructDetails, &QPushButton::clicked, this, &StructEditorWidget::onUnloadStruct);
+  connect(m_btnUnloadStructDetails, &QPushButton::clicked, this,
+          &StructEditorWidget::onUnloadStruct);
   m_btnUnloadStructDetails->setToolTip("Close struct.");
   m_btnUnloadStructDetails->setDisabled(true);
   m_btnUnloadStructDetails->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -172,7 +171,7 @@ void StructEditorWidget::initialiseWidgets()
   connect(m_txtStructName, &QLineEdit::editingFinished, this,
           &StructEditorWidget::onDetailNameChanged);
   m_txtStructName->setDisabled(true);
-  
+
   m_txtStructLength = new QLineEdit(this);
   LengthValidator* hexValidator = new LengthValidator(this);
   m_txtStructLength->setValidator(hexValidator);
@@ -180,7 +179,6 @@ void StructEditorWidget::initialiseWidgets()
           &StructEditorWidget::onDetailLengthChanged);
   m_txtStructLength->setDisabled(true);
 }
-  
 
 void StructEditorWidget::makeLayouts()
 {
@@ -192,7 +190,7 @@ void StructEditorWidget::makeLayouts()
   structDefButtonLayout->addWidget(m_btnDeleteNodes);
   structDefButtonLayout->setContentsMargins(0, 0, 0, 0);
   structDefButtons->setLayout(structDefButtonLayout);
-  
+
   QWidget* structSelectPanel = new QWidget;
   QVBoxLayout* structSelectPanelLayout = new QVBoxLayout;
 
@@ -243,7 +241,7 @@ void StructEditorWidget::makeLayouts()
   structEditPanelLayout->addLayout(structDetails);
   structEditPanelLayout->setContentsMargins(0, 0, 0, 0);
   structEditPanel->setLayout(structEditPanelLayout);
-  
+
   QHBoxLayout* widgetLayout = new QHBoxLayout;
   widgetLayout->addWidget(structSelectPanel);
   widgetLayout->addWidget(structEditPanel);
@@ -269,7 +267,8 @@ void StructEditorWidget::editFieldEntry(const QModelIndex& index)
 {
   FieldDef* field = m_structDetailModel->getFieldByRow(index.row());
 
-  DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()), m_structRootNode->getStructNames(), this, true);
+  DlgAddWatchEntry dlg(false, new MemWatchEntry(field->getEntry()),
+                       m_structRootNode->getStructNames(), this, true);
   if (dlg.exec() == QDialog::Accepted)
   {
     if (!m_structDetailModel->updateFieldEntry(new MemWatchEntry(dlg.stealEntry()), index))
@@ -410,8 +409,10 @@ void StructEditorWidget::onClearFields()
 void StructEditorWidget::onSaveStruct()
 {
   m_structDetailModel->saveStruct();
-  m_nodeInDetailEditor->setStructDef(new StructDef(m_structDetailModel->getLoadedStructNode()->getStructDef()));
-  emit structAddedRemoved(m_nodeInDetailEditor->getNameSpace(), m_nodeInDetailEditor->getStructDef());
+  m_nodeInDetailEditor->setStructDef(
+      new StructDef(m_structDetailModel->getLoadedStructNode()->getStructDef()));
+  emit structAddedRemoved(m_nodeInDetailEditor->getNameSpace(),
+                          m_nodeInDetailEditor->getStructDef());
   updateStructReferenceFieldSize(m_nodeInDetailEditor);
   m_btnSaveStructDetails->setDisabled(true);
 }
@@ -430,7 +431,8 @@ void StructEditorWidget::onLengthChange(u32 newLength)
   m_txtStructLength->setText(QString::number(newLength, 16));
 }
 
-void StructEditorWidget::onModifyStructReference(QString nodeName, QString target, bool addRef, bool& ok)
+void StructEditorWidget::onModifyStructReference(QString nodeName, QString target, bool addRef,
+                                                 bool& ok)
 {
   if (addRef)
   {
@@ -450,8 +452,8 @@ void StructEditorWidget::onModifyStructReference(QString nodeName, QString targe
     onModifyStructReference(nodeName, target, false, _);
     cycle.push_back(QString(" -- ") + cycle.takeLast());
     cycle.push_front(QString(" -> ") + cycle.takeFirst());
-    QString msg = "Cyclic struct reference found:\n\n" + cycle.join("\n |\t|\n |\tV\n |  ") + "\n\nUnable to set field of " +
-                  nodeName + " to " + target;
+    QString msg = "Cyclic struct reference found:\n\n" + cycle.join("\n |\t|\n |\tV\n |  ") +
+                  "\n\nUnable to set field of " + nodeName + " to " + target;
     QMessageBox::warning(this, "Struct - Cyclic Reference", msg);
   }
   else if (m_structReferences.contains(target))
@@ -464,7 +466,8 @@ void StructEditorWidget::onModifyStructReference(QString nodeName, QString targe
   }
 }
 
-void StructEditorWidget::onModifyStructPointerReference(QString nodeName, QString target, bool addRef)
+void StructEditorWidget::onModifyStructPointerReference(QString nodeName, QString target,
+                                                        bool addRef)
 {
   if (addRef)
   {
@@ -509,7 +512,8 @@ void StructEditorWidget::setupStructReferences()
         {
           if (!knownStructs.keys().contains(field->getEntry()->getStructName()))
           {
-            // This is an error, should be reported to the user, maybe they can select another struct to use in this field?
+            // This is an error, should be reported to the user, maybe they can select another
+            // struct to use in this field?
             printf("error");
             continue;
           }
@@ -523,7 +527,8 @@ void StructEditorWidget::setupStructReferences()
             onModifyStructReference(nameSpace, field->getEntry()->getStructName(), true, ok);
             if (!ok)
             {
-              //This is an error, should be reported to the user. field should be cleared to padding in this case.
+              // This is an error, should be reported to the user. field should be cleared to
+              // padding in this case.
             }
           }
         }
@@ -549,21 +554,22 @@ void StructEditorWidget::updateStructReferenceNames(QString old_name, QString ne
         m_structReferences[key].replace(m_structReferences[key].indexOf(old_name), new_name);
   }
 
-    if (m_structPointerReferences.contains(old_name))
+  if (m_structPointerReferences.contains(old_name))
   {
-      for (QString target : m_structPointerReferences[old_name])
-      {
-        if (target != old_name)
-          m_structRootNode->findNode(target)->getStructDef()->updateStructTypeLabel(old_name, new_name);
-        if (m_nodeInDetailEditor != nullptr)
-          m_structDetailModel->updateStructTypeLabel(old_name, new_name);
-      }
-      QStringList refs = m_structPointerReferences.take(old_name);
-      m_structPointerReferences.insert(new_name, refs);
-      for (QString key : m_structPointerReferences.keys())
-        if (m_structPointerReferences[key].contains(old_name))
-          m_structPointerReferences[key].replace(m_structPointerReferences[key].indexOf(old_name),
-                                                 new_name);
+    for (QString target : m_structPointerReferences[old_name])
+    {
+      if (target != old_name)
+        m_structRootNode->findNode(target)->getStructDef()->updateStructTypeLabel(old_name,
+                                                                                  new_name);
+      if (m_nodeInDetailEditor != nullptr)
+        m_structDetailModel->updateStructTypeLabel(old_name, new_name);
+    }
+    QStringList refs = m_structPointerReferences.take(old_name);
+    m_structPointerReferences.insert(new_name, refs);
+    for (QString key : m_structPointerReferences.keys())
+      if (m_structPointerReferences[key].contains(old_name))
+        m_structPointerReferences[key].replace(m_structPointerReferences[key].indexOf(old_name),
+                                               new_name);
   }
 }
 
@@ -577,12 +583,14 @@ void StructEditorWidget::updateStructReferenceFieldSize(StructTreeNode* node)
 
   for (QString target : m_structReferences[keyNameSpace])
   {
-    m_structRootNode->findNode(target)->getStructDef()->updateStructFieldSize(keyNameSpace, structLength);
+    m_structRootNode->findNode(target)->getStructDef()->updateStructFieldSize(keyNameSpace,
+                                                                              structLength);
     emit updateStructDetails(target);
   }
 }
 
-QStringList StructEditorWidget::checkForMapCycles(QMap<QString, QStringList> map, QString curName, QString origName)
+QStringList StructEditorWidget::checkForMapCycles(QMap<QString, QStringList> map, QString curName,
+                                                  QString origName)
 {
   QStringList cycle;
 
@@ -626,7 +634,8 @@ void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)
     if (!node->isGroup())
     {
       QAction* const editStruct{new QAction(tr("&Edit Struct"), this)};
-      connect(editStruct, &QAction::triggered, this, [this, node] { StructEditorWidget::onEditStruct(node); } );
+      connect(editStruct, &QAction::triggered, this,
+              [this, node] { StructEditorWidget::onEditStruct(node); });
       contextMenu->addAction(editStruct);
       contextMenu->addSeparator();
     }
@@ -649,7 +658,7 @@ void StructEditorWidget::onSelectContextMenuRequested(const QPoint& pos)
     connect(deleteNodes, &QAction::triggered, this, &StructEditorWidget::onDeleteNodes);
     contextMenu->addAction(deleteNodes);
   }
-  
+
   contextMenu->popup(m_structSelectView->viewport()->mapToGlobal(pos));
 }
 
@@ -666,7 +675,6 @@ void StructEditorWidget::onSelectDataEdited(const QModelIndex& index, const QVar
     StructTreeNode* node = static_cast<StructTreeNode*>(index.internalPointer());
     QString oldFullName = oldNamespace.toString();
 
-    
     if (!node->isGroup())
     {
       node->getStructDef()->updateStructTypeLabel(oldFullName, node->getNameSpace());
@@ -696,8 +704,10 @@ void StructEditorWidget::updateChildStructNames(StructTreeNode* node, QString ol
       if (newNameSpace.isEmpty())
         newNameSpace = node->getNameSpace();
 
-      QString oldName = oldNameSpace.isEmpty() ? child->getName() : child->appendNameToNameSpace(oldNameSpace);
-      QString newName = newNameSpace.isEmpty() ? child->getName() : child->appendNameToNameSpace(newNameSpace);
+      QString oldName =
+          oldNameSpace.isEmpty() ? child->getName() : child->appendNameToNameSpace(oldNameSpace);
+      QString newName =
+          newNameSpace.isEmpty() ? child->getName() : child->appendNameToNameSpace(newNameSpace);
 
       updateStructReferenceNames(oldName, newName);
       emit updateStructName(oldName, newName);
@@ -714,7 +724,7 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
 {
   QModelIndex index = m_structDetailView->indexAt(pos);
   QMenu* contextMenu = new QMenu(this);
-  
+
   QAction* const addField{new QAction(tr("Add field"), this)};
   connect(addField, &QAction::triggered, this, &StructEditorWidget::onAddPaddingField);
   contextMenu->addAction(addField);
@@ -723,7 +733,6 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
     FieldDef* node = m_structDetailModel->getFieldByRow(index.row());
     if (node != nullptr)
     {
-
       QAction* const deleteField{new QAction(tr("Delete field(s)"), this)};
       connect(deleteField, &QAction::triggered, this, &StructEditorWidget::onDeleteFields);
       contextMenu->addAction(deleteField);
@@ -744,8 +753,7 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
         contextMenu->addSeparator();
 
         QAction* const editField{new QAction(tr("Edit field entry"), this)};
-        connect(editField, &QAction::triggered, this,
-                [this, index] { editFieldEntry(index); });
+        connect(editField, &QAction::triggered, this, [this, index] { editFieldEntry(index); });
         contextMenu->addAction(editField);
       }
     }
@@ -784,14 +792,16 @@ void StructEditorWidget::onAddGroup()
 {
   const QModelIndexList selectedIndexes{m_structSelectView->selectionModel()->selectedIndexes()};
   const QModelIndex lastIndex = selectedIndexes.empty() ? QModelIndex{} : selectedIndexes.back();
-  const StructTreeNode* parentNode =  selectedIndexes.empty() ? m_structRootNode : static_cast<StructTreeNode*>(lastIndex.internalPointer());
+  const StructTreeNode* parentNode = selectedIndexes.empty() ?
+                                         m_structRootNode :
+                                         static_cast<StructTreeNode*>(lastIndex.internalPointer());
 
   bool ok = false;
   QString textIn;
   while (true)
   {
     textIn = QInputDialog::getText(this, "Add a struct group",
-                                         "Enter the group name:", QLineEdit::Normal, "", &ok);
+                                   "Enter the group name:", QLineEdit::Normal, "", &ok);
 
     if (!ok || textIn.isEmpty())
       return;
@@ -804,7 +814,8 @@ void StructEditorWidget::onAddGroup()
     QMessageBox::critical(this, "Error - duplicate name", msg);
   }
 
-  // May want to enclose the selected indices in a new node... In this case, we would need to emit name changes for any struct that was moved...
+  // May want to enclose the selected indices in a new node... In this case, we would need to emit
+  // name changes for any struct that was moved...
   m_structSelectModel->addGroup(textIn, lastIndex);
   m_unsavedChanges = true;
 }
@@ -813,14 +824,16 @@ void StructEditorWidget::onAddStruct()
 {
   const QModelIndexList selectedIndexes{m_structSelectView->selectionModel()->selectedIndexes()};
   const QModelIndex lastIndex = selectedIndexes.empty() ? QModelIndex{} : selectedIndexes.back();
-  const StructTreeNode* parentNode = selectedIndexes.empty() ? m_structRootNode : static_cast<StructTreeNode*>(lastIndex.internalPointer());
+  const StructTreeNode* parentNode = selectedIndexes.empty() ?
+                                         m_structRootNode :
+                                         static_cast<StructTreeNode*>(lastIndex.internalPointer());
 
   bool ok = false;
   QString text;
   while (true)
   {
-    text = QInputDialog::getText(this, "Add a struct",
-                                         "Enter the struct name:", QLineEdit::Normal, "", &ok);
+    text = QInputDialog::getText(this, "Add a struct", "Enter the struct name:", QLineEdit::Normal,
+                                 "", &ok);
 
     if (!ok || text.isEmpty())
       return;
@@ -836,7 +849,6 @@ void StructEditorWidget::onAddStruct()
   m_unsavedChanges = true;
 
   emit structAddedRemoved(addedNode->getNameSpace(), addedNode->getStructDef());
-
 }
 
 bool StructEditorWidget::isAnyAncestorSelected(const QModelIndex& index) const
@@ -864,7 +876,6 @@ QModelIndexList StructEditorWidget::simplifiedSelection() const
   }
   return simplifiedSelection;
 }
-
 
 void StructEditorWidget::onDeleteNodes()
 {
@@ -911,7 +922,9 @@ void StructEditorWidget::onEditStruct(StructTreeNode* node)
     return;
   if (m_structDetailModel->hasStructLoaded() && unsavedStructDetails())
   {
-    QMessageBox::StandardButton response = QMessageBox::question(this, "Save Changes?", "You have unsaved changes to this struct.\nWould you like to save them?");
+    QMessageBox::StandardButton response = QMessageBox::question(
+        this, "Save Changes?",
+        "You have unsaved changes to this struct.\nWould you like to save them?");
     if (response == QMessageBox::StandardButton::Yes)
     {
       onSaveStruct();
@@ -971,7 +984,8 @@ void StructEditorWidget::unloadStruct()
   m_txtStructLength->setDisabled(true);
 }
 
-void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<QString, QString>& map)
+void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json,
+                                                  QMap<QString, QString>& map)
 {
   QMap<QString, StructDef*> newStructDefs{};
   QMap<QString, StructDef*> replacementStructDefs{};
@@ -990,7 +1004,7 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
     {
       if (equivalentNode->isGroup())
       {
-        //ask user if they want to rename incoming struct or the group
+        // ask user if they want to rename incoming struct or the group
 
         StructTreeNode* nodeParent = equivalentNode->getParent();
         int i = 0;
@@ -1003,9 +1017,12 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
         }
         QString newName = nodeParent->getNameSpace() + "::" + newPartialName;
 
-        QString msg = QString("There is already a group with the same name as the struct on file: %1.\nHow would you like to resolve this?").arg(structName);
-        QMessageBox msgBox = QMessageBox(QMessageBox::Icon::Question, "Group and struct with same name detected!",
-                                         msg, QMessageBox::StandardButton::NoButton, this);
+        QString msg = QString("There is already a group with the same name as the struct on file: "
+                              "%1.\nHow would you like to resolve this?")
+                          .arg(structName);
+        QMessageBox msgBox =
+            QMessageBox(QMessageBox::Icon::Question, "Group and struct with same name detected!",
+                        msg, QMessageBox::StandardButton::NoButton, this);
         QPushButton* changeGroup = msgBox.addButton(tr("Rename Group"), QMessageBox::AcceptRole);
         QPushButton* changeStruct = msgBox.addButton(tr("Rename Struct"), QMessageBox::AcceptRole);
         msgBox.setDefaultButton(changeStruct);
@@ -1026,11 +1043,14 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
           QMessageBox::warning(this, "Group Renamed", msg);
         }
       }
-      else if (equivalentNode->getStructDef()->isSame(def)) // if structs are the same, no need to alert user and just use the one we have
+      else if (equivalentNode->getStructDef()->isSame(
+                   def))  // if structs are the same, no need to alert user and just use the one we
+                          // have
         continue;
       else
       {
-        //ask user if they want to just use the current struct, overwrite the current struct, or create a new struct
+        // ask user if they want to just use the current struct, overwrite the current struct, or
+        // create a new struct
         QString msg = QString("There is already a different struct named %1").arg(structName);
         QMessageBox msgBox = QMessageBox(QMessageBox::Icon::Question, "Duplicate struct detected!",
                                          msg, QMessageBox::StandardButton::NoButton, this);
@@ -1081,7 +1101,8 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json, QMap<
   }
 }
 
-void StructEditorWidget::writeStructDefMapToJson(QJsonObject& json, const QStringList desiredStructs) const
+void StructEditorWidget::writeStructDefMapToJson(QJsonObject& json,
+                                                 const QStringList desiredStructs) const
 {
   QStringList structsWritten{};
   QJsonArray structs;
@@ -1128,7 +1149,7 @@ void StructEditorWidget::writeStructDefsToJson(QJsonObject& json) const
 void StructEditorWidget::restoreStructTree(const QString& json)
 {
   const QJsonDocument loadDoc(QJsonDocument::fromJson(json.toUtf8()));
-  m_structRootNode->readFromJson(loadDoc.object()); // may need to reset model here?
+  m_structRootNode->readFromJson(loadDoc.object());  // may need to reset model here?
 
   setupStructReferences();
 }
@@ -1154,7 +1175,6 @@ QString StructEditorWidget::saveStructTree()
 
 QMap<QString, StructDef*> StructEditorWidget::getStructMap()
 {
-
   return m_structSelectModel->getStructMap();
 }
 

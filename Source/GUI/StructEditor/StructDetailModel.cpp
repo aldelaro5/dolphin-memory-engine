@@ -2,11 +2,9 @@
 
 #include <QMimeData>
 
-#include "../GUICommon.h"
 #include "../../Common/CommonUtils.h"
 #include "../../Structs/StructTreeNode.h"
-
-
+#include "../GUICommon.h"
 
 StructDetailModel::StructDetailModel(QObject* parent) : QAbstractListModel(parent)
 {
@@ -51,7 +49,7 @@ QVariant StructDetailModel::data(const QModelIndex& index, int role) const
     {
       return getFieldDetails(m_fields[index.row()]);
     }
-      
+
     default:
       break;
     }
@@ -112,7 +110,7 @@ Qt::ItemFlags StructDetailModel::flags(const QModelIndex& index) const
   if (!index.isValid())
     return Qt::ItemFlags();
 
-  Qt::ItemFlags flags =  Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+  Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 
   if (index.column() == STRUCT_COL_LABEL && !m_fields[index.row()]->isPadding())
     flags |= Qt::ItemIsEditable;
@@ -184,16 +182,18 @@ void StructDetailModel::removeFields(int start, int count)
 
   for (int i = start; i < start + count; ++i)
   {
-    if (m_fields[i]->getEntry() != nullptr && m_fields[i]->getEntry()->getType() == Common::MemType::type_struct)
+    if (m_fields[i]->getEntry() != nullptr &&
+        m_fields[i]->getEntry()->getType() == Common::MemType::type_struct)
     {
       if (m_fields[i]->getEntry()->isBoundToPointer())
-        emit modifyStructPointerReference(m_baseNode->getNameSpace(), m_fields[i]->getEntry()->getStructName(), false);
+        emit modifyStructPointerReference(m_baseNode->getNameSpace(),
+                                          m_fields[i]->getEntry()->getStructName(), false);
       else
       {
         bool _;
-        emit modifyStructReference(m_baseNode->getNameSpace(), m_fields[i]->getEntry()->getStructName(), false, _);
+        emit modifyStructReference(m_baseNode->getNameSpace(),
+                                   m_fields[i]->getEntry()->getStructName(), false, _);
       }
-
     }
     delete m_fields[i];
   }
@@ -377,8 +377,8 @@ void StructDetailModel::updateStructTypeLabel(QString oldName, QString newName)
   for (int i = 0; i < m_fields.count(); i++)
   {
     if (m_fields[i]->isPadding() ||
-      m_fields[i]->getEntry()->getType() != Common::MemType::type_struct ||
-      m_fields[i]->getEntry()->getStructName() != oldName)
+        m_fields[i]->getEntry()->getType() != Common::MemType::type_struct ||
+        m_fields[i]->getEntry()->getStructName() != oldName)
     {
       continue;
     }
@@ -475,7 +475,8 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
   if (oldEntry != nullptr && oldEntry->getType() == Common::MemType::type_struct)
   {
     if (oldEntry->isBoundToPointer())
-      emit modifyStructPointerReference(m_baseNode->getNameSpace(), oldEntry->getStructName(), false);
+      emit modifyStructPointerReference(m_baseNode->getNameSpace(), oldEntry->getStructName(),
+                                        false);
     else
     {
       bool ok = true;
@@ -533,11 +534,10 @@ FieldDef* StructDetailModel::getFieldByRow(int row)
 
 QModelIndex StructDetailModel::getLastIndex(int col)
 {
-  return createIndex(m_fields.count()-1, 0);
+  return createIndex(m_fields.count() - 1, 0);
 }
 
 QModelIndex StructDetailModel::getIndexAt(int row, int col)
 {
   return createIndex(row, col);
 }
-

@@ -1,9 +1,9 @@
 #include "StructSelectModel.h"
 
-#include <QIcon>
-#include <QMimeData>
 #include <QDataStream>
 #include <QIODevice>
+#include <QIcon>
+#include <QMimeData>
 
 #include "../../Common/CommonUtils.h"
 
@@ -20,7 +20,7 @@ StructSelectModel::~StructSelectModel()
 
 int StructSelectModel::columnCount(const QModelIndex& parent) const
 {
-  (void) parent;
+  (void)parent;
 
   return WATCH_COL_NUM;
 }
@@ -48,7 +48,6 @@ QVariant StructSelectModel::data(const QModelIndex& index, int role) const
 
   if (!item->isGroup())
   {
-
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
       switch (index.column())
@@ -246,8 +245,7 @@ int StructSelectModel::getNodeDeepness(const StructTreeNode* node) const
 }
 
 bool StructSelectModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row,
-                                     int column,
-                                 const QModelIndex& parent)
+                                     int column, const QModelIndex& parent)
 {
   (void)column;
 
@@ -359,7 +357,6 @@ void StructSelectModel::addNodes(const std::vector<StructTreeNode*>& nodes,
     parentNode->insertChild(i, nodes[static_cast<size_t>(i - first)]);
   }
   endInsertRows();
-
 }
 
 StructTreeNode* StructSelectModel::addGroup(const QString& name, const QModelIndex& referenceIndex)

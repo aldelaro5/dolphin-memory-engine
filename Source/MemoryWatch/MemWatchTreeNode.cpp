@@ -133,7 +133,9 @@ void MemWatchTreeNode::deleteChildren()
   m_children.clear();
 }
 
-void MemWatchTreeNode::readFromJson(const QJsonObject& json, const QMap<QString, QString> structNameReplacements, MemWatchTreeNode* parent)
+void MemWatchTreeNode::readFromJson(const QJsonObject& json,
+                                    const QMap<QString, QString> structNameReplacements,
+                                    MemWatchTreeNode* parent)
 {
   m_parent = parent;
   if (json["watchList"] != QJsonValue::Undefined)

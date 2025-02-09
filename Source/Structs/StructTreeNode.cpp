@@ -2,7 +2,8 @@
 
 #include <QJsonArray>
 
-StructTreeNode::StructTreeNode(StructDef* const structDef, StructTreeNode* const parent, bool isGroup, QString name)
+StructTreeNode::StructTreeNode(StructDef* const structDef, StructTreeNode* const parent,
+                               bool isGroup, QString name)
 {
   m_parent = parent;
   m_isGroup = isGroup;
@@ -52,8 +53,6 @@ void StructTreeNode::setName(const QString& name)
 
 bool StructTreeNode::isNameAvailable(QString name) const
 {
-
-
   if (m_children.isEmpty())
     return true;
 
@@ -255,7 +254,7 @@ QVector<QString> StructTreeNode::getStructNames(bool includeGroups, QString pref
     else
       nodeName = appendNameToNameSpace(prefix);
   }
-                         
+
   if (getParent() != nullptr && (!m_isGroup || includeGroups))
     names.push_back(nodeName);
 

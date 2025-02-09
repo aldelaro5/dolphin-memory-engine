@@ -14,7 +14,8 @@
 #include "../../../DolphinProcess/DolphinAccessor.h"
 #include "../../GUICommon.h"
 
-DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const entry, QVector<QString> const structs, QWidget* const parent,
+DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const entry,
+                                   QVector<QString> const structs, QWidget* const parent,
                                    bool isForStructField)
     : QDialog(parent)
 {
@@ -365,8 +366,8 @@ void DlgAddWatchEntry::accept()
   {
     QString errorMsg =
         tr("A struct name must be selected with the struct type, it cannot be an empty string");
-    QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid Struct Type"), errorMsg,
-                                            QMessageBox::Ok, this);
+    QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid Struct Type"),
+                                            errorMsg, QMessageBox::Ok, this);
     errorBox->exec();
   }
   else

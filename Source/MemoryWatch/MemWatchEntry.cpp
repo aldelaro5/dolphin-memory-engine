@@ -39,8 +39,8 @@ MemWatchEntry::MemWatchEntry(MemWatchEntry* entry)
     : m_label(entry->m_label), m_consoleAddress(entry->m_consoleAddress), m_type(entry->m_type),
       m_base(entry->m_base), m_isUnsigned(entry->m_isUnsigned),
       m_boundToPointer(entry->m_boundToPointer), m_pointerOffsets(entry->m_pointerOffsets),
-      m_isValidPointer(entry->m_isValidPointer), m_length(entry->m_length), m_structName(entry->m_structName),
-      m_curActualAddress(entry->m_curActualAddress)
+      m_isValidPointer(entry->m_isValidPointer), m_length(entry->m_length),
+      m_structName(entry->m_structName), m_curActualAddress(entry->m_curActualAddress)
 {
   m_memory = new char[getSizeForType(entry->getType(), entry->getLength())];
   std::memcpy(m_memory, entry->getMemory(), getSizeForType(entry->getType(), entry->getLength()));
@@ -386,7 +386,7 @@ void MemWatchEntry::readFromJson(const QJsonObject& json)
     length = static_cast<size_t>(json["length"].toDouble());
   setTypeAndLength(static_cast<Common::MemType>(json["typeIndex"].toInt()), length);
 
- if (json["structName"] != QJsonValue::Undefined) 
+  if (json["structName"] != QJsonValue::Undefined)
     setStructName(json["structName"].toString());
 
   setSignedUnsigned(json["unsigned"].toBool());
@@ -417,8 +417,7 @@ void MemWatchEntry::writeToJson(QJsonObject& json) const
   json["address"] = QString::fromStdString(ss.str());
   json["typeIndex"] = static_cast<double>(getType());
   json["unsigned"] = isUnsigned();
-  if (getType() == Common::MemType::type_string ||
-      getType() == Common::MemType::type_byteArray)
+  if (getType() == Common::MemType::type_string || getType() == Common::MemType::type_byteArray)
     json["length"] = static_cast<double>(getLength());
   else if (getType() == Common::MemType::type_struct)
     json["structName"] = getStructName();
