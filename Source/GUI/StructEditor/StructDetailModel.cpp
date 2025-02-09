@@ -1,6 +1,7 @@
 #include "StructDetailModel.h"
 
 #include <QMimeData>
+#include <sstream>
 
 #include "../../Common/CommonUtils.h"
 #include "../../Structs/StructTreeNode.h"
