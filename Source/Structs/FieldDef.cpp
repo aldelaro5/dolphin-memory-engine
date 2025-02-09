@@ -114,7 +114,7 @@ bool FieldDef::isSame(FieldDef* const other) const
     if (m_entry->getPointerOffsets().size() != other->m_entry->getPointerOffsets().size())
       return false;
     else
-      for (int i = 0; i < m_entry->getPointerLevel(); i++)
+      for (size_t i = 0; i < m_entry->getPointerLevel(); i++)
         if (m_entry->getPointerOffset(i) != other->m_entry->getPointerOffset(i))
           return false;
   }
@@ -168,8 +168,8 @@ QStringList FieldDef::diffList(FieldDef* const other) const
 
   if (m_entry->isBoundToPointer() || other->m_entry->isBoundToPointer())
   {
-    int i = 0;
-    while (i < fmax(m_entry->getPointerLevel(), other->m_entry->getPointerLevel()))
+    size_t i = 0;
+    while (i < std::max(m_entry->getPointerLevel(), other->m_entry->getPointerLevel()))
     {
       if (m_entry->getPointerOffsets().size() > i)
       {
@@ -204,7 +204,7 @@ QStringList FieldDef::getFieldDescLines() const
   descLines += QString("Is Pointer: %1").arg(m_entry->isBoundToPointer() ? "Yes" : "No");
   if (m_entry->isBoundToPointer())
   {
-    int i = 0;
+    size_t i = 0;
     while (i < m_entry->getPointerLevel())
     {
       descLines += QString("Pointer Offset %1: %2").arg(i).arg(m_entry->getPointerOffset(i));

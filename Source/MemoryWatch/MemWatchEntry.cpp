@@ -232,7 +232,8 @@ u32 MemWatchEntry::getAddressForPointerLevel(const int level) const
 
 u32 MemWatchEntry::getActualAddress() const
 {
-  return getPointerLevel() == 0 ? m_consoleAddress : getAddressForPointerLevel(getPointerLevel());
+  return getPointerLevel() == 0 ? m_consoleAddress :
+                                  getAddressForPointerLevel(static_cast<int>(getPointerLevel()));
 }
 
 void MemWatchEntry::updateActualAddress(u32 addr)

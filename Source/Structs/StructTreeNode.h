@@ -60,7 +60,7 @@ private:
   QString m_nodeName;
   bool m_expanded{};
   StructDef* m_structDef;
+  StructTreeNode* m_parent;
 
   QVector<StructTreeNode*> m_children{};
-  StructTreeNode* m_parent;
 };

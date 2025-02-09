@@ -221,12 +221,14 @@ void MemWatchModel::editEntry(MemWatchEntry* entry, const QModelIndex& index)
   if (GUICommon::isContainerType(entry->getType()))
   {
     if (!GUICommon::isContainerType(oldEntry->getType()))
+    {
       if (entry->getType() == Common::MemType::type_struct)
         setupStructNode(node);
-      else if (node->isExpanded())
-      {
-        expandContainerNode(node);
-      }
+    }
+    else if (node->isExpanded())
+    {
+      expandContainerNode(node);
+    }
   }
   else if (GUICommon::isContainerType(oldEntry->getType()))
   {
@@ -939,7 +941,7 @@ void MemWatchModel::collapseContainerNode(MemWatchTreeNode* node)
 
 void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
 {
-  for (int i = node->getChildren().count() - 1; i >= 0; --i)
+  for (int i = static_cast<int>(node->getChildren().count()) - 1; i >= 0; --i)
   {
     MemWatchTreeNode* child = node->getChildren()[i];
     if (GUICommon::isContainerType(child->getEntry()->getType()))

@@ -5,16 +5,16 @@
 StructTreeNode::StructTreeNode(StructDef* const structDef, StructTreeNode* const parent,
                                bool isGroup, QString name)
 {
-  m_parent = parent;
   m_isGroup = isGroup;
   m_nodeName = std::move(name);
   m_structDef = structDef;
+  m_parent = parent;
   updateName();
 }
 
 StructTreeNode::StructTreeNode(StructTreeNode* node)
-    : m_parent(node->getParent()), m_isGroup(node->isGroup()), m_nodeName(QString(node->getName())),
-      m_structDef(new StructDef(node->getStructDef()))
+    : m_isGroup(node->isGroup()), m_nodeName(QString(node->getName())),
+      m_structDef(new StructDef(node->getStructDef())), m_parent(node->getParent())
 {
 }
 
@@ -89,7 +89,7 @@ bool StructTreeNode::hasChildren() const
 
 int StructTreeNode::childrenCount() const
 {
-  return m_children.count();
+  return static_cast<int>(m_children.count());
 }
 
 const QVector<StructTreeNode*>& StructTreeNode::getChildren() const

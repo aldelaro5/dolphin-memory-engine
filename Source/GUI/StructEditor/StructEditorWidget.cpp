@@ -261,6 +261,7 @@ bool StructEditorWidget::createNewFieldEntry(const QModelIndex& index)
     return false;
 
   m_btnSaveStructDetails->setEnabled(true);
+  return true;
 }
 
 void StructEditorWidget::editFieldEntry(const QModelIndex& index)
@@ -419,7 +420,7 @@ void StructEditorWidget::onSaveStruct()
 
 void StructEditorWidget::nameChangeFailed(StructTreeNode* node, QString name)
 {
-  QString msg = "There is already a node named " + m_txtStructName->text() + " in the namespace " +
+  QString msg = "There is already a node named " + name + " in the namespace " +
                 node->getParent()->getNameSpace() + ". Reverting name to " + node->getName();
   m_txtStructName->setText(node->getName());
   QMessageBox::critical(this, "Name in Use!", msg);
@@ -1035,7 +1036,7 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json,
           QMessageBox::warning(this, "Struct Renamed", msg);
           structName = newName;
         }
-        else
+        else if (msgBox.clickedButton() == changeGroup)
         {
           m_structSelectModel->setData(m_structSelectModel->getIndexFromTreeNode(equivalentNode),
                                        newPartialName, Qt::EditRole);

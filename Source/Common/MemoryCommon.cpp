@@ -461,6 +461,12 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       index++;
     }
     actualLength = bytes.size();
+    break;
+  }
+
+  default:
+  {
+    break;
   }
   }
   return buffer;

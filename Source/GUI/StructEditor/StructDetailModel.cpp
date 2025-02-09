@@ -25,7 +25,7 @@ int StructDetailModel::columnCount(const QModelIndex& parent) const
 int StructDetailModel::rowCount(const QModelIndex& parent) const
 {
   (void)parent;
-  return m_fields.count();
+  return static_cast<int>(m_fields.count());
 }
 
 QVariant StructDetailModel::data(const QModelIndex& index, int role) const
@@ -139,7 +139,7 @@ void StructDetailModel::addPaddingFields(int count, int start)
   }
   else if (start < 0 || start >= m_fields.count())
   {
-    start = m_fields.count();
+    start = static_cast<int>(m_fields.count());
     starting_offset = m_fields.last()->getOffset() + m_fields.last()->getFieldSize();
   }
   else
@@ -307,7 +307,7 @@ void StructDetailModel::unloadStruct()
 
 bool StructDetailModel::willRemoveFields(u32 newLength)
 {
-  for (int i = m_fields.count() - 1; i >= 0; --i)
+  for (int i = static_cast<int>(m_fields.count()) - 1; i >= 0; --i)
   {
     if (m_fields[i]->getOffset() + m_fields[i]->getFieldSize() <= newLength)
       break;
@@ -357,11 +357,12 @@ void StructDetailModel::updateFieldsWithNewLength()
   }
   else
   {
-    for (int i = m_fields.count() - 1; i >= 0; --i)
+    int field_count = static_cast<int>(m_fields.count());
+    for (int i = field_count - 1; i >= 0; --i)
     {
       if (m_fields[i]->getOffset() + m_fields[i]->getFieldSize() > new_length)
         continue;
-      removeFields(i, m_fields.count() - i);
+      removeFields(i, field_count - i);
       break;
     }
     u32 cur_length = m_fields.last()->getOffset() + m_fields.last()->getFieldSize();
@@ -415,21 +416,21 @@ QString StructDetailModel::getFieldDetails(FieldDef* field) const
 void StructDetailModel::removeFields(QModelIndexList indices)
 {
   reduceIndicesToRows(indices);
-  u32 start = indices[0].row();
-  u32 count = indices.count();
+  int start = indices[0].row();
+  int count = static_cast<int>(indices.count());
   removeFields(start, count);
 }
 
 void StructDetailModel::removeLastField()
 {
-  removeFields(m_fields.count() - 1, 1);
+  removeFields(static_cast<int>(m_fields.count()) - 1, 1);
 }
 
 void StructDetailModel::clearFields(QModelIndexList indices)
 {
   reduceIndicesToRows(indices);
   int start = indices[0].row();
-  int count = indices.count();
+  int count = static_cast<int>(indices.count());
 
   for (int i = start + count - 1; i >= start; --i)
   {
@@ -534,7 +535,7 @@ FieldDef* StructDetailModel::getFieldByRow(int row)
 
 QModelIndex StructDetailModel::getLastIndex(int col)
 {
-  return createIndex(m_fields.count() - 1, 0);
+  return createIndex(static_cast<int>(m_fields.count()) - 1, col);
 }
 
 QModelIndex StructDetailModel::getIndexAt(int row, int col)

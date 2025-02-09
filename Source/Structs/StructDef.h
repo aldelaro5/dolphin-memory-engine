@@ -31,7 +31,7 @@ public:
   bool isValidStruct();
   void setLength(u32 length);
   void setLabel(const QString& label);
-  void addFields(FieldDef* entry, size_t index = -1);
+  void addFields(FieldDef* entry, int index = -1);
   void clearFields();
   void setFields(QVector<FieldDef*> entries);
   void updateStructTypeLabel(const QString& oldLabel, QString newLabel);

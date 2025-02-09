@@ -398,7 +398,7 @@ void StructSelectModel::insertNewDef(const QString& name, StructDef* structDef)
   StructTreeNode* curNode = m_rootNode->findDeepestAvailableNode(name);
   QStringList ids = name.split("::");
 
-  int levels = curNode->getNameSpace().split("::").count();
+  int levels = static_cast<int>(curNode->getNameSpace().split("::").count());
   for (int i = 0; i < levels; ++i)
     ids.removeFirst();
 
@@ -457,7 +457,7 @@ QMap<QString, StructDef*> StructSelectModel::getStructMap()
   {
     curNode = queue.takeFirst();
     if (curNode->isGroup())
-      for (int i = curNode->getChildren().count() - 1; i >= 0; --i)
+      for (int i = static_cast<int>(curNode->getChildren().count()) - 1; i >= 0; --i)
         queue.push_front(curNode->getChildren()[i]);
     else
       structMap.insert(curNode->getNameSpace(), curNode->getStructDef());

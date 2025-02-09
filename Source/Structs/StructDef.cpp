@@ -58,7 +58,7 @@ QVector<FieldDef*> StructDef::getFields()
 bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
 {
   const size_t segbitsize = sizeof(uint64_t) * 8;
-  const size_t structSegments = ceil(static_cast<float>(length) / segbitsize);
+  const size_t structSegments = static_cast<size_t>(ceil(static_cast<float>(length) / segbitsize));
   uint64_t* structBytes = new uint64_t[structSegments];
   for (size_t i = 0; i < structSegments; i++)
   {
@@ -68,14 +68,15 @@ bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
   for (FieldDef* field : fields)
   {
     size_t fieldOffset = field->getOffset();
-    u32 fieldLength = field->getFieldSize();
+    size_t fieldLength = static_cast<size_t>(field->getFieldSize());
     if (fieldOffset + fieldLength > length)
     {
       return false;
     }
 
-    size_t firstSegment = floor(static_cast<float>(fieldOffset) / segbitsize);
-    size_t lastSegment = floor(static_cast<float>(fieldOffset + fieldLength) / segbitsize);
+    size_t firstSegment = static_cast<size_t>(floor(static_cast<float>(fieldOffset) / segbitsize));
+    size_t lastSegment =
+        static_cast<size_t>(floor(static_cast<float>(fieldOffset + fieldLength) / segbitsize));
 
     size_t lengthChecked = 0;
     for (size_t i = firstSegment; i <= lastSegment; i++)
@@ -83,7 +84,7 @@ bool StructDef::isValidFieldLayout(u32 length, QVector<FieldDef*> fields)
       uint64_t entryByteMask = 0ULL;
       if (i == firstSegment)
       {
-        size_t maskLength = fmin(fieldLength, (segbitsize - fieldOffset % segbitsize));
+        size_t maskLength = std::min(fieldLength, (segbitsize - fieldOffset % segbitsize));
         if (maskLength == 0x40)
           entryByteMask--;
         else
@@ -128,7 +129,7 @@ void StructDef::setLabel(const QString& label)
   m_label = label;
 }
 
-void StructDef::addFields(FieldDef* field, size_t index)
+void StructDef::addFields(FieldDef* field, int index)
 {
   if (index == -1)
     m_fields.append(field);
@@ -220,7 +221,7 @@ QString StructDef::getDiffString(const StructDef* other) const
   if (m_length != other->m_length)
     diffs += QString("\nStruct Length: %1 -> %2").arg(m_length).arg(other->m_length);
   int i = 0;
-  while (i < fmax(m_fields.count(), other->m_fields.count()))
+  while (i < std::max(m_fields.count(), other->m_fields.count()))
   {
     if (m_fields.count() > i)
     {

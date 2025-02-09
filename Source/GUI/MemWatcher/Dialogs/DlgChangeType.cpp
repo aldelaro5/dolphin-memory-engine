@@ -18,7 +18,7 @@ DlgChangeType::DlgChangeType(QWidget* parent, const int typeIndex, const size_t 
   makeLayouts();
 
   if (m_structNames.contains(curStructName))
-    m_structSelect->setCurrentIndex(m_structNames.indexOf(curStructName));
+    m_structSelect->setCurrentIndex(static_cast<int>(m_structNames.indexOf(curStructName)));
 }
 
 void DlgChangeType::initialiseWidgets()
