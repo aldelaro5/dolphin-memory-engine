@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include <QJsonObject>
 #include <QString>
 
 #include "../Common/CommonTypes.h"
@@ -46,14 +47,23 @@ public:
   void addOffset(int offset);
   void removeOffset();
 
+  QString getStructName() const;
+  void setStructName(QString structName);
+
   Common::MemOperationReturnCode freeze();
 
   u32 getAddressForPointerLevel(int level) const;
+  u32 getActualAddress() const;
+  void updateActualAddress(u32 addr);
+  bool hasAddressChanged() const;
   std::string getAddressStringForPointerLevel(int level) const;
   Common::MemOperationReturnCode readMemoryFromRAM();
 
   std::string getStringFromMemory() const;
   Common::MemOperationReturnCode writeMemoryFromString(const std::string& inputString);
+
+  void readFromJson(const QJsonObject& json);
+  void writeToJson(QJsonObject& json) const;
 
 private:
   Common::MemOperationReturnCode writeMemoryToRAM(const char* memory, size_t size);
@@ -71,4 +81,6 @@ private:
   char* m_freezeMemory = nullptr;
   size_t m_freezeMemSize = 0;
   size_t m_length = 1;
+  QString m_structName;
+  u32 m_curActualAddress;
 };

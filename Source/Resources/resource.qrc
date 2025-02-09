@@ -7,5 +7,7 @@
         <file>status_hooked.svg</file>
         <file>status_present.svg</file>
         <file>status_unhooked.svg</file>
+        <file>struct.svg</file>
+        <file>struct2.svg</file>
     </qresource>
 </RCC>

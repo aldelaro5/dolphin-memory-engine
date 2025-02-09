@@ -95,6 +95,11 @@ void MemViewer::memoryValidityChanged(const bool valid)
   viewport()->update();
 }
 
+void MemViewer::setStructDefs(StructTreeNode* baseNode)
+{
+  m_structDefs = baseNode;
+}
+
 void MemViewer::updateMemoryData()
 {
   std::swap(m_updatedRawMemoryData, m_lastRawMemoryData);
@@ -499,7 +504,8 @@ void MemViewer::addByteIndexAsWatch(int index)
 {
   MemWatchEntry* entry = new MemWatchEntry();
   entry->setConsoleAddress(m_currentFirstAddress + index);
-  DlgAddWatchEntry dlg(true, entry, this);
+  DlgAddWatchEntry dlg(true, entry, m_structDefs->getStructNames(), this);
+
   if (dlg.exec() == QDialog::Accepted)
   {
     emit addWatch(dlg.stealEntry());

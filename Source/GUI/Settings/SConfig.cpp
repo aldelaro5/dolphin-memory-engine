@@ -68,6 +68,11 @@ QString SConfig::getWatchModel() const
   return value("watchModel", QString{}).toString();
 }
 
+QString SConfig::getStructDefs() const
+{
+  return value("structDefs", QString{}).toString();
+}
+
 bool SConfig::getAutoHook() const
 {
   return value("autoHook", true).toBool();
@@ -136,6 +141,11 @@ u32 SConfig::getMEM2Size() const
 void SConfig::setWatchModel(const QString& json)
 {
   setValue("watchModel", json);
+}
+
+void SConfig::setStructDefs(const QString& json)
+{
+  setValue("structDefs", json);
 }
 
 void SConfig::setAutoHook(const bool enabled)
