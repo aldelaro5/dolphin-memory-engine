@@ -111,10 +111,10 @@ bool FieldDef::isSame(FieldDef* const other) const
     return false;
   if (m_entry->isBoundToPointer())
   {
-    if (m_entry->getPointerOffsets().size() != other->m_entry->getPointerOffsets().size())
+    if (m_entry->getPointerLevel() != other->m_entry->getPointerLevel())
       return false;
     else
-      for (size_t i = 0; i < m_entry->getPointerLevel(); i++)
+      for (int i = 0; i < static_cast<int>(m_entry->getPointerLevel()); i++)
         if (m_entry->getPointerOffset(i) != other->m_entry->getPointerOffset(i))
           return false;
   }
@@ -168,21 +168,21 @@ QStringList FieldDef::diffList(FieldDef* const other) const
 
   if (m_entry->isBoundToPointer() || other->m_entry->isBoundToPointer())
   {
-    size_t i = 0;
-    while (i < std::max(m_entry->getPointerLevel(), other->m_entry->getPointerLevel()))
+    int i = 0;
+    while (i < static_cast<int>(std::max(m_entry->getPointerLevel(), other->m_entry->getPointerLevel())))
     {
-      if (m_entry->getPointerOffsets().size() > i)
+      if (static_cast<int>(m_entry->getPointerLevel()) > i)
       {
-        if (other->m_entry->getPointerOffsets().size() > i &&
+        if (static_cast<int>(other->m_entry->getPointerLevel()) > i &&
             m_entry->getPointerOffset(i) != other->m_entry->getPointerOffset(i))
           diffs += QString("%1: %2 -> %3")
                        .arg(i)
                        .arg(m_entry->getPointerOffset(i))
                        .arg(other->m_entry->getPointerOffset(i));
-        else if (!(other->m_entry->getPointerOffsets().size() > i))
+        else if (!(static_cast<int>(other->m_entry->getPointerLevel()) > i))
           diffs += QString("%1: %2 -> N/A").arg(i).arg(m_entry->getPointerOffset(i));
       }
-      else if (other->m_entry->getPointerOffsets().size() > i)
+      else if (static_cast<int>(other->m_entry->getPointerLevel()) > i)
         diffs += QString("%1: N/A -> %3").arg(i).arg(other->m_entry->getPointerOffset(i));
       i++;
     }
@@ -204,8 +204,8 @@ QStringList FieldDef::getFieldDescLines() const
   descLines += QString("Is Pointer: %1").arg(m_entry->isBoundToPointer() ? "Yes" : "No");
   if (m_entry->isBoundToPointer())
   {
-    size_t i = 0;
-    while (i < m_entry->getPointerLevel())
+    int i = 0;
+    while (i < static_cast<int>(m_entry->getPointerLevel()))
     {
       descLines += QString("Pointer Offset %1: %2").arg(i).arg(m_entry->getPointerOffset(i));
       i++;
