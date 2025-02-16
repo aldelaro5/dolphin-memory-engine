@@ -125,6 +125,12 @@ void MemWatchModel::changeType(const QModelIndex& index, Common::MemType type, s
 {
   MemWatchEntry* entry = getEntryFromIndex(index);
   entry->setTypeAndLength(type, length);
+  if (GUICommon::isContainerType(entry->getType()))
+  {
+    MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
+    if (entry->getType() == Common::MemType::type_struct)
+      setupStructNode(node);
+  }
   emit dataChanged(index, index);
 }
 
