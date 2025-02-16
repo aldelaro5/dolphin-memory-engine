@@ -60,6 +60,8 @@ void DlgChangeType::makeLayouts()
   Common::MemType theType = static_cast<Common::MemType>(m_typeIndex);
   if (theType != Common::MemType::type_string && theType != Common::MemType::type_byteArray)
     m_spnLength->hide();
+  if (theType != Common::MemType::type_struct)
+    m_structSelect->hide();
 
   QDialogButtonBox* buttonBox =
       new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
