@@ -887,11 +887,22 @@ void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
       deleteNode(getIndexFromTreeNode(child));
   }
 
-  if (node->isExpanded())
+  if (!node->hasChildren() && node->getEntry() != nullptr &&
+      !node->getEntry()->getStructName().isEmpty() &&
+      m_structDefMap.contains(node->getEntry()->getStructName()) &&
+      !m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
+  {
+    addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
+             getIndexFromTreeNode(node), true);
+  }
+  else if (node->hasChildren())
   {
     collapseStructNode(
         node, true);  // Shortcut for deleting all children and adding the placeholder child
+  }
 
+  if (node->isExpanded())
+  {
     if (m_structDefMap.contains(node->getEntry()->getStructName()))
       expandStructNode(node);
   }
