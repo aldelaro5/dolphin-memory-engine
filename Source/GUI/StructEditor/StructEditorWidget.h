@@ -68,6 +68,7 @@ private:
   void onDetailLengthChanged();
   void onAddPaddingField(bool setSaveState = true);
   void onAddField();
+  void onDuplicateField(const QModelIndex& index);
   void onDeleteFields();
   void onClearFields();
   void onSaveStruct();

@@ -384,6 +384,13 @@ void StructEditorWidget::onAddField()
     m_btnSaveStructDetails->setEnabled(true);
 }
 
+void StructEditorWidget::onDuplicateField(const QModelIndex& index)
+{
+  FieldDef* newField = new FieldDef(m_structDetailModel->getFieldByRow(index.row()));
+  QModelIndex insertIndex = index.siblingAtRow(index.row() + 1);
+  m_structDetailModel->addField(insertIndex, newField);
+}
+
 void StructEditorWidget::onDeleteFields()
 {
   const QModelIndexList selection = m_structDetailView->selectionModel()->selectedIndexes();

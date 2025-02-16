@@ -129,6 +129,34 @@ Qt::DropActions StructDetailModel::supportedDragActions() const
   return Qt::IgnoreAction;
 }
 
+void StructDetailModel::addField(const QModelIndex& index, FieldDef* field)
+{
+  u32 starting_offset;
+
+  int start = index.row();
+
+  if (m_fields.isEmpty())
+  {
+    start = 0;
+    starting_offset = 0;
+  }
+  else if (start < 0 || start >= m_fields.count())
+  {
+    start = static_cast<int>(m_fields.count());
+    starting_offset = m_fields.last()->getOffset() + m_fields.last()->getFieldSize();
+  }
+  else
+  {
+    starting_offset = m_fields[start]->getOffset() + m_fields[start]->getFieldSize();
+  }
+
+  beginInsertRows(QModelIndex(), start, start);
+  m_fields.insert(start, field);
+  endInsertRows();
+
+  updateFieldOffsets();
+}
+
 void StructDetailModel::addPaddingFields(int count, int start)
 {
   u32 starting_offset;
