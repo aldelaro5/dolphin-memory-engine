@@ -800,12 +800,12 @@ QModelIndex MemWatchModel::getIndexFromTreeNode(const MemWatchTreeNode* const no
 
 void MemWatchModel::setupStructNode(MemWatchTreeNode* node)
 {
-  if (m_structDefMap.contains(node->getEntry()->getStructName()) &&
-      !m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
+  if (m_structDefMap.contains(node->getEntry()->getStructName()))
   {
     addNodeToStructNodeMap(node);
-    addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
-             getIndexFromTreeNode(node), true);
+    if (!m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
+      addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
+               getIndexFromTreeNode(node), true);
   }
 }
 
@@ -968,7 +968,7 @@ void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
   {
     if (node->getEntry() != nullptr && !node->getEntry()->getStructName().isEmpty() &&
         m_structDefMap.contains(node->getEntry()->getStructName()) &&
-        m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
+        !m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
       addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
                getIndexFromTreeNode(node), true);
     node->setExpanded(false);
