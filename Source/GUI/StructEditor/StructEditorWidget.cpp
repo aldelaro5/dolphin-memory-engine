@@ -741,29 +741,34 @@ void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
     FieldDef* node = m_structDetailModel->getFieldByRow(index.row());
     if (node != nullptr)
     {
-      QAction* const deleteField{new QAction(tr("Delete field(s)"), this)};
-      connect(deleteField, &QAction::triggered, this, &StructEditorWidget::onDeleteFields);
-      contextMenu->addAction(deleteField);
-
       if (node->isPadding())
       {
         QAction* const createEntry{new QAction(tr("Create field entry"), this)};
         connect(createEntry, &QAction::triggered, this,
                 [this, index] { createNewFieldEntry(index); });
         contextMenu->addAction(createEntry);
+        contextMenu->addSeparator();
       }
       else
       {
-        QAction* const clearField{new QAction(tr("Clear field"), this)};
-        connect(clearField, &QAction::triggered, this, &StructEditorWidget::onClearFields);
-        contextMenu->addAction(clearField);
-
-        contextMenu->addSeparator();
+        QAction* const dupField{new QAction(tr("Duplicate field"), this)};
+        connect(dupField, &QAction::triggered, this, [this, index] { onDuplicateField(index); });
+        contextMenu->addAction(dupField);
 
         QAction* const editField{new QAction(tr("Edit field entry"), this)};
         connect(editField, &QAction::triggered, this, [this, index] { editFieldEntry(index); });
         contextMenu->addAction(editField);
+
+        contextMenu->addSeparator();
+
+        QAction* const clearField{new QAction(tr("Clear field"), this)};
+        connect(clearField, &QAction::triggered, this, &StructEditorWidget::onClearFields);
+        contextMenu->addAction(clearField);
       }
+
+      QAction* const deleteField{new QAction(tr("Delete field(s)"), this)};
+      connect(deleteField, &QAction::triggered, this, &StructEditorWidget::onDeleteFields);
+      contextMenu->addAction(deleteField);
     }
   }
 
