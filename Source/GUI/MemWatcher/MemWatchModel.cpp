@@ -872,7 +872,11 @@ void MemWatchModel::updateStructEntries(const QString structName)
   if (!m_structNodes.contains(structName))
     return;
   for (MemWatchTreeNode* node : m_structNodes[structName])
+  {
+    if (!m_structNodes[structName].contains(node))
+      continue;
     updateStructNode(node);
+  }
 }
 
 void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
