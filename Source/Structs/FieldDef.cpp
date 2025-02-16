@@ -181,10 +181,13 @@ QStringList FieldDef::diffList(FieldDef* const other) const
                        .arg(m_entry->getPointerOffset(i))
                        .arg(other->m_entry->getPointerOffset(i));
         else if (!(static_cast<int>(other->m_entry->getPointerLevel()) > i))
-          diffs += QString("  Pointer Offset %1: %2 -> N/A").arg(i).arg(m_entry->getPointerOffset(i));
+          diffs +=
+              QString("  Pointer Offset %1: %2 -> N/A").arg(i).arg(m_entry->getPointerOffset(i));
       }
       else if (static_cast<int>(other->m_entry->getPointerLevel()) > i)
-        diffs += QString("  Pointer Offset %1: N/A -> %3").arg(i).arg(other->m_entry->getPointerOffset(i));
+        diffs += QString("  Pointer Offset %1: N/A -> %3")
+                     .arg(i)
+                     .arg(other->m_entry->getPointerOffset(i));
       i++;
     }
   }
