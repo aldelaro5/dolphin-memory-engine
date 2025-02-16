@@ -230,15 +230,15 @@ QString StructDef::getDiffString(const StructDef* other) const
         QStringList fieldDiff = m_fields[i]->diffList(other->m_fields[i]);
         diffs += fieldDiff.isEmpty() ?
                      "" :
-                     QString("\n Field %1:\n\t%2").arg(i).arg(fieldDiff.join("\n\t"));
+                     QString("\n  Field %1:\n    %2").arg(i).arg(fieldDiff.join("\n    "));
       }
       else
-        diffs += QString("\nField %1:\n\t").arg(i) +
-                 m_fields[i]->getFieldDescLines().join(" -> N/A\n\t") + " -> N/A";
+        diffs += QString("\n  Field %1:\n    ").arg(i) +
+                 m_fields[i]->getFieldDescLines().join(" -> N/A\n    ") + " -> N/A";
     }
     else
-      diffs += QString("\nField %1:\n\tN/A -> ").arg(i) +
-               other->m_fields[i]->getFieldDescLines().join("\n\tN/A -> ");
+      diffs += QString("\n  Field %1:\n    N/A -> ").arg(i) +
+               other->m_fields[i]->getFieldDescLines().join("\n    N/A -> ");
     i++;
   }
   return diffs;
