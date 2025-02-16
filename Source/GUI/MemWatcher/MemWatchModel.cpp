@@ -909,8 +909,6 @@ void MemWatchModel::expandContainerNode(MemWatchTreeNode* node)
 void MemWatchModel::expandStructNode(MemWatchTreeNode* node)
 {
   MemWatchEntry* entry = node->getEntry();
-  u32 addr = entry->getActualAddress();
-
   if (!m_structDefMap.contains(entry->getStructName()))
     return;
 
@@ -918,10 +916,13 @@ void MemWatchModel::expandStructNode(MemWatchTreeNode* node)
     deleteNode(getIndexFromTreeNode(child));
 
   StructDef* def = m_structDefMap[entry->getStructName()];
+  if (def->getFields().isEmpty())
+    return;
 
   entry->setTypeAndLength(entry->getType(), def->getLength());
   node->setExpanded(true);
 
+  u32 addr = entry->getActualAddress();
   std::vector<MemWatchTreeNode*> childNodes{};
   for (FieldDef* field : def->getFields())
   {
@@ -965,8 +966,11 @@ void MemWatchModel::collapseStructNode(MemWatchTreeNode* node, bool isTopLevel)
 
   if (isTopLevel)
   {
-    addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
-             getIndexFromTreeNode(node), true);
+    if (node->getEntry() != nullptr && !node->getEntry()->getStructName().isEmpty() &&
+        m_structDefMap.contains(node->getEntry()->getStructName()) &&
+        m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
+      addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
+               getIndexFromTreeNode(node), true);
     node->setExpanded(false);
   }
 }
