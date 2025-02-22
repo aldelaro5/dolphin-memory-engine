@@ -33,7 +33,7 @@ public:
   void onRowsInserted(const QModelIndex& parent, int first, int last);
   void onCollapsed(const QModelIndex& index);
   void onExpanded(const QModelIndex& index);
-  void openWatchFile();
+  void openWatchFile(const QString& fileName);
   void setSelectedWatchesBase(MemWatchEntry* entry, Common::MemBase base);
   void groupCurrentSelection();
   void copySelectedWatchesToClipBoard();
@@ -49,6 +49,7 @@ public:
   bool warnIfUnsavedChanges();
   void restoreWatchModel(const QString& json);
   QString saveWatchModel();
+  QString m_watchListFile;
 
 signals:
   void mustUnhook();
@@ -66,7 +67,6 @@ private:
   QPushButton* m_btnAddWatchEntry{};
   QTimer* m_updateTimer{};
   QTimer* m_freezeTimer{};
-  QString m_watchListFile = "";
   bool m_hasUnsavedChanges = false;
 
   bool isAnyAncestorSelected(const QModelIndex& index) const;

@@ -41,7 +41,17 @@ MainWindow::MainWindow()
   GUICommon::changeApplicationStyle(
       static_cast<GUICommon::ApplicationStyle>(SConfig::getInstance().getTheme()));
 
-  m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
+  m_actAutoloadLastFile->setChecked(SConfig::getInstance().getAutoloadLastFile());
+
+  if (m_actAutoloadLastFile->isChecked() && !SConfig::getInstance().getLastLoadedFile().isEmpty())
+  {
+    m_watcher->openWatchFile(SConfig::getInstance().getLastLoadedFile());
+  }
+  else
+  {
+    m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
+  }
+
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
   if (m_actAutoHook->isChecked())
@@ -66,6 +76,8 @@ void MainWindow::makeMenus()
   m_actClearWatchList = new QAction(tr("&Clear the watch list"), this);
   m_actImportFromCT = new QAction(tr("&Import from Cheat Engine's CT file..."), this);
   m_actExportAsCSV = new QAction(tr("&Export as CSV..."), this);
+  m_actAutoloadLastFile = new QAction(tr("Auto-load last file"), this);
+  m_actAutoloadLastFile->setCheckable(true);
   QAction* const actOpenConfigDir{new QAction(tr("Open Configuration Directory..."), this)};
 
   m_actOpenWatchList->setShortcut(Qt::Modifier::CTRL | Qt::Key::Key_O);
@@ -105,6 +117,9 @@ void MainWindow::makeMenus()
     QDesktopServices::openUrl(url);
   });
 
+  connect(m_actAutoloadLastFile, &QAction::triggered, this,
+          &MainWindow::onAutoLoadLastFileTriggered);
+
   connect(m_actSettings, &QAction::triggered, this, &MainWindow::onOpenSettings);
 
   connect(m_actAutoHook, &QAction::toggled, this, &MainWindow::onAutoHookToggled);
@@ -126,6 +141,8 @@ void MainWindow::makeMenus()
   m_menuFile->addSeparator();
   m_menuFile->addAction(m_actImportFromCT);
   m_menuFile->addAction(m_actExportAsCSV);
+  m_menuFile->addSeparator();
+  m_menuFile->addAction(m_actAutoloadLastFile);
   m_menuFile->addSeparator();
   m_menuFile->addAction(actOpenConfigDir);
   m_menuFile->addSeparator();
@@ -334,6 +351,16 @@ void MainWindow::onUnhook()
   updateDolphinHookingStatus();
 }
 
+void MainWindow::onAutoLoadLastFileTriggered(const bool checked)
+{
+  if (checked)
+    return;
+  if (!m_watcher->warnIfUnsavedChanges())
+    return;
+  m_watcher->clearWatchList();
+  m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
+}
+
 void MainWindow::onAutoHookToggled(const bool checked)
 {
   if (checked)
@@ -384,7 +411,7 @@ void MainWindow::onSplitterMoved(const int pos, const int index)
 void MainWindow::onOpenWatchFile()
 {
   if (m_watcher->warnIfUnsavedChanges())
-    m_watcher->openWatchFile();
+    m_watcher->openWatchFile(QString());
 }
 
 void MainWindow::onSaveWatchFile()
@@ -545,13 +572,19 @@ void MainWindow::onQuit()
 void MainWindow::closeEvent(QCloseEvent* event)
 {
   SConfig::getInstance().setAutoHook(m_actAutoHook->isChecked());
-  SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
+  SConfig::getInstance().setAutoloadLastFile(m_actAutoloadLastFile->isChecked());
+  SConfig::getInstance().setLastLoadedFile(m_watcher->m_watchListFile);
+  if (!m_actAutoloadLastFile->isChecked() || m_watcher->m_watchListFile.isEmpty())
+  {
+    SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
+  }
   SConfig::getInstance().setMainWindowGeometry(saveGeometry());
   SConfig::getInstance().setMainWindowState(saveState());
 
-  if (!SConfig::getInstance().ownsSettingsFile())
+  // Give the user a chance to save the ephemeral watch model or if they are using auto-loading of a
+  // file rather than the stored watchmodel
+  if (!SConfig::getInstance().ownsSettingsFile() || m_actAutoloadLastFile->isChecked())
   {
-    // Give the user a chance to save the ephemeral watch model.
     if (!m_watcher->warnIfUnsavedChanges())
     {
       event->setAccepted(false);
