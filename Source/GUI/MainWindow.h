@@ -56,6 +56,8 @@ public:
   void onAbout();
   void onQuit();
 
+  void onAutoLoadLastFileTriggered(bool checked);
+
 private:
   void makeMenus();
   void initialiseWidgets();
@@ -83,6 +85,7 @@ private:
   QAction* m_actClearWatchList{};
   QAction* m_actImportFromCT{};
   QAction* m_actExportAsCSV{};
+  QAction* m_actAutoloadLastFile{};
   QAction* m_actSettings{};
   QAction* m_actAutoHook{};
   QAction* m_actHook{};

@@ -739,11 +739,19 @@ QTimer* MemWatchWidget::getFreezeTimer() const
   return m_freezeTimer;
 }
 
-void MemWatchWidget::openWatchFile()
+void MemWatchWidget::openWatchFile(const QString& fileName)
 {
-  QString fileName = QFileDialog::getOpenFileName(this, "Open watch list", m_watchListFile,
-                                                  "Dolphin memory watches file (*.dmw)");
-  if (fileName != "")
+  QString srcFileName;
+  if (fileName.isEmpty())
+  {
+    srcFileName = QFileDialog::getOpenFileName(this, "Open watch list", m_watchListFile,
+                                               "Dolphin memory watches file (*.dmw)");
+  }
+  else
+  {
+    srcFileName = fileName;
+  }
+  if (!srcFileName.isEmpty())
   {
     if (m_watchModel->hasAnyNodes())
     {
@@ -758,12 +766,12 @@ void MemWatchWidget::openWatchFile()
         m_watchModel->clearRoot();
     }
 
-    QFile watchFile(fileName);
+    QFile watchFile(srcFileName);
     if (!watchFile.exists())
     {
       QMessageBox* errorBox = new QMessageBox(
           QMessageBox::Critical, QString("Error while opening file"),
-          QString("The watch list file " + fileName + " does not exist"), QMessageBox::Ok, this);
+          QString("The watch list file " + srcFileName + " does not exist"), QMessageBox::Ok, this);
       errorBox->exec();
       return;
     }
@@ -780,7 +788,7 @@ void MemWatchWidget::openWatchFile()
     QJsonDocument loadDoc(QJsonDocument::fromJson(bytes));
     m_watchModel->loadRootFromJsonRecursive(loadDoc.object());
     updateExpansionState();
-    m_watchListFile = fileName;
+    m_watchListFile = srcFileName;
     m_hasUnsavedChanges = false;
   }
 }
@@ -842,6 +850,7 @@ bool MemWatchWidget::saveAsWatchFile()
 
 void MemWatchWidget::clearWatchList()
 {
+  m_watchListFile.clear();
   if (!m_watchModel->hasAnyNodes())
     return;
 

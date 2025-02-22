@@ -64,6 +64,11 @@ public:
 
   bool ownsSettingsFile() const;
 
+  bool getAutoloadLastFile() const;
+  void setAutoloadLastFile(bool enabled);
+  QString getLastLoadedFile() const;
+  void setLastLoadedFile(const QString& fileName);
+
 private:
   void setValue(const QString& key, const QVariant& value);
   QVariant value(const QString& key, const QVariant& defaultValue) const;

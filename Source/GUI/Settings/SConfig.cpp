@@ -203,6 +203,26 @@ void SConfig::setMEM2Size(const u32 mem2SizeReal)
   setValue("memorySettings/MEM2Size", mem2SizeReal);
 }
 
+bool SConfig::getAutoloadLastFile() const
+{
+  return value("autoloadLastFile", false).toBool();
+}
+
+void SConfig::setAutoloadLastFile(const bool enabled)
+{
+  setValue("autoloadLastFile", enabled);
+}
+
+QString SConfig::getLastLoadedFile() const
+{
+  return value("lastLoadedFile", QString{}).toString();
+}
+
+void SConfig::setLastLoadedFile(const QString& fileName)
+{
+  setValue("lastLoadedFile", fileName);
+}
+
 bool SConfig::ownsSettingsFile() const
 {
   return m_lockFile->isLocked();
