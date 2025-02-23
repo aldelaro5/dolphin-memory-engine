@@ -359,6 +359,7 @@ void MainWindow::onAutoLoadLastFileTriggered(const bool checked)
     return;
   m_watcher->clearWatchList();
   m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
+  updateStatusBar();
 }
 
 void MainWindow::onAutoHookToggled(const bool checked)
@@ -412,21 +413,25 @@ void MainWindow::onOpenWatchFile()
 {
   if (m_watcher->warnIfUnsavedChanges())
     m_watcher->openWatchFile(QString());
+  updateStatusBar();
 }
 
 void MainWindow::onSaveWatchFile()
 {
   m_watcher->saveWatchFile();
+  updateStatusBar();
 }
 
 void MainWindow::onSaveAsWatchFile()
 {
   m_watcher->saveAsWatchFile();
+  updateStatusBar();
 }
 
 void MainWindow::onClearWatchList()
 {
   m_watcher->clearWatchList();
+  updateStatusBar();
 }
 
 void MainWindow::onImportFromCT()
@@ -680,6 +685,11 @@ void MainWindow::updateStatusBar()
     toolTipLines << tr("Unhooked. Press <b>Dolphin > Hook</b> to hook to Dolphin.");
     break;
   }
+  }
+
+  if (!m_watcher->m_watchListFile.isEmpty())
+  {
+    tags << m_watcher->m_watchListFile;
   }
 
   const QSize actualIconSize{icon.actualSize(QSize(100, 100))};
