@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
   QApplication::setApplicationName("Dolphin Memory Engine");
-  QApplication::setApplicationVersion("1.2.4");
+  QApplication::setApplicationVersion("1.2.5");
 
   SConfig config;  // Initialize global settings object
 
