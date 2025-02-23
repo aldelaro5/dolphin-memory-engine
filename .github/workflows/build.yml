@@ -14,7 +14,7 @@ jobs:
     name: Clang-Format Check
     steps:
       - uses: actions/checkout@v4
-      - uses: jidicula/clang-format-action@v4.13.0
+      - uses: jidicula/clang-format-action@v4.14.0
         with:
           clang-format-version: '18'
           check-path: Source
