@@ -60,9 +60,9 @@ jobs:
           name: ${{ steps.set-artifact-name.outputs.artifact_name }}
           path: Source\bin\${{ matrix.configuration }}
 
-  build-linux:
+  build-linux-ubuntu22:
     runs-on: ubuntu-22.04
-    name: 🐧 Linux x86_64
+    name: 🐧 Linux x86_64 (Ubuntu 22.04)
 
     steps:
       - name: Checkout code
@@ -111,6 +111,59 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-ubuntu-22.04-appimage
+          path: dolphin-memory-engine.AppImage
+
+  build-linux-ubuntu24:
+    runs-on: ubuntu-24.04
+    name: 🐧 Linux x86_64 (Ubuntu 24.04)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt install cmake libevdev-dev qt6-base-private-dev libqt6svg6 libqt6svg6-dev libgl1-mesa-dev libfuse2
+        shell: bash
+
+      - name: Install GCC 14 and G++ 14
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+          sudo apt-get update
+          sudo apt-get install g++-14 gcc-14 -y
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 90
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 90
+
+      - name: Build
+        run: |
+          cmake Source -B Source/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build Source/build --parallel
+        shell: bash
+
+      - name: Copy LICENSE, README, Prepare Artifacts
+        run: |
+          mkdir Source/build/artifacts
+          cp ./README.md ./Source/build/artifacts/
+          cp ./LICENSE ./Source/build/artifacts/
+          cp ./Source/build/dolphin-memory-engine ./Source/build/artifacts/
+        shell: bash
+
+      - name: Package AppImage
+        run: |
+          .github/assets/appimage.sh
+        shell: bash
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-ubuntu-24.04-binary
+          path: Source/build/artifacts
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-ubuntu-24.04-appimage
           path: dolphin-memory-engine.AppImage
 
   build-macos-intel:
