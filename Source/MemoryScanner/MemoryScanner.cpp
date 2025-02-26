@@ -509,7 +509,8 @@ int MemScanner::getTermsNumForFilter(const MemScanner::ScanFiter filter)
 bool MemScanner::typeSupportsAdditionalOptions(const Common::MemType type)
 {
   return (type == Common::MemType::type_byte || type == Common::MemType::type_halfword ||
-          type == Common::MemType::type_word);
+          type == Common::MemType::type_word || type == Common::MemType::type_float ||
+          type == Common::MemType::type_double);
 }
 
 std::vector<u32> MemScanner::getResultsConsoleAddr() const
