@@ -6,6 +6,22 @@ project(dolphin-memory-engine)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if(DEFINED ENV{GITHUB_SHA})
+    string(SUBSTRING "$ENV{GITHUB_SHA}" 0 7 VERSION_SHA) # Get the first 7 chars of the sha
+    set(APP_VERSION "${VERSION_SHA}")
+else()
+    string(TIMESTAMP CURRENT_DATE "%Y-%m-%d")
+    set(APP_VERSION dev-${CURRENT_DATE})
+endif()
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/version.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/version.h"
+)
+
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
+
+
 if(WIN32)
     set(DolphinProcessSrc DolphinProcess/Windows/WindowsDolphinProcess.cpp)
     set(ExeIconSrc Resources/exeicon.rc)

@@ -5,11 +5,13 @@
 #include "GUI/MainWindow.h"
 #include "GUI/Settings/SConfig.h"
 
+#include "version.h"
+
 int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
   QApplication::setApplicationName("Dolphin Memory Engine");
-  QApplication::setApplicationVersion("1.2.5");
+  QApplication::setApplicationVersion(APP_VERSION);
 
   SConfig config;  // Initialize global settings object
 
