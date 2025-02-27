@@ -51,7 +51,7 @@ jobs:
 
       - name: Set Artifact Name
         id: set-artifact-name
-        run: echo "artifact_name=$(echo "windows-${{ matrix.configuration }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+        run: echo "artifact_name=$(echo "dolphin-memory-engine-${{ github.sha }}-windows-${{ matrix.configuration }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Publish Artifacts
@@ -104,13 +104,13 @@ jobs:
       - name: Publish Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux-ubuntu-22.04-binary
+          name: dolphin-memory-engine-${{ github.sha }}-ubuntu-22.04-x86_64
           path: Source/build/artifacts
 
       - name: Publish Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux-ubuntu-22.04-appimage
+          name: dolphin-memory-engine-${{ github.sha }}-linux-x86_64
           path: dolphin-memory-engine.AppImage
 
   build-macos-intel:
@@ -150,5 +150,5 @@ jobs:
       - name: Publish Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: macOS-intel
+          name: dolphin-memory-engine-${{ github.sha }}-macOS-intel
           path: Source/build/artifacts
