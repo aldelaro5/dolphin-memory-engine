@@ -238,11 +238,11 @@ QModelIndexList MemScanWidget::getSelectedResults() const
   return m_tblResulstList->selectionModel()->selectedRows();
 }
 
-MemScanner::ScanFiter MemScanWidget::getSelectedFilter() const
+MemScanner::ScanFilter MemScanWidget::getSelectedFilter() const
 {
   const auto index = GUICommon::g_memScanFilter.indexOf(
       QRegularExpression("^" + m_cmbScanFilter->currentText() + "$"));
-  return static_cast<MemScanner::ScanFiter>(index);
+  return static_cast<MemScanner::ScanFilter>(index);
 }
 
 void MemScanWidget::updateScanFilterChoices()
@@ -252,25 +252,25 @@ void MemScanWidget::updateScanFilterChoices()
   if (newType == Common::MemType::type_byteArray || newType == Common::MemType::type_string)
   {
     m_cmbScanFilter->addItem(
-        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFiter::exact)));
+        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFilter::exact)));
   }
   else if (m_memScanner->hasScanStarted())
   {
     m_cmbScanFilter->addItems(GUICommon::g_memScanFilter);
-    m_cmbScanFilter->removeItem(static_cast<int>(MemScanner::ScanFiter::unknownInitial));
+    m_cmbScanFilter->removeItem(static_cast<int>(MemScanner::ScanFilter::unknownInitial));
   }
   else
   {
     m_cmbScanFilter->addItem(
-        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFiter::exact)));
+        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFilter::exact)));
     m_cmbScanFilter->addItem(
-        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFiter::between)));
+        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFilter::between)));
     m_cmbScanFilter->addItem(
-        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFiter::biggerThan)));
+        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFilter::biggerThan)));
     m_cmbScanFilter->addItem(
-        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFiter::smallerThan)));
+        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFilter::smallerThan)));
     m_cmbScanFilter->addItem(
-        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFiter::unknownInitial)));
+        GUICommon::g_memScanFilter.at(static_cast<int>(MemScanner::ScanFilter::unknownInitial)));
   }
   m_cmbScanFilter->setCurrentIndex(0);
 }
@@ -292,7 +292,7 @@ void MemScanWidget::updateTypeAdditionalOptions()
 
 void MemScanWidget::onScanFilterChanged()
 {
-  MemScanner::ScanFiter theFilter = getSelectedFilter();
+  MemScanner::ScanFilter theFilter = getSelectedFilter();
   const int numTerms{MemScanner::getTermsNumForFilter(theFilter)};
   switch (numTerms)
   {

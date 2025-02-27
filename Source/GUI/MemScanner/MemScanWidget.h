@@ -62,7 +62,7 @@ private:
   void initialiseWidgets();
   void makeLayouts();
 
-  MemScanner::ScanFiter getSelectedFilter() const;
+  MemScanner::ScanFilter getSelectedFilter() const;
   void updateScanFilterChoices();
   void updateTypeAdditionalOptions();
 
