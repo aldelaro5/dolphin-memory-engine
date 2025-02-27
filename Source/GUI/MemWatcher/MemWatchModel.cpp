@@ -14,6 +14,7 @@
 #include "../../Common/CommonUtils.h"
 #include "../../DolphinProcess/DolphinAccessor.h"
 #include "../GUICommon.h"
+#include "../Settings/SConfig.h"
 
 namespace
 {
@@ -666,7 +667,7 @@ MemWatchModel::CTParsingErrors MemWatchModel::importRootFromCTFile(QFile* const 
 
 void MemWatchModel::writeRootToJsonRecursive(QJsonObject& json) const
 {
-  m_rootNode->writeToJson(json);
+  m_rootNode->writeToJson(json, !SConfig::getInstance().getCollapseGroupsOnSave());
 }
 
 QString MemWatchModel::writeRootToCSVStringRecursive() const

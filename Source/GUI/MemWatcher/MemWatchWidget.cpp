@@ -404,7 +404,7 @@ void MemWatchWidget::copySelectedWatchesToClipBoard()
 
       rootNodeCopy.appendChild(childNode);  // Borrow node temporarily.
     }
-    rootNodeCopy.writeToJson(jsonNode);
+    rootNodeCopy.writeToJson(jsonNode, true);
 
     // Remove borrowed children before going out of scope.
     rootNodeCopy.removeChildren();

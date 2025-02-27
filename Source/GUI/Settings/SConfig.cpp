@@ -228,6 +228,16 @@ bool SConfig::ownsSettingsFile() const
   return m_lockFile->isLocked();
 }
 
+bool SConfig::getCollapseGroupsOnSave() const
+{
+  return value("collapseGroupsOnSave", false).toBool();
+}
+
+void SConfig::setCollapseGroupsOnSave(const bool enabled)
+{
+  setValue("collapseGroupsOnSave", enabled);
+}
+
 void SConfig::setValue(const QString& key, const QVariant& value)
 {
   m_map[key] = value;
