@@ -14,7 +14,7 @@
 class MemScanner
 {
 public:
-  enum class ScanFiter
+  enum class ScanFilter
   {
     exact = 0,
     increasedBy,
@@ -45,9 +45,9 @@ public:
   MemScanner& operator=(const MemScanner&) = delete;
   MemScanner& operator=(MemScanner&&) = delete;
 
-  Common::MemOperationReturnCode firstScan(ScanFiter filter, const std::string& searchTerm1,
+  Common::MemOperationReturnCode firstScan(ScanFilter filter, const std::string& searchTerm1,
                                            const std::string& searchTerm2);
-  Common::MemOperationReturnCode nextScan(ScanFiter filter, const std::string& searchTerm1,
+  Common::MemOperationReturnCode nextScan(ScanFilter filter, const std::string& searchTerm1,
                                           const std::string& searchTerm2);
   bool undoScan();
   void reset();
@@ -139,7 +139,7 @@ public:
   size_t getResultCount() const;
   bool hasUndo() const;
   size_t getUndoCount() const;
-  static int getTermsNumForFilter(ScanFiter filter);
+  static int getTermsNumForFilter(ScanFilter filter);
   Common::MemType getType() const;
   Common::MemBase getBase() const;
   size_t getLength() const;
@@ -151,7 +151,7 @@ public:
   bool hasScanStarted() const;
 
 private:
-  inline bool isHitNextScan(ScanFiter filter, const char* memoryToCompare1,
+  inline bool isHitNextScan(ScanFilter filter, const char* memoryToCompare1,
                             const char* memoryToCompare2, const char* noOffset,
                             const char* newerRAMCache, size_t realSize, u32 consoleOffset) const;
 
