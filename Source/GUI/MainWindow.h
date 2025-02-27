@@ -37,6 +37,7 @@ public:
   void updateDolphinHookingStatus();
   void onHookAttempt();
   void onUnhook();
+  void onCollapseGroupsOnSaveTriggered(bool checked);
   void onAutoHookToggled(bool checked);
   void onHookIfNotHooked();
   void onOpenMenViewer();
@@ -86,6 +87,7 @@ private:
   QAction* m_actImportFromCT{};
   QAction* m_actExportAsCSV{};
   QAction* m_actAutoloadLastFile{};
+  QAction* m_actCollapseGroupsOnSave{};
   QAction* m_actSettings{};
   QAction* m_actAutoHook{};
   QAction* m_actHook{};

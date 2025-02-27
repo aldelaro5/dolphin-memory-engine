@@ -43,7 +43,7 @@ public:
   void deleteChildren();
 
   void readFromJson(const QJsonObject& json, MemWatchTreeNode* parent = nullptr);
-  void writeToJson(QJsonObject& json) const;
+  void writeToJson(QJsonObject& json, const bool writeExpandedState) const;
   QString writeAsCSV() const;
 
 private:

@@ -69,6 +69,9 @@ public:
   QString getLastLoadedFile() const;
   void setLastLoadedFile(const QString& fileName);
 
+  bool getCollapseGroupsOnSave() const;
+  void setCollapseGroupsOnSave(bool enabled);
+
 private:
   void setValue(const QString& key, const QVariant& value);
   QVariant value(const QString& key, const QVariant& defaultValue) const;

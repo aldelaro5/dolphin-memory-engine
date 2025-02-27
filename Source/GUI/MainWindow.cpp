@@ -52,6 +52,8 @@ MainWindow::MainWindow()
     m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
   }
 
+  m_actCollapseGroupsOnSave->setChecked(SConfig::getInstance().getCollapseGroupsOnSave());
+
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
   if (m_actAutoHook->isChecked())
@@ -78,6 +80,8 @@ void MainWindow::makeMenus()
   m_actExportAsCSV = new QAction(tr("&Export as CSV..."), this);
   m_actAutoloadLastFile = new QAction(tr("Auto-load last file"), this);
   m_actAutoloadLastFile->setCheckable(true);
+  m_actCollapseGroupsOnSave = new QAction(tr("Collapse Groups on save"), this);
+  m_actCollapseGroupsOnSave->setCheckable(true);
   QAction* const actOpenConfigDir{new QAction(tr("Open Configuration Directory..."), this)};
 
   m_actOpenWatchList->setShortcut(Qt::Modifier::CTRL | Qt::Key::Key_O);
@@ -120,6 +124,9 @@ void MainWindow::makeMenus()
   connect(m_actAutoloadLastFile, &QAction::triggered, this,
           &MainWindow::onAutoLoadLastFileTriggered);
 
+  connect(m_actCollapseGroupsOnSave, &QAction::triggered, this,
+          &MainWindow::onCollapseGroupsOnSaveTriggered);
+
   connect(m_actSettings, &QAction::triggered, this, &MainWindow::onOpenSettings);
 
   connect(m_actAutoHook, &QAction::toggled, this, &MainWindow::onAutoHookToggled);
@@ -143,6 +150,7 @@ void MainWindow::makeMenus()
   m_menuFile->addAction(m_actExportAsCSV);
   m_menuFile->addSeparator();
   m_menuFile->addAction(m_actAutoloadLastFile);
+  m_menuFile->addAction(m_actCollapseGroupsOnSave);
   m_menuFile->addSeparator();
   m_menuFile->addAction(actOpenConfigDir);
   m_menuFile->addSeparator();
@@ -362,6 +370,11 @@ void MainWindow::onAutoLoadLastFileTriggered(const bool checked)
   updateStatusBar();
 }
 
+void MainWindow::onCollapseGroupsOnSaveTriggered(const bool checked)
+{
+  SConfig::getInstance().setCollapseGroupsOnSave(checked);
+}
+
 void MainWindow::onAutoHookToggled(const bool checked)
 {
   if (checked)
@@ -579,6 +592,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
   SConfig::getInstance().setAutoHook(m_actAutoHook->isChecked());
   SConfig::getInstance().setAutoloadLastFile(m_actAutoloadLastFile->isChecked());
   SConfig::getInstance().setLastLoadedFile(m_watcher->m_watchListFile);
+  SConfig::getInstance().setCollapseGroupsOnSave(m_actCollapseGroupsOnSave->isChecked());
   if (!m_actAutoloadLastFile->isChecked() || m_watcher->m_watchListFile.isEmpty())
   {
     SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
