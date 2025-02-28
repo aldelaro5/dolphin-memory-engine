@@ -199,12 +199,12 @@ void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* p
   }
 }
 
-void MemWatchTreeNode::writeToJson(QJsonObject& json) const
+void MemWatchTreeNode::writeToJson(QJsonObject& json, const bool writeExpandedState) const
 {
   if (isGroup())
   {
     json["groupName"] = m_groupName;
-    if (m_expanded)
+    if (m_expanded && writeExpandedState)
     {
       json["expanded"] = m_expanded;
     }
@@ -212,7 +212,7 @@ void MemWatchTreeNode::writeToJson(QJsonObject& json) const
     for (MemWatchTreeNode* const child : m_children)
     {
       QJsonObject theNode;
-      child->writeToJson(theNode);
+      child->writeToJson(theNode, writeExpandedState);
       entries.append(theNode);
     }
     json["groupEntries"] = entries;
@@ -225,7 +225,7 @@ void MemWatchTreeNode::writeToJson(QJsonObject& json) const
       for (MemWatchTreeNode* const child : m_children)
       {
         QJsonObject theNode;
-        child->writeToJson(theNode);
+        child->writeToJson(theNode, writeExpandedState);
         watchList.append(theNode);
       }
       json["watchList"] = watchList;
