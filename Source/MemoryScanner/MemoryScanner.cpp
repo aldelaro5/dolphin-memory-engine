@@ -573,6 +573,14 @@ bool MemScanner::undoScan()
   return false;
 }
 
+void MemScanner::removeKnownWatches()
+{
+  if (m_resultCount > 0)
+  {
+    m_
+  }
+}
+
 size_t MemScanner::getResultCount() const
 {
   return m_resultCount;

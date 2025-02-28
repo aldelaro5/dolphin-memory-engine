@@ -149,6 +149,7 @@ public:
   void removeResultAt(int index);
   static bool typeSupportsAdditionalOptions(Common::MemType type);
   bool hasScanStarted() const;
+  void removeKnownWatches();
 
 private:
   inline bool isHitNextScan(ScanFilter filter, const char* memoryToCompare1,

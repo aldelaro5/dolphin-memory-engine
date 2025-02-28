@@ -142,6 +142,9 @@ void MemScanWidget::initialiseWidgets()
   m_chkEnforceMemAlignment = new QCheckBox(tr("Enforce alignment"));
   m_chkEnforceMemAlignment->setChecked(true);
 
+  m_chkHideAddresses = new QCheckBox(tr("Filter watches already in list"));
+  m_chkHideAddresses->setChecked(false);
+
   m_currentValuesUpdateTimer = new QTimer(this);
   connect(m_currentValuesUpdateTimer, &QTimer::timeout, this,
           &MemScanWidget::onCurrentValuesUpdateTimer);
@@ -430,6 +433,7 @@ void MemScanWidget::onFirstScan()
   }
   else
   {
+    m_memScanner->removeKnownWatches();
     const size_t resultsFound{m_memScanner->getResultCount()};
     m_lblResultCount->setText(tr("%1 result(s) found", "", static_cast<int>(resultsFound))
                                   .arg(QString::number(resultsFound)));
