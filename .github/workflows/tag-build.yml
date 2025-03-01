@@ -2,11 +2,8 @@ name: 🔨 Build
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+    tags:
+      - '*'
 
 jobs:
   clang-format-check:
@@ -49,18 +46,10 @@ jobs:
           copy .\README.md .\Source\bin\${{ matrix.configuration }}
         shell: powershell
 
-      - name: Get Short SHA
-        id: get-short-sha
-        run: |
-          $sha = '${{ github.sha }}'
-          $short_sha = $sha.Substring(0, 7)
-          echo "::set-output name=short_sha::$short_sha"
-        shell: pwsh
-
       - name: Publish Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-windows-amd64
+          name: dolphin-memory-engine-${{ github.ref_name }}-windows-amd64
           path: Source\bin\${{ matrix.configuration }}
 
   build-linux:
@@ -104,21 +93,16 @@ jobs:
           .github/assets/appimage.sh
         shell: bash
 
-      - name: Get Short SHA
-        id: get-short-sha
-        run: echo "short_sha=$(echo ${{ github.sha }} | cut -c 1-7)" >> $GITHUB_OUTPUT
-        shell: bash
-
       - name: Publish Artifacts (Binary)
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-ubuntu-22.04-binary
+          name: dolphin-memory-engine-${{ github.ref_name }}-linux-ubuntu-22.04-binary
           path: Source/build/artifacts
 
       - name: Publish Artifacts (AppImage)
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-ubuntu-22.04-appimage
+          name: dolphin-memory-engine-${{ github.ref_name }}-linux-ubuntu-22.04-appimage
           path: dolphin-memory-engine.AppImage
 
   build-macos-intel:
@@ -156,13 +140,8 @@ jobs:
           cp ./Source/build/dolphin-memory-engine.dmg ./Source/build/artifacts/
         shell: bash
 
-      - name: Get Short SHA
-        id: get-short-sha
-        run: echo "short_sha=$(echo ${{ github.sha }} | cut -c 1-7)" >> $GITHUB_OUTPUT
-        shell: bash
-
       - name: Publish Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-macOS-intel
+          name: dolphin-memory-engine-${{ github.ref_name }}-macOS-intel
           path: Source/build/artifacts
