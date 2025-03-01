@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QVBoxLayout>
+#include <QtGlobal>
 #include <sstream>
 
 #include "../../../DolphinProcess/DolphinAccessor.h"
@@ -38,8 +39,13 @@ DlgAddWatchEntry::~DlgAddWatchEntry()
 void DlgAddWatchEntry::initialiseWidgets()
 {
   m_chkBoundToPointer = new QCheckBox("This is a pointer", this);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+  connect(m_chkBoundToPointer, &QCheckBox::checkStateChanged, this,
+          &DlgAddWatchEntry::onIsPointerChanged);
+#else
   connect(m_chkBoundToPointer, &QCheckBox::stateChanged, this,
           &DlgAddWatchEntry::onIsPointerChanged);
+#endif
 
   m_lblValuePreview = new QLineEdit("", this);
   m_lblValuePreview->setReadOnly(true);
