@@ -76,7 +76,7 @@ if (WIN32)
     find_package(Qt6Widgets QUIET)
 	  if (NOT Qt6Widgets_FOUND)
 		    message(STATUS "Qt package not found, using external lib")
-		    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}\\..\\Externals\\Qt\\Qt6.8.2\\x64")
+		    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}\\..\\Externals\\Qt\\Qt6.5.3\\x64")
 		    find_package(Qt6Widgets REQUIRED)
 	  endif ()
 else ()
@@ -174,7 +174,7 @@ if(WIN32)
             $<TARGET_FILE_DIR:dolphin-memory-engine>/styles
         TARGET dolphin-memory-engine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_FILE:Qt6::QModernWindowsStylePlugin>
+            $<TARGET_FILE:Qt6::QWindowsVistaStylePlugin>
             $<TARGET_FILE_DIR:dolphin-memory-engine>/styles
     )
 endif(WIN32)
