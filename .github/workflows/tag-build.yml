@@ -1,17 +1,14 @@
-name: 🔨 Build
+name: 🔨 Build (TAG)
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+    tags:
+      - '*'
 
 jobs:
   clang-format-check:
     runs-on: ubuntu-24.04
-    name: Clang-Format Check
+    name: Clang-Format Check (TAG)
     steps:
       - uses: actions/checkout@v4
       - uses: jidicula/clang-format-action@v4.14.0
@@ -21,7 +18,7 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
-    name: 🪟 Windows x86_64
+    name: 🪟 Windows x86_64 (TAG)
     strategy:
       matrix:
         configuration: [Release]
@@ -36,6 +33,10 @@ jobs:
       - name: Initialize submodules
         run: git submodule update --init
         shell: powershell
+        
+      - name: Set APP_VERSION for tags
+        run: echo "APP_VERSION=${{ github.ref_name }}" >> $env:GITHUB_ENV
+        shell: powershell
 
       - name: Build
         run: |
@@ -49,23 +50,15 @@ jobs:
           copy .\README.md .\Source\bin\${{ matrix.configuration }}
         shell: powershell
 
-      - name: Get Short SHA
-        id: get-short-sha
-        run: |
-          $sha = '${{ github.sha }}'
-          $short_sha = $sha.Substring(0, 7)
-          echo "::set-output name=short_sha::$short_sha"
-        shell: pwsh
-
       - name: Publish Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-windows-amd64
+          name: dolphin-memory-engine-${{ github.ref_name }}-windows-amd64
           path: Source\bin\${{ matrix.configuration }}
 
   build-linux:
     runs-on: ubuntu-22.04
-    name: 🐧 Linux x86_64
+    name: 🐧 Linux x86_64 (TAG)
 
     steps:
       - name: Checkout code
@@ -84,6 +77,9 @@ jobs:
           sudo apt-get install g++-10 gcc-10 -y
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 90
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90
+
+      - name: Set APP_VERSION for tags
+        run: echo "APP_VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
       - name: Build
         run: |
@@ -104,26 +100,21 @@ jobs:
           .github/assets/appimage.sh
         shell: bash
 
-      - name: Get Short SHA
-        id: get-short-sha
-        run: echo "short_sha=$(echo ${{ github.sha }} | cut -c 1-7)" >> $GITHUB_OUTPUT
-        shell: bash
-
       - name: Publish Artifacts (Binary)
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-ubuntu-22.04-binary
+          name: dolphin-memory-engine-${{ github.ref_name }}-linux-ubuntu-22.04-binary
           path: Source/build/artifacts
 
       - name: Publish Artifacts (AppImage)
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-ubuntu-22.04-appimage
+          name: dolphin-memory-engine-${{ github.ref_name }}-linux-ubuntu-22.04-appimage
           path: dolphin-memory-engine.AppImage
 
   build-macos-intel:
     runs-on: macos-13
-    name: 🍎 macOS Intel
+    name: 🍎 macOS Intel (TAG)
 
     steps:
       - name: Checkout code
@@ -137,6 +128,9 @@ jobs:
 
       - name: Initialize submodules
         run: git submodule update --init
+        
+      - name: Set APP_VERSION for tags
+        run: echo "APP_VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
       - name: Build
         run: |
@@ -156,13 +150,8 @@ jobs:
           cp ./Source/build/dolphin-memory-engine.dmg ./Source/build/artifacts/
         shell: bash
 
-      - name: Get Short SHA
-        id: get-short-sha
-        run: echo "short_sha=$(echo ${{ github.sha }} | cut -c 1-7)" >> $GITHUB_OUTPUT
-        shell: bash
-
       - name: Publish Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-macOS-intel
+          name: dolphin-memory-engine-${{ github.ref_name }}-macOS-intel
           path: Source/build/artifacts
