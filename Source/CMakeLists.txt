@@ -6,12 +6,20 @@ project(dolphin-memory-engine)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if(DEFINED ENV{GITHUB_SHA})
-    string(SUBSTRING "$ENV{GITHUB_SHA}" 0 7 VERSION_SHA) # Get the first 7 chars of the sha
-    set(APP_VERSION "${VERSION_SHA}")
-else()
-    string(TIMESTAMP CURRENT_DATE "%Y-%m-%d")
-    set(APP_VERSION dev-${CURRENT_DATE})
+# Tag run
+if(DEFINED ENV{APP_VERSION})
+    set(APP_VERSION $ENV{APP_VERSION})
+endif()
+
+# Non-tag run
+if(NOT DEFINED APP_VERSION)
+    if(DEFINED ENV{GITHUB_SHA})
+        string(SUBSTRING "$ENV{GITHUB_SHA}" 0 7 VERSION_SHA)
+        set(APP_VERSION ${VERSION_SHA})
+    else()
+        string(TIMESTAMP CURRENT_DATE "%Y-%m-%d")
+        set(APP_VERSION dev-${CURRENT_DATE})
+    endif()
 endif()
 
 configure_file(
