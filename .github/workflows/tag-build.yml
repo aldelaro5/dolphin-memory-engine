@@ -1,4 +1,4 @@
-name: 🔨 Build
+name: 🔨 Build (TAG)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 jobs:
   clang-format-check:
     runs-on: ubuntu-24.04
-    name: Clang-Format Check
+    name: Clang-Format Check (TAG)
     steps:
       - uses: actions/checkout@v4
       - uses: jidicula/clang-format-action@v4.14.0
@@ -18,7 +18,7 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
-    name: 🪟 Windows x86_64
+    name: 🪟 Windows x86_64 (TAG)
     strategy:
       matrix:
         configuration: [Release]
@@ -54,7 +54,7 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-22.04
-    name: 🐧 Linux x86_64
+    name: 🐧 Linux x86_64 (TAG)
 
     steps:
       - name: Checkout code
@@ -107,7 +107,7 @@ jobs:
 
   build-macos-intel:
     runs-on: macos-13
-    name: 🍎 macOS Intel
+    name: 🍎 macOS Intel (TAG)
 
     steps:
       - name: Checkout code
