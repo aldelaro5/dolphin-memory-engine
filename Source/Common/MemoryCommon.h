@@ -35,6 +35,7 @@ enum class MemType
   type_string,
   type_byteArray,
   type_struct,
+  type_none  // Placeholder for the entry of a child node of a collapsed container
 };
 
 enum class MemBase
