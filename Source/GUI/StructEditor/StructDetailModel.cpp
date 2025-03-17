@@ -151,7 +151,6 @@ void StructDetailModel::addField(const QModelIndex& index, FieldDef* field)
 
 void StructDetailModel::addPaddingFields(int count, int start)
 {
-
   if (m_fields.isEmpty())
   {
     start = 0;

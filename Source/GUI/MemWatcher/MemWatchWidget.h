@@ -55,7 +55,7 @@ public:
   void onUpdateStructDetails(QString structName);
   void onUpdateStructName(QString oldName, QString newName);
   void onStructDefAddRemove(QString structName, StructDef* structDef = nullptr) const;
-  
+
   QString m_watchListFile;
 
 signals:

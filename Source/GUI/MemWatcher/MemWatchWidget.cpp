@@ -344,7 +344,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   QAction* deleteSelection = new QAction(tr("&Delete"), this);
   if (node != m_watchModel->getRootNode() &&
       !(node->getParent() != nullptr && node->getParent()->getEntry() &&
-                           GUICommon::isContainerType(node->getParent()->getEntry()->getType())))
+        GUICommon::isContainerType(node->getParent()->getEntry()->getType())))
   {
     contextMenu->addSeparator();
     connect(deleteSelection, &QAction::triggered, this, [this] { onDeleteSelection(); });

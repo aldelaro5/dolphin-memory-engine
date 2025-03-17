@@ -1019,7 +1019,7 @@ void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json,
           i++;
           newPartialName = oldPartialName + QString("(%1)").arg(i);
         }
-        QString newName = (nodeParent->getNameSpace().isEmpty()? "" : "::") + newPartialName;
+        QString newName = (nodeParent->getNameSpace().isEmpty() ? "" : "::") + newPartialName;
 
         QString msg = QString("There is already a group with the same name as the struct on file: "
                               "%1.\nHow would you like to resolve this?")

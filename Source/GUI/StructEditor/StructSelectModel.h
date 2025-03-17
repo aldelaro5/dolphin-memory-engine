@@ -40,7 +40,8 @@ public:
   void addNodes(const std::vector<StructTreeNode*>& nodes,
                 const QModelIndex& referenceIndex = QModelIndex{});
   StructTreeNode* addGroup(const QString& name, const QModelIndex& referenceIndex = QModelIndex{});
-  StructTreeNode* addStruct(const QString& name, const QModelIndex& referenceIndex = QModelIndex{}, StructDef* structDef = nullptr);
+  StructTreeNode* addStruct(const QString& name, const QModelIndex& referenceIndex = QModelIndex{},
+                            StructDef* structDef = nullptr);
   void deleteNode(const QModelIndex& index);
   void insertNewDef(const QString& name, StructDef* structDef);
   void replaceDef(const QString& name, StructDef* structDef);

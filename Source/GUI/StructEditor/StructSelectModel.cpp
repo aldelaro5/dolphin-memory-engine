@@ -366,7 +366,8 @@ StructTreeNode* StructSelectModel::addGroup(const QString& name, const QModelInd
   return newNode;
 }
 
-StructTreeNode* StructSelectModel::addStruct(const QString& name, const QModelIndex& referenceIndex, StructDef* structDef)
+StructTreeNode* StructSelectModel::addStruct(const QString& name, const QModelIndex& referenceIndex,
+                                             StructDef* structDef)
 {
   if (structDef == nullptr)
     structDef = new StructDef(name);
