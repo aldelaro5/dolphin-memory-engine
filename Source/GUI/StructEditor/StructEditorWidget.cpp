@@ -97,16 +97,6 @@ void StructEditorWidget::initialiseWidgets()
   connect(m_structDetailModel, &StructDetailModel::modifyStructReference, this,
           &StructEditorWidget::onModifyStructReference);
 
-  // connect as neeeded
-  /* Example from MemWatchWidget
-  connect(m_watchModel, &MemWatchModel::writeFailed, this, &MemWatchWidget::onValueWriteError);
-  connect(m_watchModel, &MemWatchModel::readFailed, this, &MemWatchWidget::mustUnhook);
-  connect(m_watchModel, &MemWatchModel::rowsInserted, this, &MemWatchWidget::onRowsInserted);
-   */
-
-  // Not sure if I will need this yet
-  // m_detailDelegate() = new StructDetailDelegate();
-
   m_structDetailView = new QTableView;
   m_structDetailView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
   m_structDetailView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
@@ -123,7 +113,7 @@ void StructEditorWidget::initialiseWidgets()
   m_structDetailView->setModel(m_structDetailModel);
   m_structDetailView->verticalHeader()->setDefaultSectionSize(15);
   m_structDetailView->verticalHeader()->setMinimumSectionSize(15);
-  // m_watchView->setItemDelegate(m_watchDelegate);
+  m_structDetailView->setDisabled(true);
 
   QHeaderView* header = m_structDetailView->horizontalHeader();
   header->setStretchLastSection(true);
@@ -715,11 +705,14 @@ void StructEditorWidget::onSelectDropSucceeded(StructTreeNode* oldParent, Struct
 
 void StructEditorWidget::onDetailContextMenuRequested(const QPoint& pos)
 {
+  if (m_nodeInDetailEditor == nullptr)
+    return;
+
   QModelIndex index = m_structDetailView->indexAt(pos);
   QMenu* contextMenu = new QMenu(this);
 
   QAction* const addField{new QAction(tr("Add field"), this)};
-  connect(addField, &QAction::triggered, this, &StructEditorWidget::onAddPaddingField);
+  connect(addField, &QAction::triggered, this, &StructEditorWidget::onAddField);
   contextMenu->addAction(addField);
   if (index != QModelIndex())
   {
@@ -847,6 +840,8 @@ void StructEditorWidget::onAddStruct()
   m_unsavedChanges = true;
 
   emit structAddedRemoved(addedNode->getNameSpace(), addedNode->getStructDef());
+
+  onEditStruct(addedNode);
 }
 
 bool StructEditorWidget::isAnyAncestorSelected(const QModelIndex& index) const
@@ -936,13 +931,18 @@ void StructEditorWidget::onEditStruct(StructTreeNode* node)
   m_btnAddField->setEnabled(true);
   m_btnDeleteFields->setEnabled(true);
   m_btnClearFields->setEnabled(true);
+  m_structDetailView->setEnabled(true);
 
+  m_txtStructName->blockSignals(true);
   m_txtStructName->setEnabled(true);
   m_txtStructName->setText(nodeForDetailEditor->getName());
+  m_txtStructName->blockSignals(false);
 
+  m_txtStructLength->blockSignals(true);
   m_txtStructLength->setEnabled(true);
   m_txtStructLength->setText(
       QString::number(nodeForDetailEditor->getStructDef()->getLength(), 16).toUpper());
+  m_txtStructLength->blockSignals(false);
 }
 
 void StructEditorWidget::onUnloadStruct()
@@ -975,11 +975,17 @@ void StructEditorWidget::unloadStruct()
   m_btnAddField->setDisabled(true);
   m_btnDeleteFields->setDisabled(true);
   m_btnClearFields->setDisabled(true);
+  m_structDetailView->setDisabled(true);
 
+  m_txtStructName->blockSignals(true);
   m_txtStructName->setText({});
   m_txtStructName->setDisabled(true);
+  m_txtStructName->blockSignals(false);
+
+  m_txtStructLength->blockSignals(true);
   m_txtStructLength->setText({});
   m_txtStructLength->setDisabled(true);
+  m_txtStructLength->blockSignals(false);
 }
 
 void StructEditorWidget::readStructDefMapFromJson(const QJsonObject& json,

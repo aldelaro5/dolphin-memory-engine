@@ -285,7 +285,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
     }
   }
 
-  if (!node || node->isGroup())
+  if (node == m_watchModel->getRootNode() || node->isGroup())
   {
     QAction* const addGroup{new QAction(tr("Add gro&up"), this)};
     connect(addGroup, &QAction::triggered, this, &MemWatchWidget::onAddGroup);
@@ -342,7 +342,8 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   contextMenu->addAction(paste);
 
   QAction* deleteSelection = new QAction(tr("&Delete"), this);
-  if (node != nullptr && !(node->getParent() == nullptr && node->getParent()->getEntry() &&
+  if (node != m_watchModel->getRootNode() &&
+      !(node->getParent() != nullptr && node->getParent()->getEntry() &&
                            GUICommon::isContainerType(node->getParent()->getEntry()->getType())))
   {
     contextMenu->addSeparator();
