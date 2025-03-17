@@ -1,9 +1,9 @@
 #include "StructSelectModel.h"
 
-#include <QIcon>
-#include <QMimeData>
 #include <QDataStream>
 #include <QIODevice>
+#include <QIcon>
+#include <QMimeData>
 
 #include "../../Common/CommonUtils.h"
 
@@ -20,7 +20,7 @@ StructSelectModel::~StructSelectModel()
 
 int StructSelectModel::columnCount(const QModelIndex& parent) const
 {
-  (void) parent;
+  (void)parent;
 
   return WATCH_COL_NUM;
 }
@@ -48,7 +48,6 @@ QVariant StructSelectModel::data(const QModelIndex& index, int role) const
 
   if (!item->isGroup())
   {
-
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
       switch (index.column())
@@ -133,17 +132,18 @@ bool StructSelectModel::setData(const QModelIndex& index, const QVariant& value,
       return false;
 
     StructTreeNode* node = static_cast<StructTreeNode*>(index.internalPointer());
-    if (node->getParent()->isNameAvailable(newName))
-    {
-      node->setName(newName);
-    }
-    else
+    if (newName == node->getName())
+      return false;
+    QString oldNamespace = node->getNameSpace();
+
+    if (!node->getParent()->isNameAvailable(newName))
     {
       emit nameChangeFailed(node, newName);
       return false;
     }
+    node->setName(newName);
     emit dataChanged(index, index);
-    emit dataEdited(index, value, role);
+    emit dataEdited(index, oldNamespace, role);
     return true;
   }
 
@@ -245,8 +245,7 @@ int StructSelectModel::getNodeDeepness(const StructTreeNode* node) const
 }
 
 bool StructSelectModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row,
-                                     int column,
-                                 const QModelIndex& parent)
+                                     int column, const QModelIndex& parent)
 {
   (void)column;
 
@@ -288,6 +287,8 @@ bool StructSelectModel::dropMimeData(const QMimeData* data, Qt::DropAction actio
   int count;
   stream >> count;
 
+  StructTreeNode* oldParent = leastDeepNode->getParent();
+
   for (int i = 0; i < count; ++i)
   {
     qulonglong nodePtr{};
@@ -311,7 +312,7 @@ bool StructSelectModel::dropMimeData(const QMimeData* data, Qt::DropAction actio
 
     ++row;
   }
-  emit dropSucceeded();
+  emit dropSucceeded(oldParent, destParentNode);
   return true;
 }
 
@@ -328,7 +329,7 @@ void StructSelectModel::addNodes(const std::vector<StructTreeNode*>& nodes,
   if (referenceIndex.isValid())
   {
     parentNode = static_cast<StructTreeNode*>(referenceIndex.internalPointer());
-    if (parentNode->isGroup())
+    if (parentNode->isGroup() || parentNode == m_rootNode)
     {
       targetIndex = referenceIndex.siblingAtColumn(0);
       rowIndex = parentNode->childrenCount();
@@ -348,25 +349,28 @@ void StructSelectModel::addNodes(const std::vector<StructTreeNode*>& nodes,
   }
 
   const int first{rowIndex};
-  const int last{rowIndex + static_cast<int>(nodes.size()) - 1};
+  const int count{static_cast<int>(nodes.size()) - 1};
 
-  beginInsertRows(targetIndex, first, last);
-  for (int i{first}; i <= last; ++i)
+  beginInsertRows(targetIndex, first, first + count);
+  for (int i{0}; i <= count; ++i)
   {
-    parentNode->insertChild(i, nodes[static_cast<size_t>(i - first)]);
+    parentNode->insertChild(i + first, nodes[static_cast<size_t>(i)]);
   }
   endInsertRows();
-
 }
 
-void StructSelectModel::addGroup(const QString& name, const QModelIndex& referenceIndex)
+StructTreeNode* StructSelectModel::addGroup(const QString& name, const QModelIndex& referenceIndex)
 {
-  addNodes({new StructTreeNode(NULL, m_rootNode, true, name)}, referenceIndex);
+  StructTreeNode* newNode = new StructTreeNode(nullptr, m_rootNode, true, name);
+  addNodes({newNode}, referenceIndex);
+  return newNode;
 }
 
-StructTreeNode* StructSelectModel::addStruct(const QString& name, const QModelIndex& referenceIndex)
+StructTreeNode* StructSelectModel::addStruct(const QString& name, const QModelIndex& referenceIndex, StructDef* structDef)
 {
-  StructTreeNode* newNode = new StructTreeNode(new StructDef(name), m_rootNode, false, name);
+  if (structDef == nullptr)
+    structDef = new StructDef(name);
+  StructTreeNode* newNode = new StructTreeNode(structDef, m_rootNode, false, name);
   addNodes({newNode}, referenceIndex);
   return newNode;
 }
@@ -389,6 +393,40 @@ void StructSelectModel::deleteNode(const QModelIndex& index)
       endRemoveRows();
     endRemoveRows();
   }
+}
+
+void StructSelectModel::insertNewDef(const QString& name, StructDef* structDef)
+{
+  StructTreeNode* curNode = m_rootNode->findDeepestAvailableNode(name);
+  QStringList ids = name.split("::");
+
+  if (!curNode->getNameSpace().isEmpty())
+  {
+    int levels = static_cast<int>(curNode->getNameSpace().split("::").count());
+    for (int i = 0; i < levels; ++i)
+      ids.removeFirst();
+  }
+
+  while (ids.count() > 0)
+  {
+    QString nextID = ids.takeFirst();
+    if (ids.count() > 0)
+      curNode = addGroup(nextID, getIndexFromTreeNode(curNode));
+    else
+    {
+      curNode = addStruct(nextID, getIndexFromTreeNode(curNode), structDef);
+    }
+  }
+}
+
+void StructSelectModel::replaceDef(const QString& name, StructDef* structDef)
+{
+  StructTreeNode* curNode = m_rootNode->findNode(name);
+  if (!curNode)
+    return insertNewDef(name, structDef);
+
+  curNode->setStructDef(structDef);
+  dataChanged(getIndexFromTreeNode(curNode), getIndexFromTreeNode(curNode));
 }
 
 void StructSelectModel::setNodeLabel(StructTreeNode* node, const QString name)
@@ -423,7 +461,7 @@ QMap<QString, StructDef*> StructSelectModel::getStructMap()
   {
     curNode = queue.takeFirst();
     if (curNode->isGroup())
-      for (int i = curNode->getChildren().count() - 1; i >= 0; --i)
+      for (int i = static_cast<int>(curNode->getChildren().count()) - 1; i >= 0; --i)
         queue.push_front(curNode->getChildren()[i]);
     else
       structMap.insert(curNode->getNameSpace(), curNode->getStructDef());

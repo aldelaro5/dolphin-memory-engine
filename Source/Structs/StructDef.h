@@ -14,7 +14,7 @@ class StructDef
 public:
   StructDef();
   StructDef(QString label);
-  StructDef(QString label, u32 length, QVector<FieldDef*> entries, bool isPacked);
+  StructDef(QString label, u32 length, QVector<FieldDef*> entries);
   explicit StructDef(StructDef* structDef);
 
   ~StructDef();
@@ -31,15 +31,20 @@ public:
   bool isValidStruct();
   void setLength(u32 length);
   void setLabel(const QString& label);
-  void addFields(FieldDef* entry, size_t index = -1);
+  void addFields(FieldDef* entry, int index = -1);
   void clearFields();
   void setFields(QVector<FieldDef*> entries);
   void updateStructTypeLabel(const QString& oldLabel, QString newLabel);
+  void updateStructFieldSize(QString structName, u32 newLength);
 
   void readFromJson(const QJsonObject& json);
   void writeToJson(QJsonObject& json);
 
+  bool isSame(const StructDef* other) const;
+  QString getDiffString(const StructDef* other) const;
+
 private:
+  void recalculateOffsets();
   void calculateLength();
   QString m_label;
   u32 m_length;

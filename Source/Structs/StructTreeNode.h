@@ -9,7 +9,8 @@
 class StructTreeNode
 {
 public:
-  explicit StructTreeNode(StructDef* const structDef, StructTreeNode* const parent, bool isGroup = false, QString name = {});
+  explicit StructTreeNode(StructDef* const structDef, StructTreeNode* const parent,
+                          bool isGroup = false, QString name = {});
   explicit StructTreeNode(StructTreeNode* node);
   ~StructTreeNode();
 
@@ -49,17 +50,17 @@ public:
   QString getNameSpace();
   QString appendNameToNameSpace(QString nameSpace) const;
   u32 getSizeOfStruct(QString nameSpace);
+  StructTreeNode* findNode(QString nameSpace, bool returnDeepest = false);
+  StructTreeNode* findDeepestAvailableNode(QString nameSpace);
 
 private:
   void updateName();
-  StructTreeNode* findNode(QString nameSpace);
 
   bool m_isGroup;
   QString m_nodeName;
   bool m_expanded{};
   StructDef* m_structDef;
+  StructTreeNode* m_parent;
 
   QVector<StructTreeNode*> m_children{};
-  StructTreeNode* m_parent;
-  
 };

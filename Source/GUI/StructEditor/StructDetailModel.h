@@ -13,8 +13,8 @@ public:
   {
     STRUCT_COL_OFFSET = 0,
     STRUCT_COL_SIZE,
-    STRUCT_COL_LABEL,
     STRUCT_COL_DETAIL,
+    STRUCT_COL_LABEL,
     STRUCT_COL_NUM
   };
 
@@ -35,14 +35,16 @@ public:
   Qt::DropActions supportedDropActions() const override;
   Qt::DropActions supportedDragActions() const override;
 
-  bool editData(const QModelIndex& index, const QVariant& value, int role, bool emitEdit = false);
+  void addField(const QModelIndex& index, FieldDef* field);
   void addPaddingFields(int count = 1, int start = -1);
   void removePaddingFields(int count, int start);
   void removeFields(QModelIndexList indices);
   void removeLastField();
   void clearFields(QModelIndexList indices);
-  void updateFieldEntry(MemWatchEntry* entry, const QModelIndex& index);
+  bool updateFieldEntry(MemWatchEntry* entry, const QModelIndex& index);
   FieldDef* getFieldByRow(int row);
+  QModelIndex getLastIndex(int col = 0);
+  QModelIndex getIndexAt(int row, int col = 0);
 
   bool hasStructLoaded() const;
   StructTreeNode* getLoadedStructNode() const;
@@ -53,10 +55,13 @@ public:
   bool willRemoveFields(u32 newLength);
   QString getRemovedFieldDescriptions(u32 newLength);
   void updateFieldsWithNewLength();
+  void updateStructTypeLabel(QString oldName, QString newName);
 
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& value, int role);
   void lengthChanged(u32 newLength);
+  void modifyStructReference(QString nodeName, QString target, bool addIt, bool& ok);
+  void modifyStructPointerReference(QString nodeName, QString target, bool addIt);
 
 private:
   QString getFieldDetails(FieldDef* field) const;

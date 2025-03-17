@@ -2,18 +2,19 @@
 
 #include <QJsonArray>
 
-StructTreeNode::StructTreeNode(StructDef* const structDef, StructTreeNode* const parent, bool isGroup, QString name)
+StructTreeNode::StructTreeNode(StructDef* const structDef, StructTreeNode* const parent,
+                               bool isGroup, QString name)
 {
-  m_parent = parent;
   m_isGroup = isGroup;
   m_nodeName = std::move(name);
   m_structDef = structDef;
+  m_parent = parent;
   updateName();
 }
 
 StructTreeNode::StructTreeNode(StructTreeNode* node)
-    : m_parent(node->getParent()), m_isGroup(node->isGroup()), m_nodeName(QString(node->getName())),
-      m_structDef(new StructDef(node->getStructDef()))
+    : m_isGroup(node->isGroup()), m_nodeName(QString(node->getName())),
+      m_structDef(new StructDef(node->getStructDef())), m_parent(node->getParent())
 {
 }
 
@@ -40,7 +41,6 @@ void StructTreeNode::setExpanded(const bool expanded)
 
 const QString& StructTreeNode::getName()
 {
-  updateName();
   return m_nodeName;
 }
 
@@ -53,8 +53,6 @@ void StructTreeNode::setName(const QString& name)
 
 bool StructTreeNode::isNameAvailable(QString name) const
 {
-
-
   if (m_children.isEmpty())
     return true;
 
@@ -91,7 +89,7 @@ bool StructTreeNode::hasChildren() const
 
 int StructTreeNode::childrenCount() const
 {
-  return m_children.count();
+  return static_cast<int>(m_children.count());
 }
 
 const QVector<StructTreeNode*>& StructTreeNode::getChildren() const
@@ -243,15 +241,21 @@ void StructTreeNode::writeToJson(QJsonObject& json) const
 
 QVector<QString> StructTreeNode::getStructNames(bool includeGroups, QString prefix)
 {
-  updateName();
-
   QVector<QString> names;
 
   if (prefix == QString("") && m_parent)
     prefix = m_parent->getNameSpace();
 
-  QString nodeName = appendNameToNameSpace(prefix);
-  if (!m_isGroup || includeGroups)
+  QString nodeName = QString();
+  if (getParent() != nullptr)
+  {
+    if (prefix.isEmpty())
+      nodeName = getName();
+    else
+      nodeName = appendNameToNameSpace(prefix);
+  }
+
+  if (getParent() != nullptr && (!m_isGroup || includeGroups))
     names.push_back(nodeName);
 
   for (StructTreeNode* child : m_children)
@@ -268,8 +272,6 @@ QVector<QString> StructTreeNode::getStructNames(bool includeGroups, QString pref
 
 QString StructTreeNode::getNameSpace()
 {
-  updateName();
-
   if (m_parent != nullptr)
   {
     QString parentNamespace = m_parent->getNameSpace();
@@ -298,7 +300,7 @@ void StructTreeNode::updateName()
     m_nodeName = m_structDef->getLabel();
 }
 
-StructTreeNode* StructTreeNode::findNode(QString nameSpace)
+StructTreeNode* StructTreeNode::findNode(QString nameSpace, bool returnDeepest)
 {
   StructTreeNode* cur_node = this;
   while (cur_node->getParent() != nullptr)
@@ -318,8 +320,17 @@ StructTreeNode* StructTreeNode::findNode(QString nameSpace)
       }
     }
     if (!childFound)
-      return nullptr;
+    {
+      if (returnDeepest)
+        return cur_node;
+      else
+        return nullptr;
+    }
   }
-
   return cur_node;
+}
+
+StructTreeNode* StructTreeNode::findDeepestAvailableNode(QString nameSpace)
+{
+  return findNode(nameSpace, true);
 }
