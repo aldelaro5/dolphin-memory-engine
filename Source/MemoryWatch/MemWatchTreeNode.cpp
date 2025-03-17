@@ -133,7 +133,9 @@ void MemWatchTreeNode::deleteChildren()
   m_children.clear();
 }
 
-void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* parent)
+void MemWatchTreeNode::readFromJson(const QJsonObject& json,
+                                    const QMap<QString, QString> structNameReplacements,
+                                    MemWatchTreeNode* parent)
 {
   m_parent = parent;
   if (json["watchList"] != QJsonValue::Undefined)
@@ -144,7 +146,7 @@ void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* p
     {
       QJsonObject node = i.toObject();
       MemWatchTreeNode* childNode = new MemWatchTreeNode(nullptr);
-      childNode->readFromJson(node, this);
+      childNode->readFromJson(node, structNameReplacements, this);
       m_children.append(childNode);
     }
   }
@@ -161,7 +163,7 @@ void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* p
     {
       QJsonObject node = i.toObject();
       MemWatchTreeNode* childNode = new MemWatchTreeNode(nullptr);
-      childNode->readFromJson(node, this);
+      childNode->readFromJson(node, structNameReplacements, this);
       m_children.append(childNode);
     }
   }
@@ -170,6 +172,9 @@ void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* p
     m_isGroup = false;
     m_entry = new MemWatchEntry();
     m_entry->readFromJson(json);
+    if (m_entry->getType() == Common::MemType::type_struct &&
+        structNameReplacements.contains(m_entry->getStructName()))
+      m_entry->setStructName(structNameReplacements[m_entry->getStructName()]);
   }
 }
 

@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include <QString>
 #include <QJsonObject>
+#include <QString>
 
 #include "../Common/CommonTypes.h"
 #include "../Common/MemoryCommon.h"
@@ -54,6 +54,8 @@ public:
 
   u32 getAddressForPointerLevel(int level) const;
   u32 getActualAddress() const;
+  void updateActualAddress(u32 addr);
+  bool hasAddressChanged() const;
   std::string getAddressStringForPointerLevel(int level) const;
   Common::MemOperationReturnCode readMemoryFromRAM();
 
@@ -80,4 +82,5 @@ private:
   size_t m_freezeMemSize = 0;
   size_t m_length = 1;
   QString m_structName;
+  u32 m_curActualAddress;
 };
