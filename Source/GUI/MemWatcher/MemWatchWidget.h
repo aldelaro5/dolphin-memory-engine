@@ -4,9 +4,9 @@
 #include <QTimer>
 #include <QTreeView>
 
+#include "../../Structs/StructTreeNode.h"
 #include "MemWatchDelegate.h"
 #include "MemWatchModel.h"
-#include "../../Structs/StructTreeNode.h"
 
 class MemWatchWidget : public QWidget
 {
@@ -53,7 +53,6 @@ public:
 
   void setStructDefs(StructTreeNode* structDefs, QMap<QString, StructDef*> structMap);
   void onUpdateStructDetails(QString structName);
-  void onUpdateDlgStructNames(QVector<QString> structNames);
   void onUpdateStructName(QString oldName, QString newName);
   void onStructDefAddRemove(QString structName, StructDef* structDef = nullptr) const;
   
@@ -62,8 +61,8 @@ public:
 signals:
   void mustUnhook();
   void goToAddressInViewer(u32 address);
-  void updateDlgStructNames(QVector<QString> structNames);
-  void updateDlgStructName(QString oldName, QString newName);
+  void loadStructDefsFromJson(const QJsonObject& json, QMap<QString, QString>& map);
+  void writeStructDefsToJson(QJsonObject& json, const QStringList& desiredStructs);
 
 private:
   void initialiseWidgets();

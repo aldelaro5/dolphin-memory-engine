@@ -18,7 +18,7 @@ DlgChangeType::DlgChangeType(QWidget* parent, const int typeIndex, const size_t 
   makeLayouts();
 
   if (m_structNames.contains(curStructName))
-    m_structSelect->setCurrentIndex(m_structNames.indexOf(curStructName));
+    m_structSelect->setCurrentIndex(static_cast<int>(m_structNames.indexOf(curStructName)));
 }
 
 void DlgChangeType::initialiseWidgets()
@@ -60,6 +60,8 @@ void DlgChangeType::makeLayouts()
   Common::MemType theType = static_cast<Common::MemType>(m_typeIndex);
   if (theType != Common::MemType::type_string && theType != Common::MemType::type_byteArray)
     m_spnLength->hide();
+  if (theType != Common::MemType::type_struct)
+    m_structSelect->hide();
 
   QDialogButtonBox* buttonBox =
       new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -115,25 +117,4 @@ void DlgChangeType::onTypeChange(int index)
     m_spnLength->hide();
   }
   adjustSize();
-}
-
-void DlgChangeType::onUpdateStructNames(QVector<QString> structNames)
-{
-  QString curStructName = m_structSelect->currentIndex() == 0 ?
-                              QString("") :
-                              structNames[m_structSelect->currentIndex() - 1];
-
-  m_structNames = structNames;
-  m_structNames.push_front(QString(""));
-
-  m_structSelect->clear();
-  m_structSelect->addItems(structNames);
-
-  if (m_structNames.contains(curStructName))
-    m_structSelect->setCurrentIndex(m_structNames.indexOf(curStructName));
-}
-
-void DlgChangeType::onUpdateStructName(QString oldName, QString newName)
-{
-  m_structSelect->setItemText(m_structNames.indexOf(oldName), newName);
 }

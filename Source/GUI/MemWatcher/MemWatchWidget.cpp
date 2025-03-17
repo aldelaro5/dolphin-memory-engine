@@ -247,10 +247,15 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
       connect(unlockSelection, &QAction::triggered, this, [this] { onLockSelection(false); });
       contextMenu->addAction(unlockSelection);
       contextMenu->addSeparator();
-      QAction* const editValue{new QAction(tr("Edit Value"), this)};
-      connect(editValue, &QAction::triggered, this, [this, index]() { m_watchView->edit(index); });
-      contextMenu->addAction(editValue);
-      contextMenu->addSeparator();
+
+      if (!GUICommon::isContainerType(entry->getType()))
+      {
+        QAction* const editValue{new QAction(tr("Edit Value"), this)};
+        connect(editValue, &QAction::triggered, this,
+                [this, index]() { m_watchView->edit(index); });
+        contextMenu->addAction(editValue);
+        contextMenu->addSeparator();
+      }
     }
   }
   else
@@ -261,10 +266,23 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   const QModelIndexList simplifiedSelection{simplifySelection()};
   if (!simplifiedSelection.empty())
   {
-    QAction* const groupAction{new QAction(tr("&Group"), this)};
-    connect(groupAction, &QAction::triggered, this, &MemWatchWidget::groupCurrentSelection);
-    contextMenu->addAction(groupAction);
-    contextMenu->addSeparator();
+    bool canGroupSelection = true;
+    for (const QModelIndex& selectedIndex : simplifiedSelection)
+    {
+      const MemWatchTreeNode* selectedNode = m_watchModel->getTreeNodeFromIndex(selectedIndex);
+      if (selectedNode != nullptr && selectedNode->getParent() != nullptr &&
+          (!selectedNode->getParent()->isGroup() &&
+           selectedNode->getParent() != m_watchModel->getRootNode() &&
+           GUICommon::isContainerType(selectedNode->getParent()->getEntry()->getType())))
+        canGroupSelection = false;
+    }
+    if (canGroupSelection)
+    {
+      QAction* const groupAction{new QAction(tr("&Group"), this)};
+      connect(groupAction, &QAction::triggered, this, &MemWatchWidget::groupCurrentSelection);
+      contextMenu->addAction(groupAction);
+      contextMenu->addSeparator();
+    }
   }
 
   if (!node || node->isGroup())
@@ -323,10 +341,14 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
   connect(paste, &QAction::triggered, this, [this, index] { pasteWatchFromClipBoard(index); });
   contextMenu->addAction(paste);
 
-  contextMenu->addSeparator();
   QAction* deleteSelection = new QAction(tr("&Delete"), this);
-  connect(deleteSelection, &QAction::triggered, this, [this] { onDeleteSelection(); });
-  contextMenu->addAction(deleteSelection);
+  if (node != nullptr && !(node->getParent() == nullptr && node->getParent()->getEntry() &&
+                           GUICommon::isContainerType(node->getParent()->getEntry()->getType())))
+  {
+    contextMenu->addSeparator();
+    connect(deleteSelection, &QAction::triggered, this, [this] { onDeleteSelection(); });
+    contextMenu->addAction(deleteSelection);
+  }
 
   QModelIndexList selection = m_watchView->selectionModel()->selectedRows();
   if (selection.count() == 0)
@@ -427,7 +449,7 @@ void MemWatchWidget::pasteWatchFromClipBoard(const QModelIndex& referenceIndex)
   {
     const QString nodeStr{QApplication::clipboard()->text()};
     const QJsonDocument loadDoc{QJsonDocument::fromJson(nodeStr.toUtf8())};
-    copiedRootNode.readFromJson(loadDoc.object(), nullptr);
+    copiedRootNode.readFromJson(loadDoc.object(), QMap<QString, QString>());
   }
 
   const QVector<MemWatchTreeNode*> children{copiedRootNode.getChildren()};
@@ -444,14 +466,18 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
   if (index != QVariant())
   {
     MemWatchTreeNode* node = static_cast<MemWatchTreeNode*>(index.internalPointer());
-    if (index.column() == MemWatchModel::WATCH_COL_TYPE && !node->isGroup())
+
+    if (node->isGroup() || (node->getParent() && node->getParent()->getEntry() &&
+                            GUICommon::isContainerType(node->getParent()->getEntry()->getType())))
+      return;
+
+    if (index.column() == MemWatchModel::WATCH_COL_TYPE)
     {
       MemWatchEntry* entry = node->getEntry();
       int typeIndex = static_cast<int>(entry->getType());
       DlgChangeType* dlg =
-          new DlgChangeType(this, typeIndex, entry->getLength(), m_structDefs->getStructNames(), entry->getStructName());
-      connect(this, &MemWatchWidget::updateDlgStructNames, dlg, &DlgChangeType::onUpdateStructNames);
-      connect(this, &MemWatchWidget::updateDlgStructName, dlg, &DlgChangeType::onUpdateStructName);
+          new DlgChangeType(this, typeIndex, entry->getLength(), m_structDefs->getStructNames(),
+                            entry->getStructName());
       if (dlg->exec() == QDialog::Accepted)
       {
         Common::MemType theType = static_cast<Common::MemType>(dlg->getTypeIndex());
@@ -462,12 +488,10 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
         m_hasUnsavedChanges = true;
       }
     }
-    else if (index.column() == MemWatchModel::WATCH_COL_ADDRESS && !node->isGroup())
+    else if (index.column() == MemWatchModel::WATCH_COL_ADDRESS)
     {
       MemWatchEntry* entryCopy = new MemWatchEntry(node->getEntry());
       DlgAddWatchEntry dlg(false, entryCopy, m_structDefs->getStructNames(), this);
-      connect(this, &MemWatchWidget::updateDlgStructNames, &dlg, &DlgAddWatchEntry::onUpdateStructNames);
-      connect(this, &MemWatchWidget::updateDlgStructName, &dlg, &DlgAddWatchEntry::onUpdateStructName);
       if (dlg.exec() == QDialog::Accepted)
       {
         m_watchModel->editEntry(dlg.stealEntry(), index);
@@ -592,8 +616,6 @@ void MemWatchWidget::onAddGroup()
 void MemWatchWidget::onAddWatchEntry()
 {
   DlgAddWatchEntry dlg(true, nullptr, m_structDefs->getStructNames(), this);
-  connect(this, &MemWatchWidget::updateDlgStructNames, &dlg, &DlgAddWatchEntry::onUpdateStructNames);
-  connect(this, &MemWatchWidget::updateDlgStructName, &dlg, &DlgAddWatchEntry::onUpdateStructName);
   if (dlg.exec() == QDialog::Accepted)
   {
     addWatchEntry(dlg.stealEntry());
@@ -706,6 +728,17 @@ void MemWatchWidget::onRowsInserted(const QModelIndex& parent, const int first, 
                                  lastIndex.siblingAtColumn(MemWatchModel::WATCH_COL_NUM - 1)};
 
   QItemSelectionModel* const selectionModel{m_watchView->selectionModel()};
+  // If the parent node is a container and it is not expanded, do not select the child node or
+  // expand it.
+  const MemWatchTreeNode* parentNode = MemWatchModel::getTreeNodeFromIndex(parent);
+  if (parentNode != nullptr && !parentNode->isGroup() &&
+      parentNode != m_watchModel->getRootNode() &&
+      GUICommon::isContainerType(parentNode->getEntry()->getType()))
+  {
+    selectionModel->clearSelection();
+    return;
+  }
+
   selectionModel->select(selection, QItemSelectionModel::ClearAndSelect);
   selectionModel->setCurrentIndex(lastIndex, QItemSelectionModel::Current);
 
@@ -802,7 +835,9 @@ void MemWatchWidget::openWatchFile(const QString& fileName)
     QByteArray bytes = watchFile.readAll();
     watchFile.close();
     QJsonDocument loadDoc(QJsonDocument::fromJson(bytes));
-    m_watchModel->loadRootFromJsonRecursive(loadDoc.object());
+    QMap<QString, QString> structReplacements = {};
+    emit loadStructDefsFromJson(loadDoc.object(), structReplacements);
+    m_watchModel->loadRootFromJsonRecursive(loadDoc.object(), structReplacements);
     updateExpansionState();
     m_watchListFile = srcFileName;
     m_hasUnsavedChanges = false;
@@ -825,6 +860,7 @@ bool MemWatchWidget::saveWatchFile()
     }
     QJsonObject root;
     m_watchModel->writeRootToJsonRecursive(root);
+    emit writeStructDefsToJson(root, m_watchModel->getStructsInUse());
     QJsonDocument saveDoc(root);
     watchFile.write(saveDoc.toJson());
     watchFile.close();
@@ -854,6 +890,7 @@ bool MemWatchWidget::saveAsWatchFile()
     }
     QJsonObject root;
     m_watchModel->writeRootToJsonRecursive(root);
+    emit writeStructDefsToJson(root, m_watchModel->getStructsInUse());
     QJsonDocument saveDoc(root);
     watchFile.write(saveDoc.toJson());
     watchFile.close();
@@ -1020,15 +1057,9 @@ void MemWatchWidget::onUpdateStructDetails(QString structName)
   m_watchModel->updateStructEntries(structName);
 }
 
-void MemWatchWidget::onUpdateDlgStructNames(QVector<QString> structNames)
-{
-  emit updateDlgStructNames(structNames);
-}
-
 void MemWatchWidget::onUpdateStructName(QString oldName, QString newName)
 {
   m_watchModel->onStructNameChanged(oldName, newName);
-  emit updateDlgStructName(oldName, newName);
 }
 
 void MemWatchWidget::onStructDefAddRemove(QString structName, StructDef* structDef) const

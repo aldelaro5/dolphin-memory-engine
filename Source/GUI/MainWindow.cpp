@@ -60,8 +60,6 @@ MainWindow::MainWindow()
   m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
   // Connect struct updates to mem watch widget
-  connect(m_structEditor, &StructEditorWidget::updateDlgStructList, m_watcher,
-          &MemWatchWidget::onUpdateDlgStructNames);
   connect(m_structEditor, &StructEditorWidget::updateStructName, m_watcher,
           &MemWatchWidget::onUpdateStructName);
   connect(m_structEditor, &StructEditorWidget::updateStructDetails, m_watcher,
@@ -69,11 +67,11 @@ MainWindow::MainWindow()
   connect(m_structEditor, &StructEditorWidget::structAddedRemoved, m_watcher,
           &MemWatchWidget::onStructDefAddRemove);
 
-  // connect struct updates to mem viewer widget
-  connect(m_structEditor, &StructEditorWidget::updateStructName, m_viewer,
-          &MemViewerWidget::onUpdateDlgStructName);
-  connect(m_structEditor, &StructEditorWidget::updateDlgStructList, m_viewer,
-          &MemViewerWidget::onUpdateDlgStructNames);
+  // Connect load/save structs on load/save watch file
+  connect(m_watcher, &MemWatchWidget::loadStructDefsFromJson, m_structEditor,
+          &StructEditorWidget::readStructDefMapFromJson);
+  connect(m_watcher, &MemWatchWidget::writeStructDefsToJson, m_structEditor,
+          &StructEditorWidget::writeStructDefMapToJson);
 
   if (m_actAutoHook->isChecked())
     onHookAttempt();
@@ -753,6 +751,6 @@ void MainWindow::updateStatusBar()
 
 void MainWindow::makeStructEditor()
 {
-  m_structEditor = new StructEditorWidget(this);
+  m_structEditor = new StructEditorWidget(nullptr);
   m_structEditor->setWindowIcon(windowIcon());
 }
