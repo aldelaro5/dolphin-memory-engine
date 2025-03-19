@@ -1,5 +1,6 @@
 #include "StructDetailModel.h"
 
+#include <QApplication>
 #include <QMimeData>
 #include <sstream>
 
@@ -46,7 +47,7 @@ QVariant StructDetailModel::data(const QModelIndex& index, int role) const
       if (m_fields[index.row()]->isPadding())
         return QString("-- Padding --");
       return m_fields[index.row()]->getEntry()->getLabel();
-    case STRUCT_COL_DETAIL:
+    case STRUCT_COL_TYPE:
     {
       return getFieldDetails(m_fields[index.row()]);
     }
@@ -57,7 +58,8 @@ QVariant StructDetailModel::data(const QModelIndex& index, int role) const
   }
 
   if (role == Qt::EditRole && index.column() == STRUCT_COL_LABEL)
-    return m_fields[index.row()]->getEntry()->getLabel();
+    if (!m_fields[index.row()]->isPadding())
+      return m_fields[index.row()]->getEntry()->getLabel();
 
   return {};
 }
@@ -95,7 +97,7 @@ QVariant StructDetailModel::headerData(int section, Qt::Orientation orientation,
       return tr("Offset");
     case STRUCT_COL_SIZE:
       return tr("Size");
-    case STRUCT_COL_DETAIL:
+    case STRUCT_COL_TYPE:
       return tr("Type");
     case STRUCT_COL_LABEL:
       return tr("Name");
@@ -109,9 +111,10 @@ QVariant StructDetailModel::headerData(int section, Qt::Orientation orientation,
 Qt::ItemFlags StructDetailModel::flags(const QModelIndex& index) const
 {
   if (!index.isValid())
-    return Qt::ItemFlags();
+    return Qt::ItemIsDropEnabled;
 
-  Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+  Qt::ItemFlags flags =
+      Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
 
   if (index.column() == STRUCT_COL_LABEL && !m_fields[index.row()]->isPadding())
     flags |= Qt::ItemIsEditable;
@@ -121,12 +124,91 @@ Qt::ItemFlags StructDetailModel::flags(const QModelIndex& index) const
 
 Qt::DropActions StructDetailModel::supportedDropActions() const
 {
-  return Qt::IgnoreAction;
+  return Qt::MoveAction | Qt::CopyAction;
 }
 
 Qt::DropActions StructDetailModel::supportedDragActions() const
 {
-  return Qt::IgnoreAction;
+  return Qt::MoveAction | Qt::CopyAction;
+}
+
+QStringList StructDetailModel::mimeTypes() const
+{
+  return QStringList() << "application/x-structfield";
+}
+
+QMimeData* StructDetailModel::mimeData(const QModelIndexList& indexes) const
+{
+  QMimeData* mimeData = new QMimeData;
+  QByteArray data;
+
+  QDataStream stream(&data, QIODevice::WriteOnly);
+
+  int startRow = indexes[0].row();
+  int endRow = indexes.last().row();
+
+  stream << static_cast<int>(indexes[0].row());
+  stream << static_cast<int>(endRow - startRow + 1);
+
+  mimeData->setData("application/x-structfield", data);
+  return mimeData;
+}
+
+bool StructDetailModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row,
+                                     int column, const QModelIndex& parent)
+{
+  (void)column;
+
+  if (action != Qt::CopyAction && action != Qt::MoveAction)
+    return false;
+
+  if (!data->hasFormat("application/x-structfield"))
+    return false;
+
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+    action = Qt::CopyAction;
+
+  row = parent.row();
+
+  QByteArray bytes = data->data("application/x-structfield");
+  QDataStream stream(&bytes, QIODevice::ReadOnly);
+
+  int firstRow;
+  stream >> firstRow;
+
+  int count;
+  stream >> count;
+
+  int unmovedRowCount = m_fields.count() - count;
+
+  if (row == -1)
+    row = unmovedRowCount;
+
+  beginResetModel();
+
+  QList<FieldDef*> fields = m_fields.mid(firstRow, count);
+  if (action == Qt::MoveAction)
+  {
+    m_fields.remove(firstRow, count);
+    for (int i = count - 1; i >= 0; i--)
+    {
+      m_fields.insert(row, fields.takeAt(i));
+    }
+  }
+  else
+  {
+    for (int i = count - 1; i >= 0; i--)
+    {
+      FieldDef* newField = new FieldDef(fields[i]);
+      m_fields.insert(row, newField);
+    }
+  }
+
+  endResetModel();
+
+  updateFieldOffsets();
+
+  return true;
 }
 
 void StructDetailModel::addField(const QModelIndex& index, FieldDef* field)
@@ -236,8 +318,11 @@ void StructDetailModel::updateFieldOffsets()
   if (!m_fields.isEmpty())
     newLength = m_fields.last()->getOffset() + m_fields.last()->getFieldSize();
 
-  m_baseNode->getStructDef()->setLength(newLength);
-  emit lengthChanged(newLength);
+  if (m_baseNode->getStructDef()->getLength() != newLength)
+  {
+    m_baseNode->getStructDef()->setLength(newLength);
+    emit lengthChanged(newLength);
+  }
 }
 
 void StructDetailModel::reduceIndicesToRows(QModelIndexList& indices)
@@ -541,7 +626,7 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
 
 FieldDef* StructDetailModel::getFieldByRow(int row)
 {
-  if (row >= m_fields.count())
+  if (row < 0 || row >= m_fields.count())
     return nullptr;
   return m_fields[row];
 }

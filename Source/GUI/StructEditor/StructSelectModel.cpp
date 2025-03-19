@@ -289,6 +289,8 @@ bool StructSelectModel::dropMimeData(const QMimeData* data, Qt::DropAction actio
 
   StructTreeNode* oldParent = leastDeepNode->getParent();
 
+  QStringList collisions{};
+
   for (int i = 0; i < count; ++i)
   {
     qulonglong nodePtr{};
@@ -304,6 +306,13 @@ bool StructSelectModel::dropMimeData(const QMimeData* data, Qt::DropAction actio
     const int srcNodeRow = srcNode->getRow();
     const QModelIndex idx = createIndex(srcNodeRow, 0, srcNode);
 
+    const QString srcName = srcNode->getName();
+    if (destParentNode->getChildNames().contains(srcName) && srcNode->getParent() != destParentNode)
+    {
+      collisions.append(srcName);
+      continue;
+    }
+
     // A move is imperative here to not have the view collapse the source on its own.
     beginMoveRows(idx.parent(), srcNodeRow, srcNodeRow, parent, destMoveRow);
     srcNode->getParent()->removeChild(srcNodeRow);
@@ -311,8 +320,12 @@ bool StructSelectModel::dropMimeData(const QMimeData* data, Qt::DropAction actio
     endMoveRows();
 
     ++row;
+
+    emit dropSucceeded(oldParent, srcNode);
   }
-  emit dropSucceeded(oldParent, destParentNode);
+  if (!collisions.isEmpty())
+    emit nameClashes(collisions);
+
   return true;
 }
 
@@ -396,6 +409,13 @@ void StructSelectModel::deleteNode(const QModelIndex& index)
   }
 }
 
+void StructSelectModel::clearTree()
+{
+  QModelIndex parent = getIndexFromTreeNode(m_rootNode);
+  while (m_rootNode->getChildren().count() > 0)
+    deleteNode(index(0, 0, parent));
+}
+
 void StructSelectModel::insertNewDef(const QString& name, StructDef* structDef)
 {
   StructTreeNode* curNode = m_rootNode->findDeepestAvailableNode(name);
@@ -447,9 +467,14 @@ QModelIndex StructSelectModel::getIndexFromTreeNode(const StructTreeNode* node)
   if (node == m_rootNode)
     return createIndex(0, 0, m_rootNode);
 
-  const StructTreeNode* const parent{node->getParent()};
+  StructTreeNode* parent = node->getParent();
   return index(static_cast<int>(parent->getChildren().indexOf(node)), 0,
                getIndexFromTreeNode(parent));
+}
+
+QModelIndex StructSelectModel::getNewChildIndexFromTreeNode(const StructTreeNode* node)
+{
+  return createIndex(static_cast<int>(node->getChildren().count()), 0, node);
 }
 
 QMap<QString, StructDef*> StructSelectModel::getStructMap()

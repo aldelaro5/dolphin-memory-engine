@@ -247,11 +247,10 @@ QString StructDef::getDiffString(const StructDef* other) const
 void StructDef::recalculateOffsets()
 {
   u32 cur_offset = 0;
-  for (int i = 0; i < m_fields.count(); ++i)
+  for (int i = 0; i < m_fields.count() - 1; ++i)
   {
-    if (m_fields[i]->getOffset() != cur_offset)
-      m_fields[i]->setOffset(cur_offset);
-    cur_offset += m_fields[i]->getFieldSize();
+    if (m_fields[i]->getOffset() + m_fields[i]->getFieldSize() > m_fields[i + 1]->getOffset())
+      m_fields[i + 1]->setOffset(m_fields[i]->getOffset() + m_fields[i]->getFieldSize());
   }
   calculateLength();
 }

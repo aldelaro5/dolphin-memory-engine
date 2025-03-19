@@ -275,14 +275,14 @@ QString StructTreeNode::getNameSpace()
   if (m_parent != nullptr)
   {
     QString parentNamespace = m_parent->getNameSpace();
-    return parentNamespace.isEmpty() ? m_nodeName : parentNamespace + QString("::") + m_nodeName;
+    return (parentNamespace.isEmpty() ? "" : parentNamespace + QString("::")) + m_nodeName;
   }
   return QString();
 }
 
 QString StructTreeNode::appendNameToNameSpace(QString nameSpace) const
 {
-  return nameSpace + QString("::") + m_nodeName;
+  return (nameSpace.isEmpty() ? "" : nameSpace + QString("::")) + m_nodeName;
 }
 
 u32 StructTreeNode::getSizeOfStruct(QString nameSpace)

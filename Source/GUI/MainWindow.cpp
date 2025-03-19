@@ -43,21 +43,6 @@ MainWindow::MainWindow()
       static_cast<GUICommon::ApplicationStyle>(SConfig::getInstance().getTheme()));
   m_actAutoloadLastFile->setChecked(SConfig::getInstance().getAutoloadLastFile());
 
-  if (m_actAutoloadLastFile->isChecked() && !SConfig::getInstance().getLastLoadedFile().isEmpty())
-  {
-    m_watcher->openWatchFile(SConfig::getInstance().getLastLoadedFile());
-  }
-  else
-  {
-    m_structEditor->restoreStructTree(SConfig::getInstance().getStructDefs());
-    m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
-  }
-
-  m_actCollapseGroupsOnSave->setChecked(SConfig::getInstance().getCollapseGroupsOnSave());
-  m_watcher->setStructDefs(m_structEditor->getStructDefs(), m_structEditor->getStructMap());
-  m_viewer->setStructDefs(m_structEditor->getStructDefs());
-  m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
-
   // Connect struct updates to mem watch widget
   connect(m_structEditor, &StructEditorWidget::updateStructName, m_watcher,
           &MemWatchWidget::onUpdateStructName);
@@ -68,9 +53,25 @@ MainWindow::MainWindow()
 
   // Connect load/save structs on load/save watch file
   connect(m_watcher, &MemWatchWidget::loadStructDefsFromJson, m_structEditor,
-          &StructEditorWidget::readStructDefMapFromJson);
-  connect(m_watcher, &MemWatchWidget::writeStructDefsToJson, m_structEditor,
-          &StructEditorWidget::writeStructDefMapToJson);
+          &StructEditorWidget::readStructTreeFromFile);
+  connect(m_watcher, &MemWatchWidget::writeStructDefTreeToJson, m_structEditor,
+          &StructEditorWidget::writeStructDefTreeToJson);
+
+  if (m_actAutoloadLastFile->isChecked() && !SConfig::getInstance().getLastLoadedFile().isEmpty())
+  {
+    m_watcher->openWatchFile(SConfig::getInstance().getLastLoadedFile());
+    m_watcher->setStructDefs(m_structEditor->getStructDefs(), m_structEditor->getStructMap());
+  }
+  else
+  {
+    m_structEditor->restoreStructTreeFromSettings(SConfig::getInstance().getStructDefs());
+    m_watcher->setStructDefs(m_structEditor->getStructDefs(), m_structEditor->getStructMap());
+    m_watcher->restoreWatchModel(SConfig::getInstance().getWatchModel());
+  }
+
+  m_actCollapseGroupsOnSave->setChecked(SConfig::getInstance().getCollapseGroupsOnSave());
+  m_viewer->setStructDefs(m_structEditor->getStructDefs());
+  m_actAutoHook->setChecked(SConfig::getInstance().getAutoHook());
 
   if (m_actAutoHook->isChecked())
     onHookAttempt();
@@ -622,7 +623,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
   if (!m_actAutoloadLastFile->isChecked() || m_watcher->m_watchListFile.isEmpty())
   {
     SConfig::getInstance().setWatchModel(m_watcher->saveWatchModel());
-    SConfig::getInstance().setStructDefs(m_structEditor->saveStructTree());
+    SConfig::getInstance().setStructDefs(m_structEditor->saveStructTreeToSettings());
   }
   SConfig::getInstance().setMainWindowGeometry(saveGeometry());
   SConfig::getInstance().setMainWindowState(saveState());

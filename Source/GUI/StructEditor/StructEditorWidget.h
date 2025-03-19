@@ -2,6 +2,7 @@
 
 #include <QLineEdit>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QTableView>
 #include <QTreeView>
 #include <QWidget>
@@ -24,7 +25,7 @@ public:
 
   void onSelectContextMenuRequested(const QPoint& pos);
   void onSelectDataEdited(const QModelIndex& index, const QVariant& oldNamespace, int role);
-  void onSelectDropSucceeded(StructTreeNode* oldParent, StructTreeNode* newParent);
+  void onSelectDropSucceeded(StructTreeNode* oldParent, StructTreeNode* movedNode);
 
   void onDetailContextMenuRequested(const QPoint& pos);
   void onDetailDoubleClicked(const QModelIndex& index);
@@ -32,20 +33,19 @@ public:
 
   void onAddGroup();
   void onAddStruct();
+  void onDuplicateStruct();
   void onDeleteNodes();
   void onEditStruct(StructTreeNode* node);
   void onUnloadStruct();
   bool unsavedStructDetails();
   void unloadStruct();
-
-  void readStructDefMapFromJson(const QJsonObject& json, QMap<QString, QString>& map);
-  void writeStructDefMapToJson(QJsonObject& json,
-                               const QStringList desiredStructs = QStringList()) const;
-  void writeStructDefsToJson(QJsonObject& json) const;
+  void nameCollisionOnMove(QStringList collisions);
 
   StructTreeNode* getStructDefs();
-  void restoreStructTree(const QString& json);
-  QString saveStructTree();
+  void readStructTreeFromFile(const QJsonObject& json, QMap<QString, QString>& map, bool clearTree);
+  void writeStructDefTreeToJson(QJsonObject& json);
+  void restoreStructTreeFromSettings(const QString& json);
+  QString saveStructTreeToSettings();
   QMap<QString, StructDef*> getStructMap();
 
 signals:
@@ -73,12 +73,16 @@ private:
   void onClearFields();
   void onSaveStruct();
   void nameChangeFailed(StructTreeNode* node, QString name);
+  QString getNextAvailableName(StructTreeNode* parent, QString curName);
   void onLengthChange(u32 newLength);
   void onModifyStructReference(QString nodeName, QString target, bool addIt, bool& ok);
   void onModifyStructPointerReference(QString nodeName, QString target, bool addIt);
   void setupStructReferences();
   void updateStructReferenceNames(QString old_name, QString new_name);
   void updateStructReferenceFieldSize(StructTreeNode* node);
+  void checkStructDetailSave();
+
+  void readStructDefTreeFromJson(const QJsonObject& json, QMap<QString, QString>& map);
 
   QStringList checkForMapCycles(QMap<QString, QStringList> map, QString curName = nullptr,
                                 QString origName = nullptr);
@@ -112,4 +116,6 @@ private:
   QPushButton* m_btnClearFields{};
   QLineEdit* m_txtStructName{};
   QLineEdit* m_txtStructLength{};
+
+  QRegularExpression m_numAppend = QRegularExpression("\\(\\d+\\)$");
 };

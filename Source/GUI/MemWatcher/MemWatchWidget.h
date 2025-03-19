@@ -54,15 +54,16 @@ public:
   void setStructDefs(StructTreeNode* structDefs, QMap<QString, StructDef*> structMap);
   void onUpdateStructDetails(QString structName);
   void onUpdateStructName(QString oldName, QString newName);
-  void onStructDefAddRemove(QString structName, StructDef* structDef = nullptr) const;
+  void onStructDefAddRemove(QString structName, StructDef* structDef = nullptr);
 
   QString m_watchListFile;
 
 signals:
   void mustUnhook();
   void goToAddressInViewer(u32 address);
-  void loadStructDefsFromJson(const QJsonObject& json, QMap<QString, QString>& map);
-  void writeStructDefsToJson(QJsonObject& json, const QStringList& desiredStructs);
+  void loadStructDefsFromJson(const QJsonObject& json, QMap<QString, QString>& map,
+                              bool clearStructs);
+  void writeStructDefTreeToJson(QJsonObject& json);
 
 private:
   void initialiseWidgets();

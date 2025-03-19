@@ -803,17 +803,25 @@ void MemWatchWidget::openWatchFile(const QString& fileName)
   }
   if (!srcFileName.isEmpty())
   {
+    bool structsOnly = false;
+    bool clearStructTree = false;
     if (m_watchModel->hasAnyNodes())
     {
       QMessageBox* questionBox = new QMessageBox(
           QMessageBox::Question, "Asking to merge lists",
           "The current watch list has entries in it, do you want to merge it with this one?",
           QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, this);
+      QPushButton* structOnly = questionBox->addButton(tr("Structs only"), QMessageBox::AcceptRole);
       int answer = questionBox->exec();
       if (answer == QMessageBox::Cancel)
         return;
-      if (answer == QMessageBox::No)
+      else if (answer == QMessageBox::No)
+      {
         m_watchModel->clearRoot();
+        clearStructTree = true;
+      }
+      else if (answer != QMessageBox::Yes && questionBox->clickedButton() == structOnly)
+        structsOnly = true;
     }
 
     QFile watchFile(srcFileName);
@@ -837,8 +845,9 @@ void MemWatchWidget::openWatchFile(const QString& fileName)
     watchFile.close();
     QJsonDocument loadDoc(QJsonDocument::fromJson(bytes));
     QMap<QString, QString> structReplacements = {};
-    emit loadStructDefsFromJson(loadDoc.object(), structReplacements);
-    m_watchModel->loadRootFromJsonRecursive(loadDoc.object(), structReplacements);
+    emit loadStructDefsFromJson(loadDoc.object(), structReplacements, clearStructTree);
+    if (!structsOnly)
+      m_watchModel->loadRootFromJsonRecursive(loadDoc.object(), structReplacements);
     updateExpansionState();
     m_watchListFile = srcFileName;
     m_hasUnsavedChanges = false;
@@ -861,7 +870,7 @@ bool MemWatchWidget::saveWatchFile()
     }
     QJsonObject root;
     m_watchModel->writeRootToJsonRecursive(root);
-    emit writeStructDefsToJson(root, m_watchModel->getStructsInUse());
+    emit writeStructDefTreeToJson(root);
     QJsonDocument saveDoc(root);
     watchFile.write(saveDoc.toJson());
     watchFile.close();
@@ -891,7 +900,7 @@ bool MemWatchWidget::saveAsWatchFile()
     }
     QJsonObject root;
     m_watchModel->writeRootToJsonRecursive(root);
-    emit writeStructDefsToJson(root, m_watchModel->getStructsInUse());
+    emit writeStructDefTreeToJson(root);
     QJsonDocument saveDoc(root);
     watchFile.write(saveDoc.toJson());
     watchFile.close();
@@ -1056,16 +1065,19 @@ void MemWatchWidget::setStructDefs(StructTreeNode* structDefs, QMap<QString, Str
 void MemWatchWidget::onUpdateStructDetails(QString structName)
 {
   m_watchModel->updateStructEntries(structName);
+  m_hasUnsavedChanges = true;
 }
 
 void MemWatchWidget::onUpdateStructName(QString oldName, QString newName)
 {
   m_watchModel->onStructNameChanged(oldName, newName);
+  m_hasUnsavedChanges = true;
 }
 
-void MemWatchWidget::onStructDefAddRemove(QString structName, StructDef* structDef) const
+void MemWatchWidget::onStructDefAddRemove(QString structName, StructDef* structDef)
 {
   m_watchModel->onStructDefAddRemove(structName, structDef);
+  m_hasUnsavedChanges = true;
 }
 
 void MemWatchWidget::updateExpansionState(const MemWatchTreeNode* const node)

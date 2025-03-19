@@ -43,6 +43,7 @@ public:
   StructTreeNode* addStruct(const QString& name, const QModelIndex& referenceIndex = QModelIndex{},
                             StructDef* structDef = nullptr);
   void deleteNode(const QModelIndex& index);
+  void clearTree();
   void insertNewDef(const QString& name, StructDef* structDef);
   void replaceDef(const QString& name, StructDef* structDef);
 
@@ -50,13 +51,15 @@ public:
 
   static StructTreeNode* getTreeNodeFromIndex(const QModelIndex& index);
   QModelIndex getIndexFromTreeNode(const StructTreeNode* node);
+  QModelIndex getNewChildIndexFromTreeNode(const StructTreeNode* node);
 
   QMap<QString, StructDef*> getStructMap();
 
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& oldNamespace, int role);
-  void dropSucceeded(StructTreeNode* oldParent, StructTreeNode* newParent);
+  void dropSucceeded(StructTreeNode* oldParent, StructTreeNode* movedNode);
   void nameChangeFailed(StructTreeNode* node, QString name);
+  void nameClashes(QStringList collisions);
 
 private:
   StructTreeNode* getLeastDeepNodeFromList(const QList<StructTreeNode*>& nodes) const;

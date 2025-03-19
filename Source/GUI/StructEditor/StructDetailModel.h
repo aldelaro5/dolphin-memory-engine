@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QAbstractListModel>
+#include <QDropEvent>
 #include <QFile>
 #include "../../Structs/StructTreeNode.h"
 
@@ -13,7 +14,7 @@ public:
   {
     STRUCT_COL_OFFSET = 0,
     STRUCT_COL_SIZE,
-    STRUCT_COL_DETAIL,
+    STRUCT_COL_TYPE,
     STRUCT_COL_LABEL,
     STRUCT_COL_NUM
   };
@@ -34,6 +35,10 @@ public:
   Qt::ItemFlags flags(const QModelIndex& index) const override;
   Qt::DropActions supportedDropActions() const override;
   Qt::DropActions supportedDragActions() const override;
+  QStringList mimeTypes() const override;
+  QMimeData* mimeData(const QModelIndexList& indexes) const override;
+  bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column,
+                    const QModelIndex& parent) override;
 
   void addField(const QModelIndex& index, FieldDef* field);
   void addPaddingFields(int count = 1, int start = -1);

@@ -916,8 +916,8 @@ void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
   }
   else if (node->hasChildren())
   {
-    collapseStructNode(
-        node, true);  // Shortcut for deleting all children and adding the placeholder child
+    // Shortcut for deleting all children and adding the placeholder child
+    collapseStructNode(node, true);
   }
 
   if (node->isExpanded())

@@ -28,10 +28,13 @@ FieldDef::FieldDef(u32 offset, MemWatchEntry* entry)
   m_entry = entry;
 }
 
-FieldDef::FieldDef(FieldDef* field)
-    : m_structOffset(field->m_structOffset), m_size(field->m_size),
-      m_entry(new MemWatchEntry(field->m_entry))
+FieldDef::FieldDef(FieldDef* field) : m_structOffset(field->m_structOffset), m_size(field->m_size)
+
 {
+  if (field->isPadding())
+    m_entry = nullptr;
+  else
+    m_entry = new MemWatchEntry(field->m_entry);
 }
 
 FieldDef::~FieldDef()
