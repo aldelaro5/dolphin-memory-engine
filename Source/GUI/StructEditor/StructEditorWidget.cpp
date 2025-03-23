@@ -429,13 +429,13 @@ QString StructEditorWidget::getNextAvailableName(StructTreeNode* parent, QString
   if (m_numAppend.match(curName).hasMatch())
   {
     const QString numStrMatch = m_numAppend.match(curName).captured(0);
-    const QString numStr = numStrMatch.mid(1, numStrMatch.count() - 2);
+    const QString numStr = numStrMatch.mid(1, numStrMatch.length() - 2);
     bool success = false;
     const int num = numStr.toInt(&success);
     if (success)
     {
       i = num + 1;
-      curName = curName.first(curName.count() - numStrMatch.count());
+      curName = curName.first(curName.length() - numStrMatch.length());
     }
   }
   QString newPartialName = curName + QString("(%1)").arg(i);

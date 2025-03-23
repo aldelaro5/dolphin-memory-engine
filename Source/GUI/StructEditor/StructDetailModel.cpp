@@ -179,7 +179,7 @@ bool StructDetailModel::dropMimeData(const QMimeData* data, Qt::DropAction actio
   int count;
   stream >> count;
 
-  int unmovedRowCount = m_fields.count() - count;
+  int unmovedRowCount = static_cast<int>(m_fields.count()) - count;
 
   if (row == -1)
     row = unmovedRowCount;
