@@ -86,7 +86,6 @@ public:
   void expandContainerNode(MemWatchTreeNode* node);
   void collapseContainerNode(MemWatchTreeNode* node);
   void setupContainersRecursive(MemWatchTreeNode* node);
-  QStringList getStructsInUse();
 
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& value, int role);
@@ -108,7 +107,7 @@ private:
   void addNodeToStructNodeMap(MemWatchTreeNode* node);
   void removeNodeFromStructNodeMap(MemWatchTreeNode* node);
   void expandStructNode(MemWatchTreeNode* node);
-  void collapseStructNode(MemWatchTreeNode* node, bool isTopLevel = false);
+  void collapseStructNode(MemWatchTreeNode* node);
 
   MemWatchTreeNode* m_rootNode;
   MemWatchEntry* m_placeholderEntry;

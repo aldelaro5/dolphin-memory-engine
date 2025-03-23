@@ -79,7 +79,7 @@ void FieldDef::setFieldSize(u32 size)
 QString FieldDef::getLabel() const
 {
   if (!m_entry)
-    return QString("");
+    return QString();
   return m_entry->getLabel();
 }
 

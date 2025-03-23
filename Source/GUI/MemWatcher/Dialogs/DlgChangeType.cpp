@@ -12,7 +12,7 @@ DlgChangeType::DlgChangeType(QWidget* parent, const int typeIndex, const size_t 
                              QVector<QString> structNames, QString curStructName)
     : QDialog(parent), m_typeIndex(typeIndex), m_length(length), m_structNames(structNames)
 {
-  m_structNames.push_front(QString(""));
+  m_structNames.push_front(QString());
   setWindowTitle("Change Type");
   initialiseWidgets();
   makeLayouts();

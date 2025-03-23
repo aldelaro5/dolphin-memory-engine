@@ -537,18 +537,18 @@ void StructDetailModel::clearFields(QModelIndexList indices)
       FieldDef* cur_field = m_fields[i];
       if (cur_field->getEntry()->getType() == Common::MemType::type_struct)
       {
-        if (m_fields[i]->getEntry()->isBoundToPointer())
+        if (cur_field->getEntry()->isBoundToPointer())
           emit modifyStructPointerReference(m_baseNode->getNameSpace(),
-                                            m_fields[i]->getEntry()->getStructName(), false);
+                                            cur_field->getEntry()->getStructName(), false);
         else
         {
           bool _;
           emit modifyStructReference(m_baseNode->getNameSpace(),
-                                     m_fields[i]->getEntry()->getStructName(), false, _);
+                                     cur_field->getEntry()->getStructName(), false, _);
         }
       }
 
-      if (m_fields[i]->getFieldSize() == 0)
+      if (cur_field->getFieldSize() == 0)
       {
         removeFields({createIndex(i, 0, cur_field)});
         continue;
@@ -617,7 +617,10 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
   emit dataChanged(index.siblingAtColumn(0), index.siblingAtColumn(columnCount({}) - 1));
 
   if (oldFieldLen < fieldLen)
-    removePaddingFields(fieldLen - 1, index.row() + 1);
+    removePaddingFields(fieldLen - oldFieldLen, index.row() + 1);
+
+  if (oldFieldLen > fieldLen)
+    addPaddingFields(oldFieldLen - fieldLen, index.row() + 1);
 
   updateFieldOffsets();
 

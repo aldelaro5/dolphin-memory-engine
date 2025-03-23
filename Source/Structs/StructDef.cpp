@@ -4,7 +4,7 @@
 
 StructDef::StructDef()
 {
-  m_label = QString("");
+  m_label = QString();
   m_length = 0;
   m_fields = QVector<FieldDef*>();
   m_isValid = true;

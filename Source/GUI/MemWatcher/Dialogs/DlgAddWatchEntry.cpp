@@ -22,7 +22,7 @@ DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const ent
 {
   m_isForStructField = isForStructField;
   m_structNames = structs;
-  m_structNames.push_front(QString(""));
+  m_structNames.push_front(QString());
   setWindowTitle(newEntry ? "Add Watch" : "Edit Watch");
   initialiseWidgets();
   makeLayouts();
@@ -412,7 +412,7 @@ void DlgAddWatchEntry::accept()
     if (m_entry->getType() == Common::MemType::type_struct)
       m_entry->setStructName(m_structNames[m_structSelect->currentIndex()]);
     else
-      m_entry->setStructName(QString(""));
+      m_entry->setStructName(QString());
     setResult(QDialog::Accepted);
     hide();
   }
