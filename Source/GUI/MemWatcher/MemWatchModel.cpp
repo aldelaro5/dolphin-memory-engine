@@ -922,7 +922,8 @@ void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
   }
   else if (node->hasChildren() && isExpanded)
   {
-    // Shortcut for deleting all children and adding the placeholder child. Also overrides expanded state, so need to capture above and use below
+    // Shortcut for deleting all children and adding the placeholder child. Also overrides expanded
+    // state, so need to capture above and use below
     collapseStructNode(node);
   }
 
@@ -984,7 +985,7 @@ void MemWatchModel::collapseStructNode(MemWatchTreeNode* node)
   if (m_structDefMap.contains(node->getEntry()->getStructName()) &&
       !m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
     addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
-              getIndexFromTreeNode(node), true);
+             getIndexFromTreeNode(node), true);
   node->setExpanded(false);
 }
 
@@ -1006,22 +1007,24 @@ void MemWatchModel::updateStructAddresses(MemWatchTreeNode* node)
   StructDef* def = m_structDefMap[node->getEntry()->getStructName()];
 
   if (def->getFields().count() != node->getChildren().count())
+  {
     if (node->isExpanded())
       updateStructNode(node);
-  else if (!node->getEntry()->hasAddressChanged())
-    return;
-  else
-  {
-    u32 addr = node->getEntry()->getActualAddress();
-    node->getEntry()->updateActualAddress(addr);
-    QVector<FieldDef*> fields = def->getFields();
-    QVector<MemWatchTreeNode*> children = node->getChildren();
-
-    for (int i = 0; i < def->getFields().count(); ++i)
+    else if (!node->getEntry()->hasAddressChanged())
+      return;
+    else
     {
-      children[i]->getEntry()->setConsoleAddress(addr + fields[i]->getOffset());
-      if (GUICommon::isContainerType(children[i]->getEntry()->getType()))
-        updateContainerAddresses(children[i]);
+      u32 addr = node->getEntry()->getActualAddress();
+      node->getEntry()->updateActualAddress(addr);
+      QVector<FieldDef*> fields = def->getFields();
+      QVector<MemWatchTreeNode*> children = node->getChildren();
+
+      for (int i = 0; i < def->getFields().count(); ++i)
+      {
+        children[i]->getEntry()->setConsoleAddress(addr + fields[i]->getOffset());
+        if (GUICommon::isContainerType(children[i]->getEntry()->getType()))
+          updateContainerAddresses(children[i]);
+      }
     }
   }
 }
