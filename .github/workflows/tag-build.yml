@@ -1,4 +1,4 @@
-name: 🔨 Build (TAG)
+name: 🔨 Build & Release (TAG)
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     name: Clang-Format Check (TAG)
     steps:
       - uses: actions/checkout@v4
-      - uses: jidicula/clang-format-action@v4.14.0
+      - uses: jidicula/clang-format-action@v4.15.0
         with:
           clang-format-version: '19'
           check-path: Source
@@ -40,21 +40,32 @@ jobs:
 
       - name: Build
         run: |
-          cmake Source -B .\Source\bin -A x64 "-DCMAKE_PREFIX_PATH=..\Externals\Qt\Qt6.8.2\x64"
+          cmake Source -B .\Source\bin -A x64 "-DCMAKE_PREFIX_PATH=..\Externals\Qt\Qt6.5.3\x64"
           cmake --build .\Source\bin --config ${{ matrix.configuration }} --parallel
         shell: powershell
 
-      - name: Copy LICENSE, README
+      - name: Copy LICENSE, README to build directory
         run: |
           copy .\LICENSE .\Source\bin\${{ matrix.configuration }}
           copy .\README.md .\Source\bin\${{ matrix.configuration }}
         shell: powershell
 
-      - name: Publish Artifacts
+      - name: Create Release Archive
+        run: |
+          Compress-Archive -Path Source/bin/${{ matrix.configuration }}/* -DestinationPath dolphin-memory-engine-${{ github.ref_name }}-windows-amd64.zip
+        shell: powershell
+
+      - name: Publish Workflow Artifact
         uses: actions/upload-artifact@v4
         with:
           name: dolphin-memory-engine-${{ github.ref_name }}-windows-amd64
-          path: Source\bin\${{ matrix.configuration }}
+          path: dolphin-memory-engine-${{ github.ref_name }}-windows-amd64.zip
+
+      - name: Upload to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: dolphin-memory-engine-${{ github.ref_name }}-windows-amd64.zip
 
   build-linux:
     runs-on: ubuntu-22.04
@@ -87,12 +98,14 @@ jobs:
           cmake --build Source/build --parallel
         shell: bash
 
-      - name: Copy LICENSE, README, Prepare Artifacts
+      - name: Prepare Linux Binary
         run: |
-          mkdir Source/build/artifacts
-          cp ./README.md ./Source/build/artifacts/
-          cp ./LICENSE ./Source/build/artifacts/
-          cp ./Source/build/dolphin-memory-engine ./Source/build/artifacts/
+          mkdir -p Source/build/linux_release_files
+          cp ./README.md ./Source/build/linux_release_files/
+          cp ./LICENSE ./Source/build/linux_release_files/
+          cp ./Source/build/dolphin-memory-engine ./Source/build/linux_release_files/dolphin-memory-engine
+          chmod +x ./Source/build/linux_release_files/dolphin-memory-engine
+          tar -czvf dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64-binary.tar.gz -C Source/build/linux_release_files .
         shell: bash
 
       - name: Package AppImage
@@ -100,17 +113,34 @@ jobs:
           .github/assets/appimage.sh
         shell: bash
 
-      - name: Publish Artifacts (Binary)
-        uses: actions/upload-artifact@v4
-        with:
-          name: dolphin-memory-engine-${{ github.ref_name }}-linux-ubuntu-22.04-binary
-          path: Source/build/artifacts
+      - name: Rename AppImage for Release
+        id: rename_appimage
+        run: |
+          FINAL_APPIMAGE_NAME="dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64.AppImage"
+          mv dolphin-memory-engine.AppImage $FINAL_APPIMAGE_NAME
+          echo "Renamed AppImage to $FINAL_APPIMAGE_NAME"
+          echo "appimage_name=$FINAL_APPIMAGE_NAME" >> $GITHUB_OUTPUT
+        shell: bash
 
-      - name: Publish Artifacts (AppImage)
+      - name: Publish Workflow Artifact (Linux binary tarball)
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ github.ref_name }}-linux-ubuntu-22.04-appimage
-          path: dolphin-memory-engine.AppImage
+          name: dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64-binary
+          path: dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64-binary.tar.gz
+
+      - name: Publish Workflow Artifact (AppImage)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64-appimage
+          path: ${{ steps.rename_appimage.outputs.appimage_name }}
+
+      - name: Upload to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: |
+            ${{ steps.rename_appimage.outputs.appimage_name }}
+            dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64-binary.tar.gz
 
   build-macos-intel:
     runs-on: macos-13
@@ -120,12 +150,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Current Runner has cmake we want by default; Omitting for now but restore if they stop bundling it
-      # - name: Install Dependencies
-      #   run: |
-      #     brew install --formula cmake
-      #   shell: bash
-
       - name: Initialize submodules
         run: git submodule update --init
         
@@ -134,24 +158,35 @@ jobs:
 
       - name: Build
         run: |
-          mkdir Source/build
+          mkdir -p Source/build
           cd Source/build
           cmake .. -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)"
           make
           echo -e "\n" | ../../Tools/MacDeploy.sh
         shell: bash
 
-      - name: Copy LICENSE, README, Prepare Artifacts
+      - name: Prepare macOS Release Artifacts
         run: |
-          mkdir Source/build/artifacts
-          cp ./README.md ./Source/build/artifacts/
-          cp ./LICENSE ./Source/build/artifacts/
-          cp ./Tools/MacSetup.sh ./Source/build/artifacts/
-          cp ./Source/build/dolphin-memory-engine.dmg ./Source/build/artifacts/
+          mkdir -p Source/build/macos_bundle_contents
+          cp ./README.md ./Source/build/macos_bundle_contents/
+          cp ./LICENSE ./Source/build/macos_bundle_contents/
+          cp ./Tools/MacSetup.sh ./Source/build/macos_bundle_contents/
+          cp ./Source/build/dolphin-memory-engine.dmg ./Source/build/macos_bundle_contents/dolphin-memory-engine.dmg
         shell: bash
 
-      - name: Publish Artifacts
+      - name: Create macOS Release Archive
+        run: |
+          (cd Source/build/macos_bundle_contents && zip -r ../../../dolphin-memory-engine-${{ github.ref_name }}-macOS-intel.zip .)
+        shell: bash
+
+      - name: Publish Workflow Artifact
         uses: actions/upload-artifact@v4
         with:
           name: dolphin-memory-engine-${{ github.ref_name }}-macOS-intel
-          path: Source/build/artifacts
+          path: dolphin-memory-engine-${{ github.ref_name }}-macOS-intel.zip
+        
+      - name: Upload to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: dolphin-memory-engine-${{ github.ref_name }}-macOS-intel.zip
