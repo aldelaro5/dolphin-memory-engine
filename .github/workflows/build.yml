@@ -14,7 +14,7 @@ jobs:
     name: Clang-Format Check
     steps:
       - uses: actions/checkout@v4
-      - uses: jidicula/clang-format-action@v4.14.0
+      - uses: jidicula/clang-format-action@v4.15.0
         with:
           clang-format-version: '19'
           check-path: Source
@@ -24,7 +24,7 @@ jobs:
     name: 🪟 Windows x86_64
     strategy:
       matrix:
-        configuration: [Release]
+        configuration: [Debug, Release]
 
     steps:
       - name: Checkout code
@@ -60,7 +60,7 @@ jobs:
       - name: Publish Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-windows-amd64
+          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-windows-${{ matrix.configuration }}-amd64
           path: Source\bin\${{ matrix.configuration }}
 
   build-linux:

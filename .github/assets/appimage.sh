@@ -4,7 +4,7 @@ curl -sSfL https://github.com/linuxdeploy/linuxdeploy/releases/download/continuo
 curl -sSfL https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage -o linuxdeployqt
 
 mkdir -p AppDir/usr/
-cp -r Source/build/artifacts AppDir/usr/bin
+cp -r Source/build/linux_release_files AppDir/usr/bin
 ln -sr AppDir/usr/bin/"${BINNAME}" AppDir/AppRun
 chmod +x AppDir/usr/bin
 chmod +x AppDir/AppRun
