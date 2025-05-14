@@ -60,7 +60,7 @@ jobs:
       - name: Publish Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-windows-amd64
+          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-windows-${{ matrix.configuration }}-amd64
           path: Source\bin\${{ matrix.configuration }}
 
   build-linux:
