@@ -8,6 +8,7 @@
 
 #include "../../MemoryWatch/MemWatchEntry.h"
 #include "../../MemoryWatch/MemWatchTreeNode.h"
+#include "../../Structs/StructDef.h"
 
 class MemWatchModel : public QAbstractItemModel
 {
@@ -56,7 +57,8 @@ public:
   void changeType(const QModelIndex& index, Common::MemType type, size_t length);
   static MemWatchEntry* getEntryFromIndex(const QModelIndex& index);
   void addNodes(const std::vector<MemWatchTreeNode*>& nodes,
-                const QModelIndex& referenceIndex = QModelIndex{});
+                const QModelIndex& referenceIndex = QModelIndex{},
+                const bool insertInContainer = false);
   void addGroup(const QString& name, const QModelIndex& referenceIndex = QModelIndex{});
   void addEntry(MemWatchEntry* entry, const QModelIndex& referenceIndex = QModelIndex{});
   void editEntry(MemWatchEntry* entry, const QModelIndex& index);
@@ -65,7 +67,8 @@ public:
   void groupSelection(const QModelIndexList& indexes);
   void onUpdateTimer();
   void onFreezeTimer();
-  void loadRootFromJsonRecursive(const QJsonObject& json);
+  void loadRootFromJsonRecursive(const QJsonObject& jsonconst,
+                                 QMap<QString, QString> structNameReplacements = {});
   CTParsingErrors importRootFromCTFile(QFile* CTFile, bool useDolphinPointer, u32 CEStart = 0);
   void writeRootToJsonRecursive(QJsonObject& json) const;
   QString writeRootToCSVStringRecursive() const;
@@ -74,6 +77,15 @@ public:
   static MemWatchTreeNode* getTreeNodeFromIndex(const QModelIndex& index);
   QModelIndex getIndexFromTreeNode(const MemWatchTreeNode* node);
   bool editData(const QModelIndex& index, const QVariant& value, int role, bool emitEdit = false);
+
+  void setStructMap(QMap<QString, StructDef*> structDefmap);
+  void onStructNameChanged(const QString old_name, const QString new_name);
+  void onStructDefAddRemove(QString structName, StructDef* structDef);
+  void updateStructEntries(QString structName);
+  void updateStructNode(MemWatchTreeNode* node);
+  void expandContainerNode(MemWatchTreeNode* node);
+  void collapseContainerNode(MemWatchTreeNode* node);
+  void setupContainersRecursive(MemWatchTreeNode* node);
 
 signals:
   void dataEdited(const QModelIndex& index, const QVariant& value, int role);
@@ -89,5 +101,16 @@ private:
   MemWatchTreeNode* getLeastDeepNodeFromList(const QList<MemWatchTreeNode*>& nodes) const;
   int getNodeDeepness(const MemWatchTreeNode* node) const;
 
+  void updateContainerAddresses(MemWatchTreeNode* node);
+  void updateStructAddresses(MemWatchTreeNode* node);
+  void setupStructNode(MemWatchTreeNode* node);
+  void addNodeToStructNodeMap(MemWatchTreeNode* node);
+  void removeNodeFromStructNodeMap(MemWatchTreeNode* node);
+  void expandStructNode(MemWatchTreeNode* node);
+  void collapseStructNode(MemWatchTreeNode* node);
+
   MemWatchTreeNode* m_rootNode;
+  MemWatchEntry* m_placeholderEntry;
+  QMap<QString, StructDef*> m_structDefMap{};
+  QMap<QString, QVector<MemWatchTreeNode*>> m_structNodes{};
 };
