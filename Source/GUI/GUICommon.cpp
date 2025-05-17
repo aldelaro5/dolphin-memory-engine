@@ -17,8 +17,12 @@ QStringList g_memTypeNames =
                  QCoreApplication::translate("Common", "String"),
                  QCoreApplication::translate("Common", "Array of bytes"),
                  QCoreApplication::translate("Common", "Struct"),
+<<<<<<< HEAD
                  QCoreApplication::translate("Common", "Assembly (PowerPC)"),
                  QCoreApplication::translate("Common", "8 bytes (Doubleword)")});
+=======
+                 QCoreApplication::translate("Common", "Array")});
+>>>>>>> c043db8 (Common, GUICommon: Added array type and type string.)
 
 QStringList g_memBaseNames = QStringList({QCoreApplication::translate("Common", "Decimal"),
                                           QCoreApplication::translate("Common", "Hexadecimal"),
@@ -52,6 +56,7 @@ QString getStringFromType(const Common::MemType type, const size_t length)
   case Common::MemType::type_double:
   case Common::MemType::type_struct:
   case Common::MemType::type_ppc:
+  case Common::MemType::type_array:
     return GUICommon::g_memTypeNames.at(static_cast<int>(type));
   case Common::MemType::type_string:
     return QString::fromStdString("string[" + std::to_string(length) + "]");
@@ -83,6 +88,7 @@ bool isContainerType(const Common::MemType type)
 {
   switch (type)
   {
+  case Common::MemType::type_array:
   case Common::MemType::type_struct:
     return true;
   default:

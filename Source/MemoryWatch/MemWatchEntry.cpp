@@ -44,7 +44,8 @@ MemWatchEntry::MemWatchEntry(MemWatchEntry* entry)
       m_absoluteBranch(entry->m_absoluteBranch), m_boundToPointer(entry->m_boundToPointer),
       m_pointerOffsets(entry->m_pointerOffsets), m_isValidPointer(entry->m_isValidPointer),
       m_length(entry->m_length), m_structName(entry->m_structName),
-      m_curActualAddress(entry->m_curActualAddress)
+      m_curActualAddress(entry->m_curActualAddress), 
+      m_collectionEntry(new MemWatchEntry(entry->m_collectionEntry)), m_collectionCount(m_collectionCount)
 {
   m_memory = new char[getSizeForType(entry->getType(), entry->getLength())];
   std::memcpy(m_memory, entry->getMemory(), getSizeForType(entry->getType(), entry->getLength()));
@@ -204,6 +205,26 @@ QString MemWatchEntry::getStructName() const
 void MemWatchEntry::setStructName(QString structName)
 {
   m_structName = structName;
+}
+
+MemWatchEntry* MemWatchEntry::getContainerEntry() const
+{
+  return m_collectionEntry;
+}
+
+void MemWatchEntry::setContainerEntry(MemWatchEntry* elementEntry)
+{
+  m_collectionEntry = elementEntry;
+}
+
+u32 MemWatchEntry::getCollectionCount()
+{
+  return m_collectionCount;
+}
+
+void MemWatchEntry::setCollectionCount(u32 size)
+{
+  m_collectionCount = size;
 }
 
 void MemWatchEntry::addOffset(const int offset)

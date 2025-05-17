@@ -103,11 +103,15 @@ private:
 
   void updateContainerAddresses(MemWatchTreeNode* node);
   void updateStructAddresses(MemWatchTreeNode* node);
+  void updateArrayAddresses(MemWatchTreeNode* node);
   void setupStructNode(MemWatchTreeNode* node);
   void addNodeToStructNodeMap(MemWatchTreeNode* node);
   void removeNodeFromStructNodeMap(MemWatchTreeNode* node);
   void expandStructNode(MemWatchTreeNode* node);
   void collapseStructNode(MemWatchTreeNode* node);
+  void setupArrayNode(MemWatchTreeNode* node);
+  void expandArrayNode(MemWatchTreeNode* node);
+  void collapseArrayNode(MemWatchTreeNode* node);
 
   MemWatchTreeNode* m_rootNode;
   MemWatchEntry* m_placeholderEntry;
