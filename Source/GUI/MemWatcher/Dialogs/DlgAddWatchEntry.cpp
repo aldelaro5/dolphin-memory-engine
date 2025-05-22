@@ -17,13 +17,17 @@
 
 DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const entry,
                                    QVector<QString> const structs, QWidget* const parent,
-                                   bool isForStructField)
+                                   bool isForStructField, int arrayDepth)
     : QDialog(parent)
 {
   m_isForStructField = isForStructField;
   m_structNames = structs;
   m_structNames.push_front(QString());
-  setWindowTitle(newEntry ? "Add Watch" : "Edit Watch");
+  m_curArrayDepth = arrayDepth;
+  QString title = newEntry ? "Add Watch" : "Edit Watch";
+  if (arrayDepth > 0)
+    title += " for Container at level " + arrayDepth;
+  setWindowTitle(title);
   initialiseWidgets();
   makeLayouts();
   fillFields(entry);
@@ -87,6 +91,15 @@ void DlgAddWatchEntry::initialiseWidgets()
 
   m_structSelect = new QComboBox(this);
   m_structSelect->addItems(m_structNames);
+
+  m_spnContainerSize = new QSpinBox(this);
+  m_spnContainerSize->setPrefix("");
+  m_spnContainerSize->setMinimum(1);
+  m_spnContainerSize->setMaximum(9999);
+
+  m_btnSetupContainerEntry = new QPushButton("Setup Contents");
+  connect(m_btnSetupContainerEntry, &QPushButton::clicked, this,
+          &DlgAddWatchEntry::onSetupContainerContents);
 }
 
 void DlgAddWatchEntry::makeLayouts()
@@ -105,8 +118,14 @@ void DlgAddWatchEntry::makeLayouts()
   layout_type->addWidget(m_cmbTypes, 1);
   layout_type->addWidget(m_spnLength);
   layout_type->addWidget(m_structSelect);
+  layout_type->addWidget(m_spnContainerSize);
+  
+  QVBoxLayout* super_layout_type = new QVBoxLayout;
+  super_layout_type->addLayout(layout_type);
+  super_layout_type->addWidget(m_btnSetupContainerEntry);
+
   QWidget* widget_type = new QWidget;
-  widget_type->setLayout(layout_type);
+  widget_type->setLayout(super_layout_type);
   widget_type->setContentsMargins(0, 0, 0, 0);
   formLayout->addRow("Type:", widget_type);
 
@@ -159,6 +178,8 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_pointerWidget->hide();
     m_structSelect->setCurrentIndex(0);
     m_structSelect->hide();
+    m_spnContainerSize->hide();
+    m_btnSetupContainerEntry->hide();
   }
   else
   {
@@ -166,11 +187,14 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
 
     m_spnLength->setValue(static_cast<int>(m_entry->getLength()));
     m_cmbTypes->setCurrentIndex(static_cast<int>(m_entry->getType()));
+    m_spnContainerSize->setValue(static_cast<int>(m_entry->getContainerCount()));
     if (m_entry->getType() == Common::MemType::type_string ||
         m_entry->getType() == Common::MemType::type_byteArray)
     {
       m_spnLength->show();
       m_structSelect->hide();
+      m_spnContainerSize->hide();
+      m_btnSetupContainerEntry->hide();
     }
     else if (m_entry->getType() == Common::MemType::type_struct)
     {
@@ -180,11 +204,22 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
 
       m_structSelect->show();
       m_spnLength->hide();
+      m_spnContainerSize->hide();
+      m_btnSetupContainerEntry->hide();
+    }
+    else if (m_entry->getType() == Common::MemType::type_array)
+    {
+      m_spnContainerSize->show();
+      m_btnSetupContainerEntry->show();
+      m_spnLength->hide();
+      m_structSelect->hide();
     }
     else
     {
       m_spnLength->hide();
       m_structSelect->hide();
+      m_spnContainerSize->hide();
+      m_btnSetupContainerEntry->hide();
     }
     m_txbLabel->setText(m_entry->getLabel());
     if (!m_isForStructField)
@@ -336,16 +371,29 @@ void DlgAddWatchEntry::onTypeChange(int index)
   {
     m_spnLength->show();
     m_structSelect->hide();
+    m_spnContainerSize->hide();
+    m_btnSetupContainerEntry->hide();
   }
   else if (theType == Common::MemType::type_struct)
   {
     m_spnLength->hide();
     m_structSelect->show();
+    m_spnContainerSize->hide();
+    m_btnSetupContainerEntry->hide();
+  }
+  else if (theType == Common::MemType::type_array)
+  {
+    m_spnLength->hide();
+    m_structSelect->hide();
+    m_spnContainerSize->show();
+    m_btnSetupContainerEntry->show();
   }
   else
   {
     m_spnLength->hide();
     m_structSelect->hide();
+    m_spnContainerSize->hide();
+    m_btnSetupContainerEntry->hide();
   }
   m_entry->setTypeAndLength(theType, m_spnLength->value());
   if (!m_isForStructField && validateAndSetAddress())
@@ -536,4 +584,16 @@ void DlgAddWatchEntry::onPointerOffsetContextMenuRequested(const QPoint& pos)
   }
 
   contextMenu->popup(lbl->mapToGlobal(pos));
+}
+
+void DlgAddWatchEntry::onSetupContainerContents()
+{
+  MemWatchEntry* curEntry = m_entry->getContainerEntry();
+  bool isNewEntry = curEntry == nullptr;
+
+  DlgAddWatchEntry dlg(isNewEntry, curEntry, m_structNames, this, m_isForStructField, m_curArrayDepth + 1);
+  if (dlg.exec() == QDialog::Accepted)
+  {
+    m_entry->setContainerEntry(dlg.stealEntry());
+  }
 }

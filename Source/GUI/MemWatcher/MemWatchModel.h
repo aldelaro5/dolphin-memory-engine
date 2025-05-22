@@ -112,6 +112,7 @@ private:
   void setupArrayNode(MemWatchTreeNode* node);
   void expandArrayNode(MemWatchTreeNode* node);
   void collapseArrayNode(MemWatchTreeNode* node);
+  int getTotalContainerLength(MemWatchEntry* entry);
 
   MemWatchTreeNode* m_rootNode;
   MemWatchEntry* m_placeholderEntry;

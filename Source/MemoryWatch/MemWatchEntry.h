@@ -55,8 +55,8 @@ public:
 
   MemWatchEntry* getContainerEntry() const;
   void setContainerEntry(MemWatchEntry* elementEntry);
-  u32 getCollectionCount();
-  void setCollectionCount(u32 size);
+  size_t getContainerCount() const;
+  void setContainerCount(size_t size);
 
   Common::MemOperationReturnCode freeze();
 
@@ -93,5 +93,5 @@ private:
   QString m_structName;
   u32 m_curActualAddress;
   MemWatchEntry* m_collectionEntry{};
-  u32 m_collectionCount = 0;
+  size_t m_collectionCount = 1;
 };
