@@ -26,7 +26,7 @@ DlgAddWatchEntry::DlgAddWatchEntry(const bool newEntry, MemWatchEntry* const ent
   m_curArrayDepth = arrayDepth;
   QString title = newEntry ? "Add Watch" : "Edit Watch";
   if (arrayDepth > 0)
-    title += " for Container at level " + arrayDepth;
+    title += QString(" for Container at level ") + QString::number(arrayDepth);
   setWindowTitle(title);
   initialiseWidgets();
   makeLayouts();
@@ -461,6 +461,10 @@ void DlgAddWatchEntry::accept()
       m_entry->setStructName(m_structNames[m_structSelect->currentIndex()]);
     else
       m_entry->setStructName(QString());
+    if (m_entry->getType() == Common::MemType::type_array)
+      m_entry->setContainerCount(m_spnContainerSize->value());
+    else
+      m_entry->setContainerCount(1);
     setResult(QDialog::Accepted);
     hide();
   }
@@ -591,7 +595,7 @@ void DlgAddWatchEntry::onSetupContainerContents()
   MemWatchEntry* curEntry = m_entry->getContainerEntry();
   bool isNewEntry = curEntry == nullptr;
 
-  DlgAddWatchEntry dlg(isNewEntry, curEntry, m_structNames, this, m_isForStructField, m_curArrayDepth + 1);
+  DlgAddWatchEntry dlg(isNewEntry, curEntry, m_structNames, this, true, m_curArrayDepth + 1);
   if (dlg.exec() == QDialog::Accepted)
   {
     m_entry->setContainerEntry(dlg.stealEntry());

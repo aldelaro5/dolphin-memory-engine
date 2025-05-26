@@ -1001,6 +1001,8 @@ void MemWatchModel::expandArrayNode(MemWatchTreeNode* node)
   for (int i = 0; i < node->getEntry()->getContainerCount(); i++)
   {
     MemWatchEntry* childEntry = new MemWatchEntry(node->getEntry()->getContainerEntry());
+    childEntry->setLabel(QString("[%1] ").arg(i) + childEntry->getLabel());
+
     MemWatchTreeNode* child = new MemWatchTreeNode(childEntry, node);
     childNodes.push_back(child);
   }
