@@ -497,14 +497,19 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
     {
       MemWatchEntry* entry = node->getEntry();
       int typeIndex = static_cast<int>(entry->getType());
-      DlgChangeType* dlg =
-          new DlgChangeType(this, typeIndex, entry->getLength(), m_structDefs->getStructNames(),
-                            entry->getStructName());
+      DlgChangeType* dlg = new DlgChangeType(
+          this, typeIndex, entry->getLength(), m_structDefs->getStructNames(),
+          entry->getStructName(), entry->getContainerCount(), entry->getContainerEntry());
       if (dlg->exec() == QDialog::Accepted)
       {
         Common::MemType theType = static_cast<Common::MemType>(dlg->getTypeIndex());
         if (theType == Common::MemType::type_struct && dlg->getStructName() != QString())
           entry->setStructName(dlg->getStructName());
+        if (theType == Common::MemType::type_array)
+        {
+          entry->setContainerCount(dlg->getContainerCount());
+          entry->setContainerEntry(dlg->getContainerEntry());
+        }
 
         m_watchModel->changeType(index, theType, dlg->getLength());
         m_hasUnsavedChanges = true;
@@ -519,6 +524,17 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
         m_watchModel->editEntry(dlg.stealEntry(), index);
         m_hasUnsavedChanges = true;
       }
+    }
+
+    if (index.column() == MemWatchModel::WATCH_COL_VALUE &&
+        node->getEntry()->getType() == Common::MemType::type_array)
+    {
+      bool ok{};
+      size_t newCount =
+          QInputDialog::getInt(this, tr("Set Array Count"), tr("Array Count:"),
+                               node->getEntry()->getContainerCount(), 1, 9999, 1, &ok, Qt::Dialog);
+      if (ok)
+        m_watchModel->setContainerCount(node, newCount);
     }
   }
 }

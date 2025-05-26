@@ -65,6 +65,6 @@ private:
   QVector<QString> m_structNames{};
   bool m_isForStructField;
   QPushButton* m_btnSetupContainerEntry{};
-  QSpinBox* m_spnContainerSize{};
+  QSpinBox* m_spnContainerCount{};
   int m_curArrayDepth = 0;
 };

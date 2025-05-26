@@ -9,5 +9,6 @@
         <file>status_unhooked.svg</file>
         <file>struct.svg</file>
         <file>struct2.svg</file>
+        <file>array.svg</file>
     </qresource>
 </RCC>

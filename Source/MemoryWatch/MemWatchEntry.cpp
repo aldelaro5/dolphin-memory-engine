@@ -44,7 +44,8 @@ MemWatchEntry::MemWatchEntry(MemWatchEntry* entry)
       m_absoluteBranch(entry->m_absoluteBranch), m_boundToPointer(entry->m_boundToPointer),
       m_pointerOffsets(entry->m_pointerOffsets), m_isValidPointer(entry->m_isValidPointer),
       m_length(entry->m_length), m_structName(entry->m_structName),
-      m_curActualAddress(entry->m_curActualAddress), m_collectionCount(m_collectionCount)
+      m_curActualAddress(entry->m_curActualAddress), 
+      m_collectionCount(entry->m_collectionCount)
 {
   m_memory = new char[getSizeForType(entry->getType(), entry->getLength())];
   std::memcpy(m_memory, entry->getMemory(), getSizeForType(entry->getType(), entry->getLength()));
@@ -57,6 +58,7 @@ MemWatchEntry::~MemWatchEntry()
 {
   delete[] m_memory;
   delete[] m_freezeMemory;
+  delete m_collectionEntry;
 }
 
 QString MemWatchEntry::getLabel() const
@@ -216,6 +218,7 @@ MemWatchEntry* MemWatchEntry::getContainerEntry() const
 
 void MemWatchEntry::setContainerEntry(MemWatchEntry* elementEntry)
 {
+  delete m_collectionEntry;
   m_collectionEntry = elementEntry;
 }
 
@@ -428,6 +431,14 @@ void MemWatchEntry::readFromJson(const QJsonObject& json)
   if (json["structName"] != QJsonValue::Undefined)
     setStructName(json["structName"].toString());
 
+  if (json["containerCount"] != QJsonValue::Undefined)
+  {
+    setContainerCount(static_cast<size_t>(json["containerCount"].toDouble()));
+    MemWatchEntry* containerEntry = new MemWatchEntry();
+    containerEntry->readFromJson(json["containerEntry"].toObject());
+    setContainerEntry(containerEntry);
+  }
+
   setSignedUnsigned(json["unsigned"].toBool());
   setBase(static_cast<Common::MemBase>(json["baseIndex"].toInt()));
   if (json["pointerOffsets"] != QJsonValue::Undefined)
@@ -463,6 +474,13 @@ void MemWatchEntry::writeToJson(QJsonObject& json) const
     json["length"] = static_cast<double>(getLength());
   else if (getType() == Common::MemType::type_struct)
     json["structName"] = getStructName();
+  else if (getType() == Common::MemType::type_array)
+  {
+    QJsonObject containerEntryJson{};
+    getContainerEntry()->writeToJson(containerEntryJson);
+    json["containerEntry"] = containerEntryJson;
+    json["containerCount"] = static_cast<double>(getContainerCount());
+  }
 
   json["baseIndex"] = static_cast<double>(getBase());
   if (isBoundToPointer())

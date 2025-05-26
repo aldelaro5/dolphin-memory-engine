@@ -434,6 +434,11 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
         static const QIcon s_structIcon(":/struct2.svg");
         return s_structIcon;
       }
+      else if (entry->getType() == Common::MemType::type_array)
+      {
+        static const QIcon s_arrayIcon(":/array.svg");
+        return s_arrayIcon;
+      }
     }
   }
   else
@@ -825,12 +830,21 @@ QModelIndex MemWatchModel::getIndexFromTreeNode(const MemWatchTreeNode* const no
 
 void MemWatchModel::setupStructNode(MemWatchTreeNode* node)
 {
+  bool wasExpanded = node->isExpanded();
+  collapseStructNode(node);
+  removeNodeFromStructNodeMap(node, true);
+
   if (m_structDefMap.contains(node->getEntry()->getStructName()))
   {
     addNodeToStructNodeMap(node);
     if (!m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
-      addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
-               getIndexFromTreeNode(node), true);
+    {
+      if (wasExpanded)
+        expandStructNode(node);
+      else
+        addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
+                 getIndexFromTreeNode(node), true);
+    }
   }
 }
 
@@ -841,11 +855,11 @@ void MemWatchModel::addNodeToStructNodeMap(MemWatchTreeNode* node)
     return;
   if (!m_structNodes.contains(name))
     m_structNodes.insert(name, {node});
-  else
+  else if (!m_structNodes[name].contains(node))
     m_structNodes[name].push_back(node);
 }
 
-void MemWatchModel::removeNodeFromStructNodeMap(MemWatchTreeNode* node)
+void MemWatchModel::removeNodeFromStructNodeMap(MemWatchTreeNode* node, bool allEntries)
 {
   QList<MemWatchTreeNode*> queue{node};
 
@@ -860,13 +874,22 @@ void MemWatchModel::removeNodeFromStructNodeMap(MemWatchTreeNode* node)
     if (!curNode->isGroup() && curNode->getEntry() &&
         curNode->getEntry()->getType() == Common::MemType::type_struct)
     {
-      QString name = curNode->getEntry()->getStructName();
-      if (name.isEmpty() || m_structNodes.isEmpty() || !m_structNodes.contains(name) ||
-          m_structNodes[name].isEmpty() || !m_structNodes[name].contains(node))
-        return;
-      m_structNodes[name].remove(m_structNodes[name].indexOf(node));
-      if (m_structNodes[name].isEmpty())
-        m_structNodes.remove(name);
+      QStringList names{};
+      if (allEntries)
+        names.append(m_structNodes.keys());
+      else
+        names.append(node->getEntry()->getStructName());
+
+      for (QString name : names)
+      {
+        if (name.isEmpty() || m_structNodes.isEmpty() || !m_structNodes.contains(name) ||
+            m_structNodes[name].isEmpty() || !m_structNodes[name].contains(node))
+          continue;
+
+        m_structNodes[name].remove(m_structNodes[name].indexOf(node));
+        if (m_structNodes[name].isEmpty())
+          m_structNodes.remove(name);
+      }
     }
   }
 }
@@ -1131,8 +1154,23 @@ void MemWatchModel::setupContainersRecursive(MemWatchTreeNode* node)
   }
 }
 
+void MemWatchModel::setContainerCount(MemWatchTreeNode* node, size_t count)
+{
+  node->getEntry()->setContainerCount(count);
+  setupArrayNode(node);
+}
+
 void MemWatchModel::setupArrayNode(MemWatchTreeNode* node)
 {
-  addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
-            getIndexFromTreeNode(node), true);
+  if (node->childrenCount() == 0)
+  {
+    addNodes({new MemWatchTreeNode(new MemWatchEntry(m_placeholderEntry))},
+             getIndexFromTreeNode(node), true);
+    return;
+  }
+  else if (node->isExpanded())
+  {
+    collapseArrayNode(node);
+    expandArrayNode(node);
+  }
 }
