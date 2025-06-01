@@ -97,9 +97,12 @@ void DlgAddWatchEntry::initialiseWidgets()
   m_spnContainerCount->setMinimum(1);
   m_spnContainerCount->setMaximum(9999);
 
-  m_btnSetupContainerEntry = new QPushButton("Setup Contents");
+  m_btnSetupContainerEntry = new QPushButton("Setup Contents", this);
   connect(m_btnSetupContainerEntry, &QPushButton::clicked, this,
           &DlgAddWatchEntry::onSetupContainerContents);
+
+  m_lblContainerType = new QLabel(this);
+  m_lblContainerType->setText(noContainerSetText);
 }
 
 void DlgAddWatchEntry::makeLayouts()
@@ -122,6 +125,7 @@ void DlgAddWatchEntry::makeLayouts()
 
   QVBoxLayout* super_layout_type = new QVBoxLayout;
   super_layout_type->addLayout(layout_type);
+  super_layout_type->addWidget(m_lblContainerType);
   super_layout_type->addWidget(m_btnSetupContainerEntry);
 
   QWidget* widget_type = new QWidget;
@@ -179,6 +183,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_structSelect->setCurrentIndex(0);
     m_structSelect->hide();
     m_spnContainerCount->hide();
+    m_lblContainerType->hide();
     m_btnSetupContainerEntry->hide();
   }
   else
@@ -194,6 +199,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
       m_spnLength->show();
       m_structSelect->hide();
       m_spnContainerCount->hide();
+      m_lblContainerType->hide();
       m_btnSetupContainerEntry->hide();
     }
     else if (m_entry->getType() == Common::MemType::type_struct)
@@ -205,11 +211,14 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
       m_structSelect->show();
       m_spnLength->hide();
       m_spnContainerCount->hide();
+      m_lblContainerType->hide();
       m_btnSetupContainerEntry->hide();
     }
     else if (m_entry->getType() == Common::MemType::type_array)
     {
       m_spnContainerCount->show();
+      m_lblContainerType->show();
+      m_lblContainerType->setText(getContainerTypeText(m_entry));
       m_btnSetupContainerEntry->show();
       m_spnLength->hide();
       m_structSelect->hide();
@@ -219,6 +228,7 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
       m_spnLength->hide();
       m_structSelect->hide();
       m_spnContainerCount->hide();
+      m_lblContainerType->hide();
       m_btnSetupContainerEntry->hide();
     }
     m_txbLabel->setText(m_entry->getLabel());
@@ -372,6 +382,7 @@ void DlgAddWatchEntry::onTypeChange(int index)
     m_spnLength->show();
     m_structSelect->hide();
     m_spnContainerCount->hide();
+    m_lblContainerType->hide();
     m_btnSetupContainerEntry->hide();
   }
   else if (theType == Common::MemType::type_struct)
@@ -379,6 +390,7 @@ void DlgAddWatchEntry::onTypeChange(int index)
     m_spnLength->hide();
     m_structSelect->show();
     m_spnContainerCount->hide();
+    m_lblContainerType->hide();
     m_btnSetupContainerEntry->hide();
   }
   else if (theType == Common::MemType::type_array)
@@ -386,6 +398,7 @@ void DlgAddWatchEntry::onTypeChange(int index)
     m_spnLength->hide();
     m_structSelect->hide();
     m_spnContainerCount->show();
+    m_lblContainerType->show();
     m_btnSetupContainerEntry->show();
   }
   else
@@ -393,6 +406,7 @@ void DlgAddWatchEntry::onTypeChange(int index)
     m_spnLength->hide();
     m_structSelect->hide();
     m_spnContainerCount->hide();
+    m_lblContainerType->hide();
     m_btnSetupContainerEntry->hide();
   }
   m_entry->setTypeAndLength(theType, m_spnLength->value());
@@ -422,6 +436,14 @@ void DlgAddWatchEntry::accept()
     QString errorMsg =
         tr("A struct name must be selected with the struct type, it cannot be an empty string");
     QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid Struct Type"),
+                                            errorMsg, QMessageBox::Ok, this);
+    errorBox->exec();
+  }
+  else if (m_entry->getType() == Common::MemType::type_array &&
+           m_entry->getContainerEntry() == nullptr)
+  {
+    QString errorMsg = tr("Must define the array contents");
+    QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid Array Type"),
                                             errorMsg, QMessageBox::Ok, this);
     errorBox->exec();
   }
@@ -590,14 +612,37 @@ void DlgAddWatchEntry::onPointerOffsetContextMenuRequested(const QPoint& pos)
   contextMenu->popup(lbl->mapToGlobal(pos));
 }
 
+QString DlgAddWatchEntry::getContainerTypeText(MemWatchEntry* entry)
+{
+  if (!GUICommon::isContainerType(entry->getType()))
+    return GUICommon::getStringFromType(entry->getType());
+
+  if (entry->getType() == Common::MemType::type_struct)
+  {
+    return "Struct<" + entry->getStructName() + ">";
+  }
+
+  if (entry->getContainerEntry() == nullptr)
+    return noContainerSetText;
+
+  return GUICommon::getStringFromType(entry->getType()) + "<" +
+         getContainerTypeText(entry->getContainerEntry()) + ">";
+}
+
 void DlgAddWatchEntry::onSetupContainerContents()
 {
-  MemWatchEntry* curEntry = new MemWatchEntry(m_entry->getContainerEntry());
-  bool isNewEntry = curEntry == nullptr;
+  bool isNewEntry = true;
+  MemWatchEntry* curEntry = nullptr;
+  if (m_entry->getContainerEntry())
+  {
+    curEntry = new MemWatchEntry(m_entry->getContainerEntry());
+    isNewEntry = false;
+  }
 
   DlgAddWatchEntry dlg(isNewEntry, curEntry, m_structNames, this, true, m_curArrayDepth + 1);
   if (dlg.exec() == QDialog::Accepted)
   {
     m_entry->setContainerEntry(dlg.stealEntry());
+    m_lblContainerType->setText(getContainerTypeText(m_entry));
   }
 }

@@ -44,21 +44,20 @@ MemWatchEntry::MemWatchEntry(MemWatchEntry* entry)
       m_absoluteBranch(entry->m_absoluteBranch), m_boundToPointer(entry->m_boundToPointer),
       m_pointerOffsets(entry->m_pointerOffsets), m_isValidPointer(entry->m_isValidPointer),
       m_length(entry->m_length), m_structName(entry->m_structName),
-      m_curActualAddress(entry->m_curActualAddress), 
-      m_collectionCount(entry->m_collectionCount)
+      m_curActualAddress(entry->m_curActualAddress), m_collectionCount(entry->m_collectionCount)
 {
   m_memory = new char[getSizeForType(entry->getType(), entry->getLength())];
   std::memcpy(m_memory, entry->getMemory(), getSizeForType(entry->getType(), entry->getLength()));
 
   if (entry->getContainerEntry() != nullptr)
-    m_collectionEntry = new MemWatchEntry(entry->m_collectionEntry);
+    m_containerEntry = new MemWatchEntry(entry->m_containerEntry);
 }
 
 MemWatchEntry::~MemWatchEntry()
 {
   delete[] m_memory;
   delete[] m_freezeMemory;
-  delete m_collectionEntry;
+  delete m_containerEntry;
 }
 
 QString MemWatchEntry::getLabel() const
@@ -213,13 +212,13 @@ void MemWatchEntry::setStructName(QString structName)
 
 MemWatchEntry* MemWatchEntry::getContainerEntry() const
 {
-  return m_collectionEntry;
+  return m_containerEntry;
 }
 
 void MemWatchEntry::setContainerEntry(MemWatchEntry* elementEntry)
 {
-  delete m_collectionEntry;
-  m_collectionEntry = elementEntry;
+  delete m_containerEntry;
+  m_containerEntry = elementEntry;
 }
 
 size_t MemWatchEntry::getContainerCount() const

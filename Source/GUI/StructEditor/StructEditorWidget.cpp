@@ -105,6 +105,8 @@ void StructEditorWidget::initialiseWidgets()
           &StructEditorWidget::onLengthChange);
   connect(m_structDetailModel, &StructDetailModel::modifyStructReference, this,
           &StructEditorWidget::onModifyStructReference);
+  connect(m_structDetailModel, &StructDetailModel::getStructLength, this,
+          &StructEditorWidget::getStructLength);
 
   m_structDetailView = new QTableView;
   m_structDetailView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
@@ -638,6 +640,11 @@ void StructEditorWidget::checkStructDetailSave()
       onSaveStruct();
     }
   }
+}
+
+void StructEditorWidget::getStructLength(QString name, int& len)
+{
+  len = getStructMap().find(name).value()->getLength();
 }
 
 QStringList StructEditorWidget::checkForMapCycles(QMap<QString, QStringList> map, QString curName,

@@ -588,6 +588,27 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
         return false;
     }
   }
+  else if (oldEntry != nullptr && oldEntry->getType() == Common::MemType::type_array)
+  {
+    MemWatchEntry* oldContainerEntry = oldEntry->getContainerEntry();
+    while (oldContainerEntry && oldContainerEntry->getType() == Common::MemType::type_array)
+      oldContainerEntry = oldContainerEntry->getContainerEntry();
+
+    if (oldContainerEntry != nullptr && oldEntry->getType() == Common::MemType::type_struct)
+    {
+      if (oldContainerEntry->isBoundToPointer())
+        emit modifyStructPointerReference(m_baseNode->getNameSpace(),
+                                          oldContainerEntry->getStructName(), false);
+      else
+      {
+        bool ok = true;
+        emit modifyStructReference(m_baseNode->getNameSpace(), oldContainerEntry->getStructName(),
+                                   false, ok);
+        if (!ok)
+          return false;
+      }
+    }
+  }
 
   u32 fieldLen = 0;
   if (entry->isBoundToPointer())
@@ -613,6 +634,30 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
         return false;
     }
   }
+  else if (entry->getType() == Common::MemType::type_array)
+  {
+    fieldLen = getTotalContainerLength(entry);
+
+    MemWatchEntry* containerEntry = entry->getContainerEntry();
+    while (containerEntry != nullptr && containerEntry->getType() == Common::MemType::type_array)
+      containerEntry = containerEntry->getContainerEntry();
+
+    if (containerEntry != nullptr && containerEntry->getType() == Common::MemType::type_struct)
+    {
+      if (containerEntry->getStructName() == m_baseNode->getNameSpace())
+      {
+        return false;
+      }
+      else
+      {
+        bool ok = true;
+        emit modifyStructReference(m_baseNode->getNameSpace(), containerEntry->getStructName(),
+                                   true, ok);
+        if (!ok)
+          return false;
+      }
+    }
+  }
   else
     fieldLen = static_cast<u32>(Common::getSizeForType(entry->getType(), entry->getLength()));
 
@@ -629,6 +674,24 @@ bool StructDetailModel::updateFieldEntry(MemWatchEntry* entry, const QModelIndex
   updateFieldOffsets();
 
   return true;
+}
+
+int StructDetailModel::getTotalContainerLength(MemWatchEntry* entry)
+{
+  if (entry->isBoundToPointer())
+    return 4;
+  else if (entry->getType() != Common::MemType::type_array &&
+           entry->getType() != Common::MemType::type_struct)
+    return Common::getSizeForType(entry->getType(), entry->getLength());
+  else if (entry->getType() == Common::MemType::type_array && entry->getContainerEntry() != nullptr)
+    return entry->getContainerCount() * getTotalContainerLength(entry->getContainerEntry());
+  else if (entry->getType() == Common::MemType::type_struct)
+  {
+    int len = 0;
+    emit getStructLength(entry->getStructName(), len);
+    return len;
+  }
+  return 0;
 }
 
 FieldDef* StructDetailModel::getFieldByRow(int row)

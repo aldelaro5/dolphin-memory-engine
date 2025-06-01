@@ -17,12 +17,9 @@ QStringList g_memTypeNames =
                  QCoreApplication::translate("Common", "String"),
                  QCoreApplication::translate("Common", "Array of bytes"),
                  QCoreApplication::translate("Common", "Struct"),
-<<<<<<< HEAD
                  QCoreApplication::translate("Common", "Assembly (PowerPC)"),
-                 QCoreApplication::translate("Common", "8 bytes (Doubleword)")});
-=======
+                 QCoreApplication::translate("Common", "8 bytes (Doubleword)"),
                  QCoreApplication::translate("Common", "Array")});
->>>>>>> c043db8 (Common, GUICommon: Added array type and type string.)
 
 QStringList g_memBaseNames = QStringList({QCoreApplication::translate("Common", "Decimal"),
                                           QCoreApplication::translate("Common", "Hexadecimal"),

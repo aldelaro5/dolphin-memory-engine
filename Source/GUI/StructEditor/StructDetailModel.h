@@ -47,6 +47,7 @@ public:
   void removeLastField();
   void clearFields(QModelIndexList indices);
   bool updateFieldEntry(MemWatchEntry* entry, const QModelIndex& index);
+  int getTotalContainerLength(MemWatchEntry* entry);
   FieldDef* getFieldByRow(int row);
   QModelIndex getLastIndex(int col = 0);
   QModelIndex getIndexAt(int row, int col = 0);
@@ -67,6 +68,7 @@ signals:
   void lengthChanged(u32 newLength);
   void modifyStructReference(QString nodeName, QString target, bool addIt, bool& ok);
   void modifyStructPointerReference(QString nodeName, QString target, bool addIt);
+  void getStructLength(const QString name, int& len);
 
 private:
   QString getFieldDetails(FieldDef* field) const;

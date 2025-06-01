@@ -394,6 +394,30 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
         if (type == Common::MemType::type_struct && !entry->getStructName().isEmpty())
           return entry->getStructName();
         size_t length = entry->getLength();
+        if (type == Common::MemType::type_array && entry->getContainerEntry() != nullptr)
+        {
+          std::stringstream prefix = {};
+          std::stringstream suffix = {};
+          prefix << GUICommon::getStringFromType(type, length).toStdString() + "<";
+          while (entry->getContainerEntry() != nullptr &&
+                 entry->getType() == Common::MemType::type_array)
+          {
+            suffix.seekp(0);
+            suffix << ">[" + std::to_string(entry->getContainerCount()) + "]";
+            entry = entry->getContainerEntry();
+            if (entry->getType() == Common::MemType::type_struct)
+              prefix << entry->getStructName().toStdString();
+            else if (entry->getType() == Common::MemType::type_array)
+            {
+              prefix << entry->getStructName().toStdString() + "<";
+            }
+            else
+              prefix << GUICommon::getStringFromType(entry->getType(), entry->getLength())
+                            .toStdString();
+          }
+          std::string typeOut = prefix.str() + suffix.str();
+          return QString().fromStdString(typeOut);
+        }
         return GUICommon::getStringFromType(type, length);
       }
       case WATCH_COL_ADDRESS:
@@ -414,10 +438,6 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
             return QString("???");
           else
             return QString();
-        }
-        else if (entry->getType() == Common::MemType::type_array)
-        {
-          return QString("%1 entries in array.").arg(entry->getContainerCount());
         }
         break;
       }
@@ -1024,7 +1044,10 @@ void MemWatchModel::expandArrayNode(MemWatchTreeNode* node)
   for (int i = 0; i < node->getEntry()->getContainerCount(); i++)
   {
     MemWatchEntry* childEntry = new MemWatchEntry(node->getEntry()->getContainerEntry());
-    childEntry->setLabel(QString("[%1] ").arg(i) + childEntry->getLabel());
+    QString childLabel = QString("[%1]").arg(i);
+    if (childEntry->getLabel() != "No label")
+      childLabel += childEntry->getLabel();
+    childEntry->setLabel(childLabel);
 
     MemWatchTreeNode* child = new MemWatchTreeNode(childEntry, node);
     childNodes.push_back(child);

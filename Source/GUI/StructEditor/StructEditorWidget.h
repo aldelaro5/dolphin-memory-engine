@@ -81,6 +81,7 @@ private:
   void updateStructReferenceNames(QString old_name, QString new_name);
   void updateStructReferenceFieldSize(StructTreeNode* node);
   void checkStructDetailSave();
+  void getStructLength(QString name, int& len);
 
   void readStructDefTreeFromJson(const QJsonObject& json, QMap<QString, QString>& map);
 
