@@ -129,5 +129,14 @@ If it doesn't work, verify that you do not have the `nosuid` mount flag on your 
 
 On macOS, Dolphin (upon install or after an update) must be signed with specific entitlements to permit memory access. Follow the instructions [above](#macos-code-signing).
 
+## Python Library
+
+This library has no affiliation with the dolphin-memory-engine project.
+[py-dolphin-memory-engine](https://github.com/randovania/py-dolphin-memory-engine).
+
+Use py-dolphin-memory-engine instead of dolphin-memory-engine if creating software or scripts that rely on reading or writing Dolphin memory.
+
+An example project is [This AI can 100% complete Mario Kart Wii. by AI Tango](https://youtu.be/6OofM-Q3dGA)
+
 ## License
 This program is licensed under the MIT license which grants you the permission to do anything you wish to with the software, as long as you preserve all copyright notices. See the file LICENSE for the legal text.
