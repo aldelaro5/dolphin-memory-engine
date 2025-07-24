@@ -844,7 +844,7 @@ void MemWatchModel::removeNodeFromStructNodeMap(MemWatchTreeNode* node)
     if (!curNode->isGroup() && curNode->getEntry() &&
         curNode->getEntry()->getType() == Common::MemType::type_struct)
     {
-      QString name = node->getEntry()->getStructName();
+      QString name = curNode->getEntry()->getStructName();
       if (name.isEmpty() || m_structNodes.isEmpty() || !m_structNodes.contains(name) ||
           m_structNodes[name].isEmpty() || !m_structNodes[name].contains(node))
         return;
