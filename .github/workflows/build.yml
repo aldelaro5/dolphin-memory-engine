@@ -91,12 +91,19 @@ jobs:
           cmake --build Source/build --parallel
         shell: bash
 
-      - name: Copy LICENSE, README, Prepare Artifacts
+      - name: Get Short SHA
+        id: get-short-sha
+        run: echo "short_sha=$(echo ${{ github.sha }} | cut -c 1-7)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Prepare Linux Binary
         run: |
-          mkdir Source/build/artifacts
-          cp ./README.md ./Source/build/artifacts/
-          cp ./LICENSE ./Source/build/artifacts/
-          cp ./Source/build/dolphin-memory-engine ./Source/build/artifacts/
+          mkdir -p Source/build/linux_release_files
+          cp ./README.md ./Source/build/linux_release_files/
+          cp ./LICENSE ./Source/build/linux_release_files/
+          cp ./Source/build/dolphin-memory-engine ./Source/build/linux_release_files/dolphin-memory-engine
+          chmod +x ./Source/build/linux_release_files/dolphin-memory-engine
+          tar -czvf dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-x86_64-binary.tar.gz -C Source/build/linux_release_files .
         shell: bash
 
       - name: Package AppImage
@@ -104,21 +111,16 @@ jobs:
           .github/assets/appimage.sh
         shell: bash
 
-      - name: Get Short SHA
-        id: get-short-sha
-        run: echo "short_sha=$(echo ${{ github.sha }} | cut -c 1-7)" >> $GITHUB_OUTPUT
-        shell: bash
-
       - name: Publish Artifacts (Binary)
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-ubuntu-22.04-binary
-          path: Source/build/artifacts
+          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-x86_64-binary
+          path: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-x86_64-binary.tar.gz
 
       - name: Publish Artifacts (AppImage)
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-ubuntu-22.04-appimage
+          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-x86_64-appimage
           path: dolphin-memory-engine.AppImage
 
   build-macos-intel:
