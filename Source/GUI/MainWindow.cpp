@@ -239,7 +239,7 @@ void MainWindow::makeLayouts()
   statusLayout->addWidget(m_statusLabel);
 
   QStatusBar* const statusBar{new QStatusBar};
-  statusBar->addWidget(statusWidget);
+  statusBar->addWidget(statusWidget, 1);
 
   setCentralWidget(m_splitter);
   setStatusBar(statusBar);
