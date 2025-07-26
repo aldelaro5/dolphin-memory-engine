@@ -230,13 +230,14 @@ void MainWindow::makeLayouts()
 
   m_statusIcon = new QLabel;
   m_statusLabel = new QLabel;
+  m_statusLabel->setMinimumWidth(0);
 
   QWidget* statusWidget{new QWidget};
   QHBoxLayout* statusLayout{new QHBoxLayout(statusWidget)};
   statusLayout->setContentsMargins(0, 0, 0, 0);
   statusLayout->setContentsMargins(statusLayout->spacing(), 0, 0, 0);
   statusLayout->addWidget(m_statusIcon);
-  statusLayout->addWidget(m_statusLabel);
+  statusLayout->addWidget(m_statusLabel, 1);
 
   QStatusBar* const statusBar{new QStatusBar};
   statusBar->addWidget(statusWidget, 1);
