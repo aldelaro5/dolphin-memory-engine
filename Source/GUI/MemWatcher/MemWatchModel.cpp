@@ -1019,7 +1019,7 @@ void MemWatchModel::updateStructAddresses(MemWatchTreeNode* node)
       QVector<FieldDef*> fields = def->getFields();
       QVector<MemWatchTreeNode*> children = node->getChildren();
 
-      for (int i = 0; i < def->getFields().count(); ++i)
+      for (int i = 0; i < children.count(); ++i)
       {
         children[i]->getEntry()->setConsoleAddress(addr + fields[i]->getOffset());
         if (GUICommon::isContainerType(children[i]->getEntry()->getType()))
