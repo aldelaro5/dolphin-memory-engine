@@ -566,7 +566,10 @@ void StructEditorWidget::updateStructReferenceNames(QString old_name, QString ne
   {
     for (QString target : m_structReferences[old_name])
     {
-      m_structRootNode->findNode(target)->getStructDef()->updateStructTypeLabel(old_name, new_name);
+      const StructTreeNode* const targetNode = m_structRootNode->findNode(target);
+      if (targetNode)
+        targetNode->getStructDef()->updateStructTypeLabel(old_name, new_name);
+
       if (m_nodeInDetailEditor != nullptr)
         m_structDetailModel->updateStructTypeLabel(old_name, new_name);
     }
@@ -583,8 +586,12 @@ void StructEditorWidget::updateStructReferenceNames(QString old_name, QString ne
     for (QString target : m_structPointerReferences[old_name])
     {
       if (target != old_name)
-        m_structRootNode->findNode(target)->getStructDef()->updateStructTypeLabel(old_name,
-                                                                                  new_name);
+      {
+        const StructTreeNode* const targetNode = m_structRootNode->findNode(target);
+        if (targetNode)
+          targetNode->getStructDef()->updateStructTypeLabel(old_name, new_name);
+      }
+
       if (m_nodeInDetailEditor != nullptr)
         m_structDetailModel->updateStructTypeLabel(old_name, new_name);
     }
@@ -608,9 +615,12 @@ void StructEditorWidget::updateStructReferenceFieldSize(StructTreeNode* node)
 
   for (QString target : m_structReferences[keyNameSpace])
   {
-    m_structRootNode->findNode(target)->getStructDef()->updateStructFieldSize(keyNameSpace,
-                                                                              structLength);
-    emit updateStructDetails(target);
+    const StructTreeNode* const targetNode = m_structRootNode->findNode(target);
+    if (targetNode)
+    {
+      targetNode->getStructDef()->updateStructFieldSize(keyNameSpace, structLength);
+      emit updateStructDetails(target);
+    }
   }
 }
 
