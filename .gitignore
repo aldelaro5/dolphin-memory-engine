@@ -15,6 +15,7 @@ Source/*.obj
 Source/*.tlog
 Source/*.VC.opendb
 Source/*.VC.db
+Source/.cache/
 Source/.vs/
 Source/.vscode/
 .vscode/
