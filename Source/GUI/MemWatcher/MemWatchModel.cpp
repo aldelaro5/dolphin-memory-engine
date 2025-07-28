@@ -384,6 +384,8 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
       case WATCH_COL_TYPE:
       {
         Common::MemType type = entry->getType();
+        if (type == Common::MemType::type_struct && !entry->getStructName().isEmpty())
+          return entry->getStructName();
         size_t length = entry->getLength();
         return GUICommon::getStringFromType(type, length);
       }
@@ -404,7 +406,7 @@ QVariant MemWatchModel::data(const QModelIndex& index, int role) const
           else if (!DolphinComm::DolphinAccessor::isValidConsoleAddress(entry->getActualAddress()))
             return QString("???");
           else
-            return QString("%1 definition loaded").arg(entry->getStructName());
+            return QString();
         }
         break;
       }
