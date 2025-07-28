@@ -529,7 +529,10 @@ Qt::ItemFlags MemWatchModel::flags(const QModelIndex& index) const
 
   if (index.column() == WATCH_COL_LABEL)
   {
-    flags |= Qt::ItemIsEditable;
+    const bool parentContainer{parent->getEntry() != nullptr &&
+                               GUICommon::isContainerType(parent->getEntry()->getType())};
+    const Qt::ItemFlag itemIsEditable{!parentContainer ? Qt::ItemIsEditable : Qt::NoItemFlags};
+    flags |= itemIsEditable;
   }
   else if (index.column() == WATCH_COL_VALUE)
   {
