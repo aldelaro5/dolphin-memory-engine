@@ -732,7 +732,10 @@ void MainWindow::updateStatusBar()
 
   if (!m_watcher->m_watchListFile.isEmpty())
   {
-    tags << m_watcher->m_watchListFile;
+    if (m_watcher->m_watchListFile.size() > 50)
+      tags << "..." + m_watcher->m_watchListFile.right(47);
+    else
+      tags << m_watcher->m_watchListFile;
   }
 
   const QSize actualIconSize{icon.actualSize(QSize(100, 100))};
