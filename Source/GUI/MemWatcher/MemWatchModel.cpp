@@ -905,7 +905,7 @@ void MemWatchModel::updateStructEntries(const QString structName)
 
 void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
 {
-  if (!m_structDefMap.contains(node->getEntry()->getStructName()) &&
+  if (!m_structDefMap.contains(node->getEntry()->getStructName()) ||
       !m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
   {
     while (node->hasChildren())
