@@ -20,6 +20,8 @@ public:
   LengthValidator(QObject* parent) : QValidator(parent) {}
   QValidator::State validate(QString& input, int& pos) const override
   {
+    constexpr int MAX_SIZE = 0x5000;
+
     (void)pos;
     if (input.isEmpty())
       return Intermediate;
@@ -30,7 +32,7 @@ public:
     if (!ok)
       return Invalid;
 
-    if (value > fmax(Common::GetMEM1Size(), Common::GetMEM2Size()))
+    if (value > MAX_SIZE)
       return Invalid;
 
     return Acceptable;
