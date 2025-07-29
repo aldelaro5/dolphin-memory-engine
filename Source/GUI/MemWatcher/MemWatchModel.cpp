@@ -1012,25 +1012,22 @@ void MemWatchModel::updateStructAddresses(MemWatchTreeNode* node)
 
   StructDef* def = m_structDefMap[node->getEntry()->getStructName()];
 
-  if (def->getFields().count() != node->getChildren().count())
+  if (node->isExpanded())
+    updateStructNode(node);
+  else if (!node->getEntry()->hasAddressChanged())
+    return;
+  else
   {
-    if (node->isExpanded())
-      updateStructNode(node);
-    else if (!node->getEntry()->hasAddressChanged())
-      return;
-    else
-    {
-      u32 addr = node->getEntry()->getActualAddress();
-      node->getEntry()->updateActualAddress(addr);
-      QVector<FieldDef*> fields = def->getFields();
-      QVector<MemWatchTreeNode*> children = node->getChildren();
+    u32 addr = node->getEntry()->getActualAddress();
+    node->getEntry()->updateActualAddress(addr);
+    QVector<FieldDef*> fields = def->getFields();
+    QVector<MemWatchTreeNode*> children = node->getChildren();
 
-      for (int i = 0; i < children.count(); ++i)
-      {
-        children[i]->getEntry()->setConsoleAddress(addr + fields[i]->getOffset());
-        if (GUICommon::isContainerType(children[i]->getEntry()->getType()))
-          updateContainerAddresses(children[i]);
-      }
+    for (int i = 0; i < children.count(); ++i)
+    {
+      children[i]->getEntry()->setConsoleAddress(addr + fields[i]->getOffset());
+      if (GUICommon::isContainerType(children[i]->getEntry()->getType()))
+        updateContainerAddresses(children[i]);
     }
   }
 }
