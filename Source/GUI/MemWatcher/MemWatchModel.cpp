@@ -910,8 +910,9 @@ void MemWatchModel::updateStructEntries(const QString structName)
 
 void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
 {
-  if (!m_structDefMap.contains(node->getEntry()->getStructName()) ||
-      !m_structDefMap[node->getEntry()->getStructName()]->getFields().isEmpty())
+  const QString structName = node->getEntry()->getStructName();
+
+  if (!m_structDefMap.contains(structName) || m_structDefMap[structName]->getFields().isEmpty())
   {
     while (node->hasChildren())
       deleteNode(getIndexFromTreeNode(node->getChildren()[0]));
@@ -934,7 +935,7 @@ void MemWatchModel::updateStructNode(MemWatchTreeNode* node)
 
   if (isExpanded)
   {
-    if (m_structDefMap.contains(node->getEntry()->getStructName()))
+    if (m_structDefMap.contains(structName))
       expandStructNode(node);
   }
 }
