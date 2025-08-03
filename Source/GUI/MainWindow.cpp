@@ -378,6 +378,7 @@ void MainWindow::onUnhook()
   m_viewer->hookStatusChanged(false);
   DolphinComm::DolphinAccessor::unHook();
   updateDolphinHookingStatus();
+  m_watcher->update();
 }
 
 void MainWindow::onAutoLoadLastFileTriggered(const bool checked)
