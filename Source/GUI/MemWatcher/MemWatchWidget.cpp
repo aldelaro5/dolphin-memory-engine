@@ -805,7 +805,7 @@ void MemWatchWidget::openWatchFile(const QString& fileName)
   {
     bool structsOnly = false;
     bool clearStructTree = false;
-    if (m_watchModel->hasAnyNodes())
+    if (m_watchModel->hasAnyNodes() || m_structDefs->hasChildren())
     {
       QMessageBox* questionBox = new QMessageBox(
           QMessageBox::Question, "Asking to merge lists",
