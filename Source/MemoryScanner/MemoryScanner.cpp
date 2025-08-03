@@ -500,8 +500,8 @@ int MemScanner::getTermsNumForFilter(const MemScanner::ScanFilter filter)
   if (filter == MemScanner::ScanFilter::between)
     return 2;
   if (filter == MemScanner::ScanFilter::exact || filter == MemScanner::ScanFilter::increasedBy ||
-      filter == MemScanner::ScanFilter::decreasedBy || filter == MemScanner::ScanFilter::biggerThan ||
-      filter == MemScanner::ScanFilter::smallerThan)
+      filter == MemScanner::ScanFilter::decreasedBy ||
+      filter == MemScanner::ScanFilter::biggerThan || filter == MemScanner::ScanFilter::smallerThan)
     return 1;
   return 0;
 }
