@@ -913,17 +913,21 @@ bool MemWatchWidget::saveAsWatchFile()
 
 void MemWatchWidget::clearWatchList()
 {
-  m_watchListFile.clear();
-  if (!m_watchModel->hasAnyNodes())
+  if (!m_watchModel->hasAnyNodes() && !m_structDefs->hasChildren())
+  {
+    m_watchListFile.clear();
     return;
+  }
 
-  const QString msg{tr("Are you sure you want to delete these watches and/or groups?")};
-  QMessageBox box(QMessageBox::Question, tr("Clear watch list confirmation"), msg,
+  const QString msg{tr("Are you sure you want to delete all watches and structs?")};
+  QMessageBox box(QMessageBox::Question, tr("Clear confirmation"), msg,
                   QMessageBox::Yes | QMessageBox::Cancel, this);
   box.setDefaultButton(QMessageBox::Yes);
   if (box.exec() != QMessageBox::Yes)
     return;
 
+  m_watchListFile.clear();
+  m_structDefs->removeChildren();
   m_watchModel->clearRoot();
 }
 
