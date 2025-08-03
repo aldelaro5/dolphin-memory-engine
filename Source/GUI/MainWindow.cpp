@@ -59,8 +59,8 @@ MainWindow::MainWindow()
 
   if (m_actAutoloadLastFile->isChecked() && !SConfig::getInstance().getLastLoadedFile().isEmpty())
   {
-    m_watcher->openWatchFile(SConfig::getInstance().getLastLoadedFile());
     m_watcher->setStructDefs(m_structEditor->getStructDefs(), m_structEditor->getStructMap());
+    m_watcher->openWatchFile(SConfig::getInstance().getLastLoadedFile());
   }
   else
   {

@@ -84,7 +84,7 @@ int StructTreeNode::getRow() const
 
 bool StructTreeNode::hasChildren() const
 {
-  return m_children.count() > 0;
+  return !m_children.isEmpty();
 }
 
 int StructTreeNode::childrenCount() const
