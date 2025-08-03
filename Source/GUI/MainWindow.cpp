@@ -93,7 +93,7 @@ void MainWindow::makeMenus()
   m_actOpenWatchList = new QAction(tr("&Open..."), this);
   m_actSaveWatchList = new QAction(tr("&Save"), this);
   m_actSaveAsWatchList = new QAction(tr("&Save as..."), this);
-  m_actClearWatchList = new QAction(tr("&Clear the watch list"), this);
+  m_actClearWatchList = new QAction(tr("&Clear watchlist and structs"), this);
   m_actImportFromCT = new QAction(tr("&Import from Cheat Engine's CT file..."), this);
   m_actExportAsCSV = new QAction(tr("&Export as CSV..."), this);
   m_actAutoloadLastFile = new QAction(tr("Auto-load last file"), this);
