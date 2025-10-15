@@ -122,9 +122,10 @@ bool LinuxDolphinProcess::findPID()
     aCmdLineFile.open("/proc/" + std::string(name) + "/comm");
     getline(aCmdLineFile, line);
 
-    const bool match{s_dolphinProcessName ? line == s_dolphinProcessName :
-                                            (line == "dolphin-emu" || line == "dolphin-emu-qt2" ||
-                                             line == "dolphin-emu-wx")};
+    const bool match{s_dolphinProcessName ?
+                         line == s_dolphinProcessName :
+                         (line == "dolphin-emu" || line == "dolphin-emu-qt2" ||
+                          line == "dolphin-emu-wx" || line == ".dolphin-emu-wr")};
     if (match)
       m_PID = aPID;
 
