@@ -119,15 +119,26 @@ Options:
 
 ## Troubleshooting
 
-On Linux, the program may require additional kernel permissions to be able to read and write memory to external processes (which is required to read and write the memory of Dolphin). If nothing happens to Dolphin, but the program frequently unhooks itself, the program is missing the required permissions. Grant these permissions by running the following command as root:
 
-	setcap cap_sys_ptrace=eip dolphin-memory-engine
+### Linux
 
-Where `dolphin-memory-engine` is the path of the Dolphin Memory Engine executable. This sets the permission for future executions.
+1. This program requires additional kernel permissions to be able to read and write memory to external processes (which is required to read and write the memory of Dolphin). If the program frequently unhooks itself, the program is missing the required permissions. Grant these permissions by running the following command as root:
 
-If it doesn't work, verify that you do not have the `nosuid` mount flag on your `/etc/fstab` as it can cause this command to silently fail.
+`setcap cap_sys_ptrace=eip dolphin-memory-engine`
 
-On macOS, Dolphin (upon install or after an update) must be signed with specific entitlements to permit memory access. Follow the instructions [above](#macos-code-signing).
+where `dolphin-memory-engine` is the path of the Dolphin Memory Engine executable. This sets the permission for future executions. If it doesn't work, verify that you do not have the `nosuid` mount flag on your `/etc/fstab` as it can cause this command to silently fail.
+
+2. Some setups may require running as root, ex:
+
+`sudo -E ./dolphin-memory-engine-linux-x86_64.AppImage`
+
+3. If you're on wayland, you may also need to allow root to access xwayland
+
+`xhost si:localuser:root`
+
+### MacOS
+
+Dolphin (upon install or after an update) must be signed with specific entitlements to permit memory access. Follow the instructions [above](#macos-code-signing).
 
 ## Python Library
 
