@@ -26,7 +26,7 @@ int main(int argc, char** argv)
       QStringList() << "d" << "dolphin-process-name",
       QObject::tr("Specify custom name for the Dolphin Emulator process. By default, "
                   "platform-specific names are used (e.g. \"Dolphin.exe\" on Windows, or "
-                  "\"dolphin-emu\" on Linux or macOS)."),
+                  "\"dolphin-emu\" on Linux or macOS). Check Task Manager or btop if in doubt."),
       "dolphin_process_name");
   parser.addOption(dolphinProcessNameOption);
 

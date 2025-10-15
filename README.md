@@ -115,6 +115,8 @@ Options:
                                                      used (e.g. "Dolphin.exe" on
                                                      Windows, or "dolphin-emu"
                                                      on Linux or macOS).
+                                                     Check Task Manager
+                                                     or btop if in doubt.
 ```
 
 ## Troubleshooting
@@ -122,9 +124,9 @@ Options:
 
 ### Linux
 
-1. This program requires additional kernel permissions to be able to read and write memory to external processes (which is required to read and write the memory of Dolphin). If the program frequently unhooks itself, the program is missing the required permissions. Grant these permissions by running the following command as root:
+1. This program requires additional kernel permissions to be able to read and write memory to external processes (which is required to read and write the memory of Dolphin). If the program frequently unhooks itself, the program is missing the required permissions. Grant these permissions with:
 
-`setcap cap_sys_ptrace=eip dolphin-memory-engine`
+`sudo setcap cap_sys_ptrace=eip dolphin-memory-engine`
 
 where `dolphin-memory-engine` is the path of the Dolphin Memory Engine executable. This sets the permission for future executions. If it doesn't work, verify that you do not have the `nosuid` mount flag on your `/etc/fstab` as it can cause this command to silently fail.
 
@@ -132,7 +134,7 @@ where `dolphin-memory-engine` is the path of the Dolphin Memory Engine executabl
 
 `sudo -E ./dolphin-memory-engine-linux-x86_64.AppImage`
 
-3. If you're on wayland, you may also need to allow root to access xwayland
+If you're on wayland, you may also need to allow root to access xwayland
 
 `xhost si:localuser:root`
 
