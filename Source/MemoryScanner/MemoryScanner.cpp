@@ -414,6 +414,8 @@ MemScanner::compareMemoryAsNumbers(const char* first, const char* second, const 
     return compareMemoryAsNumbersWithType<float>(first, second, offset, offsetInvert, bswapSecond);
   case Common::MemType::type_double:
     return compareMemoryAsNumbersWithType<double>(first, second, offset, offsetInvert, bswapSecond);
+  case Common::MemType::type_ppc:
+    return compareMemoryAsNumbersWithType<u32>(first, second, offset, offsetInvert, bswapSecond);
   default:
     return MemScanner::CompareResult::nan;
   }
