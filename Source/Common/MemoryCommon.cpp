@@ -10,6 +10,8 @@
 #include "../Common/CommonTypes.h"
 #include "../Common/CommonUtils.h"
 #include "../GUI/Settings/SConfig.h"
+#include "../Common/PPC/PowerPCDisassembler.h"
+#include "../Common/PPC/PowerPCAssembler.h"
 
 namespace Common
 {
@@ -75,6 +77,8 @@ size_t getSizeForType(const MemType type, const size_t length)
     return length;
   case MemType::type_struct:
     return length;
+  case MemType::type_ppc:
+    return sizeof(u32);
   default:
     return 0;
   }
@@ -100,6 +104,8 @@ bool shouldBeBSwappedForType(const MemType type)
     return false;
   case MemType::type_struct:
     return false;
+  case MemType::type_ppc:
+    return true;
   default:
     return false;
   }
@@ -125,6 +131,8 @@ int getNbrBytesAlignmentForType(const MemType type)
     return 1;
   case MemType::type_struct:
     return 1;
+  case MemType::type_ppc:
+    return 4;
   default:
     return 1;
   }
@@ -463,6 +471,13 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     actualLength = bytes.size();
     break;
   }
+  case Common::MemType::type_ppc:
+  {
+    u32 result = Common::PowerPCAssembler::PPCAssemble(inputString.data());
+    memcpy(buffer, &result, size);
+    actualLength = size;
+    break;
+  }
 
   default:
   {
@@ -697,6 +712,20 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
     // Remove the space at the end
     str.pop_back();
     return str;
+  }
+  case Common::MemType::type_ppc:
+  {
+    u32 binary = 0;
+    for (size_t i{0}; i < 4; ++i)
+    {
+      if (!withBSwap)
+        binary |= (static_cast<u8>(memory[i])) << (i*8);
+      else
+        binary |= (static_cast<u8>(memory[i])) << ((3 - i)*8);
+    }
+    // returns binary at address 0 (big endian mode).
+    // So a branch to 0x100 would be shown as "b ->0x100"
+    return Common::PowerPCDisassembler::Disassemble(binary, 0x00000000, true);
   }
   default:
     return "";
