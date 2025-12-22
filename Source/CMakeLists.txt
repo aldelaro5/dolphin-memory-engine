@@ -28,6 +28,10 @@ configure_file(
 )
 
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
+add_subdirectory(
+    ${PROJECT_SOURCE_DIR}/../Externals/fmt
+    ${PROJECT_BINARY_DIR}/../Externals/fmt
+)
 
 
 if(WIN32)
@@ -42,15 +46,6 @@ endif(UNIX AND NOT APPLE)
 if(APPLE)
    set(DolphinProcessSrc DolphinProcess/Mac/MacDolphinProcess.cpp)
 endif(APPLE)
-
-# Add fmt for disassembler
-include(FetchContent)
-FetchContent_Declare(
-    fmt
-    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG        12.1.0
-)
-FetchContent_MakeAvailable(fmt)
 
 set(SRCS ${DolphinProcessSrc}
          DolphinProcess/DolphinAccessor.cpp
