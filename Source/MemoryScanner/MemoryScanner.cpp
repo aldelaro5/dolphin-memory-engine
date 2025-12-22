@@ -136,7 +136,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
   if (m_memType == Common::MemType::type_ppc)
   {
     MemoryBackToString = Common::formatMemoryToString(
-        memoryToCompare1, m_memType, Common::getSizeForType(Common::MemType::type_ppc, NULL),
+        memoryToCompare1, m_memType, Common::getSizeForType(Common::MemType::type_ppc, m_memSize),
         m_memBase, !m_memIsSigned, false);
   }
 
@@ -172,7 +172,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
         isResult =
             MemoryBackToString ==
             Common::formatMemoryToString(
-                memoryCandidate, m_memType, Common::getSizeForType(Common::MemType::type_ppc, NULL),
+                memoryCandidate, m_memType, Common::getSizeForType(Common::MemType::type_ppc, m_memSize),
                 m_memBase, !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
       }
       else
@@ -353,7 +353,7 @@ inline bool MemScanner::isHitNextScan(const MemScanner::ScanFilter filter,
   if (m_memType == Common::MemType::type_ppc)
   {
     MemoryBackToString = Common::formatMemoryToString(
-        memoryToCompare1, m_memType, Common::getSizeForType(Common::MemType::type_ppc, NULL),
+        memoryToCompare1, m_memType, Common::getSizeForType(Common::MemType::type_ppc, m_memSize),
         m_memBase, !m_memIsSigned, false);
   }
 
@@ -372,7 +372,7 @@ inline bool MemScanner::isHitNextScan(const MemScanner::ScanFilter filter,
       // opcode is 0 or 1 as no instruction can have these opcodes
       return MemoryBackToString ==
              Common::formatMemoryToString(
-                 newerMemory, m_memType, Common::getSizeForType(Common::MemType::type_ppc, NULL),
+                 newerMemory, m_memType, Common::getSizeForType(Common::MemType::type_ppc, m_memSize),
                  m_memBase, !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
     }
 
