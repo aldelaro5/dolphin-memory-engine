@@ -6,3 +6,6 @@
 	url = https://github.com/dreamsyntax/dme-ext-win-qt.git
 	branch = master
 	shallow = true
+[submodule "Externals/fmt"]
+	path = Externals/fmt
+	url = https://github.com/fmtlib/fmt.git
