@@ -10,7 +10,7 @@ namespace Common
 class PowerPCAssembler final
 {
 public:
-  static u32 PPCAssemble(const std::string &instruction);
+  static u32 PPCAssemble(const std::string& instruction);
 
 private:
   PowerPCAssembler() = delete;
@@ -19,7 +19,8 @@ private:
   static u32 StringAliasToNumber(const std::string& token);
   static u32 StringToNumber(const std::string& token, bool consider_alias = true);
 
-  // MIStruct - Make Instruction Struct. Contains a value and size in bits for how much of the instruction it takes up.
+  // MIStruct - Make Instruction Struct. Contains a value and size in bits for how much of the
+  // instruction it takes up.
   struct MIStruct
   {
     u32 value;
@@ -37,22 +38,30 @@ private:
   static u32 BIAmt(const std::string& mnemonic);
   static u32 TOAmt(const std::string& mnemonic);
 
-  static u32 InstructionA(const std::vector<std::string>& t, const std::vector<u32>& n, const u32 rc);
+  static u32 InstructionA(const std::vector<std::string>& t, const std::vector<u32>& n,
+                          const u32 rc);
   static u32 InstructionB(const std::vector<std::string>& t, std::vector<u32>& n, u32 end_in_plus);
   static u32 InstructionC(const std::vector<std::string>& t, std::vector<u32>& n, const u32 rc);
-  static u32 InstructionD(const std::vector<std::string>& t, const std::vector<u32>& n, const u32 rc);
-  static u32 InstructionE(const std::vector<std::string>& t, const std::vector<u32>& n, const u32 rc);
+  static u32 InstructionD(const std::vector<std::string>& t, const std::vector<u32>& n,
+                          const u32 rc);
+  static u32 InstructionE(const std::vector<std::string>& t, const std::vector<u32>& n,
+                          const u32 rc);
   static u32 InstructionF(const std::vector<std::string>& t, std::vector<u32>& n, const u32 rc);
   static u32 InstructionI(const std::vector<std::string>& t, const std::vector<u32>& n);
   static u32 InstructionL(const std::vector<std::string>& t, const std::vector<u32>& n);
   static u32 InstructionM(const std::vector<std::string>& t, std::vector<u32>& n, const u32 rc);
-  static u32 InstructionN(const std::vector<std::string>& t, const std::vector<u32>& n, const u32 rc);
-  static u32 InstructionO(const std::vector<std::string>& t, const std::vector<u32>& n, const u32 rc);
+  static u32 InstructionN(const std::vector<std::string>& t, const std::vector<u32>& n,
+                          const u32 rc);
+  static u32 InstructionO(const std::vector<std::string>& t, const std::vector<u32>& n,
+                          const u32 rc);
   static u32 InstructionP(const std::vector<std::string>& t, std::vector<u32>& n, const u32 rc);
-  static u32 InstructionR(const std::vector<std::string>& t, const std::vector<u32>& n, const u32 rc);
-  static u32 InstructionS(const std::vector<std::string>& t, const std::vector<u32>& n, const u32 rc);
+  static u32 InstructionR(const std::vector<std::string>& t, const std::vector<u32>& n,
+                          const u32 rc);
+  static u32 InstructionS(const std::vector<std::string>& t, const std::vector<u32>& n,
+                          const u32 rc);
   static u32 InstructionT(const std::vector<std::string>& t, const std::vector<u32>& n);
-  static u32 InstructionX(const std::vector<std::string>& t, const std::vector<u32>& n, const u32 rc);
+  static u32 InstructionX(const std::vector<std::string>& t, const std::vector<u32>& n,
+                          const u32 rc);
   static u32 InstructionPeriod(const std::vector<std::string>& t);
 };
-} // namespace Common
+}  // namespace Common

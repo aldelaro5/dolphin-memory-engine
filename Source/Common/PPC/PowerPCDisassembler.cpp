@@ -29,13 +29,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
- // Modified for use with Dolphin
- // Modified further for use in Dolphin Memory Engine
+// Modified for use with Dolphin
+// Modified further for use in Dolphin Memory Engine
 
 #include "PowerPCDisassembler.h"
 #include <array>
-#include <string>
 #include <fmt/format.h>
+#include <string>
 #include "../../Common/CommonTypes.h"
 
 namespace Common
@@ -756,7 +756,7 @@ void PowerPCDisassembler::trap(u32 in, unsigned char dmode)
 
 // Standard instruction: xxxx rD,rA,rB
 void PowerPCDisassembler::dab(u32 in, std::string_view name, int mask, int smode, int chkoe,
-                            int chkrc)
+                              int chkrc)
 {
   if (chkrc >= 0 && ((in & 1) != (unsigned int)chkrc))
   {
@@ -2267,7 +2267,7 @@ u32* PowerPCDisassembler::DoDisassembly(bool big_endian)
 
 // simplified interface
 std::string PowerPCDisassembler::Disassemble(u32 opcode, u32 current_instruction_address,
-                                           bool big_endian)
+                                             bool big_endian)
 {
   u32 opc = opcode;
   u32 addr = current_instruction_address;

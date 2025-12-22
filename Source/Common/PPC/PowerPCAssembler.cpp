@@ -535,8 +535,8 @@ u32 PowerPCAssembler::TOAmt(const std::string& mnemonic)
 }
 
 // Handles all instructions starting with the letter "a"
-u32 PowerPCAssembler::InstructionA(const std::vector<std::string>& t,
-                                   const std::vector<u32>& n, const u32 rc)
+u32 PowerPCAssembler::InstructionA(const std::vector<std::string>& t, const std::vector<u32>& n,
+                                   const u32 rc)
 {
   switch (HsRn(t[0]))
   {
@@ -584,19 +584,14 @@ u32 PowerPCAssembler::InstructionB(const std::vector<std::string>& t, std::vecto
   case HsCp("bca"):
   case HsCp("bcl"):
   case HsCp("bcla"):
-    return MI(
-        {{16, 6}, {n[1], 5}, {n[2], 5}, {n[3] >> 2, 14}, {EndA(t[0]), 1}, {EndL(t[0]), 1}});
+    return MI({{16, 6}, {n[1], 5}, {n[2], 5}, {n[3] >> 2, 14}, {EndA(t[0]), 1}, {EndL(t[0]), 1}});
   case HsCp("bdnzf"):
   case HsCp("bdnzfl"):
   case HsCp("bdnzfa"):
   case HsCp("bdnzfla"):
     end_in_plus = end_in_plus ^ (n[2] > 0x8000);
-    return MI({{16, 6},
-               {end_in_plus, 5},
-               {n[1], 5},
-               {n[2] >> 2, 14},
-               {EndA(t[0]), 1},
-               {EndL(t[0]), 1}});
+    return MI(
+        {{16, 6}, {end_in_plus, 5}, {n[1], 5}, {n[2] >> 2, 14}, {EndA(t[0]), 1}, {EndL(t[0]), 1}});
   case HsCp("bdzf"):
   case HsCp("bdzfl"):
   case HsCp("bdzfa"):
@@ -701,8 +696,7 @@ u32 PowerPCAssembler::InstructionB(const std::vector<std::string>& t, std::vecto
   case HsCp("bdnzfctrl"):
     return MI({{19, 6}, {end_in_plus, 5}, {n[1], 5}, {0, 5}, {528, 10}, {EndL(t[0]), 1}});
   case HsCp("bcctrl"):
-    return MI(
-        {{19, 6}, {n[1] + end_in_plus, 5}, {n[2], 5}, {0, 5}, {528, 10}, {EndL(t[0]), 1}});
+    return MI({{19, 6}, {n[1] + end_in_plus, 5}, {n[2], 5}, {0, 5}, {528, 10}, {EndL(t[0]), 1}});
 
   case HsCp("bnsectr"):
   case HsCp("bnsectrl"):
@@ -899,8 +893,7 @@ u32 PowerPCAssembler::InstructionC(const std::vector<std::string>& t, std::vecto
       n[2] = n[1];
       n[1] = 0;
     }
-    return MI(
-        {{31, 6}, {n[1], 3}, {0, 1}, {EndD(t[0]), 1}, {n[2], 5}, {n[3], 5}, {0, 10}, {0, 1}});
+    return MI({{31, 6}, {n[1], 3}, {0, 1}, {EndD(t[0]), 1}, {n[2], 5}, {n[3], 5}, {0, 10}, {0, 1}});
   case HsCp("cmpl"):
     if (t[4] == "")
     {
@@ -931,8 +924,8 @@ u32 PowerPCAssembler::InstructionC(const std::vector<std::string>& t, std::vecto
   }
 }
 // Handles all instructions starting with the letter "d"
-u32 PowerPCAssembler::InstructionD(const std::vector<std::string>& t,
-                                   const std::vector<u32>& n, const u32 rc)
+u32 PowerPCAssembler::InstructionD(const std::vector<std::string>& t, const std::vector<u32>& n,
+                                   const u32 rc)
 {
   switch (HsRn(t[0]))
   {
@@ -967,8 +960,8 @@ u32 PowerPCAssembler::InstructionD(const std::vector<std::string>& t,
   }
 }
 // Handles all instructions starting with the letter "e"
-u32 PowerPCAssembler::InstructionE(const std::vector<std::string>& t,
-                                   const std::vector<u32>& n, const u32 rc)
+u32 PowerPCAssembler::InstructionE(const std::vector<std::string>& t, const std::vector<u32>& n,
+                                   const u32 rc)
 {
   switch (HsRn(t[0]))
   {
@@ -1082,8 +1075,7 @@ u32 PowerPCAssembler::InstructionF(const std::vector<std::string>& t, std::vecto
   }
 }
 // Handles all instructions starting with the letter "i"
-u32 PowerPCAssembler::InstructionI(const std::vector<std::string>& t,
-                                   const std::vector<u32>& n)
+u32 PowerPCAssembler::InstructionI(const std::vector<std::string>& t, const std::vector<u32>& n)
 {
   switch (HsRn(t[0]))
   {
@@ -1099,8 +1091,7 @@ u32 PowerPCAssembler::InstructionI(const std::vector<std::string>& t,
   }
 }
 // Handles all instructions starting with the letter "l"
-u32 PowerPCAssembler::InstructionL(const std::vector<std::string>& t,
-                                   const std::vector<u32>& n)
+u32 PowerPCAssembler::InstructionL(const std::vector<std::string>& t, const std::vector<u32>& n)
 {
   switch (HsRn(t[0]))
   {
@@ -1256,7 +1247,7 @@ u32 PowerPCAssembler::InstructionM(const std::vector<std::string>& t, std::vecto
     return MI({{31, 6}, {n[1], 5}, {n[2] & 0x1F, 5}, {n[2] >> 5, 5}, {371, 10}, {0, 1}});
   case HsCp("mftbu"):
     return MI({{31, 6}, {n[1], 5}, {13, 5}, {8, 5}, {371, 10}, {0, 1}});
-  case HsCp("mftbl"): // undocumetned instruction. mftb???
+  case HsCp("mftbl"):  // undocumetned instruction. mftb???
     return MI({{31, 6}, {n[1], 5}, {803558, 21}});
   case HsCp("mtfsb1"):
     return MI({{63, 6}, {n[1], 5}, {0, 5}, {0, 5}, {38, 10}, {rc, 1}});
@@ -1275,8 +1266,8 @@ u32 PowerPCAssembler::InstructionM(const std::vector<std::string>& t, std::vecto
   }
 }
 // Handles all instructions starting with the letter "n"
-u32 PowerPCAssembler::InstructionN(const std::vector<std::string>& t,
-                                   const std::vector<u32>& n, const u32 rc)
+u32 PowerPCAssembler::InstructionN(const std::vector<std::string>& t, const std::vector<u32>& n,
+                                   const u32 rc)
 {
   switch (HsRn(t[0]))
   {
@@ -1296,8 +1287,8 @@ u32 PowerPCAssembler::InstructionN(const std::vector<std::string>& t,
   }
 }
 // Handles all instructions starting with the letter "o"
-u32 PowerPCAssembler::InstructionO(const std::vector<std::string>& t,
-                                   const std::vector<u32>& n, const u32 rc)
+u32 PowerPCAssembler::InstructionO(const std::vector<std::string>& t, const std::vector<u32>& n,
+                                   const u32 rc)
 {
   switch (HsRn(t[0]))
   {
@@ -1405,11 +1396,9 @@ u32 PowerPCAssembler::InstructionP(const std::vector<std::string>& t, std::vecto
   case HsCp("ps_nabs"):
     return MI({{4, 6}, {n[1], 5}, {0, 5}, {n[2], 5}, {136, 10}, {rc, 1}});
   case HsCp("psq_lux"):
-    return MI(
-        {{4, 6}, {n[1], 5}, {n[2], 5}, {n[3], 5}, {n[4], 1}, {n[5], 3}, {38, 6}, {0, 1}});
+    return MI({{4, 6}, {n[1], 5}, {n[2], 5}, {n[3], 5}, {n[4], 1}, {n[5], 3}, {38, 6}, {0, 1}});
   case HsCp("psq_stux"):
-    return MI(
-        {{4, 6}, {n[1], 5}, {n[2], 5}, {n[3], 5}, {n[4], 1}, {n[5], 3}, {39, 6}, {0, 1}});
+    return MI({{4, 6}, {n[1], 5}, {n[2], 5}, {n[3], 5}, {n[4], 1}, {n[5], 3}, {39, 6}, {0, 1}});
   case HsCp("ps_cmpu1"):
     if (t[3] == "")
     {
@@ -1443,8 +1432,8 @@ u32 PowerPCAssembler::InstructionP(const std::vector<std::string>& t, std::vecto
   }
 }
 // Handles all instructions starting with the letter "r"
-u32 PowerPCAssembler::InstructionR(const std::vector<std::string>& t,
-                                   const std::vector<u32>& n, const u32 rc)
+u32 PowerPCAssembler::InstructionR(const std::vector<std::string>& t, const std::vector<u32>& n,
+                                   const u32 rc)
 {
   switch (HsRn(t[0]))
   {
@@ -1459,41 +1448,17 @@ u32 PowerPCAssembler::InstructionR(const std::vector<std::string>& t,
   case HsCp("rlwinm"):
     return MI({{21, 6}, {n[2], 5}, {n[1], 5}, {n[3], 5}, {n[4], 5}, {n[5], 5}, {rc, 1}});
   case HsCp("rldicl"):
-    return MI({{30, 6},
-               {n[2], 5},
-               {n[1], 5},
-               {n[3], 5},
-               {n[4], 6},
-               {0, 3},
-               {n[3] >> 5, 1},
-               {rc, 1}});
+    return MI(
+        {{30, 6}, {n[2], 5}, {n[1], 5}, {n[3], 5}, {n[4], 6}, {0, 3}, {n[3] >> 5, 1}, {rc, 1}});
   case HsCp("rldicr"):
-    return MI({{30, 6},
-               {n[2], 5},
-               {n[1], 5},
-               {n[3], 5},
-               {n[4], 6},
-               {1, 3},
-               {n[3] >> 5, 1},
-               {rc, 1}});
+    return MI(
+        {{30, 6}, {n[2], 5}, {n[1], 5}, {n[3], 5}, {n[4], 6}, {1, 3}, {n[3] >> 5, 1}, {rc, 1}});
   case HsCp("rldic"):
-    return MI({{30, 6},
-               {n[2], 5},
-               {n[1], 5},
-               {n[3], 5},
-               {n[4], 6},
-               {2, 3},
-               {n[3] >> 5, 1},
-               {rc, 1}});
+    return MI(
+        {{30, 6}, {n[2], 5}, {n[1], 5}, {n[3], 5}, {n[4], 6}, {2, 3}, {n[3] >> 5, 1}, {rc, 1}});
   case HsCp("rldimi"):
-    return MI({{30, 6},
-               {n[2], 5},
-               {n[1], 5},
-               {n[3], 5},
-               {n[4], 6},
-               {3, 3},
-               {n[3] >> 5, 1},
-               {rc, 1}});
+    return MI(
+        {{30, 6}, {n[2], 5}, {n[1], 5}, {n[3], 5}, {n[4], 6}, {3, 3}, {n[3] >> 5, 1}, {rc, 1}});
   case HsCp("rldcr"):
     return MI({{30, 6}, {n[2], 5}, {n[1], 5}, {n[3], 5}, {n[4], 6}, {9, 4}, {rc, 1}});
   case HsCp("rldcl"):
@@ -1503,8 +1468,8 @@ u32 PowerPCAssembler::InstructionR(const std::vector<std::string>& t,
   }
 }
 // Handles all instructions starting with the letter "s"
-u32 PowerPCAssembler::InstructionS(const std::vector<std::string>& t,
-                                   const std::vector<u32>& n, const u32 rc)
+u32 PowerPCAssembler::InstructionS(const std::vector<std::string>& t, const std::vector<u32>& n,
+                                   const u32 rc)
 {
   switch (HsRn(t[0]))
   {
@@ -1630,8 +1595,7 @@ u32 PowerPCAssembler::InstructionS(const std::vector<std::string>& t,
   }
 }
 // Handles all instructions starting with the letter "t"
-u32 PowerPCAssembler::InstructionT(const std::vector<std::string>& t,
-                                   const std::vector<u32>& n)
+u32 PowerPCAssembler::InstructionT(const std::vector<std::string>& t, const std::vector<u32>& n)
 {
   switch (HsRn(t[0]))
   {
@@ -1700,8 +1664,8 @@ u32 PowerPCAssembler::InstructionT(const std::vector<std::string>& t,
   }
 }
 // Handles all instructions starting with the letter "x"
-u32 PowerPCAssembler::InstructionX(const std::vector<std::string>& t,
-                                   const std::vector<u32>& n, const u32 rc)
+u32 PowerPCAssembler::InstructionX(const std::vector<std::string>& t, const std::vector<u32>& n,
+                                   const u32 rc)
 {
   switch (HsRn(t[0]))
   {
@@ -1746,8 +1710,8 @@ u32 PowerPCAssembler::PPCAssemble(const std::string& instruction)
   }
 
   // tokenize instruction, get values as well
-  std::vector<std::string> t = Tokenize(lowerCase);   // tokens variable. t for short
-  std::vector<u32> n = std::vector<u32>(t.size(), 0); // numbers variable. n for short
+  std::vector<std::string> t = Tokenize(lowerCase);    // tokens variable. t for short
+  std::vector<u32> n = std::vector<u32>(t.size(), 0);  // numbers variable. n for short
   for (size_t i = 0; i < t.size(); ++i)
   {
     n[i] = StringToNumber(t[i]);
@@ -1810,4 +1774,4 @@ u32 PowerPCAssembler::PPCAssemble(const std::string& instruction)
     return 0;
   }
 }
-} // namespace Common
+}  // namespace Common

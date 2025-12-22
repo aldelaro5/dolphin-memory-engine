@@ -9,9 +9,9 @@
 
 #include "../Common/CommonTypes.h"
 #include "../Common/CommonUtils.h"
-#include "../GUI/Settings/SConfig.h"
-#include "../Common/PPC/PowerPCDisassembler.h"
 #include "../Common/PPC/PowerPCAssembler.h"
+#include "../Common/PPC/PowerPCDisassembler.h"
+#include "../GUI/Settings/SConfig.h"
 
 namespace Common
 {
@@ -719,9 +719,9 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
     for (size_t i{0}; i < 4; ++i)
     {
       if (!withBSwap)
-        binary |= (static_cast<u8>(memory[i])) << (i*8);
+        binary |= (static_cast<u8>(memory[i])) << (i * 8);
       else
-        binary |= (static_cast<u8>(memory[i])) << ((3 - i)*8);
+        binary |= (static_cast<u8>(memory[i])) << ((3 - i) * 8);
     }
     // returns binary at address 0 (big endian mode).
     // So a branch to 0x100 would be shown as "b ->0x100"
