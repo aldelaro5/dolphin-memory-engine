@@ -130,6 +130,16 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
     }
   }
 
+  // in the case of PPC instructions, we don't want to do the same MemoryToString operation for
+  // every address, so get it here once and use it later.
+  std::string MemoryBackToString = "";
+  if (m_memType == Common::MemType::type_ppc)
+  {
+    MemoryBackToString = Common::formatMemoryToString(
+        memoryToCompare1, m_memType, Common::getSizeForType(Common::MemType::type_ppc, NULL),
+        m_memBase, !m_memIsSigned, false);
+  }
+
   m_memSize = Common::getSizeForType(m_memType, termActualLength);
 
   char* noOffset = new char[m_memSize];
@@ -149,10 +159,27 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
     case ScanFilter::exact:
     {
       if (m_memType == Common::MemType::type_string || m_memType == Common::MemType::type_byteArray)
+      {
         isResult = (std::memcmp(memoryCandidate, memoryToCompare1, m_memSize) == 0);
+      }
+      else if (m_memType == Common::MemType::type_ppc &&
+               (Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
+                                                             memoryCandidate[0] & 0xF8))
+      {
+        // accounts for situations where an instruction can be represented in different ways. i.e.
+        // blr is 0x4FFF0020 and 0x4E800020. Code doesn't enter here to speedup performance if
+        // opcode is 0 or 1 as no instruction can have these opcodes
+        isResult =
+            MemoryBackToString ==
+            Common::formatMemoryToString(
+                memoryCandidate, m_memType, Common::getSizeForType(Common::MemType::type_ppc, NULL),
+                m_memBase, !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
+      }
       else
+      {
         isResult = (compareMemoryAsNumbers(memoryCandidate, memoryToCompare1, noOffset, false,
                                            false, m_memSize) == MemScanner::CompareResult::equal);
+      }
       break;
     }
     case ScanFilter::between:
@@ -320,12 +347,34 @@ inline bool MemScanner::isHitNextScan(const MemScanner::ScanFilter filter,
   char* olderMemory = &m_scanRAMCache[consoleOffset];
   const char* newerMemory = &newerRAMCache[consoleOffset];
 
+  // in the case of PPC instructions, we don't want to do the same MemoryToString operation for
+  // every address, so get it here once and use it later.
+  std::string MemoryBackToString = "";
+  if (m_memType == Common::MemType::type_ppc)
+  {
+    MemoryBackToString = Common::formatMemoryToString(
+        memoryToCompare1, m_memType, Common::getSizeForType(Common::MemType::type_ppc, NULL),
+        m_memBase, !m_memIsSigned, false);
+  }
+
   switch (filter)
   {
   case ScanFilter::exact:
   {
     if (m_memType == Common::MemType::type_string || m_memType == Common::MemType::type_byteArray)
       return (std::memcmp(newerMemory, memoryToCompare1, realSize) == 0);
+    if (m_memType == Common::MemType::type_ppc &&
+        (Common::shouldBeBSwappedForType(m_memType) ? newerMemory[3] & 0xF8 :
+                                                      newerMemory[0] & 0xF8))
+    {
+      // accounts for situations where an instruction can be represented in different ways. i.e.
+      // blr is 0x4FFF0020 and 0x4E800020. Code doesn't enter here to speedup performance if
+      // opcode is 0 or 1 as no instruction can have these opcodes
+      return MemoryBackToString ==
+             Common::formatMemoryToString(
+                 newerMemory, m_memType, Common::getSizeForType(Common::MemType::type_ppc, NULL),
+                 m_memBase, !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
+    }
 
     return (compareMemoryAsNumbers(newerMemory, memoryToCompare1, noOffset, false, false,
                                    realSize) == MemScanner::CompareResult::equal);
