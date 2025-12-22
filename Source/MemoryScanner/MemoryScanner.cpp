@@ -169,11 +169,11 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
         // accounts for situations where an instruction can be represented in different ways. i.e.
         // blr is 0x4FFF0020 and 0x4E800020. Code doesn't enter here to speedup performance if
         // opcode is 0 or 1 as no instruction can have these opcodes
-        isResult =
-            MemoryBackToString ==
-            Common::formatMemoryToString(
-                memoryCandidate, m_memType, Common::getSizeForType(Common::MemType::type_ppc, m_memSize),
-                m_memBase, !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
+        isResult = MemoryBackToString ==
+                   Common::formatMemoryToString(
+                       memoryCandidate, m_memType,
+                       Common::getSizeForType(Common::MemType::type_ppc, m_memSize), m_memBase,
+                       !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
       }
       else
       {
@@ -370,10 +370,11 @@ inline bool MemScanner::isHitNextScan(const MemScanner::ScanFilter filter,
       // accounts for situations where an instruction can be represented in different ways. i.e.
       // blr is 0x4FFF0020 and 0x4E800020. Code doesn't enter here to speedup performance if
       // opcode is 0 or 1 as no instruction can have these opcodes
-      return MemoryBackToString ==
-             Common::formatMemoryToString(
-                 newerMemory, m_memType, Common::getSizeForType(Common::MemType::type_ppc, m_memSize),
-                 m_memBase, !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
+      return MemoryBackToString == Common::formatMemoryToString(
+                                       newerMemory, m_memType,
+                                       Common::getSizeForType(Common::MemType::type_ppc, m_memSize),
+                                       m_memBase, !m_memIsSigned,
+                                       Common::shouldBeBSwappedForType(m_memType));
     }
 
     return (compareMemoryAsNumbers(newerMemory, memoryToCompare1, noOffset, false, false,
