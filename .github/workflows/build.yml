@@ -124,7 +124,7 @@ jobs:
           path: dolphin-memory-engine.AppImage
 
   build-macos-intel:
-    runs-on: macos-13
+    runs-on: macos-15-intel
     name: 🍎 macOS Intel
 
     steps:
