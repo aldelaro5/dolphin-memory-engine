@@ -796,7 +796,7 @@ u32 PowerPCAssembler::InstructionB(const std::vector<std::string>& t, std::vecto
                {16, 10},
                {EndL(t[0]), 1}});
   case HsCp("blr"):
-    // more familiar looking format instead of the above
+    // more familiar looking format instead of the above (aka 0x4FFF0020) or 0x4FFE4820
     return 0x4E800020;
   default:
     return 0;
