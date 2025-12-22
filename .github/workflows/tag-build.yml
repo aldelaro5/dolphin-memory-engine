@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-24.04
     name: Clang-Format Check (TAG)
     steps:
-      - uses: actions/checkout@v4
-      - uses: jidicula/clang-format-action@v4.15.0
+      - uses: actions/checkout@v6
+      - uses: jidicula/clang-format-action@v4.16.0
         with:
           clang-format-version: '19'
           check-path: Source
@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v2
@@ -56,7 +56,7 @@ jobs:
         shell: powershell
 
       - name: Publish Workflow Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dolphin-memory-engine-${{ github.ref_name }}-windows-amd64
           path: dolphin-memory-engine-${{ github.ref_name }}-windows-amd64.zip
@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Dependencies
         run: |
@@ -123,13 +123,13 @@ jobs:
         shell: bash
 
       - name: Publish Workflow Artifact (Linux binary tarball)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64-binary
           path: dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64-binary.tar.gz
 
       - name: Publish Workflow Artifact (AppImage)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64-appimage
           path: ${{ steps.rename_appimage.outputs.appimage_name }}
@@ -143,12 +143,12 @@ jobs:
             dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64-binary.tar.gz
 
   build-macos-intel:
-    runs-on: macos-13
+    runs-on: macos-15-intel
     name: 🍎 macOS Intel (TAG)
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Initialize submodules
         run: git submodule update --init
@@ -180,7 +180,7 @@ jobs:
         shell: bash
 
       - name: Publish Workflow Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dolphin-memory-engine-${{ github.ref_name }}-macOS-intel
           path: dolphin-memory-engine-${{ github.ref_name }}-macOS-intel.zip
