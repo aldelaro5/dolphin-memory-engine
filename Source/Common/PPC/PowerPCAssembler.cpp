@@ -338,7 +338,8 @@ u32 PowerPCAssembler::StringAliasToNumber(const std::string& token)
 // converts a string to a value. So "r0" becomes 0, "sp" becomes 1, "0x10" becomes 16, etc.
 // -
 // str assumed all lowercase and no leading or trailing spaces
-u32 PowerPCAssembler::StringToNumber(const std::string& token, bool consider_alias)
+u32 PowerPCAssembler::StringToNumber(const std::string& token, const bool consider_alias,
+                                     const u32 current_instruction_address)
 {
   // check if token (aka str) is a valid alias
   if (consider_alias && StringAliasToNumber(token))
@@ -391,9 +392,16 @@ u32 PowerPCAssembler::StringToNumber(const std::string& token, bool consider_ali
       }
     }
   }
-  // flip sign of returned value using (doing it like this avoids warning on unsigned int)
-  if (isNegative)
+
+  if (toReturn > 0x10000000 && current_instruction_address != 0)
   {
+    // handle case of branch addresses being given as absolute values. It's assumed if its a very
+    // large value its an absolute branch address
+    toReturn = toReturn - current_instruction_address;
+  }
+  else if (isNegative)
+  {
+    // flip sign of returned value (doing it like this avoids warning on unsigned int)
     toReturn = 0xFFFFFFFF - toReturn + 1;
   }
   return toReturn;
@@ -1713,11 +1721,11 @@ u32 PowerPCAssembler::PPCAssemble(const std::string& instruction,
   // tokenize instruction, get values as well
   std::vector<std::string> t = Tokenize(lowerCase);    // tokens variable. t for short
   std::vector<u32> n = std::vector<u32>(t.size(), 0);  // numbers variable. n for short
+  bool is_statement =
+      t[0][0] == '.' || t[0] == "ill";  // if "ill" don't assume its an absolute branch address
   for (size_t i = 0; i < t.size(); ++i)
   {
-    n[i] = StringToNumber(t[i]);
-    if (n[i] >= 0x80000000 && current_instruction_address != 0)
-      n[i] = n[i] - current_instruction_address;
+    n[i] = StringToNumber(t[i], true, is_statement ? 0 : current_instruction_address);
   }
 
   // if no mnemonic, return 0

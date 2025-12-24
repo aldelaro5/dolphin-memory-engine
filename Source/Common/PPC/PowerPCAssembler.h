@@ -17,7 +17,8 @@ private:
   static u32 HsRn(const std::string& str);
   static std::vector<std::string> Tokenize(const std::string& user_str);
   static u32 StringAliasToNumber(const std::string& token);
-  static u32 StringToNumber(const std::string& token, bool consider_alias = true);
+  static u32 StringToNumber(const std::string& token, const bool consider_alias = true,
+                            const u32 current_instruction_address = 0);
 
   // MIStruct - Make Instruction Struct. Contains a value and size in bits for how much of the
   // instruction it takes up.
