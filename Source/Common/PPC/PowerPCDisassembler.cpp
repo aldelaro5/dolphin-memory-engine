@@ -604,13 +604,24 @@ void PowerPCDisassembler::bc(u32 in)
 
   if (d & 0x8000)
     d |= 0xffff0000;
+  int d_signed = (int)d;
 
   branch(in, "", (in & 2) ? 1 : 0, d);
 
   if (in & 2)  // AA ?
-    m_operands = fmt::format("{} ->0x{:08X}", m_operands, d);
+  {
+    if (*m_iaddr)
+      m_operands = fmt::format("{} ->0x{:08X}", m_operands, d);
+    else
+      m_operands = fmt::format("{} 0x{:X}", m_operands, d_signed);
+  }
   else
-    m_operands = fmt::format("{} ->0x{:08X}", m_operands, *m_iaddr + d);
+  {
+    if (*m_iaddr)
+      m_operands = fmt::format("{} ->0x{:08X}", m_operands, *m_iaddr + d);
+    else
+      m_operands = fmt::format("{} 0x{:X}", m_operands, d_signed);
+  }
 }
 
 void PowerPCDisassembler::bli(u32 in)
@@ -619,13 +630,24 @@ void PowerPCDisassembler::bli(u32 in)
 
   if (d & 0x02000000)
     d |= 0xfc000000;
+  int d_signed = (int)d;
 
   m_opcode = fmt::format("b{}", b_ext[in & 3]);
 
   if (in & 2)  // AA ?
-    m_operands = fmt::format("->0x{:08X}", d);
+  {
+    if (*m_iaddr)
+      m_operands = fmt::format("->0x{:08X}", d);
+    else
+      m_operands = fmt::format("0x{:X}", d_signed);
+  }
   else
-    m_operands = fmt::format("->0x{:08X}", *m_iaddr + d);
+  {
+    if (*m_iaddr)
+      m_operands = fmt::format("->0x{:08X}", *m_iaddr + d);
+    else
+      m_operands = fmt::format("0x{:X}", d_signed);
+  }
 }
 
 void PowerPCDisassembler::mcrf(u32 in, std::string_view suffix)
