@@ -601,10 +601,15 @@ size_t PowerPCDisassembler::branch(u32 in, std::string_view bname, int aform, in
 void PowerPCDisassembler::bc(u32 in)
 {
   unsigned int d = (int)(in & 0xfffc);
+  bool is_negative = false;
+  int d_relative_amt = (int)d;
 
   if (d & 0x8000)
+  {
     d |= 0xffff0000;
-  int d_signed = (int)d;
+    is_negative = true;
+    d_relative_amt = ((int)d) * -1;
+  }
 
   branch(in, "", (in & 2) ? 1 : 0, d);
 
@@ -613,24 +618,29 @@ void PowerPCDisassembler::bc(u32 in)
     if (*m_iaddr)
       m_operands = fmt::format("{} ->0x{:08X}", m_operands, d);
     else
-      m_operands = fmt::format("{} 0x{:X}", m_operands, d_signed);
+      m_operands = fmt::format("{} {}0x{:X}", m_operands, (is_negative ? "-" : ""), d_relative_amt);
   }
   else
   {
     if (*m_iaddr)
       m_operands = fmt::format("{} ->0x{:08X}", m_operands, *m_iaddr + d);
     else
-      m_operands = fmt::format("{} 0x{:X}", m_operands, d_signed);
+      m_operands = fmt::format("{} {}0x{:X}", m_operands, (is_negative ? "-" : ""), d_relative_amt);
   }
 }
 
 void PowerPCDisassembler::bli(u32 in)
 {
   unsigned int d = (unsigned int)(in & 0x3fffffc);
+  bool is_negative = false;
+  int d_relative_amt = (int)d;
 
   if (d & 0x02000000)
+  {
     d |= 0xfc000000;
-  int d_signed = (int)d;
+    is_negative = true;
+    d_relative_amt = ((int)d) * -1;
+  }
 
   m_opcode = fmt::format("b{}", b_ext[in & 3]);
 
@@ -639,14 +649,14 @@ void PowerPCDisassembler::bli(u32 in)
     if (*m_iaddr)
       m_operands = fmt::format("->0x{:08X}", d);
     else
-      m_operands = fmt::format("0x{:X}", d_signed);
+      m_operands = fmt::format("{}0x{:X}", (is_negative ? "-" : ""), d_relative_amt);
   }
   else
   {
     if (*m_iaddr)
       m_operands = fmt::format("->0x{:08X}", *m_iaddr + d);
     else
-      m_operands = fmt::format("0x{:X}", d_signed);
+      m_operands = fmt::format("{}0x{:X}", (is_negative ? "-" : ""), d_relative_amt);
   }
 }
 
