@@ -10,7 +10,7 @@ namespace Common
 class PowerPCAssembler final
 {
 public:
-  static u32 PPCAssemble(const std::string& instruction);
+  static u32 PPCAssemble(const std::string& instruction, const u32 current_instruction_address = 0);
 
 private:
   PowerPCAssembler() = delete;

@@ -1696,7 +1696,8 @@ u32 PowerPCAssembler::InstructionPeriod(const std::vector<std::string>& t)
 
 // Main assemble function. Takes a string of a PowerPC instruction and returns a big endian
 // 32-bit integer
-u32 PowerPCAssembler::PPCAssemble(const std::string& instruction)
+u32 PowerPCAssembler::PPCAssemble(const std::string& instruction,
+                                  const u32 current_instruction_address)
 {
   // if instruction is empty string, return 0
   if (instruction.empty() || instruction.size() == 0)
@@ -1715,6 +1716,8 @@ u32 PowerPCAssembler::PPCAssemble(const std::string& instruction)
   for (size_t i = 0; i < t.size(); ++i)
   {
     n[i] = StringToNumber(t[i]);
+    if (n[i] >= 0x80000000 && current_instruction_address != 0)
+      n[i] = n[i] - current_instruction_address;
   }
 
   // if no mnemonic, return 0
