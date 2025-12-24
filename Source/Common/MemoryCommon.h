@@ -61,7 +61,9 @@ size_t getSizeForType(MemType type, size_t length);
 bool shouldBeBSwappedForType(MemType type);
 int getNbrBytesAlignmentForType(MemType type);
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
-                           std::string_view inputString, MemBase base, MemType type, size_t length);
+                           std::string_view inputString, MemBase base, MemType type, size_t length,
+                           const u32 ppcBranchOrigin = 0);
 std::string formatMemoryToString(const char* memory, MemType type, size_t length, MemBase base,
-                                 bool isUnsigned, bool withBSwap = false);
+                                 bool isUnsigned, bool withBSwap = false,
+                                 const u32 ppcBranchOrigin = 0);
 }  // namespace Common

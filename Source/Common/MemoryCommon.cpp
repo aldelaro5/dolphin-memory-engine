@@ -140,7 +140,7 @@ int getNbrBytesAlignmentForType(const MemType type)
 
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
                            const std::string_view inputString, const MemBase base,
-                           const MemType type, const size_t length)
+                           const MemType type, const size_t length, u32 ppcBranchOrigin)
 {
   if (inputString.empty())
   {
@@ -473,7 +473,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
   }
   case Common::MemType::type_ppc:
   {
-    u32 result = Common::PowerPCAssembler::PPCAssemble(inputString.data());
+    u32 result = Common::PowerPCAssembler::PPCAssemble(inputString.data(), ppcBranchOrigin);
     memcpy(buffer, &result, size);
     actualLength = size;
     break;
@@ -487,8 +487,10 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
   return buffer;
 }
 
+// ppcBranchOrigin = 0 means relative branch, non-zero means absolute branch will be shown
 std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
-                                 const MemBase base, const bool isUnsigned, const bool withBSwap)
+                                 const MemBase base, const bool isUnsigned, const bool withBSwap,
+                                 const u32 ppcBranchOrigin)
 {
   std::stringstream ss;
   switch (base)
@@ -723,9 +725,9 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
       else
         binary |= (static_cast<u8>(memory[i])) << ((3 - i) * 8);
     }
-    // returns binary at address 0 (big endian mode).
-    // So a branch to 0x100 would be shown as "b ->0x100"
-    return Common::PowerPCDisassembler::Disassemble(binary, 0x00000000, true);
+    // returns binary (big endian mode).
+    // Branch is relative if ppcBranchOrigin == 0, absolute otherwise
+    return Common::PowerPCDisassembler::Disassemble(binary, ppcBranchOrigin, true);
   }
   default:
     return "";
