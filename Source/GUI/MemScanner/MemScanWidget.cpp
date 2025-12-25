@@ -566,6 +566,18 @@ void MemScanWidget::handleScannerErrors(const Common::MemOperationReturnCode err
                         QMessageBox::Ok, this);
     errorBox->exec();
   }
+  else if (errorCode == Common::MemOperationReturnCode::noAbsoluteBranchForPPC)
+  {
+    QMessageBox* errorBox = new QMessageBox(
+        QMessageBox::Critical, tr("No Valid Branch Location Found"),
+        tr("Couldn't find an address to look for in all branch statements. Ensure its the only "
+           "thing you type in the input box, ensure it's in hex, and ensure the address is larger "
+           "than 0x10000000. As an example input: '0x802A2567'. DO NOT TYPE IN SOMETHING LIKE "
+           "'bne- ->0x802A2567'\n\nIf this is a mistake uncheck the 'Absolute Branch Search' "
+           "checkbox to search for assembly instructions again."),
+        QMessageBox::Ok, this);
+    errorBox->exec();
+  }
   else if (errorCode == Common::MemOperationReturnCode::operationFailed)
   {
     emit mustUnhook();

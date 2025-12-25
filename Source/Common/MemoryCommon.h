@@ -54,7 +54,8 @@ enum class MemOperationReturnCode
   operationFailed,
   inputTooLong,
   invalidPointer,
-  OK
+  OK,
+  noAbsoluteBranchForPPC
 };
 
 size_t getSizeForType(MemType type, size_t length);
