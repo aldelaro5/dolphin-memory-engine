@@ -422,6 +422,9 @@ void MemWatchEntry::readFromJson(const QJsonObject& json)
   {
     setBoundToPointer(false);
   }
+
+  if (json["absoluteBranch"] != QJsonValue::Undefined)
+    m_absoluteBranch = json["absoluteBranch"].toBool();
 }
 
 void MemWatchEntry::writeToJson(QJsonObject& json) const
@@ -449,4 +452,6 @@ void MemWatchEntry::writeToJson(QJsonObject& json) const
     }
     json["pointerOffsets"] = offsets;
   }
+
+  json["absoluteBranch"] = m_absoluteBranch;
 }
