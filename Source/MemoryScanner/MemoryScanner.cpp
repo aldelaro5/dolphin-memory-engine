@@ -190,30 +190,32 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
       {
         isResult = (std::memcmp(memoryCandidate, memoryToCompare1, m_memSize) == 0);
       }
+      else if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
+      {
+        if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
+                                                        memoryCandidate[0] & 0xF8))
+        {
+          // invalid opcode
+          isResult = false;
+          break;
+        }
+        // when searching for absolute branches, we need to calculate the branch target of the
+        // instruction at this memory location and see if it matches the desired target
+        u32 cur_b_tar = memoryToStringWithAbsoluteBranchAmount(
+            memoryCandidate, Common::shouldBeBSwappedForType(m_memType), cur_address);
+        isResult = (cur_b_tar != 0xFFFFFFFF) && (cur_b_tar == absolute_b_addr1);
+      }
       else if (m_memType == Common::MemType::type_ppc &&
                (Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
                                                              memoryCandidate[0] & 0xF8))
       {
-        // Code doesn't enter here to speedup performance if opcode is 0 or 1 as no instruction can
-        // have these opcodes
-        if (m_branchIsAbsolute)
-        {
-          // when searching for absolute branches, we need to calculate the branch target of the
-          // instruction at this memory location and see if it matches the desired target
-          u32 cur_b_tar = memoryToStringWithAbsoluteBranchAmount(
-              memoryCandidate, Common::shouldBeBSwappedForType(m_memType), cur_address);
-          isResult = (cur_b_tar != 0xFFFFFFFF) && (cur_b_tar == absolute_b_addr1);
-        }
-        else
-        {
-          // accounts for situations where an instruction can be represented in different ways. i.e.
-          // blr is 0x4FFF0020 and 0x4E800020.
-          isResult = mem_back_to_str1 ==
-                     Common::formatMemoryToString(
-                         memoryCandidate, m_memType,
-                         Common::getSizeForType(Common::MemType::type_ppc, m_memSize), m_memBase,
-                         !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
-        }
+        // accounts for situations where an instruction can be represented in different ways. i.e.
+        // blr is 0x4FFF0020 and 0x4E800020. invalid opcodes skipped for performance
+        isResult = mem_back_to_str1 ==
+                    Common::formatMemoryToString(
+                        memoryCandidate, m_memType,
+                        Common::getSizeForType(Common::MemType::type_ppc, m_memSize), m_memBase,
+                        !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
       }
       else
       {
@@ -224,10 +226,15 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
     }
     case ScanFilter::between:
     {
-      if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc &&
-          (Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
-                                                        memoryCandidate[0] & 0xF8))
+      if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
       {
+        if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
+                                                        memoryCandidate[0] & 0xF8))
+        {
+          // invalid opcode
+          isResult = false;
+          break;
+        }
         u32 cur_b_tar = memoryToStringWithAbsoluteBranchAmount(
             memoryCandidate, Common::shouldBeBSwappedForType(m_memType), cur_address);
         isResult = (cur_b_tar != 0xFFFFFFFF) &&
@@ -246,10 +253,15 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
     }
     case ScanFilter::biggerThan:
     {
-      if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc &&
-          (Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
-                                                        memoryCandidate[0] & 0xF8))
+      if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
       {
+        if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
+                                                        memoryCandidate[0] & 0xF8))
+        {
+          // invalid opcode
+          isResult = false;
+          break;
+        }
         u32 cur_b_tar = memoryToStringWithAbsoluteBranchAmount(
             memoryCandidate, Common::shouldBeBSwappedForType(m_memType), cur_address);
         isResult = (cur_b_tar != 0xFFFFFFFF) && (cur_b_tar > absolute_b_addr1);
@@ -261,10 +273,15 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
     }
     case ScanFilter::smallerThan:
     {
-      if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc &&
-          (Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
-                                                        memoryCandidate[0] & 0xF8))
+      if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
       {
+        if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
+                                                        memoryCandidate[0] & 0xF8))
+        {
+          // invalid opcode
+          isResult = false;
+          break;
+        }
         u32 cur_b_tar = memoryToStringWithAbsoluteBranchAmount(
             memoryCandidate, Common::shouldBeBSwappedForType(m_memType), cur_address);
         isResult = (cur_b_tar != 0xFFFFFFFF) && (cur_b_tar < absolute_b_addr1);
