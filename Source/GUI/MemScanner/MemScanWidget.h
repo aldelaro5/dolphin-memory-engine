@@ -51,11 +51,11 @@ public:
 
 signals:
   void requestAddWatchEntry(u32 address, Common::MemType type, size_t length, bool isUnsigned,
-                            Common::MemBase base);
+                            Common::MemBase base, bool isBranchAbsolute);
   void requestAddSelectedResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
-                                            Common::MemBase base);
+                                            Common::MemBase base, bool isBranchAbsolute);
   void requestAddAllResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
-                                       Common::MemBase base);
+                                       Common::MemBase base, bool isBranchAbsolute);
   void mustUnhook();
 
 private:

@@ -179,11 +179,11 @@ Common::MemOperationReturnCode DolphinAccessor::readEntireRAM(char* buffer)
 std::string DolphinAccessor::getFormattedValueFromMemory(const u32 ramIndex,
                                                          Common::MemType memType, size_t memSize,
                                                          Common::MemBase memBase,
-                                                         bool memIsUnsigned)
+                                                         bool memIsUnsigned, u32 ppcBranchOrigin)
 {
   std::unique_ptr<char[]> buffer(new char[memSize]);
   readFromRAM(ramIndex, buffer.get(), memSize, false);
   return Common::formatMemoryToString(buffer.get(), memType, memSize, memBase, memIsUnsigned,
-                                      Common::shouldBeBSwappedForType(memType));
+                                      Common::shouldBeBSwappedForType(memType), ppcBranchOrigin);
 }
 }  // namespace DolphinComm
