@@ -648,7 +648,8 @@ std::string MemScanner::getFormattedScannedValueAt(const int index) const
   u32 ramIndex = Common::offsetToCacheIndex(offset, aramAccessible);
   const size_t length{m_memType == Common::MemType::type_string ? ~0ULL : m_memSize};
   return Common::formatMemoryToString(&m_scanRAMCache[ramIndex], m_memType, length, m_memBase,
-                                      !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
+                                      !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType),
+                                      m_branchIsAbsolute ? m_resultsConsoleAddr.at(index) : 0);
 }
 
 std::string MemScanner::getFormattedCurrentValueAt(const int index) const
@@ -657,8 +658,9 @@ std::string MemScanner::getFormattedCurrentValueAt(const int index) const
   {
     bool aramAccessible = DolphinComm::DolphinAccessor::isARAMAccessible();
     u32 offset = Common::dolphinAddrToOffset(m_resultsConsoleAddr.at(index), aramAccessible);
-    return DolphinComm::DolphinAccessor::getFormattedValueFromMemory(offset, m_memType, m_memSize,
-                                                                     m_memBase, !m_memIsSigned);
+    return DolphinComm::DolphinAccessor::getFormattedValueFromMemory(
+        offset, m_memType, m_memSize, m_memBase, !m_memIsSigned,
+        m_branchIsAbsolute ? m_resultsConsoleAddr.at(index) : 0);
   }
   return "";
 }
