@@ -86,6 +86,7 @@ private:
   QComboBox* m_cmbScanType{};
   QLabel* m_lblResultCount{};
   QCheckBox* m_chkSignedScan{};
+  QCheckBox* m_chkAbsoluteBranch{};
   QCheckBox* m_chkEnforceMemAlignment{};
   QButtonGroup* m_btnGroupScanBase{};
   QRadioButton* m_rdbBaseDecimal{};

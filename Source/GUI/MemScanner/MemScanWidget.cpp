@@ -139,6 +139,10 @@ void MemScanWidget::initialiseWidgets()
   m_chkSignedScan = new QCheckBox(tr("Signed value scan"));
   m_chkSignedScan->setChecked(false);
 
+  m_chkAbsoluteBranch = new QCheckBox(tr("Absolute Branch Search"));
+  m_chkAbsoluteBranch->setChecked(false);
+  m_chkAbsoluteBranch->hide();
+
   m_chkEnforceMemAlignment = new QCheckBox(tr("Enforce alignment"));
   m_chkEnforceMemAlignment->setChecked(true);
 
@@ -199,6 +203,7 @@ void MemScanWidget::makeLayouts()
   QHBoxLayout* layout_extraParams = new QHBoxLayout();
   layout_extraParams->addWidget(m_chkEnforceMemAlignment);
   layout_extraParams->addWidget(m_chkSignedScan);
+  layout_extraParams->addWidget(m_chkAbsoluteBranch);
 
   QVBoxLayout* scannerParams_layout = new QVBoxLayout();
   scannerParams_layout->addWidget(m_searchRange);
@@ -282,11 +287,19 @@ void MemScanWidget::updateTypeAdditionalOptions()
   {
     m_chkSignedScan->show();
     m_groupScanBase->show();
+    m_chkAbsoluteBranch->hide();
+  }
+  else if (static_cast<Common::MemType>(m_cmbScanType->currentIndex()) == Common::MemType::type_ppc)
+  {
+    m_chkSignedScan->hide();
+    m_groupScanBase->hide();
+    m_chkAbsoluteBranch->show();
   }
   else
   {
     m_chkSignedScan->hide();
     m_groupScanBase->hide();
+    m_chkAbsoluteBranch->hide();
   }
 }
 
@@ -419,6 +432,7 @@ void MemScanWidget::onFirstScan()
 
   m_memScanner->setType(static_cast<Common::MemType>(m_cmbScanType->currentIndex()));
   m_memScanner->setIsSigned(m_chkSignedScan->isChecked());
+  m_memScanner->setBranchIsAbsolute(m_chkAbsoluteBranch->isChecked());
   m_memScanner->setEnforceMemAlignment(m_chkEnforceMemAlignment->isChecked());
   m_memScanner->setBase(static_cast<Common::MemBase>(m_btnGroupScanBase->checkedId()));
   Common::MemOperationReturnCode scannerReturn =
@@ -441,12 +455,20 @@ void MemScanWidget::onFirstScan()
     }
     m_btnFirstScan->hide();
     m_btnNextScan->show();
+    if (m_chkAbsoluteBranch->isChecked() && m_memScanner->getType() == Common::MemType::type_ppc)
+    {
+      m_btnNextScan->setDisabled(true);
+      m_txbSearchTerm1->setDisabled(true);
+      m_txbSearchTerm2->setDisabled(true);
+      m_cmbScanFilter->setDisabled(true);
+    }
     m_btnResetScan->show();
     m_btnUndoScan->show();
     m_btnUndoScan->setEnabled(m_memScanner->hasUndo());
     m_searchRange->hide();
     m_cmbScanType->setDisabled(true);
     m_chkSignedScan->setDisabled(true);
+    m_chkAbsoluteBranch->setDisabled(true);
     m_chkEnforceMemAlignment->setDisabled(true);
     m_groupScanBase->setDisabled(true);
     updateScanFilterChoices();
@@ -518,11 +540,16 @@ void MemScanWidget::onResetScan()
   m_btnRemoveSelection->setEnabled(false);
   m_btnFirstScan->show();
   m_btnNextScan->hide();
+  m_btnNextScan->setEnabled(true);
+  m_txbSearchTerm1->setEnabled(true);
+  m_txbSearchTerm2->setEnabled(true);
+  m_cmbScanFilter->setEnabled(true);
   m_btnResetScan->hide();
   m_btnUndoScan->hide();
   m_searchRange->show();
   m_cmbScanType->setEnabled(true);
   m_chkSignedScan->setEnabled(true);
+  m_chkAbsoluteBranch->setEnabled(true);
   m_chkEnforceMemAlignment->setEnabled(true);
   m_groupScanBase->setEnabled(true);
   m_resultsListModel->updateAfterScannerReset();
