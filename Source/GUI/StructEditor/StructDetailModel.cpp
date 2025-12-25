@@ -273,6 +273,10 @@ void StructDetailModel::removePaddingFields(int count, int start)
 
 void StructDetailModel::removeFields(int start, int count)
 {
+  if (start == -1)
+  {
+    return;
+  }
   beginRemoveRows(QModelIndex(), start, start + count - 1);
 
   for (int i = start; i < start + count; ++i)
