@@ -142,7 +142,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
                                                     m_memBase, !m_memIsSigned);
     try
     {
-      absolute_b_addr1 = std::stoul(formattedSearchTerm1, nullptr, 16);
+      absolute_b_addr1 = static_cast<u32>(std::stoul(formattedSearchTerm1, nullptr, 16));
     }
     catch (...)
     {
@@ -150,7 +150,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
     }
     try
     {
-      absolute_b_addr2 = std::stoul(searchTerm2, nullptr, 16);
+      absolute_b_addr2 = static_cast<u32>(std::stoul(searchTerm2, nullptr, 16));
     }
     catch (...)
     {
@@ -693,7 +693,7 @@ u32 MemScanner::memoryToStringWithAbsoluteBranchAmount(const char* memory, const
   if (arrow_pos != std::string::npos)
   {
     // str always ends with ->0xADDR if branch
-    return std::stoul(str.substr(arrow_pos + 4), nullptr, 16);
+    return static_cast<u32>(std::stoul(str.substr(arrow_pos + 4), nullptr, 16));
   }
   return 0xFFFFFFFF;
 }
