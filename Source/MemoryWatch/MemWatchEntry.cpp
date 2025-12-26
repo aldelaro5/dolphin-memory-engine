@@ -18,8 +18,8 @@ MemWatchEntry::MemWatchEntry(QString label, const u32 consoleAddress, const Comm
                              const Common::MemBase base, const bool isUnsigned, const size_t length,
                              const bool isBoundToPointer, const bool absoluteBranch)
     : m_label(std::move(label)), m_consoleAddress(consoleAddress), m_type(type), m_base(base),
-      m_isUnsigned(isUnsigned), m_boundToPointer(isBoundToPointer), m_length(length),
-      m_absoluteBranch(absoluteBranch)
+      m_isUnsigned(isUnsigned), m_absoluteBranch(absoluteBranch), m_boundToPointer(isBoundToPointer), m_length(length)
+      
 {
   m_memory = new char[getSizeForType(m_type, m_length)];
   m_curActualAddress = getActualAddress();
