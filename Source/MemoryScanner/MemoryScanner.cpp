@@ -193,7 +193,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
       else if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
       {
         if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
-                                                        memoryCandidate[0] & 0xF8))
+                                                           memoryCandidate[0] & 0xF8))
         {
           // invalid opcode
           isResult = false;
@@ -212,10 +212,10 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
         // accounts for situations where an instruction can be represented in different ways. i.e.
         // blr is 0x4FFF0020 and 0x4E800020. invalid opcodes skipped for performance
         isResult = mem_back_to_str1 ==
-                    Common::formatMemoryToString(
-                        memoryCandidate, m_memType,
-                        Common::getSizeForType(Common::MemType::type_ppc, m_memSize), m_memBase,
-                        !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
+                   Common::formatMemoryToString(
+                       memoryCandidate, m_memType,
+                       Common::getSizeForType(Common::MemType::type_ppc, m_memSize), m_memBase,
+                       !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
       }
       else
       {
@@ -229,7 +229,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
       if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
       {
         if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
-                                                        memoryCandidate[0] & 0xF8))
+                                                           memoryCandidate[0] & 0xF8))
         {
           // invalid opcode
           isResult = false;
@@ -256,7 +256,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
       if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
       {
         if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
-                                                        memoryCandidate[0] & 0xF8))
+                                                           memoryCandidate[0] & 0xF8))
         {
           // invalid opcode
           isResult = false;
@@ -276,7 +276,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
       if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
       {
         if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
-                                                        memoryCandidate[0] & 0xF8))
+                                                           memoryCandidate[0] & 0xF8))
         {
           // invalid opcode
           isResult = false;
