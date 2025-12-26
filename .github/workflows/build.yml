@@ -37,9 +37,17 @@ jobs:
         run: git submodule update --init
         shell: powershell
 
+      - name: Install fmt Library
+        run: |
+          cd ./Externals/fmt
+          cmake -S . -B build -A x64 -DCMAKE_INSTALL_PREFIX=install -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
+          cmake --build build --config ${{ matrix.configuration }} --target install --parallel
+          cd ../..
+        shell: powershell
+
       - name: Build
         run: |
-          cmake Source -B .\Source\bin -A x64 "-DCMAKE_PREFIX_PATH=..\Externals\Qt\Qt6.5.3\x64"
+          cmake Source -B .\Source\bin -A x64 "-DCMAKE_PREFIX_PATH=..\Externals\Qt\Qt6.5.3\x64;..\Externals\fmt\install"
           cmake --build .\Source\bin --config ${{ matrix.configuration }} --parallel
         shell: powershell
 
@@ -70,13 +78,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-        with:
-          submodules: recursive
 
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt install cmake libevdev-dev qt6-base-private-dev libqt6svg6 libqt6svg6-dev libgl1-mesa-dev libfuse2
+          sudo apt install cmake libevdev-dev qt6-base-private-dev libqt6svg6 libqt6svg6-dev libgl1-mesa-dev libfuse2 libfmt-dev
         shell: bash
 
       - name: Install GCC 10 and G++ 10
@@ -141,6 +147,11 @@ jobs:
 
       - name: Initialize submodules
         run: git submodule update --init
+
+      - name: Install fmt
+        run: |
+          brew install fmt
+        shell: bash
 
       - name: Build
         run: |

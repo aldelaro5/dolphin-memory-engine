@@ -28,10 +28,7 @@ configure_file(
 )
 
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
-add_subdirectory(
-    ${PROJECT_SOURCE_DIR}/../Externals/fmt
-    ${PROJECT_BINARY_DIR}/../Externals/fmt
-)
+
 
 if(WIN32)
     set(DolphinProcessSrc DolphinProcess/Windows/WindowsDolphinProcess.cpp)
@@ -97,6 +94,7 @@ endif ()
 find_package(Qt6Core REQUIRED)
 find_package(Qt6Gui REQUIRED)
 find_package(Qt6Svg REQUIRED)
+find_package(fmt REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
