@@ -619,6 +619,8 @@ void MemWatchWidget::onValueWriteError(const QModelIndex& index,
   }
   case Common::MemOperationReturnCode::OK:
     break;
+  case Common::MemOperationReturnCode::noAbsoluteBranchForPPC:
+    break;
   }
 }
 
