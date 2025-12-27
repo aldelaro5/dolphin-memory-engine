@@ -94,7 +94,15 @@ endif ()
 find_package(Qt6Core REQUIRED)
 find_package(Qt6Gui REQUIRED)
 find_package(Qt6Svg REQUIRED)
-find_package(fmt REQUIRED)
+
+if (WIN32)
+    add_subdirectory(
+        ${CMAKE_CURRENT_LIST_DIR}/../Externals/fmt
+        ${CMAKE_CURRENT_LIST_DIR}/../Externals/fmt
+    )
+else ()
+    find_package(fmt REQUIRED)
+endif()
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

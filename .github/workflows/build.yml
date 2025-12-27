@@ -37,17 +37,9 @@ jobs:
         run: git submodule update --init
         shell: powershell
 
-      - name: Install fmt Library
-        run: |
-          cd ./Externals/fmt
-          cmake -S . -B build -A x64 -DCMAKE_INSTALL_PREFIX=install -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
-          cmake --build build --config ${{ matrix.configuration }} --target install --parallel
-          cd ../..
-        shell: powershell
-
       - name: Build
         run: |
-          cmake Source -B .\Source\bin -A x64 "-DCMAKE_PREFIX_PATH=..\Externals\Qt\Qt6.5.3\x64;..\Externals\fmt\install"
+          cmake Source -B .\Source\bin -A x64 "-DCMAKE_PREFIX_PATH=..\Externals\Qt\Qt6.5.3\x64"
           cmake --build .\Source\bin --config ${{ matrix.configuration }} --parallel
         shell: powershell
 
