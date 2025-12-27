@@ -16,9 +16,11 @@
 
 MemWatchEntry::MemWatchEntry(QString label, const u32 consoleAddress, const Common::MemType type,
                              const Common::MemBase base, const bool isUnsigned, const size_t length,
-                             const bool isBoundToPointer)
+                             const bool isBoundToPointer, const bool absoluteBranch)
     : m_label(std::move(label)), m_consoleAddress(consoleAddress), m_type(type), m_base(base),
-      m_isUnsigned(isUnsigned), m_boundToPointer(isBoundToPointer), m_length(length)
+      m_isUnsigned(isUnsigned), m_absoluteBranch(absoluteBranch),
+      m_boundToPointer(isBoundToPointer), m_length(length)
+
 {
   m_memory = new char[getSizeForType(m_type, m_length)];
   m_curActualAddress = getActualAddress();
@@ -33,14 +35,16 @@ MemWatchEntry::MemWatchEntry()
   m_isUnsigned = false;
   m_consoleAddress = 0x80000000;
   m_curActualAddress = 0x80000000;
+  m_absoluteBranch = false;
 }
 
 MemWatchEntry::MemWatchEntry(MemWatchEntry* entry)
     : m_label(entry->m_label), m_consoleAddress(entry->m_consoleAddress), m_type(entry->m_type),
       m_base(entry->m_base), m_isUnsigned(entry->m_isUnsigned),
-      m_boundToPointer(entry->m_boundToPointer), m_pointerOffsets(entry->m_pointerOffsets),
-      m_isValidPointer(entry->m_isValidPointer), m_length(entry->m_length),
-      m_structName(entry->m_structName), m_curActualAddress(entry->m_curActualAddress)
+      m_absoluteBranch(entry->m_absoluteBranch), m_boundToPointer(entry->m_boundToPointer),
+      m_pointerOffsets(entry->m_pointerOffsets), m_isValidPointer(entry->m_isValidPointer),
+      m_length(entry->m_length), m_structName(entry->m_structName),
+      m_curActualAddress(entry->m_curActualAddress)
 {
   m_memory = new char[getSizeForType(entry->getType(), entry->getLength())];
   std::memcpy(m_memory, entry->getMemory(), getSizeForType(entry->getType(), entry->getLength()));
@@ -112,6 +116,11 @@ bool MemWatchEntry::isUnsigned() const
   return m_isUnsigned;
 }
 
+bool MemWatchEntry::isAbsoluteBranch() const
+{
+  return m_absoluteBranch;
+}
+
 void MemWatchEntry::setLabel(const QString& label)
 {
   m_label = label;
@@ -165,6 +174,11 @@ void MemWatchEntry::setLock(const bool doLock)
 void MemWatchEntry::setSignedUnsigned(const bool isUnsigned)
 {
   m_isUnsigned = isUnsigned;
+}
+
+void MemWatchEntry::setBranchType(const bool absoluteBranch)
+{
+  m_absoluteBranch = absoluteBranch;
 }
 
 void MemWatchEntry::setBoundToPointer(const bool boundToPointer)
@@ -353,15 +367,16 @@ std::string MemWatchEntry::getStringFromMemory() const
   if ((m_boundToPointer && !m_isValidPointer) ||
       !DolphinComm::DolphinAccessor::isValidConsoleAddress(m_consoleAddress))
     return "???";
-  return Common::formatMemoryToString(m_memory, m_type, m_length, m_base, m_isUnsigned);
+  return Common::formatMemoryToString(m_memory, m_type, m_length, m_base, m_isUnsigned, false,
+                                      m_absoluteBranch ? m_consoleAddress : 0);
 }
 
 Common::MemOperationReturnCode MemWatchEntry::writeMemoryFromString(const std::string& inputString)
 {
   Common::MemOperationReturnCode writeReturn = Common::MemOperationReturnCode::OK;
   size_t sizeToWrite = 0;
-  char* buffer =
-      Common::formatStringToMemory(writeReturn, sizeToWrite, inputString, m_base, m_type, m_length);
+  char* buffer = Common::formatStringToMemory(writeReturn, sizeToWrite, inputString, m_base, m_type,
+                                              m_length, m_consoleAddress);
   if (writeReturn != Common::MemOperationReturnCode::OK)
     return writeReturn;
 
@@ -408,6 +423,9 @@ void MemWatchEntry::readFromJson(const QJsonObject& json)
   {
     setBoundToPointer(false);
   }
+
+  if (json["absoluteBranch"] != QJsonValue::Undefined)
+    m_absoluteBranch = json["absoluteBranch"].toBool();
 }
 
 void MemWatchEntry::writeToJson(QJsonObject& json) const
@@ -435,4 +453,6 @@ void MemWatchEntry::writeToJson(QJsonObject& json) const
     }
     json["pointerOffsets"] = offsets;
   }
+
+  json["absoluteBranch"] = m_absoluteBranch;
 }

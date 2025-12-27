@@ -179,7 +179,7 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
 
         contextMenu->addAction(showInViewer);
       }
-      if (theType != Common::MemType::type_string)
+      if (theType != Common::MemType::type_string && theType != Common::MemType::type_ppc)
       {
         contextMenu->addSeparator();
 
@@ -238,6 +238,27 @@ void MemWatchWidget::onMemWatchContextMenuRequested(const QPoint& pos)
                 ->setEnabled(false);
           }
         }
+      }
+      if (theType == Common::MemType::type_ppc)
+      {
+        contextMenu->addSeparator();
+
+        QAction* b_absolute = new QAction(tr("Branch Type &Absolute"), this);
+        QAction* b_relative = new QAction(tr("Branch Type &Relative"), this);
+
+        connect(b_absolute, &QAction::triggered, m_watchModel, [this, entry] {
+          entry->setBranchType(true);
+          m_hasUnsavedChanges = true;
+        });
+        connect(b_relative, &QAction::triggered, m_watchModel, [this, entry] {
+          entry->setBranchType(false);
+          m_hasUnsavedChanges = true;
+        });
+
+        contextMenu->addAction(b_absolute);
+        contextMenu->addAction(b_relative);
+
+        contextMenu->actions().at((entry->isAbsoluteBranch() ? 0 : 1) + 2)->setEnabled(false);
       }
       contextMenu->addSeparator();
       QAction* lockSelection = new QAction(tr("Lock"), this);
@@ -597,6 +618,8 @@ void MemWatchWidget::onValueWriteError(const QModelIndex& index,
     break;
   }
   case Common::MemOperationReturnCode::OK:
+    break;
+  case Common::MemOperationReturnCode::noAbsoluteBranchForPPC:
     break;
   }
 }

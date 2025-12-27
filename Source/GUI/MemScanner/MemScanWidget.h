@@ -51,11 +51,11 @@ public:
 
 signals:
   void requestAddWatchEntry(u32 address, Common::MemType type, size_t length, bool isUnsigned,
-                            Common::MemBase base);
+                            Common::MemBase base, bool isBranchAbsolute);
   void requestAddSelectedResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
-                                            Common::MemBase base);
+                                            Common::MemBase base, bool isBranchAbsolute);
   void requestAddAllResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
-                                       Common::MemBase base);
+                                       Common::MemBase base, bool isBranchAbsolute);
   void mustUnhook();
 
 private:
@@ -86,6 +86,7 @@ private:
   QComboBox* m_cmbScanType{};
   QLabel* m_lblResultCount{};
   QCheckBox* m_chkSignedScan{};
+  QCheckBox* m_chkAbsoluteBranch{};
   QCheckBox* m_chkEnforceMemAlignment{};
   QButtonGroup* m_btnGroupScanBase{};
   QRadioButton* m_rdbBaseDecimal{};
