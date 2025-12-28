@@ -98,7 +98,7 @@ find_package(Qt6Svg REQUIRED)
 if (WIN32)
     add_subdirectory(
         ${CMAKE_CURRENT_LIST_DIR}/../Externals/fmt
-        ${CMAKE_CURRENT_LIST_DIR}/../Externals/fmt
+        ./fmt
     )
 else ()
     find_package(fmt REQUIRED)
