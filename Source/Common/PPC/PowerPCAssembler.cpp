@@ -393,10 +393,11 @@ u32 PowerPCAssembler::StringToNumber(const std::string& token, const bool consid
     }
   }
 
-  if (toReturn > 0x10000000 && current_instruction_address != 0)
+  if (toReturn > 0x10000000 && toReturn < 0xF8000000 && current_instruction_address != 0)
   {
     // handle case of branch addresses being given as absolute values. It's assumed if its a very
-    // large value its an absolute branch address
+    // large value its an absolute branch address. Ignore values too high for instructions like
+    // 'ba' since they can branch to ->0xFFFFFFFF
     toReturn = toReturn - current_instruction_address;
   }
   else if (isNegative)
