@@ -95,15 +95,6 @@ find_package(Qt6Core REQUIRED)
 find_package(Qt6Gui REQUIRED)
 find_package(Qt6Svg REQUIRED)
 
-if (WIN32)
-    add_subdirectory(
-        ${CMAKE_CURRENT_LIST_DIR}/../Externals/fmt
-        ./fmt
-    )
-else ()
-    find_package(fmt REQUIRED)
-endif()
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
@@ -141,7 +132,6 @@ target_link_libraries(dolphin-memory-engine Qt6::Widgets)
 target_link_libraries(dolphin-memory-engine Qt6::Gui)
 target_link_libraries(dolphin-memory-engine Qt6::Core)
 target_link_libraries(dolphin-memory-engine Qt6::Svg)
-target_link_libraries(dolphin-memory-engine fmt::fmt)
 
 if(WIN32)
     set_target_properties(dolphin-memory-engine PROPERTIES OUTPUT_NAME DolphinMemoryEngine)
