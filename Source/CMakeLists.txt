@@ -46,6 +46,8 @@ endif(APPLE)
 set(SRCS ${DolphinProcessSrc}
          DolphinProcess/DolphinAccessor.cpp
          Common/MemoryCommon.cpp
+         Common/PPC/PowerPCAssembler.cpp
+         Common/PPC/PowerPCDisassembler.cpp
          MemoryWatch/MemWatchEntry.cpp
          MemoryWatch/MemWatchTreeNode.cpp
          CheatEngineParser/CheatEngineParser.cpp

@@ -256,34 +256,34 @@ void MainWindow::makeMemViewer()
 }
 
 void MainWindow::addSelectedResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
-                                               Common::MemBase base)
+                                               Common::MemBase base, bool isBranchAbsolute)
 {
   QModelIndexList selection = m_scanner->getSelectedResults();
   for (int i = 0; i < selection.count(); i++)
   {
     u32 address = m_scanner->getResultListModel()->getResultAddress(selection.at(i).row());
-    MemWatchEntry* newEntry =
-        new MemWatchEntry(tr("No label"), address, type, base, isUnsigned, length);
+    MemWatchEntry* newEntry = new MemWatchEntry(tr("No label"), address, type, base, isUnsigned,
+                                                length, false, isBranchAbsolute);
     m_watcher->addWatchEntry(newEntry);
   }
 }
 
 void MainWindow::addAllResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
-                                          Common::MemBase base)
+                                          Common::MemBase base, bool isBranchAbsolute)
 {
   for (auto item : m_scanner->getAllResults())
   {
-    MemWatchEntry* newEntry =
-        new MemWatchEntry(tr("No label"), item, type, base, isUnsigned, length);
+    MemWatchEntry* newEntry = new MemWatchEntry(tr("No label"), item, type, base, isUnsigned,
+                                                length, false, isBranchAbsolute);
     m_watcher->addWatchEntry(newEntry);
   }
 }
 
 void MainWindow::addWatchRequested(u32 address, Common::MemType type, size_t length,
-                                   bool isUnsigned, Common::MemBase base)
+                                   bool isUnsigned, Common::MemBase base, bool isBranchAbsolute)
 {
-  MemWatchEntry* newEntry =
-      new MemWatchEntry(tr("No label"), address, type, base, isUnsigned, length);
+  MemWatchEntry* newEntry = new MemWatchEntry(tr("No label"), address, type, base, isUnsigned,
+                                              length, false, isBranchAbsolute);
   m_watcher->addWatchEntry(newEntry);
 }
 

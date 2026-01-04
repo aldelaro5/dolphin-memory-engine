@@ -9,6 +9,8 @@
 
 #include "../Common/CommonTypes.h"
 #include "../Common/CommonUtils.h"
+#include "../Common/PPC/PowerPCAssembler.h"
+#include "../Common/PPC/PowerPCDisassembler.h"
 #include "../GUI/Settings/SConfig.h"
 
 namespace Common
@@ -75,6 +77,8 @@ size_t getSizeForType(const MemType type, const size_t length)
     return length;
   case MemType::type_struct:
     return length;
+  case MemType::type_ppc:
+    return sizeof(u32);
   default:
     return 0;
   }
@@ -100,6 +104,8 @@ bool shouldBeBSwappedForType(const MemType type)
     return false;
   case MemType::type_struct:
     return false;
+  case MemType::type_ppc:
+    return true;
   default:
     return false;
   }
@@ -125,6 +131,8 @@ int getNbrBytesAlignmentForType(const MemType type)
     return 1;
   case MemType::type_struct:
     return 1;
+  case MemType::type_ppc:
+    return 4;
   default:
     return 1;
   }
@@ -132,7 +140,7 @@ int getNbrBytesAlignmentForType(const MemType type)
 
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
                            const std::string_view inputString, const MemBase base,
-                           const MemType type, const size_t length)
+                           const MemType type, const size_t length, u32 ppcBranchOrigin)
 {
   if (inputString.empty())
   {
@@ -463,6 +471,13 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
     actualLength = bytes.size();
     break;
   }
+  case Common::MemType::type_ppc:
+  {
+    u32 result = Common::PowerPCAssembler::PPCAssemble(inputString.data(), ppcBranchOrigin);
+    memcpy(buffer, &result, size);
+    actualLength = size;
+    break;
+  }
 
   default:
   {
@@ -472,8 +487,10 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
   return buffer;
 }
 
+// ppcBranchOrigin = 0 means relative branch, non-zero means absolute branch will be shown
 std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
-                                 const MemBase base, const bool isUnsigned, const bool withBSwap)
+                                 const MemBase base, const bool isUnsigned, const bool withBSwap,
+                                 const u32 ppcBranchOrigin)
 {
   std::stringstream ss;
   switch (base)
@@ -697,6 +714,20 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
     // Remove the space at the end
     str.pop_back();
     return str;
+  }
+  case Common::MemType::type_ppc:
+  {
+    u32 binary = 0;
+    for (size_t i{0}; i < 4; ++i)
+    {
+      if (!withBSwap)
+        binary |= (static_cast<u8>(memory[i])) << (i * 8);
+      else
+        binary |= (static_cast<u8>(memory[i])) << ((3 - i) * 8);
+    }
+    // returns binary (big endian mode).
+    // Branch is relative if ppcBranchOrigin == 0, absolute otherwise
+    return Common::PowerPCDisassembler::PPCDisassemble(binary, ppcBranchOrigin);
   }
   default:
     return "";

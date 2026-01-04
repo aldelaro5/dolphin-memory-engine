@@ -15,7 +15,8 @@ public:
   MemWatchEntry();
   MemWatchEntry(QString label, u32 consoleAddress, Common::MemType type,
                 Common::MemBase = Common::MemBase::base_decimal, bool m_isUnsigned = false,
-                size_t length = 1, bool isBoundToPointer = false);
+                size_t length = 1, bool isBoundToPointer = false,
+                const bool absoluteBranch = false);
   explicit MemWatchEntry(MemWatchEntry* entry);
   ~MemWatchEntry();
 
@@ -33,6 +34,7 @@ public:
   size_t getLength() const;
   char* getMemory() const;
   bool isUnsigned() const;
+  bool isAbsoluteBranch() const;
   int getPointerOffset(int index) const;
   std::vector<int> getPointerOffsets() const;
   size_t getPointerLevel() const;
@@ -42,6 +44,7 @@ public:
   void setBase(Common::MemBase base);
   void setLock(bool doLock);
   void setSignedUnsigned(bool isUnsigned);
+  void setBranchType(bool absoluteBranch);  // true = absolute, false = relative
   void setBoundToPointer(bool boundToPointer);
   void setPointerOffset(int pointerOffset, int index);
   void addOffset(int offset);
@@ -74,6 +77,7 @@ private:
   Common::MemType m_type;
   Common::MemBase m_base;
   bool m_isUnsigned;
+  bool m_absoluteBranch;  // true = absolute, false = relative
   bool m_boundToPointer = false;
   std::vector<int> m_pointerOffsets;
   bool m_isValidPointer = false;
