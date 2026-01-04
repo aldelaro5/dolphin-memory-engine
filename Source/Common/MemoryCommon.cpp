@@ -727,7 +727,7 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
     }
     // returns binary (big endian mode).
     // Branch is relative if ppcBranchOrigin == 0, absolute otherwise
-    return Common::PowerPCDisassembler::Disassemble(binary, ppcBranchOrigin, true);
+    return Common::PowerPCDisassembler::PPCDisassemble(binary, ppcBranchOrigin);
   }
   default:
     return "";
