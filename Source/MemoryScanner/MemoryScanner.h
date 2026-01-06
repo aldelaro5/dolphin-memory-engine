@@ -130,6 +130,7 @@ public:
   void setBase(Common::MemBase base);
   void setEnforceMemAlignment(bool enforceAlignment);
   void setIsSigned(bool isSigned);
+  void setBranchIsAbsolute(const bool isAbsolute);
   void resetSearchRange();
   bool setSearchRangeBegin(u32 beginRange);
   bool setSearchRangeEnd(u32 endRange);
@@ -144,6 +145,7 @@ public:
   Common::MemBase getBase() const;
   size_t getLength() const;
   bool getIsUnsigned() const;
+  bool getIsBranchAbsolute() const;
   std::string getFormattedScannedValueAt(int index) const;
   std::string getFormattedCurrentValueAt(int index) const;
   void removeResultAt(int index);
@@ -154,6 +156,8 @@ private:
   inline bool isHitNextScan(ScanFilter filter, const char* memoryToCompare1,
                             const char* memoryToCompare2, const char* noOffset,
                             const char* newerRAMCache, size_t realSize, u32 consoleOffset) const;
+  u32 memoryToStringWithAbsoluteBranchAmount(const char* memory, const bool bSwap,
+                                             const u32 ppcBranchOrigin) const;
 
   bool m_searchInRangeBegin = false;
   bool m_searchInRangeEnd = false;
@@ -165,6 +169,7 @@ private:
   size_t m_memSize{};
   bool m_enforceMemAlignment = true;
   bool m_memIsSigned = false;
+  bool m_branchIsAbsolute = false;
 
   size_t m_resultCount = 0;
   size_t m_undoCount = 0;

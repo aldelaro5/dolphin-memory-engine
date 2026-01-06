@@ -130,6 +130,39 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
     }
   }
 
+  // in the case of PPC instructions, we don't want to grab this same information per address check,
+  // so we do it once here and use it everywhere else
+  std::string mem_back_to_str1 = "";
+  u32 absolute_b_addr1 = 0;
+  u32 absolute_b_addr2 = 0;
+  if (m_memType == Common::MemType::type_ppc)
+  {
+    mem_back_to_str1 = Common::formatMemoryToString(memoryToCompare1, m_memType,
+                                                    Common::getSizeForType(m_memType, m_memSize),
+                                                    m_memBase, !m_memIsSigned);
+    try
+    {
+      absolute_b_addr1 = static_cast<u32>(std::stoul(formattedSearchTerm1, nullptr, 16));
+    }
+    catch (...)
+    {
+      absolute_b_addr1 = 0;
+    }
+    try
+    {
+      absolute_b_addr2 = static_cast<u32>(std::stoul(searchTerm2, nullptr, 16));
+    }
+    catch (...)
+    {
+      absolute_b_addr2 = 0;
+    }
+
+    if (m_branchIsAbsolute && absolute_b_addr1 < 0x10000000)
+      return Common::MemOperationReturnCode::noAbsoluteBranchForPPC;
+    if (m_branchIsAbsolute && absolute_b_addr2 < 0x10000000 && filter == ScanFilter::between)
+      return Common::MemOperationReturnCode::noAbsoluteBranchForPPC;
+  }
+
   m_memSize = Common::getSizeForType(m_memType, termActualLength);
 
   char* noOffset = new char[m_memSize];
@@ -144,19 +177,70 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
   {
     char* memoryCandidate = &m_scanRAMCache[i];
     bool isResult = false;
+
+    bool aramAccessible = DolphinComm::DolphinAccessor::isARAMAccessible();
+    u32 consoleOffset = Common::cacheIndexToOffset(i, aramAccessible);
+    u32 cur_address = Common::offsetToDolphinAddr(consoleOffset, aramAccessible);
+
     switch (filter)
     {
     case ScanFilter::exact:
     {
       if (m_memType == Common::MemType::type_string || m_memType == Common::MemType::type_byteArray)
+      {
         isResult = (std::memcmp(memoryCandidate, memoryToCompare1, m_memSize) == 0);
+      }
+      else if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
+      {
+        if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
+                                                           memoryCandidate[0] & 0xF8))
+        {
+          // invalid opcode
+          isResult = false;
+          break;
+        }
+        // when searching for absolute branches, we need to calculate the branch target of the
+        // instruction at this memory location and see if it matches the desired target
+        u32 cur_b_tar = memoryToStringWithAbsoluteBranchAmount(
+            memoryCandidate, Common::shouldBeBSwappedForType(m_memType), cur_address);
+        isResult = (cur_b_tar != 0xFFFFFFFF) && (cur_b_tar == absolute_b_addr1);
+      }
+      else if (m_memType == Common::MemType::type_ppc &&
+               (Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
+                                                             memoryCandidate[0] & 0xF8))
+      {
+        // accounts for situations where an instruction can be represented in different ways. i.e.
+        // blr is 0x4FFF0020 and 0x4E800020. invalid opcodes skipped for performance
+        isResult = mem_back_to_str1 ==
+                   Common::formatMemoryToString(
+                       memoryCandidate, m_memType,
+                       Common::getSizeForType(Common::MemType::type_ppc, m_memSize), m_memBase,
+                       !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
+      }
       else
+      {
         isResult = (compareMemoryAsNumbers(memoryCandidate, memoryToCompare1, noOffset, false,
                                            false, m_memSize) == MemScanner::CompareResult::equal);
+      }
       break;
     }
     case ScanFilter::between:
     {
+      if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
+      {
+        if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
+                                                           memoryCandidate[0] & 0xF8))
+        {
+          // invalid opcode
+          isResult = false;
+          break;
+        }
+        u32 cur_b_tar = memoryToStringWithAbsoluteBranchAmount(
+            memoryCandidate, Common::shouldBeBSwappedForType(m_memType), cur_address);
+        isResult = (cur_b_tar != 0xFFFFFFFF) &&
+                   (cur_b_tar >= absolute_b_addr1 && cur_b_tar <= absolute_b_addr2);
+        break;
+      }
       MemScanner::CompareResult result1 = compareMemoryAsNumbers(memoryCandidate, memoryToCompare1,
                                                                  noOffset, false, false, m_memSize);
       MemScanner::CompareResult result2 = compareMemoryAsNumbers(memoryCandidate, memoryToCompare2,
@@ -169,12 +253,40 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
     }
     case ScanFilter::biggerThan:
     {
+      if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
+      {
+        if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
+                                                           memoryCandidate[0] & 0xF8))
+        {
+          // invalid opcode
+          isResult = false;
+          break;
+        }
+        u32 cur_b_tar = memoryToStringWithAbsoluteBranchAmount(
+            memoryCandidate, Common::shouldBeBSwappedForType(m_memType), cur_address);
+        isResult = (cur_b_tar != 0xFFFFFFFF) && (cur_b_tar > absolute_b_addr1);
+        break;
+      }
       isResult = (compareMemoryAsNumbers(memoryCandidate, memoryToCompare1, noOffset, false, false,
                                          m_memSize) == MemScanner::CompareResult::bigger);
       break;
     }
     case ScanFilter::smallerThan:
     {
+      if (m_branchIsAbsolute && m_memType == Common::MemType::type_ppc)
+      {
+        if (!(Common::shouldBeBSwappedForType(m_memType) ? memoryCandidate[3] & 0xF8 :
+                                                           memoryCandidate[0] & 0xF8))
+        {
+          // invalid opcode
+          isResult = false;
+          break;
+        }
+        u32 cur_b_tar = memoryToStringWithAbsoluteBranchAmount(
+            memoryCandidate, Common::shouldBeBSwappedForType(m_memType), cur_address);
+        isResult = (cur_b_tar != 0xFFFFFFFF) && (cur_b_tar < absolute_b_addr1);
+        break;
+      }
       isResult = (compareMemoryAsNumbers(memoryCandidate, memoryToCompare1, noOffset, false, false,
                                          m_memSize) == MemScanner::CompareResult::smaller);
       break;
@@ -185,9 +297,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
 
     if (isResult)
     {
-      bool aramAccessible = DolphinComm::DolphinAccessor::isARAMAccessible();
-      u32 consoleOffset = Common::cacheIndexToOffset(i, aramAccessible);
-      m_resultsConsoleAddr.push_back(Common::offsetToDolphinAddr(consoleOffset, aramAccessible));
+      m_resultsConsoleAddr.push_back(cur_address);
     }
   }
   delete[] noOffset;
@@ -320,12 +430,35 @@ inline bool MemScanner::isHitNextScan(const MemScanner::ScanFilter filter,
   char* olderMemory = &m_scanRAMCache[consoleOffset];
   const char* newerMemory = &newerRAMCache[consoleOffset];
 
+  // in the case of PPC instructions, we don't want to do the same MemoryToString operation for
+  // every address, so get it here once and use it later.
+  std::string MemoryBackToString = "";
+  if (m_memType == Common::MemType::type_ppc)
+  {
+    MemoryBackToString = Common::formatMemoryToString(
+        memoryToCompare1, m_memType, Common::getSizeForType(Common::MemType::type_ppc, m_memSize),
+        m_memBase, !m_memIsSigned, false);
+  }
+
   switch (filter)
   {
   case ScanFilter::exact:
   {
     if (m_memType == Common::MemType::type_string || m_memType == Common::MemType::type_byteArray)
       return (std::memcmp(newerMemory, memoryToCompare1, realSize) == 0);
+    if (m_memType == Common::MemType::type_ppc &&
+        (Common::shouldBeBSwappedForType(m_memType) ? newerMemory[3] & 0xF8 :
+                                                      newerMemory[0] & 0xF8))
+    {
+      // accounts for situations where an instruction can be represented in different ways. i.e.
+      // blr is 0x4FFF0020 and 0x4E800020. Code doesn't enter here to speedup performance if
+      // opcode is 0 or 1 as no instruction can have these opcodes
+      return MemoryBackToString == Common::formatMemoryToString(
+                                       newerMemory, m_memType,
+                                       Common::getSizeForType(Common::MemType::type_ppc, m_memSize),
+                                       m_memBase, !m_memIsSigned,
+                                       Common::shouldBeBSwappedForType(m_memType));
+    }
 
     return (compareMemoryAsNumbers(newerMemory, memoryToCompare1, noOffset, false, false,
                                    realSize) == MemScanner::CompareResult::equal);
@@ -414,6 +547,8 @@ MemScanner::compareMemoryAsNumbers(const char* first, const char* second, const 
     return compareMemoryAsNumbersWithType<float>(first, second, offset, offsetInvert, bswapSecond);
   case Common::MemType::type_double:
     return compareMemoryAsNumbersWithType<double>(first, second, offset, offsetInvert, bswapSecond);
+  case Common::MemType::type_ppc:
+    return compareMemoryAsNumbersWithType<u32>(first, second, offset, offsetInvert, bswapSecond);
   default:
     return MemScanner::CompareResult::nan;
   }
@@ -437,6 +572,11 @@ void MemScanner::setEnforceMemAlignment(const bool enforceAlignment)
 void MemScanner::setIsSigned(const bool isSigned)
 {
   m_memIsSigned = isSigned;
+}
+
+void MemScanner::setBranchIsAbsolute(const bool isAbsolute)
+{
+  m_branchIsAbsolute = isAbsolute;
 }
 
 void MemScanner::resetSearchRange()
@@ -525,7 +665,8 @@ std::string MemScanner::getFormattedScannedValueAt(const int index) const
   u32 ramIndex = Common::offsetToCacheIndex(offset, aramAccessible);
   const size_t length{m_memType == Common::MemType::type_string ? ~0ULL : m_memSize};
   return Common::formatMemoryToString(&m_scanRAMCache[ramIndex], m_memType, length, m_memBase,
-                                      !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
+                                      !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType),
+                                      m_branchIsAbsolute ? m_resultsConsoleAddr.at(index) : 0);
 }
 
 std::string MemScanner::getFormattedCurrentValueAt(const int index) const
@@ -534,10 +675,27 @@ std::string MemScanner::getFormattedCurrentValueAt(const int index) const
   {
     bool aramAccessible = DolphinComm::DolphinAccessor::isARAMAccessible();
     u32 offset = Common::dolphinAddrToOffset(m_resultsConsoleAddr.at(index), aramAccessible);
-    return DolphinComm::DolphinAccessor::getFormattedValueFromMemory(offset, m_memType, m_memSize,
-                                                                     m_memBase, !m_memIsSigned);
+    return DolphinComm::DolphinAccessor::getFormattedValueFromMemory(
+        offset, m_memType, m_memSize, m_memBase, !m_memIsSigned,
+        m_branchIsAbsolute ? m_resultsConsoleAddr.at(index) : 0);
   }
   return "";
+}
+
+u32 MemScanner::memoryToStringWithAbsoluteBranchAmount(const char* memory, const bool bSwap,
+                                                       const u32 ppcBranchOrigin) const
+{
+  std::string str =
+      Common::formatMemoryToString(memory, m_memType, Common::getSizeForType(m_memType, m_memSize),
+                                   m_memBase, !m_memIsSigned, bSwap, ppcBranchOrigin);
+
+  size_t arrow_pos = str.find("->0x");
+  if (arrow_pos != std::string::npos)
+  {
+    // str always ends with ->0xADDR if branch
+    return static_cast<u32>(std::stoul(str.substr(arrow_pos + 4), nullptr, 16));
+  }
+  return 0xFFFFFFFF;
 }
 
 void MemScanner::removeResultAt(int index)
@@ -611,4 +769,9 @@ size_t MemScanner::getLength() const
 bool MemScanner::getIsUnsigned() const
 {
   return !m_memIsSigned;
+}
+
+bool MemScanner::getIsBranchAbsolute() const
+{
+  return m_branchIsAbsolute;
 }

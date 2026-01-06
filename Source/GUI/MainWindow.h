@@ -30,11 +30,11 @@ public:
 
   void closeEvent(QCloseEvent* event) override;
   void addWatchRequested(u32 address, Common::MemType type, size_t length, bool isUnsigned,
-                         Common::MemBase base);
+                         Common::MemBase base, bool isBranchAbsolute);
   void addSelectedResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
-                                     Common::MemBase base);
+                                     Common::MemBase base, bool isBranchAbsolute);
   void addAllResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
-                                Common::MemBase base);
+                                Common::MemBase base, bool isBranchAbsolute);
   void updateDolphinHookingStatus();
   void onHookAttempt();
   void onUnhook();

@@ -34,7 +34,7 @@ public:
   static Common::MemOperationReturnCode readEntireRAM(char* buffer);
   static std::string getFormattedValueFromMemory(u32 ramIndex, Common::MemType memType,
                                                  size_t memSize, Common::MemBase memBase,
-                                                 bool memIsUnsigned);
+                                                 bool memIsUnsigned, u32 ppcBranchOrigin);
   static bool isValidConsoleAddress(u32 address);
 
 private:
