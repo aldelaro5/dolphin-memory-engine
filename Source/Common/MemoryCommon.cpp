@@ -67,6 +67,8 @@ size_t getSizeForType(const MemType type, const size_t length)
     return sizeof(u16);
   case MemType::type_word:
     return sizeof(u32);
+  case MemType::type_doubleword:
+    return sizeof(u64);
   case MemType::type_float:
     return sizeof(float);
   case MemType::type_double:
@@ -93,6 +95,8 @@ bool shouldBeBSwappedForType(const MemType type)
   case MemType::type_halfword:
     return true;
   case MemType::type_word:
+    return true;
+  case MemType::type_doubleword:
     return true;
   case MemType::type_float:
     return true;
@@ -121,6 +125,8 @@ int getNbrBytesAlignmentForType(const MemType type)
     return 2;
   case MemType::type_word:
     return 4;
+  case MemType::type_doubleword:
+    return 8;
   case MemType::type_float:
     return 4;
   case MemType::type_double:
@@ -280,6 +286,43 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
 
     std::memcpy(buffer, &theWord, size);
     actualLength = sizeof(u32);
+    break;
+  }
+
+  case MemType::type_doubleword:
+  {
+    u64 theDoubleword = 0;
+    if (base == MemBase::base_binary)
+    {
+      u64 input{};
+      try
+      {
+        input = static_cast<u64>(
+            std::bitset<sizeof(u64) * 8>(inputString.data(), inputString.size()).to_ullong());
+      }
+      catch (const std::invalid_argument&)
+      {
+        delete[] buffer;
+        buffer = nullptr;
+        returnCode = MemOperationReturnCode::invalidInput;
+        return buffer;
+      }
+      theDoubleword = input;
+    }
+    else
+    {
+      ss >> theDoubleword;
+      if (ss.fail())
+      {
+        delete[] buffer;
+        buffer = nullptr;
+        returnCode = MemOperationReturnCode::invalidInput;
+        return buffer;
+      }
+    }
+
+    std::memcpy(buffer, &theDoubleword, size);
+    actualLength = sizeof(u64);
     break;
   }
 
@@ -596,6 +639,37 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
     s32 aWord = 0;
     std::memcpy(&aWord, memoryCopy, sizeof(s32));
     ss << aWord;
+    delete[] memoryCopy;
+    return ss.str();
+  }
+  case Common::MemType::type_doubleword:
+  {
+    char* memoryCopy = new char[sizeof(u64)];
+    std::memcpy(memoryCopy, memory, sizeof(u64));
+    if (withBSwap)
+    {
+      u64 doubleword = 0;
+      std::memcpy(&doubleword, memoryCopy, sizeof(u64));
+      doubleword = Common::bSwap64(doubleword);
+      std::memcpy(memoryCopy, &doubleword, sizeof(u64));
+    }
+
+    if (isUnsigned || base == Common::MemBase::base_binary)
+    {
+      u64 unsignedDoubleword = 0;
+      std::memcpy(&unsignedDoubleword, memoryCopy, sizeof(u64));
+      if (base == Common::MemBase::base_binary)
+      {
+        delete[] memoryCopy;
+        return std::bitset<sizeof(u64) * 8>(unsignedDoubleword).to_string();
+      }
+      ss << unsignedDoubleword;
+      delete[] memoryCopy;
+      return ss.str();
+    }
+    s64 aDoubleword = 0;
+    std::memcpy(&aDoubleword, memoryCopy, sizeof(s64));
+    ss << aDoubleword;
     delete[] memoryCopy;
     return ss.str();
   }

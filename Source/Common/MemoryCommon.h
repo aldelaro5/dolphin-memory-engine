@@ -36,6 +36,7 @@ enum class MemType
   type_byteArray,
   type_struct,
   type_ppc,
+  type_doubleword,
   type_none  // Placeholder for the entry of a child node of a collapsed container
 };
 

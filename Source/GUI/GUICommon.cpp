@@ -12,6 +12,7 @@ QStringList g_memTypeNames =
     QStringList({QCoreApplication::translate("Common", "Byte"),
                  QCoreApplication::translate("Common", "2 bytes (Halfword)"),
                  QCoreApplication::translate("Common", "4 bytes (Word)"),
+                 QCoreApplication::translate("Common", "8 bytes (Doubleword)"),
                  QCoreApplication::translate("Common", "Float"),
                  QCoreApplication::translate("Common", "Double"),
                  QCoreApplication::translate("Common", "String"),
@@ -46,6 +47,7 @@ QString getStringFromType(const Common::MemType type, const size_t length)
   case Common::MemType::type_byte:
   case Common::MemType::type_halfword:
   case Common::MemType::type_word:
+  case Common::MemType::type_doubleword:
   case Common::MemType::type_float:
   case Common::MemType::type_double:
   case Common::MemType::type_struct:
