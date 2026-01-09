@@ -75,17 +75,18 @@ bool MemWatchModel::updateNodeValueRecursive(MemWatchTreeNode* node, const QMode
     updateContainerAddresses(node);
 
   QVector<MemWatchTreeNode*> children = node->getChildren();
-  if (children.count() > 0)
+  for (MemWatchTreeNode* const child : children)
   {
-    for (MemWatchTreeNode* const child : children)
-    {
-      QModelIndex theIndex = index(child->getRow(), WATCH_COL_VALUE, parent);
-      readSucess = updateNodeValueRecursive(child, theIndex, readSucess);
-      if (!readSucess)
-        return false;
-      if (!GUICommon::g_valueEditing && !child->isGroup())
-        emit dataChanged(theIndex, theIndex);
-    }
+    // Don't bother update children that aren't visible
+    if (child->isGroup() && !child->isExpanded())
+      continue;
+
+    QModelIndex theIndex = index(child->getRow(), WATCH_COL_VALUE, parent);
+    readSucess = updateNodeValueRecursive(child, theIndex, readSucess);
+    if (!readSucess)
+      return false;
+    if (!GUICommon::g_valueEditing && !child->isGroup())
+      emit dataChanged(theIndex, theIndex);
   }
 
   MemWatchEntry* entry = node->getEntry();
@@ -99,15 +100,12 @@ bool MemWatchModel::freezeNodeValueRecursive(MemWatchTreeNode* node, const QMode
                                              bool writeSucess)
 {
   QVector<MemWatchTreeNode*> children = node->getChildren();
-  if (children.count() > 0)
+  for (MemWatchTreeNode* const child : children)
   {
-    for (MemWatchTreeNode* const child : children)
-    {
-      QModelIndex theIndex = index(child->getRow(), WATCH_COL_VALUE, parent);
-      writeSucess = freezeNodeValueRecursive(child, theIndex, writeSucess);
-      if (!writeSucess)
-        return false;
-    }
+    QModelIndex theIndex = index(child->getRow(), WATCH_COL_VALUE, parent);
+    writeSucess = freezeNodeValueRecursive(child, theIndex, writeSucess);
+    if (!writeSucess)
+      return false;
   }
 
   MemWatchEntry* entry = node->getEntry();
