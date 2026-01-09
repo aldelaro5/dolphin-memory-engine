@@ -161,6 +161,8 @@ void CheatEngineParser::parseCheatEntry(MemWatchTreeNode* node, const bool useDo
           type = Common::MemType::type_halfword;
         else if (strVarType == "4 Byte Big Endian")
           type = Common::MemType::type_word;
+        else if (strVarType == "8 Byte Big Endian")
+          type = Common::MemType::type_doubleword;
         else if (strVarType == "Float Big Endian")
           type = Common::MemType::type_float;
         else

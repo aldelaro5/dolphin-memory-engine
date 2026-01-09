@@ -543,6 +543,10 @@ MemScanner::compareMemoryAsNumbers(const char* first, const char* second, const 
     if (m_memIsSigned)
       return compareMemoryAsNumbersWithType<s32>(first, second, offset, offsetInvert, bswapSecond);
     return compareMemoryAsNumbersWithType<u32>(first, second, offset, offsetInvert, bswapSecond);
+  case Common::MemType::type_doubleword:
+    if (m_memIsSigned)
+      return compareMemoryAsNumbersWithType<s64>(first, second, offset, offsetInvert, bswapSecond);
+    return compareMemoryAsNumbersWithType<u64>(first, second, offset, offsetInvert, bswapSecond);
   case Common::MemType::type_float:
     return compareMemoryAsNumbersWithType<float>(first, second, offset, offsetInvert, bswapSecond);
   case Common::MemType::type_double:
@@ -649,8 +653,8 @@ int MemScanner::getTermsNumForFilter(const MemScanner::ScanFilter filter)
 bool MemScanner::typeSupportsAdditionalOptions(const Common::MemType type)
 {
   return (type == Common::MemType::type_byte || type == Common::MemType::type_halfword ||
-          type == Common::MemType::type_word || type == Common::MemType::type_float ||
-          type == Common::MemType::type_double);
+          type == Common::MemType::type_word || type == Common::MemType::type_doubleword ||
+          type == Common::MemType::type_float || type == Common::MemType::type_double);
 }
 
 std::vector<u32> MemScanner::getResultsConsoleAddr() const
