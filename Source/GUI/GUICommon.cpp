@@ -12,13 +12,13 @@ QStringList g_memTypeNames =
     QStringList({QCoreApplication::translate("Common", "Byte"),
                  QCoreApplication::translate("Common", "2 bytes (Halfword)"),
                  QCoreApplication::translate("Common", "4 bytes (Word)"),
-                 QCoreApplication::translate("Common", "8 bytes (Doubleword)"),
                  QCoreApplication::translate("Common", "Float"),
                  QCoreApplication::translate("Common", "Double"),
                  QCoreApplication::translate("Common", "String"),
                  QCoreApplication::translate("Common", "Array of bytes"),
                  QCoreApplication::translate("Common", "Struct"),
-                 QCoreApplication::translate("Common", "Assembly (PowerPC)")});
+                 QCoreApplication::translate("Common", "Assembly (PowerPC)"),
+                 QCoreApplication::translate("Common", "8 bytes (Doubleword)")});
 
 QStringList g_memBaseNames = QStringList({QCoreApplication::translate("Common", "Decimal"),
                                           QCoreApplication::translate("Common", "Hexadecimal"),
