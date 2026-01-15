@@ -1039,9 +1039,8 @@ void MemWatchModel::expandArrayNode(MemWatchTreeNode* node)
     deleteNode(getIndexFromTreeNode(child));
 
   MemWatchEntry* entry = node->getEntry();
-  u32 addr = entry->getActualAddress();
   std::vector<MemWatchTreeNode*> childNodes{};
-  for (int i = 0; i < node->getEntry()->getContainerCount(); i++)
+  for (size_t i = 0; i < node->getEntry()->getContainerCount(); i++)
   {
     MemWatchEntry* childEntry = new MemWatchEntry(node->getEntry()->getContainerEntry());
     QString childLabel = QString("[%1]").arg(i);
@@ -1070,12 +1069,13 @@ int MemWatchModel::getTotalContainerLength(MemWatchEntry* entry)
   if (entry->isBoundToPointer())
     return 4;
   if (!GUICommon::isContainerType(entry->getType()))
-    return Common::getSizeForType(entry->getType(), entry->getLength());
+    return static_cast<int>(Common::getSizeForType(entry->getType(), entry->getLength()));
   if (entry->getType() == Common::MemType::type_array && entry->getContainerEntry() != nullptr)
-    return entry->getContainerCount() * getTotalContainerLength(entry->getContainerEntry());
+    return static_cast<int>(entry->getContainerCount() *
+                            getTotalContainerLength(entry->getContainerEntry()));
   else if (entry->getType() == Common::MemType::type_struct &&
            m_structDefMap.contains(entry->getStructName()))
-    return m_structDefMap.find(entry->getStructName()).value()->getLength();
+    return static_cast<int>(m_structDefMap.find(entry->getStructName()).value()->getLength());
   return 0;
 }
 

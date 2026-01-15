@@ -622,6 +622,7 @@ void MemViewer::updateDigitsPerBox()
   case Common::MemType::type_string:
   case Common::MemType::type_byteArray:
   case Common::MemType::type_struct:
+  case Common::MemType::type_array:
   case Common::MemType::type_none:
     m_digitsPerBox = 2;  // Shouldn't ever reach here
   }
@@ -748,6 +749,7 @@ QString MemViewer::getEditAllText() const
   case Common::MemType::type_string:
   case Common::MemType::type_byteArray:
   case Common::MemType::type_struct:
+  case Common::MemType::type_array:
   case Common::MemType::type_none:
     break;
   }

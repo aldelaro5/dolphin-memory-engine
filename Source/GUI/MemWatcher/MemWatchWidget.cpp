@@ -530,9 +530,9 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
         node->getEntry()->getType() == Common::MemType::type_array)
     {
       bool ok{};
-      size_t newCount =
-          QInputDialog::getInt(this, tr("Set Array Count"), tr("Array Count:"),
-                               node->getEntry()->getContainerCount(), 1, 9999, 1, &ok, Qt::Dialog);
+      size_t newCount = QInputDialog::getInt(
+          this, tr("Set Array Count"), tr("Array Count:"),
+          static_cast<int>(node->getEntry()->getContainerCount()), 1, 9999, 1, &ok, Qt::Dialog);
       if (ok)
         m_watchModel->setContainerCount(node, newCount);
     }

@@ -682,9 +682,10 @@ int StructDetailModel::getTotalContainerLength(MemWatchEntry* entry)
     return 4;
   else if (entry->getType() != Common::MemType::type_array &&
            entry->getType() != Common::MemType::type_struct)
-    return Common::getSizeForType(entry->getType(), entry->getLength());
+    return static_cast<int>(Common::getSizeForType(entry->getType(), entry->getLength()));
   else if (entry->getType() == Common::MemType::type_array && entry->getContainerEntry() != nullptr)
-    return entry->getContainerCount() * getTotalContainerLength(entry->getContainerEntry());
+    return static_cast<int>(entry->getContainerCount() *
+                            getTotalContainerLength(entry->getContainerEntry()));
   else if (entry->getType() == Common::MemType::type_struct)
   {
     int len = 0;

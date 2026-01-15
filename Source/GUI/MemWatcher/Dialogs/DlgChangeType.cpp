@@ -12,8 +12,8 @@
 DlgChangeType::DlgChangeType(QWidget* parent, const int typeIndex, const size_t length,
                              QVector<QString> structNames, QString curStructName,
                              size_t containerCount, MemWatchEntry* containerEntry)
-    : QDialog(parent), m_typeIndex(typeIndex), m_length(length), m_structNames(structNames),
-      m_containerCount(containerCount)
+    : QDialog(parent), m_typeIndex(typeIndex), m_length(length), m_containerCount(containerCount),
+      m_structNames(structNames)
 {
   m_structNames.push_front(QString());
   setWindowTitle("Change Type");
@@ -47,7 +47,7 @@ void DlgChangeType::initialiseWidgets()
   m_spnContainerCount->setPrefix("");
   m_spnContainerCount->setMinimum(1);
   m_spnContainerCount->setMaximum(9999);
-  m_spnContainerCount->setValue(m_containerCount);
+  m_spnContainerCount->setValue(static_cast<int>(m_containerCount));
 
   m_btnSetupContainerEntry = new QPushButton("Setup Contents");
   connect(m_btnSetupContainerEntry, &QPushButton::clicked, this,

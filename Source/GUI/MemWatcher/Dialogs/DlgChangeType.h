@@ -29,7 +29,7 @@ private:
   int m_typeIndex;
   size_t m_length;
   size_t m_containerCount;
-  MemWatchEntry* m_containerEntry;
+  MemWatchEntry* m_containerEntry{};
   QComboBox* m_cmbTypes{};
   QSpinBox* m_spnLength{};
   QWidget* m_lengthSelection{};
