@@ -111,7 +111,25 @@ void MemScanWidget::initialiseWidgets()
   m_searchTerm2Widget->hide();
 
   m_cmbScanType = new QComboBox();
-  m_cmbScanType->addItems(GUICommon::g_memTypeNames);
+  // Manually add items in a logical order (Byte -> Halfword -> Word -> Doubleword -> Float...)
+  // The second number (0, 1, 2...) is the "UserData" which preserves the original ID.
+  
+  // Integers
+  m_cmbScanType->addItem(GUICommon::g_memTypeNames.at(0), 0); // Byte
+  m_cmbScanType->addItem(GUICommon::g_memTypeNames.at(1), 1); // 2 bytes (Halfword)
+  m_cmbScanType->addItem(GUICommon::g_memTypeNames.at(2), 2); // 4 bytes (Word)
+  m_cmbScanType->addItem(GUICommon::g_memTypeNames.at(9), 9); // 8 bytes (Doubleword) <-- MOVED UP!
+  
+  // Floating Point
+  m_cmbScanType->addItem(GUICommon::g_memTypeNames.at(3), 3); // Float
+  m_cmbScanType->addItem(GUICommon::g_memTypeNames.at(4), 4); // Double
+  
+  // Others
+  m_cmbScanType->addItem(GUICommon::g_memTypeNames.at(5), 5); // String
+  m_cmbScanType->addItem(GUICommon::g_memTypeNames.at(6), 6); // Array of bytes
+  m_cmbScanType->addItem(GUICommon::g_memTypeNames.at(7), 7); // Struct
+  m_cmbScanType->addItem(GUICommon::g_memTypeNames.at(8), 8); // Assembly
+  m_cmbScanType->addItem(GUICommon::g_memTypeNames.at(10), 10); // Array
   m_cmbScanType->setCurrentIndex(0);
   connect(m_cmbScanType, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
           &MemScanWidget::onScanMemTypeChanged);
@@ -252,7 +270,7 @@ MemScanner::ScanFilter MemScanWidget::getSelectedFilter() const
 
 void MemScanWidget::updateScanFilterChoices()
 {
-  Common::MemType newType = static_cast<Common::MemType>(m_cmbScanType->currentIndex());
+  Common::MemType newType = static_cast<Common::MemType>(m_cmbScanType->currentData().toInt());
   m_cmbScanFilter->clear();
   if (newType == Common::MemType::type_byteArray || newType == Common::MemType::type_string)
   {
@@ -430,7 +448,7 @@ void MemScanWidget::onFirstScan()
     return;
   }
 
-  m_memScanner->setType(static_cast<Common::MemType>(m_cmbScanType->currentIndex()));
+  m_memScanner->setType(static_cast<Common::MemType>(m_cmbScanType->currentData().toInt()));
   m_memScanner->setIsSigned(m_chkSignedScan->isChecked());
   m_memScanner->setBranchIsAbsolute(m_chkAbsoluteBranch->isChecked());
   m_memScanner->setEnforceMemAlignment(m_chkEnforceMemAlignment->isChecked());

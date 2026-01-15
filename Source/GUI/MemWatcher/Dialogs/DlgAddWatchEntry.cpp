@@ -82,7 +82,25 @@ void DlgAddWatchEntry::initialiseWidgets()
   m_txbLabel = new QLineEdit(this);
 
   m_cmbTypes = new QComboBox(this);
-  m_cmbTypes->addItems(GUICommon::g_memTypeNames);
+  // Manually add items in a logical order (Byte -> Halfword -> Word -> Doubleword -> Float...)
+  // The second number (0, 1, 2...) is the UserData to preserve the original ID.
+  
+  // Integers
+  m_cmbTypes->addItem(GUICommon::g_memTypeNames.at(0), 0); // Byte
+  m_cmbTypes->addItem(GUICommon::g_memTypeNames.at(1), 1); // 2 bytes (Halfword)
+  m_cmbTypes->addItem(GUICommon::g_memTypeNames.at(2), 2); // 4 bytes (Word)
+  m_cmbTypes->addItem(GUICommon::g_memTypeNames.at(9), 9); // 8 bytes (Doubleword) <-- Moved!
+  
+  // Floating Point
+  m_cmbTypes->addItem(GUICommon::g_memTypeNames.at(3), 3); // Float
+  m_cmbTypes->addItem(GUICommon::g_memTypeNames.at(4), 4); // Double
+  
+  // Others
+  m_cmbTypes->addItem(GUICommon::g_memTypeNames.at(5), 5); // String
+  m_cmbTypes->addItem(GUICommon::g_memTypeNames.at(6), 6); // Array of bytes
+  m_cmbTypes->addItem(GUICommon::g_memTypeNames.at(7), 7); // Struct
+  m_cmbTypes->addItem(GUICommon::g_memTypeNames.at(8), 8); // Assembly
+  m_cmbTypes->addItem(GUICommon::g_memTypeNames.at(10), 10); // Array
 
   m_spnLength = new QSpinBox(this);
   m_spnLength->setPrefix("Length: ");
@@ -560,7 +578,7 @@ void DlgAddWatchEntry::updatePreview()
 
 void DlgAddWatchEntry::onLengthChanged()
 {
-  Common::MemType theType = static_cast<Common::MemType>(m_cmbTypes->currentIndex());
+  Common::MemType theType = static_cast<Common::MemType>(m_cmbTypes->currentData().toInt());
   m_entry->setTypeAndLength(theType, m_spnLength->value());
   if (!m_isForStructField && validateAndSetAddress())
     updatePreview();
