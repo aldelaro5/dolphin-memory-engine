@@ -1038,7 +1038,6 @@ void MemWatchModel::expandArrayNode(MemWatchTreeNode* node)
   for (MemWatchTreeNode* child : node->getChildren())
     deleteNode(getIndexFromTreeNode(child));
 
-  MemWatchEntry* entry = node->getEntry();
   std::vector<MemWatchTreeNode*> childNodes{};
   for (size_t i = 0; i < node->getEntry()->getContainerCount(); i++)
   {
