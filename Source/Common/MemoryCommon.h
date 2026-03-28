@@ -10,8 +10,6 @@ namespace Common
 {
 u32 GetMEM1SizeReal();
 u32 GetMEM2SizeReal();
-u32 GetMEM1Size();
-u32 GetMEM2Size();
 u32 GetMEM1End();
 u32 GetMEM2End();
 constexpr u32 MEM1_START = 0x80000000;
@@ -23,7 +21,7 @@ constexpr u32 ARAM_FAKESIZE = 0x2000000;
 constexpr u32 ARAM_START = 0x7E000000;
 constexpr u32 ARAM_END = 0x7F000000;
 
-void UpdateMemoryValues();
+void UpdateMemoryValues(u32 mem1size, u32 mem2size);
 
 enum class MemType
 {

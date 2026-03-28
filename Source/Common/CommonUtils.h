@@ -1,5 +1,10 @@
 #pragma once
 
+#include <bit>
+#include <sstream>
+#include <utility>
+#include <vector>
+
 #ifdef __linux__
 #include <byteswap.h>
 #elif _WIN32
@@ -63,6 +68,21 @@ inline u64 bSwap64(u64 data)
 }
 #endif
 
+inline u16 fromBigEndianToSystemEndian16(const u16 data)
+{
+  return std::endian::native == std::endian::big ? data : bSwap16(data);
+}
+
+inline u32 fromBigEndianToSystemEndian32(const u32 data)
+{
+  return std::endian::native == std::endian::big ? data : bSwap32(data);
+}
+
+inline u64 fromBigEndianToSystemEndian64(const u64 data)
+{
+  return std::endian::native == std::endian::big ? data : bSwap64(data);
+}
+
 constexpr u32 NextPowerOf2(u32 value)
 {
   --value;
@@ -75,6 +95,12 @@ constexpr u32 NextPowerOf2(u32 value)
 
   return value;
 };
+
+template <typename T>
+bool isInBounds(const T low, const T value, const T high)
+{
+  return low <= value && value <= high;
+}
 
 inline u32 dolphinAddrToOffset(u32 addr, bool considerAram)
 {
@@ -165,5 +191,17 @@ inline u32 cacheIndexToOffset(u32 cacheIndex, bool considerAram)
     }
   }
   return cacheIndex;
+}
+
+inline std::vector<std::string> splitBySpace(const std::string& str)
+{
+  std::vector<std::string> parts;
+  std::istringstream iss(str);
+  std::string token;
+  while (iss >> token)
+  {
+    parts.push_back(std::move(token));
+  }
+  return parts;
 }
 }  // namespace Common

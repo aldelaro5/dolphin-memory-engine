@@ -30,6 +30,9 @@ public:
   static bool isARAMAccessible();
   static u64 getARAMAddressStart();
   static bool isMEM2Present();
+  static u32 getARAMSize();
+  static u32 getMEM1Size();
+  static u32 getMEM2Size();
   static size_t getRAMTotalSize();
   static Common::MemOperationReturnCode readEntireRAM(char* buffer);
   static std::string getFormattedValueFromMemory(u32 ramIndex, Common::MemType memType,

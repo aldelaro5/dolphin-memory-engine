@@ -4,6 +4,8 @@
 #include "../../Common/CommonUtils.h"
 #include "../../Common/MemoryCommon.h"
 
+#include <array>
+#include <cctype>
 #include <cstdlib>
 #include <cstring>
 #include <dirent.h>
@@ -14,90 +16,151 @@
 #include <sys/uio.h>
 #include <vector>
 
+namespace
+{
+bool readFromRAM(const pid_t pid, const u64 ramAddress, const u32 offset, char* const buffer,
+                 const size_t size)
+{
+  iovec local{};
+  local.iov_base = buffer;
+  local.iov_len = size;
+
+  iovec remote{};
+  remote.iov_base = reinterpret_cast<void*>(ramAddress + offset);
+  remote.iov_len = size;
+
+  const ssize_t nread{process_vm_readv(pid, &local, 1, &remote, 1, 0)};
+  if (nread == -1)
+  {
+    // A more specific error type should be available in `errno` (if ever interested).
+    return false;
+  }
+
+  if (static_cast<size_t>(nread) != size)
+    return false;
+
+  return true;
+}
+}  // namespace
+
 namespace DolphinComm
 {
 bool LinuxDolphinProcess::obtainEmuRAMInformations()
 {
-  std::ifstream theMapsFile("/proc/" + std::to_string(m_PID) + "/maps");
-  std::string line;
-  bool MEM1Found = false;
-  while (getline(theMapsFile, line))
+  struct MemoryMapLine
   {
-    std::vector<std::string> lineData;
-    std::string token;
-    std::stringstream ss(line);
-    while (getline(ss, token, ' '))
+    const std::string line;
+    const u64 firstAddress;
+    const u64 secondAddress;
+    const u32 offset;
+  };
+
+  // Parse memory map of the Dolphin process.
+  std::vector<MemoryMapLine> memoryMapLines;
+  {
+    std::ifstream mapsFile("/proc/" + std::to_string(m_PID) + "/maps");
+
+    std::string line;
+    while (getline(mapsFile, line))
     {
-      if (!token.empty())
-        lineData.push_back(token);
+      if (line.find("/dev/shm/dolphin-emu") == std::string::npos &&
+          line.find("/dev/shm/dolphinmem") == std::string::npos)
+        continue;
+
+      const std::vector<std::string> lineParts{Common::splitBySpace(line)};
+      if (lineParts.size() < 3)
+        continue;
+
+      const std::size_t indexDash{lineParts[0].find('-')};
+      const std::string firstAddressStr{"0x" + lineParts[0].substr(0, indexDash)};
+      const std::string secondAddressStr{"0x" + lineParts[0].substr(indexDash + 1)};
+      const u64 firstAddress{std::stoul(firstAddressStr, nullptr, 16)};
+      const u64 secondAddress{std::stoul(secondAddressStr, nullptr, 16)};
+      const std::string offsetStr("0x" + lineParts[2]);
+      const u32 offset{static_cast<u32>(std::stoul(offsetStr, nullptr, 16))};
+      memoryMapLines.push_back({line, firstAddress, secondAddress, offset});
+    }
+  }
+
+  SystemInfo systemInfo{};
+  DolphinOSGlobals dolphinOSGlobals{};
+  WiiSpecificInfo wiiSpecificInfo{};
+
+  // In a first pass, attempt to parse data structures from the top of the memory region.
+  for (const auto& [line, firstAddress, secondAddress, offset] : memoryMapLines)
+  {
+    if (offset)
+      continue;
+
+    if (!::readFromRAM(m_PID, firstAddress, SYSTEM_INFO_OFFSET,
+                       reinterpret_cast<char*>(&systemInfo), sizeof(systemInfo)) ||
+        !::readFromRAM(m_PID, firstAddress, DOLPHIN_OS_GLOBALS_OFFSET,
+                       reinterpret_cast<char*>(&dolphinOSGlobals), sizeof(dolphinOSGlobals)) ||
+        !::readFromRAM(m_PID, firstAddress, WII_SPECIFIC_INFO_OFFSET,
+                       reinterpret_cast<char*>(&wiiSpecificInfo), sizeof(wiiSpecificInfo)))
+      continue;
+
+    // GameCube or Triforce game.
+    if (systemInfo.isDiscMagicWordGCKnown() && systemInfo.isBootCodeKnown())
+    {
+      m_emuRAMAddressStart = firstAddress;
+      m_MEM1Size = dolphinOSGlobals.getSimulatedMemorySize();
+      m_ARAMSize = dolphinOSGlobals.getARAMSize();
+      break;
     }
 
-    if (lineData.size() < 3)
-      continue;
-
-    bool foundDevShmDolphin = false;
-    for (const std::string& str : lineData)
+    // Wii game.
+    if (systemInfo.isDiscMagicWordWiiKnown() && systemInfo.isBootCodeKnown())
     {
-      if (str.substr(0, 19) == "/dev/shm/dolphinmem" || str.substr(0, 20) == "/dev/shm/dolphin-emu")
-      {
-        foundDevShmDolphin = true;
-        break;
-      }
+      m_emuRAMAddressStart = firstAddress;
+      m_MEM1Size = wiiSpecificInfo.getSimulatedMEM1Size();
+      m_MEM2Size = wiiSpecificInfo.getSimulatedMEM2Size();
+      break;
     }
 
-    if (!foundDevShmDolphin)
-      continue;
+    // WAD game.
+    // NOTE: All magic words happen to be null when a WAD game is running. One consistency check
+    // that can be performed is compare the physical and simulated memory in the two structures
+    // where they are written: if they match and have a reasonable size, it is likely a WAD game.
+    if (systemInfo.isNull() &&
+        Common::isInBounds(0x01800000U, systemInfo.getPhysicalMemorySize(), 0x08000000U) &&
+        systemInfo.getPhysicalMemorySize() == wiiSpecificInfo.getPhysicalMEM1Size() &&
+        Common::isInBounds(0x01800000U, dolphinOSGlobals.getSimulatedMemorySize(), 0x08000000U) &&
+        dolphinOSGlobals.getSimulatedMemorySize() == wiiSpecificInfo.getSimulatedMEM1Size())
+    {
+      m_emuRAMAddressStart = firstAddress;
+      m_MEM1Size = wiiSpecificInfo.getSimulatedMEM1Size();
+      m_MEM2Size = wiiSpecificInfo.getSimulatedMEM2Size();
+      break;
+    }
+  }
 
-    std::string offsetStr("0x" + lineData[2]);
-    const u32 offset{static_cast<u32>(std::stoul(offsetStr, nullptr, 16))};
-    if (offset != 0 && offset != Common::GetMEM1Size() + 0x40000)
-      continue;
+  // Second loop to find either the ARAM address (GameCube or Triforce) or the MEM2 address (Wii).
+  for (const auto& [line, firstAddress, secondAddress, offset] : memoryMapLines)
+  {
+    const u64 size{secondAddress - firstAddress};
 
-    u64 firstAddress = 0;
-    u64 SecondAddress = 0;
-    const std::size_t indexDash{lineData[0].find('-')};
-    std::string firstAddressStr("0x" + lineData[0].substr(0, indexDash));
-    std::string secondAddressStr("0x" + lineData[0].substr(indexDash + 1));
+    if (m_ARAMSize && size == Common::NextPowerOf2(m_MEM1Size) &&
+        (offset & 0x00040000) == 0x00040000)
+    {
+      m_emuARAMAdressStart = firstAddress;
+      m_ARAMAccessible = true;
+      break;
+    }
 
-    firstAddress = std::stoul(firstAddressStr, nullptr, 16);
-    SecondAddress = std::stoul(secondAddressStr, nullptr, 16);
-
-    if (SecondAddress - firstAddress == Common::GetMEM2Size() &&
-        offset == Common::GetMEM1Size() + 0x40000)
+    if (m_MEM2Size && size == Common::NextPowerOf2(m_MEM2Size) &&
+        (offset & 0x00040000) == 0x00040000)
     {
       m_MEM2AddressStart = firstAddress;
       m_MEM2Present = true;
-      if (MEM1Found)
-        break;
+      break;
     }
 
-    if (SecondAddress - firstAddress == Common::GetMEM1Size())
-    {
-      if (offset == 0x0)
-      {
-        m_emuRAMAddressStart = firstAddress;
-        MEM1Found = true;
-      }
-      else if (offset == Common::GetMEM1Size() + 0x40000)
-      {
-        m_emuARAMAdressStart = firstAddress;
-        m_ARAMAccessible = true;
-      }
-    }
+    // TODO(CA): Ideally, we'd inspect the memory to try to determine whether it's pointing to the
+    // expected data, as opposed to relying on these fragile size and offset checks.
   }
 
-  // On Wii, there is no concept of speedhack so act as if we couldn't find it
-  if (m_MEM2Present)
-  {
-    m_emuARAMAdressStart = 0;
-    m_ARAMAccessible = false;
-  }
-
-  if (m_emuRAMAddressStart != 0)
-    return true;
-
-  // Here, Dolphin appears to be running, but the emulator isn't started
-  return false;
+  return m_emuRAMAddressStart != 0;
 }
 
 bool LinuxDolphinProcess::findPID()
@@ -157,22 +220,7 @@ bool LinuxDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size
     RAMAddress = m_emuRAMAddressStart + offset;
   }
 
-  iovec local{};
-  local.iov_base = buffer;
-  local.iov_len = size;
-
-  iovec remote{};
-  remote.iov_base = reinterpret_cast<void*>(RAMAddress);
-  remote.iov_len = size;
-
-  const ssize_t nread{process_vm_readv(m_PID, &local, 1, &remote, 1, 0)};
-  if (nread == -1)
-  {
-    // A more specific error type should be available in `errno` (if ever interested).
-    return false;
-  }
-
-  if (static_cast<size_t>(nread) != size)
+  if (!::readFromRAM(m_PID, RAMAddress, 0, buffer, size))
     return false;
 
   if (withBSwap)

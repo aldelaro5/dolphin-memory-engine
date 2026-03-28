@@ -20,7 +20,6 @@ DolphinAccessor::DolphinStatus DolphinAccessor::m_status = DolphinStatus::unHook
 
 void DolphinAccessor::init()
 {
-  Common::UpdateMemoryValues();
   if (m_instance == nullptr)
   {
 #ifdef __linux__
@@ -30,6 +29,10 @@ void DolphinAccessor::init()
 #elif __APPLE__
     m_instance = new MacDolphinProcess();
 #endif
+  }
+  else
+  {
+    m_instance->reset();
   }
 }
 
@@ -53,6 +56,8 @@ void DolphinAccessor::hook()
   {
     m_status = DolphinStatus::hooked;
   }
+
+  Common::UpdateMemoryValues(m_instance->getMEM1Size(), m_instance->getMEM2Size());
 }
 
 void DolphinAccessor::unHook()
@@ -102,6 +107,21 @@ u64 DolphinAccessor::getARAMAddressStart()
 bool DolphinAccessor::isMEM2Present()
 {
   return m_instance ? m_instance->isMEM2Present() : false;
+}
+
+u32 DolphinAccessor::getARAMSize()
+{
+  return m_instance ? m_instance->getARAMSize() : 0;
+}
+
+u32 DolphinAccessor::getMEM1Size()
+{
+  return m_instance ? m_instance->getMEM1Size() : 0;
+}
+
+u32 DolphinAccessor::getMEM2Size()
+{
+  return m_instance ? m_instance->getMEM2Size() : 0;
 }
 
 bool DolphinAccessor::isValidConsoleAddress(const u32 address)

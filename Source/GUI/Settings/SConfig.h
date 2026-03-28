@@ -39,8 +39,6 @@ public:
   int getScannerUpdateTimerMs() const;
   int getViewerUpdateTimerMs() const;
   int getScannerShowThreshold() const;
-  u32 getMEM1Size() const;
-  u32 getMEM2Size() const;
 
   int getViewerNbrBytesSeparator() const;
 
@@ -59,8 +57,6 @@ public:
   void setScannerUpdateTimerMs(int scannerUpdateTimerMs);
   void setViewerUpdateTimerMs(int viewerUpdateTimerMs);
   void setScannerShowThreshold(int scannerShowThreshold);
-  void setMEM1Size(u32 mem1SizeReal);
-  void setMEM2Size(u32 mem2SizeReal);
 
   void setViewerNbrBytesSeparator(int viewerNbrBytesSeparator);
 

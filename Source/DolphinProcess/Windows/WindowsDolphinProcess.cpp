@@ -78,78 +78,120 @@ bool WindowsDolphinProcess::findPID()
 
 bool WindowsDolphinProcess::obtainEmuRAMInformations()
 {
-  MEMORY_BASIC_INFORMATION info;
-  bool MEM1Found = false;
-  for (unsigned char* p = nullptr;
-       VirtualQueryEx(m_hDolphin, p, &info, sizeof(info)) == sizeof(info); p += info.RegionSize)
+  struct MemoryMapLine
   {
-    // Check region size so that we know it's MEM2
-    if (!m_MEM2Present && info.RegionSize == Common::GetMEM2Size())
+    const u64 baseAddress;
+    const u64 size;
+  };
+
+  // In a first pass, attempt to parse data structures from the top of the memory region.
+  std::vector<MemoryMapLine> memoryMapLines;
+  {
+    MEMORY_BASIC_INFORMATION info{};
+
+    for (unsigned char* p{nullptr};
+         VirtualQueryEx(m_hDolphin, p, &info, sizeof(info)) == sizeof(info); p += info.RegionSize)
     {
-      u64 regionBaseAddress = 0;
-      std::memcpy(&regionBaseAddress, &(info.BaseAddress), sizeof(info.BaseAddress));
-      if (MEM1Found && regionBaseAddress > m_emuRAMAddressStart + 0x10000000)
-      {
-        // In some cases MEM2 could actually be before MEM1. Once we find MEM1, ignore regions of
-        // this size that are too far away. There apparently are other non-MEM2 regions of 64 MiB.
-        break;
-      }
-      // View the comment for MEM1.
-      PSAPI_WORKING_SET_EX_INFORMATION wsInfo;
+      PSAPI_WORKING_SET_EX_INFORMATION wsInfo{};
       wsInfo.VirtualAddress = info.BaseAddress;
-      if (QueryWorkingSetEx(m_hDolphin, &wsInfo, sizeof(PSAPI_WORKING_SET_EX_INFORMATION)))
-      {
-        if (wsInfo.VirtualAttributes.Valid)
-        {
-          std::memcpy(&m_MEM2AddressStart, &(regionBaseAddress), sizeof(regionBaseAddress));
-          m_MEM2Present = true;
-        }
-      }
-    }
-    else if (info.RegionSize == Common::GetMEM1Size() && info.Type == MEM_MAPPED)
-    {
-      // Here, it's likely the right page, but it can happen that multiple pages with these criteria
-      // exists and have nothing to do with the emulated memory. Only the right page has valid
-      // working set information so an additional check is required that it is backed by physical
-      // memory.
-      PSAPI_WORKING_SET_EX_INFORMATION wsInfo;
-      wsInfo.VirtualAddress = info.BaseAddress;
-      if (QueryWorkingSetEx(m_hDolphin, &wsInfo, sizeof(PSAPI_WORKING_SET_EX_INFORMATION)))
-      {
-        if (wsInfo.VirtualAttributes.Valid)
-        {
-          if (!MEM1Found)
-          {
-            std::memcpy(&m_emuRAMAddressStart, &(info.BaseAddress), sizeof(info.BaseAddress));
-            MEM1Found = true;
-          }
-          else
-          {
-            u64 aramCandidate = 0;
-            std::memcpy(&aramCandidate, &(info.BaseAddress), sizeof(info.BaseAddress));
-            if (aramCandidate == m_emuRAMAddressStart + Common::GetMEM1Size())
-            {
-              m_emuARAMAdressStart = aramCandidate;
-              m_ARAMAccessible = true;
-            }
-          }
-        }
-      }
+      if (!QueryWorkingSetEx(m_hDolphin, &wsInfo, sizeof(PSAPI_WORKING_SET_EX_INFORMATION)) ||
+          !wsInfo.VirtualAttributes.Valid)
+        continue;
+
+      memoryMapLines.push_back({Common::bit_cast<u64>(info.BaseAddress), info.RegionSize});
     }
   }
 
-  if (m_MEM2Present)
+  SystemInfo systemInfo{};
+  DolphinOSGlobals dolphinOSGlobals{};
+  WiiSpecificInfo wiiSpecificInfo{};
+
+  // In a first pass, attempt to parse data structures from the top of the memory region.
+  for (const auto& [baseAddress, size] : memoryMapLines)
   {
-    m_emuARAMAdressStart = 0;
-    m_ARAMAccessible = false;
+    SIZE_T nread{};
+    if (!ReadProcessMemory(m_hDolphin, reinterpret_cast<void*>(baseAddress + SYSTEM_INFO_OFFSET),
+                           reinterpret_cast<char*>(&systemInfo), sizeof(systemInfo), &nread))
+      continue;
+    if (nread != sizeof(systemInfo))
+      continue;
+    if (!ReadProcessMemory(
+            m_hDolphin, reinterpret_cast<void*>(baseAddress + DOLPHIN_OS_GLOBALS_OFFSET),
+            reinterpret_cast<char*>(&dolphinOSGlobals), sizeof(dolphinOSGlobals), &nread))
+      continue;
+    if (nread != sizeof(dolphinOSGlobals))
+      continue;
+    if (!ReadProcessMemory(
+            m_hDolphin, reinterpret_cast<void*>(baseAddress + WII_SPECIFIC_INFO_OFFSET),
+            reinterpret_cast<char*>(&wiiSpecificInfo), sizeof(wiiSpecificInfo), &nread))
+      continue;
+    if (nread != sizeof(wiiSpecificInfo))
+      continue;
+
+    // GameCube or Triforce game.
+    if (systemInfo.isDiscMagicWordGCKnown() && systemInfo.isBootCodeKnown())
+    {
+      m_emuRAMAddressStart = baseAddress;
+      m_MEM1Size = dolphinOSGlobals.getSimulatedMemorySize();
+      m_ARAMSize = dolphinOSGlobals.getARAMSize();
+      break;
+    }
+
+    // Wii game.
+    if (systemInfo.isDiscMagicWordWiiKnown() && systemInfo.isBootCodeKnown())
+    {
+      m_emuRAMAddressStart = baseAddress;
+      m_MEM1Size = wiiSpecificInfo.getSimulatedMEM1Size();
+      m_MEM2Size = wiiSpecificInfo.getSimulatedMEM2Size();
+      break;
+    }
+
+    // WAD game.
+    // NOTE: All magic words happen to be null when a WAD game is running. One consistency check
+    // that can be performed is compare the physical and simulated memory in the two structures
+    // where they are written: if they match and have a reasonable size, it is likely a WAD game.
+    if (systemInfo.isNull() &&
+        Common::isInBounds(0x01800000U, systemInfo.getPhysicalMemorySize(), 0x08000000U) &&
+        systemInfo.getPhysicalMemorySize() == wiiSpecificInfo.getPhysicalMEM1Size() &&
+        Common::isInBounds(0x01800000U, dolphinOSGlobals.getSimulatedMemorySize(), 0x08000000U) &&
+        dolphinOSGlobals.getSimulatedMemorySize() == wiiSpecificInfo.getSimulatedMEM1Size())
+    {
+      m_emuRAMAddressStart = baseAddress;
+      m_MEM1Size = wiiSpecificInfo.getSimulatedMEM1Size();
+      m_MEM2Size = wiiSpecificInfo.getSimulatedMEM2Size();
+      break;
+    }
   }
 
-  if (m_emuRAMAddressStart == 0)
+  // Second loop to find either the ARAM address (GameCube or Triforce) or the MEM2 address (Wii).
+  for (const auto& [baseAddress, size] : memoryMapLines)
   {
-    // Here, Dolphin is running, but the emulation hasn't started
-    return false;
+    if (m_ARAMSize && size == Common::NextPowerOf2(m_MEM1Size) &&
+        baseAddress == m_emuRAMAddressStart + Common::NextPowerOf2(m_MEM1Size))
+    {
+      m_emuARAMAdressStart = baseAddress;
+      m_ARAMAccessible = true;
+      break;
+    }
+
+    if (m_MEM2Size && size == Common::NextPowerOf2(m_MEM2Size))
+    {
+      // In some cases, MEM2 can actually be before MEM1. Once MEM1 is found, regions of the
+      // expected size that are too far away are ignored: there apparently are other non-MEM2
+      // regions of 64 MiB.
+      if (baseAddress >= m_emuRAMAddressStart + 0x10000000)
+        continue;
+
+      m_MEM2AddressStart = baseAddress;
+      m_MEM2Present = true;
+      break;
+    }
+
+    // TODO(CA): Ideally, we'd inspect the memory to try to determine whether it's pointing to the
+    // expected data, as opposed to relying on these fragile size and offset checks.
   }
-  return true;
+
+  return m_emuRAMAddressStart != 0;
 }
 
 bool WindowsDolphinProcess::readFromRAM(const u32 offset, char* buffer, const size_t size,

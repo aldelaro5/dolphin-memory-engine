@@ -50,69 +50,137 @@ bool MacDolphinProcess::obtainEmuRAMInformations()
   if (error != KERN_SUCCESS)
     return false;
 
-  mach_vm_address_t regionAddr = 0;
-  mach_vm_size_t size = 0;
-  vm_region_extended_info_data_t regInfo;
-  vm_region_basic_info_data_64_t basInfo;
-  vm_region_top_info_data_t topInfo;
-  mach_msg_type_number_t cnt = VM_REGION_EXTENDED_INFO_COUNT;
-  mach_port_t obj;
-  bool MEM1Found = false;
-  unsigned int MEM1Obj = 0;
-  while (mach_vm_region(m_task, &regionAddr, &size, VM_REGION_EXTENDED_INFO, (int*)&regInfo, &cnt,
-                        &obj) == KERN_SUCCESS)
+  struct MemoryMapLine
   {
-    cnt = VM_REGION_BASIC_INFO_COUNT_64;
-    if (mach_vm_region(m_task, &regionAddr, &size, VM_REGION_BASIC_INFO_64, (int*)&basInfo, &cnt,
-                       &obj) != KERN_SUCCESS)
-      break;
-    cnt = VM_REGION_TOP_INFO_COUNT;
-    if (mach_vm_region(m_task, &regionAddr, &size, VM_REGION_TOP_INFO, (int*)&topInfo, &cnt,
-                       &obj) != 0)
-      break;
+    const mach_vm_address_t regionAddr;
+    const mach_vm_size_t size;
+    const vm_region_extended_info_data_t regInfo;
+    const vm_region_basic_info_data_64_t basInfo;
+  };
 
-    if (!m_MEM2Present && size == Common::GetMEM2Size() &&
-        basInfo.offset == Common::GetMEM1Size() + 0x40000)
+  // Parse memory map of the Dolphin process.
+  std::vector<MemoryMapLine> memoryMapLines;
+  {
+    mach_vm_address_t regionAddr = 0;
+    mach_vm_size_t size = 0;
+    vm_region_extended_info_data_t regInfo;
+    vm_region_basic_info_data_64_t basInfo;
+    vm_region_top_info_data_t topInfo;
+    mach_msg_type_number_t cnt = VM_REGION_EXTENDED_INFO_COUNT;
+    mach_port_t obj;
+
+    while (mach_vm_region(m_task, &regionAddr, &size, VM_REGION_EXTENDED_INFO, (int*)&regInfo, &cnt,
+                          &obj) == KERN_SUCCESS)
     {
-      m_MEM2Present = true;
+      cnt = VM_REGION_BASIC_INFO_COUNT_64;
+      if (mach_vm_region(m_task, &regionAddr, &size, VM_REGION_BASIC_INFO_64, (int*)&basInfo, &cnt,
+                         &obj) != KERN_SUCCESS)
+        break;
+      cnt = VM_REGION_TOP_INFO_COUNT;
+      if (mach_vm_region(m_task, &regionAddr, &size, VM_REGION_TOP_INFO, (int*)&topInfo, &cnt,
+                         &obj) != 0)
+        break;
+
+      memoryMapLines.push_back({regionAddr, size, regInfo, basInfo});
+
+      regionAddr += size;
+      cnt = VM_REGION_EXTENDED_INFO_COUNT;
+    }
+  }
+
+  SystemInfo systemInfo{};
+  DolphinOSGlobals dolphinOSGlobals{};
+  WiiSpecificInfo wiiSpecificInfo{};
+
+  // In a first pass, attempt to parse data structures from the top of the memory region.
+  for (const auto& [regionAddr, size, regInfo, basInfo] : memoryMapLines)
+  {
+    if (basInfo.offset)
+      continue;
+
+    if (!(regInfo.share_mode == SM_TRUESHARED &&
+          basInfo.max_protection == (VM_PROT_READ | VM_PROT_WRITE)))
+      continue;
+
+    vm_size_t nread{};
+    if (vm_read_overwrite(m_task, regionAddr + SYSTEM_INFO_OFFSET, sizeof(systemInfo),
+                          reinterpret_cast<vm_address_t>(&systemInfo), &nread) != KERN_SUCCESS)
+      continue;
+    if (nread != sizeof(systemInfo))
+      continue;
+    if (vm_read_overwrite(m_task, regionAddr + DOLPHIN_OS_GLOBALS_OFFSET, sizeof(dolphinOSGlobals),
+                          reinterpret_cast<vm_address_t>(&dolphinOSGlobals),
+                          &nread) != KERN_SUCCESS)
+      continue;
+    if (nread != sizeof(dolphinOSGlobals))
+      continue;
+    if (vm_read_overwrite(m_task, regionAddr + WII_SPECIFIC_INFO_OFFSET, sizeof(wiiSpecificInfo),
+                          reinterpret_cast<vm_address_t>(&wiiSpecificInfo), &nread) != KERN_SUCCESS)
+      continue;
+    if (nread != sizeof(wiiSpecificInfo))
+      continue;
+
+    // GameCube or Triforce game.
+    if (systemInfo.isDiscMagicWordGCKnown() && systemInfo.isBootCodeKnown())
+    {
+      m_emuRAMAddressStart = regionAddr;
+      m_MEM1Size = dolphinOSGlobals.getSimulatedMemorySize();
+      m_ARAMSize = dolphinOSGlobals.getARAMSize();
+      break;
+    }
+
+    // Wii game.
+    if (systemInfo.isDiscMagicWordWiiKnown() && systemInfo.isBootCodeKnown())
+    {
+      m_emuRAMAddressStart = regionAddr;
+      m_MEM1Size = wiiSpecificInfo.getSimulatedMEM1Size();
+      m_MEM2Size = wiiSpecificInfo.getSimulatedMEM2Size();
+      break;
+    }
+
+    // WAD game.
+    // NOTE: All magic words happen to be null when a WAD game is running. One consistency check
+    // that can be performed is compare the physical and simulated memory in the two structures
+    // where they are written: if they match and have a reasonable size, it is likely a WAD game.
+    if (systemInfo.isNull() &&
+        Common::isInBounds(0x01800000U, systemInfo.getPhysicalMemorySize(), 0x08000000U) &&
+        systemInfo.getPhysicalMemorySize() == wiiSpecificInfo.getPhysicalMEM1Size() &&
+        Common::isInBounds(0x01800000U, dolphinOSGlobals.getSimulatedMemorySize(), 0x08000000U) &&
+        dolphinOSGlobals.getSimulatedMemorySize() == wiiSpecificInfo.getSimulatedMEM1Size())
+    {
+      m_emuRAMAddressStart = regionAddr;
+      m_MEM1Size = wiiSpecificInfo.getSimulatedMEM1Size();
+      m_MEM2Size = wiiSpecificInfo.getSimulatedMEM2Size();
+      break;
+    }
+  }
+
+  // Second loop to find either the ARAM address (GameCube or Triforce) or the MEM2 address (Wii).
+  for (const auto& [regionAddr, size, regInfo, basInfo] : memoryMapLines)
+  {
+    (void)regInfo;
+
+    if (m_ARAMSize && size == Common::NextPowerOf2(m_MEM1Size) &&
+        (basInfo.offset & 0x00040000) == 0x00040000)
+    {
+      m_emuARAMAdressStart = regionAddr;
+      m_ARAMAccessible = true;
+      break;
+    }
+
+    if (m_MEM2Size && size == Common::NextPowerOf2(m_MEM2Size) &&
+        (basInfo.offset & 0x00040000) == 0x00040000)
+    {
       m_MEM2AddressStart = regionAddr;
+      m_MEM2Present = true;
+      break;
     }
 
-    // if these are true, then it is very likely the correct region, but we cannot guarantee
-    if ((!MEM1Found || (MEM1Found && MEM1Obj == topInfo.obj_id)) && size == Common::GetMEM1Size() &&
-        regInfo.share_mode == SM_TRUESHARED &&
-        basInfo.max_protection == (VM_PROT_READ | VM_PROT_WRITE))
-    {
-      if (basInfo.offset == 0x0)
-      {
-        m_emuRAMAddressStart = regionAddr;
-        MEM1Found = true;
-      }
-      else if (basInfo.offset == Common::GetMEM1Size() + 0x40000)
-      {
-        m_emuARAMAdressStart = regionAddr;
-        m_ARAMAccessible = true;
-      }
-
-      MEM1Found = true;
-      MEM1Obj = topInfo.obj_id;
-    }
-
-    regionAddr += size;
-    cnt = VM_REGION_EXTENDED_INFO_COUNT;
+    // TODO(CA): Ideally, we'd inspect the memory to try to determine whether it's pointing to the
+    // expected data, as opposed to relying on these fragile size and offset checks.
   }
 
-  if (m_MEM2Present)
-  {
-    m_emuARAMAdressStart = 0;
-    m_ARAMAccessible = false;
-  }
-
-  if (m_emuRAMAddressStart != 0)
-    return true;
-
-  // Here, Dolphin appears to be running, but the emulator isn't started
-  return false;
+  return m_emuRAMAddressStart != 0;
 }
 
 bool MacDolphinProcess::readFromRAM(const u32 offset, char* buffer, size_t size,
