@@ -450,26 +450,18 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
 
   case MemType::type_byteArray:
   {
+    const size_t tokenLen = (base == MemBase::base_binary) ? 8 : 2;
     std::vector<std::string> bytes;
     std::string next;
-    for (auto i : inputString)
+    for (char c : inputString)
     {
-      if (i == ' ')
+      if (std::isspace(static_cast<unsigned char>(c)))
+        continue;
+      next += c;
+      if (next.size() == tokenLen)
       {
-        if (!next.empty())
-        {
-          bytes.push_back(next);
-          next.clear();
-        }
-      }
-      else
-      {
-        if (base == MemBase::base_binary && next.size() == 8)
-        {
-          bytes.push_back(next);
-          next.clear();
-        }
-        next += i;
+        bytes.push_back(next);
+        next.clear();
       }
     }
     if (!next.empty())
@@ -496,10 +488,11 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
       }
       else
       {
-        ss >> std::hex;
         int theByteInt = 0;
-        ss >> theByteInt;
-        if (ss.fail())
+        std::stringstream byteStream;
+        byteStream << std::hex << i;
+        byteStream >> theByteInt;
+        if (byteStream.fail())
         {
           delete[] buffer;
           buffer = nullptr;

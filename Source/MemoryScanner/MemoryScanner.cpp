@@ -5,28 +5,6 @@
 #include "../Common/CommonUtils.h"
 #include "../DolphinProcess/DolphinAccessor.h"
 
-namespace
-{
-std::string addSpacesToBytesArrays(const std::string_view bytesArray)
-{
-  std::string result(bytesArray);
-  std::string::size_type spacesAdded = 0;
-  for (std::string::size_type i{2}; i < bytesArray.length(); i += 2)
-  {
-    if (bytesArray[i] != ' ')
-    {
-      result.insert(i + spacesAdded, 1, ' ');
-      spacesAdded++;
-    }
-    else
-    {
-      i++;
-    }
-  }
-  return result;
-}
-}  // namespace
-
 MemScanner::MemScanner() = default;
 
 MemScanner::~MemScanner()
@@ -99,14 +77,8 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
     // Have no restriction on the length for the rest
     termMaxLength = ramSize;
 
-  std::string formattedSearchTerm1;
-  if (m_memType == Common::MemType::type_byteArray)
-    formattedSearchTerm1 = addSpacesToBytesArrays(searchTerm1);
-  else
-    formattedSearchTerm1 = searchTerm1;
-
-  char* memoryToCompare1 = Common::formatStringToMemory(
-      scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength);
+  char* memoryToCompare1 = Common::formatStringToMemory(scanReturn, termActualLength, searchTerm1,
+                                                        m_memBase, m_memType, termMaxLength);
   if (scanReturn != Common::MemOperationReturnCode::OK)
   {
     delete[] memoryToCompare1;
@@ -142,7 +114,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFilte
                                                     m_memBase, !m_memIsSigned);
     try
     {
-      absolute_b_addr1 = static_cast<u32>(std::stoul(formattedSearchTerm1, nullptr, 16));
+      absolute_b_addr1 = static_cast<u32>(std::stoul(searchTerm1, nullptr, 16));
     }
     catch (...)
     {
@@ -332,14 +304,8 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFilter
   if (filter != ScanFilter::increased && filter != ScanFilter::decreased &&
       filter != ScanFilter::changed && filter != ScanFilter::unchanged)
   {
-    std::string formattedSearchTerm1;
-    if (m_memType == Common::MemType::type_byteArray)
-      formattedSearchTerm1 = addSpacesToBytesArrays(searchTerm1);
-    else
-      formattedSearchTerm1 = searchTerm1;
-
-    memoryToCompare1 = Common::formatStringToMemory(
-        scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength);
+    memoryToCompare1 = Common::formatStringToMemory(scanReturn, termActualLength, searchTerm1,
+                                                    m_memBase, m_memType, termMaxLength);
     if (scanReturn != Common::MemOperationReturnCode::OK)
       return scanReturn;
   }
