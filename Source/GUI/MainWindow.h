@@ -78,6 +78,7 @@ private:
   StructEditorWidget* m_structEditor{};
 
   QTimer m_autoHookTimer;
+  int m_partialHookRehookAttempts{0};
 
   QMenu* m_menuFile{};
   QMenu* m_menuEdit{};

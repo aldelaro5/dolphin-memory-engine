@@ -379,6 +379,8 @@ void MainWindow::onUnhook()
   DolphinComm::DolphinAccessor::unHook();
   updateDolphinHookingStatus();
   m_watcher->update();
+
+  m_partialHookRehookAttempts = 0;
 }
 
 void MainWindow::onAutoLoadLastFileTriggered(const bool checked)
@@ -418,6 +420,19 @@ void MainWindow::onHookIfNotHooked()
       DolphinComm::DolphinAccessor::DolphinStatus::hooked)
   {
     onHookAttempt();
+  }
+  else
+  {
+    // Occasionally, DME can successfully hook to Dolphin before the game ID has been written to
+    // memory, leading to a partial hook status. To mitigate this scenario, there will be a few
+    // attempts to rehook.
+    static constexpr int MAX_PARTIAL_HOOK_REHOOK_ATTEMPTS{5};
+    if (m_partialHookRehookAttempts < MAX_PARTIAL_HOOK_REHOOK_ATTEMPTS &&
+        !DolphinComm::DolphinAccessor::isGameIDValid())
+    {
+      ++m_partialHookRehookAttempts;
+      onHookAttempt();
+    }
   }
 }
 

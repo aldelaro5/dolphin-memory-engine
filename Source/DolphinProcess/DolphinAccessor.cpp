@@ -195,6 +195,11 @@ const std::string& DolphinAccessor::getGameID()
   return s_gameID;
 }
 
+bool DolphinAccessor::isGameIDValid()
+{
+  return s_gameID.size() == strlen("GM4P01") && s_gameID != "??????";
+}
+
 Common::MemOperationReturnCode DolphinAccessor::readEntireRAM(char* buffer)
 {
   // MEM2, if enabled, is read right after MEM1 in the buffer so both regions are contigous
