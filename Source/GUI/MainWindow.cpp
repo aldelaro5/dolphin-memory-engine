@@ -663,21 +663,7 @@ void MainWindow::updateStatusBar()
     const bool mem2{DolphinComm::DolphinAccessor::isMEM2Present()};
     const bool aram{!mem2 && DolphinComm::DolphinAccessor::isARAMAccessible()};
 
-    std::array<char, sizeof("GM4E01")> gameID{};
-    if (DolphinComm::DolphinAccessor::readFromRAM(
-            Common::dolphinAddrToOffset(Common::MEM1_START, aram), gameID.data(), gameID.size(),
-            false))
-    {
-      for (char& c : gameID)
-      {
-        if (!std::isprint(static_cast<int>(static_cast<unsigned char>(c))))
-        {
-          c = '?';
-        }
-      }
-      gameID.back() = '\0';
-      tags << QString(gameID.data());
-    }
+    tags << QString::fromStdString(DolphinComm::DolphinAccessor::getGameID());
 
     toolTipLines
         << tr("Hooked to Dolphin successfully. Current start address: ") +
