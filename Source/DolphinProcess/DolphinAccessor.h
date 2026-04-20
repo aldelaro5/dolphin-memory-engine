@@ -1,6 +1,8 @@
 // Wrapper around IDolphinProcess
 #pragma once
 
+#include <string>
+
 #include "../Common/CommonTypes.h"
 #include "../Common/MemoryCommon.h"
 #include "IDolphinProcess.h"
@@ -34,6 +36,8 @@ public:
   static u32 getMEM1Size();
   static u32 getMEM2Size();
   static size_t getRAMTotalSize();
+  static const std::string& getGameID();
+  static bool isGameIDValid();
   static Common::MemOperationReturnCode readEntireRAM(char* buffer);
   static std::string getFormattedValueFromMemory(u32 ramIndex, Common::MemType memType,
                                                  size_t memSize, Common::MemBase memBase,

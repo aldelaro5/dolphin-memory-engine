@@ -7,11 +7,42 @@
 #include "Mac/MacDolphinProcess.h"
 #endif
 
+#include <array>
 #include <cstring>
 #include <memory>
 
 #include "../Common/CommonUtils.h"
 #include "../Common/MemoryCommon.h"
+
+namespace
+{
+std::string s_gameID;
+
+std::string readGameID()
+{
+  const bool aram{DolphinComm::DolphinAccessor::isARAMAccessible()};
+
+  std::array<char, sizeof("GM4P01")> gameID{};
+
+  if (DolphinComm::DolphinAccessor::readFromRAM(
+          Common::dolphinAddrToOffset(Common::MEM1_START, aram), gameID.data(), gameID.size(),
+          false))
+  {
+    for (char& c : gameID)
+    {
+      if (!std::isprint(static_cast<int>(static_cast<unsigned char>(c))))
+      {
+        c = '?';
+      }
+    }
+
+    gameID.back() = '\0';
+    return {gameID.data(), gameID.size() - 1};
+  }
+
+  return {};
+}
+}  // namespace
 
 namespace DolphinComm
 {
@@ -20,6 +51,8 @@ DolphinAccessor::DolphinStatus DolphinAccessor::m_status = DolphinStatus::unHook
 
 void DolphinAccessor::init()
 {
+  s_gameID.clear();
+
   if (m_instance == nullptr)
   {
 #ifdef __linux__
@@ -55,6 +88,8 @@ void DolphinAccessor::hook()
   else
   {
     m_status = DolphinStatus::hooked;
+
+    s_gameID = readGameID();
   }
 
   Common::UpdateMemoryValues(m_instance->getMEM1Size(), m_instance->getMEM2Size());
@@ -153,6 +188,16 @@ size_t DolphinAccessor::getRAMTotalSize()
   }
 
   return Common::GetMEM1SizeReal();
+}
+
+const std::string& DolphinAccessor::getGameID()
+{
+  return s_gameID;
+}
+
+bool DolphinAccessor::isGameIDValid()
+{
+  return s_gameID.size() == strlen("GM4P01") && s_gameID != "??????";
 }
 
 Common::MemOperationReturnCode DolphinAccessor::readEntireRAM(char* buffer)
