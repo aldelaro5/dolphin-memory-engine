@@ -145,8 +145,9 @@ jobs:
         run: |
           mkdir Source/build
           cd Source/build
-          cmake .. -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)"
-                   -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+              cmake .. \
+                -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)" \
+                -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           make
           echo -e "\n" | ../../Tools/MacDeploy.sh
         shell: bash
