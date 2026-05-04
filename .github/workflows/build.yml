@@ -124,55 +124,9 @@ jobs:
           name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-x86_64-appimage
           path: dolphin-memory-engine.AppImage
 
-  build-macos-intel:
-    runs-on: macos-15-intel
-    name: 🍎 macOS Intel
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      # Current Runner has cmake we want by default; Omitting for now but restore if they stop bundling it
-      # - name: Install Dependencies
-      #   run: |
-      #     brew install --formula cmake
-      #   shell: bash
-
-      - name: Initialize submodules
-        run: git submodule update --init
-
-      - name: Build
-        run: |
-          mkdir Source/build
-          cd Source/build
-          cmake .. -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)"
-          make
-          echo -e "\n" | ../../Tools/MacDeploy.sh
-        shell: bash
-
-      - name: Copy LICENSE, README, Prepare Artifacts
-        run: |
-          mkdir Source/build/artifacts
-          cp ./README.md ./Source/build/artifacts/
-          cp ./LICENSE ./Source/build/artifacts/
-          cp ./Tools/MacSetup.sh ./Source/build/artifacts/
-          cp ./Source/build/dolphin-memory-engine.dmg ./Source/build/artifacts/
-        shell: bash
-
-      - name: Get Short SHA
-        id: get-short-sha
-        run: echo "short_sha=$(echo ${{ github.sha }} | cut -c 1-7)" >> $GITHUB_OUTPUT
-        shell: bash
-
-      - name: Publish Artifacts
-        uses: actions/upload-artifact@v6
-        with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-macOS-intel
-          path: Source/build/artifacts
-
-  build-macos-arm:
+  build-macos:
     runs-on: macos-15
-    name: 🍎 macOS ARM64
+    name: 🍎 macOS
 
     steps:
       - name: Checkout code
@@ -192,7 +146,7 @@ jobs:
           mkdir Source/build
           cd Source/build
           cmake .. -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)" \
-                   -DCMAKE_OSX_ARCHITECTURES=arm64
+                   -DCMAKE_OSX_ARCHITECTURES=arm64;x86_64
           make
           echo -e "\n" | ../../Tools/MacDeploy.sh
         shell: bash
@@ -214,5 +168,5 @@ jobs:
       - name: Publish Artifacts
         uses: actions/upload-artifact@v6
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-macOS-arm64
+          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-macOS
           path: Source/build/artifacts
