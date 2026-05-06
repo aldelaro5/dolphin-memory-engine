@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   clang-format-check:
@@ -123,9 +124,9 @@ jobs:
           name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-linux-x86_64-appimage
           path: dolphin-memory-engine.AppImage
 
-  build-macos-intel:
-    runs-on: macos-15-intel
-    name: 🍎 macOS Intel
+  build-macos:
+    runs-on: macos-15
+    name: 🍎 macOS
 
     steps:
       - name: Checkout code
@@ -144,7 +145,9 @@ jobs:
         run: |
           mkdir Source/build
           cd Source/build
-          cmake .. -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)"
+              cmake .. \
+                -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)" \
+                -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           make
           echo -e "\n" | ../../Tools/MacDeploy.sh
         shell: bash
@@ -166,5 +169,5 @@ jobs:
       - name: Publish Artifacts
         uses: actions/upload-artifact@v6
         with:
-          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-macOS-intel
+          name: dolphin-memory-engine-${{ steps.get-short-sha.outputs.short_sha }}-macOS
           path: Source/build/artifacts
