@@ -142,9 +142,9 @@ jobs:
             ${{ steps.rename_appimage.outputs.appimage_name }}
             dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64-binary.tar.gz
 
-  build-macos-intel:
-    runs-on: macos-15-intel
-    name: 🍎 macOS Intel (TAG)
+  build-macos:
+    runs-on: macos-15
+    name: 🍎 macOS (TAG)
 
     steps:
       - name: Checkout code
@@ -160,7 +160,9 @@ jobs:
         run: |
           mkdir -p Source/build
           cd Source/build
-          cmake .. -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)"
+          cmake .. \
+            -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)" \
+            -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           make
           echo -e "\n" | ../../Tools/MacDeploy.sh
         shell: bash
@@ -176,17 +178,17 @@ jobs:
 
       - name: Create macOS Release Archive
         run: |
-          (cd Source/build/macos_bundle_contents && zip -r ../../../dolphin-memory-engine-${{ github.ref_name }}-macOS-intel.zip .)
+          (cd Source/build/macos_bundle_contents && zip -r ../../../dolphin-memory-engine-${{ github.ref_name }}-macOS.zip .)
         shell: bash
 
       - name: Publish Workflow Artifact
         uses: actions/upload-artifact@v6
         with:
-          name: dolphin-memory-engine-${{ github.ref_name }}-macOS-intel
-          path: dolphin-memory-engine-${{ github.ref_name }}-macOS-intel.zip
+          name: dolphin-memory-engine-${{ github.ref_name }}-macOS
+          path: dolphin-memory-engine-${{ github.ref_name }}-macOS.zip
         
       - name: Upload to GitHub Releases
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
-          files: dolphin-memory-engine-${{ github.ref_name }}-macOS-intel.zip
+          files: dolphin-memory-engine-${{ github.ref_name }}-macOS.zip

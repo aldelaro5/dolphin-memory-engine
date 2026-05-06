@@ -21,7 +21,6 @@ For binary releases of this program, refer to [the "releases" page](https://gith
 
 
 ## System requirements
-Any x86_64 based system should work.
 
 This repository uses CMake for all platforms.
 
@@ -148,8 +147,6 @@ This library has no affiliation with the dolphin-memory-engine project.
 [py-dolphin-memory-engine](https://github.com/randovania/py-dolphin-memory-engine).
 
 Use py-dolphin-memory-engine instead of dolphin-memory-engine if creating software or scripts that rely on reading or writing Dolphin memory.
-
-An example project is [This AI can 100% complete Mario Kart Wii. by AI Tango](https://youtu.be/6OofM-Q3dGA)
 
 ## License
 This program is licensed under the MIT license which grants you the permission to do anything you wish to with the software, as long as you preserve all copyright notices. See the file LICENSE for the legal text.
