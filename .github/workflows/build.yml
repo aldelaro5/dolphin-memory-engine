@@ -54,7 +54,7 @@ jobs:
         run: |
           $sha = '${{ github.sha }}'
           $short_sha = $sha.Substring(0, 7)
-          echo "::set-output name=short_sha::$short_sha"
+          echo "short_sha=$short_sha" >> $env:GITHUB_OUTPUT
         shell: pwsh
 
       - name: Publish Artifacts
