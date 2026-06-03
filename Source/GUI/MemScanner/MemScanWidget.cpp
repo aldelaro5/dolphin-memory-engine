@@ -513,6 +513,7 @@ void MemScanWidget::onNextScan()
 
 void MemScanWidget::onUndoScan()
 {
+  m_tblResulstList->scrollToTop();
   if (m_memScanner->hasUndo())
   {
     m_memScanner->undoScan();
@@ -544,6 +545,7 @@ void MemScanWidget::onUndoScan()
 
 void MemScanWidget::onResetScan()
 {
+  m_tblResulstList->scrollToTop();
   m_memScanner->reset();
   m_lblResultCount->setText("");
   m_btnAddAll->setEnabled(false);
