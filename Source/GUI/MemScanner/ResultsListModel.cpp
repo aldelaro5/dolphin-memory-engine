@@ -41,7 +41,7 @@ QVariant ResultsListModel::data(const QModelIndex& index, int role) const
     switch (index.column())
     {
     case RESULT_COL_ADDRESS:
-      return QString::number(m_scanner->getResultsConsoleAddr().at(index.row()), 16).toUpper();
+      return QString::number(m_scanner->getResultAddressAt(index.row()), 16).toUpper();
     case RESULT_COL_SCANNED:
       return QString::fromStdString(m_scanner->getFormattedScannedValueAt(index.row()));
     case RESULT_COL_CURRENT:
@@ -56,8 +56,8 @@ QVariant ResultsListModel::data(const QModelIndex& index, int role) const
 bool ResultsListModel::removeRows(int row, int count, const QModelIndex& parent)
 {
   beginRemoveRows(parent, row, row + count - 1);
-  for (int i = 0; i < count; i++)
-    m_scanner->removeResultAt(i + row);
+  for (int i = count - 1; i >= 0; i--)
+    m_scanner->removeResultAt(row + i);
   endRemoveRows();
 
   return true;
@@ -65,7 +65,7 @@ bool ResultsListModel::removeRows(int row, int count, const QModelIndex& parent)
 
 u32 ResultsListModel::getResultAddress(const int row) const
 {
-  return m_scanner->getResultsConsoleAddr().at(row);
+  return m_scanner->getResultAddressAt(row);
 }
 
 QVariant ResultsListModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -94,7 +94,8 @@ void ResultsListModel::updateScanner()
 
 void ResultsListModel::updateAfterScannerReset()
 {
-  emit layoutChanged();
+  beginResetModel();
+  endResetModel();
 }
 
 void ResultsListModel::setShowThreshold(const size_t showThreshold)

@@ -3,7 +3,9 @@
 #include <QPushButton>
 #include <QTimer>
 #include <QTreeView>
+#include <vector>
 
+#include "../../MemoryWatch/MemWatchEntry.h"
 #include "../../Structs/StructTreeNode.h"
 #include "MemWatchDelegate.h"
 #include "MemWatchModel.h"
@@ -28,6 +30,7 @@ public:
   void onAddGroup();
   void onAddWatchEntry();
   void addWatchEntry(MemWatchEntry* entry);
+  void addWatchEntries(const std::vector<MemWatchEntry*>& entries);
   void onLockSelection(bool lockStatus);
   void onDeleteSelection();
   void onDropSucceeded();
