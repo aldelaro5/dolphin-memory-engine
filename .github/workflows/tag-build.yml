@@ -68,7 +68,7 @@ jobs:
           files: dolphin-memory-engine-${{ github.ref_name }}-windows-amd64.zip
 
   build-linux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     name: 🐧 Linux x86_64 (TAG)
 
     steps:
