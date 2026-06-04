@@ -669,6 +669,21 @@ void MemWatchWidget::addWatchEntry(MemWatchEntry* entry)
   m_hasUnsavedChanges = true;
 }
 
+void MemWatchWidget::addWatchEntries(const std::vector<MemWatchEntry*>& entries)
+{
+  if (entries.empty())
+    return;
+
+  std::vector<MemWatchTreeNode*> nodes;
+  nodes.reserve(entries.size());
+  for (MemWatchEntry* entry : entries)
+    nodes.push_back(new MemWatchTreeNode(entry));
+
+  const QModelIndexList selectedIndexes{m_watchView->selectionModel()->selectedIndexes()};
+  m_watchModel->addNodes(nodes, selectedIndexes.empty() ? QModelIndex{} : selectedIndexes.back());
+  m_hasUnsavedChanges = true;
+}
+
 QModelIndexList MemWatchWidget::simplifySelection() const
 {
   QModelIndexList simplifiedSelection;
@@ -787,7 +802,9 @@ void MemWatchWidget::onRowsInserted(const QModelIndex& parent, const int first, 
     {
       const MemWatchTreeNode* const node{
           MemWatchModel::getTreeNodeFromIndex(m_watchModel->index(i, 0, parent))};
-      updateExpansionState(node);
+      if (node && (node->isGroup() ||
+                   (node->getEntry() && GUICommon::isContainerType(node->getEntry()->getType()))))
+        updateExpansionState(node);
     }
 
     m_watchView->scrollTo(lastIndex);

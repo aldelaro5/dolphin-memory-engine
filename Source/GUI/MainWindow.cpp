@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <string>
+#include <vector>
 
 #include "../DolphinProcess/DolphinAccessor.h"
 #include "../MemoryWatch/MemWatchEntry.h"
@@ -259,24 +260,30 @@ void MainWindow::addSelectedResultsToWatchList(Common::MemType type, size_t leng
                                                Common::MemBase base, bool isBranchAbsolute)
 {
   QModelIndexList selection = m_scanner->getSelectedResults();
+  std::vector<MemWatchEntry*> entries;
+  entries.reserve(selection.count());
   for (int i = 0; i < selection.count(); i++)
   {
     u32 address = m_scanner->getResultListModel()->getResultAddress(selection.at(i).row());
-    MemWatchEntry* newEntry = new MemWatchEntry(tr("No label"), address, type, base, isUnsigned,
-                                                length, false, isBranchAbsolute);
-    m_watcher->addWatchEntry(newEntry);
+    entries.push_back(new MemWatchEntry(tr("No label"), address, type, base, isUnsigned, length,
+                                        false, isBranchAbsolute));
   }
+  m_watcher->addWatchEntries(entries);
 }
 
 void MainWindow::addAllResultsToWatchList(Common::MemType type, size_t length, bool isUnsigned,
                                           Common::MemBase base, bool isBranchAbsolute)
 {
-  for (auto item : m_scanner->getAllResults())
+  const size_t count = m_scanner->getResultCount();
+  std::vector<MemWatchEntry*> entries;
+  entries.reserve(count);
+  for (size_t i = 0; i < count; ++i)
   {
-    MemWatchEntry* newEntry = new MemWatchEntry(tr("No label"), item, type, base, isUnsigned,
-                                                length, false, isBranchAbsolute);
-    m_watcher->addWatchEntry(newEntry);
+    u32 address = m_scanner->getResultAddressAt(static_cast<int>(i));
+    entries.push_back(new MemWatchEntry(tr("No label"), address, type, base, isUnsigned, length,
+                                        false, isBranchAbsolute));
   }
+  m_watcher->addWatchEntries(entries);
 }
 
 void MainWindow::addWatchRequested(u32 address, Common::MemType type, size_t length,

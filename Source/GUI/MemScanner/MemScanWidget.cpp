@@ -11,6 +11,7 @@
 #include <QRegularExpression>
 #include <QShortcut>
 #include <QVBoxLayout>
+#include <algorithm>
 #include <cassert>
 #include <sstream>
 #include "../GUICommon.h"
@@ -236,6 +237,16 @@ ResultsListModel* MemScanWidget::getResultListModel() const
 std::vector<u32> MemScanWidget::getAllResults() const
 {
   return m_memScanner->getResultsConsoleAddr();
+}
+
+u32 MemScanWidget::getResultAddressAt(const int index) const
+{
+  return m_memScanner->getResultAddressAt(index);
+}
+
+size_t MemScanWidget::getResultCount() const
+{
+  return m_memScanner->getResultCount();
 }
 
 QModelIndexList MemScanWidget::getSelectedResults() const
@@ -502,6 +513,7 @@ void MemScanWidget::onNextScan()
 
 void MemScanWidget::onUndoScan()
 {
+  m_tblResulstList->scrollToTop();
   if (m_memScanner->hasUndo())
   {
     m_memScanner->undoScan();
@@ -509,7 +521,7 @@ void MemScanWidget::onUndoScan()
     const size_t resultsFound{m_memScanner->getResultCount()};
     m_lblResultCount->setText(tr("%1 result(s) found", "", static_cast<int>(resultsFound))
                                   .arg(QString::number(resultsFound)));
-    if (resultsFound <= 1000 && resultsFound != 0)
+    if (resultsFound <= m_showThreshold && resultsFound != 0)
     {
       m_btnAddAll->setEnabled(true);
       m_btnAddSelection->setEnabled(true);
@@ -533,6 +545,7 @@ void MemScanWidget::onUndoScan()
 
 void MemScanWidget::onResetScan()
 {
+  m_tblResulstList->scrollToTop();
   m_memScanner->reset();
   m_lblResultCount->setText("");
   m_btnAddAll->setEnabled(false);
@@ -565,11 +578,23 @@ void MemScanWidget::onAddSelection()
 
 void MemScanWidget::onRemoveSelection()
 {
-  if (!m_tblResulstList->selectionModel()->hasSelection())
+  QModelIndexList selection = m_tblResulstList->selectionModel()->selectedRows();
+  if (selection.isEmpty())
     return;
 
-  while (m_tblResulstList->selectionModel()->hasSelection())
-    m_resultsListModel->removeRow(m_tblResulstList->selectionModel()->selectedRows().at(0).row());
+  std::sort(selection.begin(), selection.end(),
+            [](const QModelIndex& a, const QModelIndex& b) { return a.row() > b.row(); });
+
+  int i = 0;
+  while (i < selection.count())
+  {
+    int endRow = selection[i].row();
+    int count = 1;
+    while (i + count < selection.count() && selection[i + count].row() == endRow - count)
+      count++;
+    m_resultsListModel->removeRows(endRow - count + 1, count, QModelIndex());
+    i += count;
+  }
 
   // The result count is already updated at the backend by this point
   const size_t resultsFound{m_memScanner->getResultCount()};

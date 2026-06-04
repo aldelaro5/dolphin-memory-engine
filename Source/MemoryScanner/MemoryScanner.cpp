@@ -376,15 +376,14 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFilter
 void MemScanner::reset()
 {
   m_resultsConsoleAddr.clear();
+  m_resultsConsoleAddr.shrink_to_fit();
   m_wasUnknownInitialValue = false;
   delete[] m_scanRAMCache;
   m_scanRAMCache = nullptr;
   m_resultCount = 0;
   m_scanStarted = false;
-  while (!m_UndoStack.empty())
-  {
-    m_UndoStack.pop();
-  }
+  std::stack<MemScannerUndoAction> empty;
+  std::swap(m_UndoStack, empty);
   m_undoCount = 0;
 }
 
@@ -626,6 +625,11 @@ bool MemScanner::typeSupportsAdditionalOptions(const Common::MemType type)
 std::vector<u32> MemScanner::getResultsConsoleAddr() const
 {
   return m_resultsConsoleAddr;
+}
+
+u32 MemScanner::getResultAddressAt(const int index) const
+{
+  return m_resultsConsoleAddr.at(index);
 }
 
 std::string MemScanner::getFormattedScannedValueAt(const int index) const

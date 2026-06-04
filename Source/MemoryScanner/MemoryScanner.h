@@ -137,6 +137,7 @@ public:
   bool setSearchRange(u32 beginRange, u32 endRange);
 
   std::vector<u32> getResultsConsoleAddr() const;
+  u32 getResultAddressAt(int index) const;
   size_t getResultCount() const;
   bool hasUndo() const;
   size_t getUndoCount() const;

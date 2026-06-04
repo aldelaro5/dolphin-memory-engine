@@ -31,6 +31,8 @@ public:
 
   ResultsListModel* getResultListModel() const;
   std::vector<u32> getAllResults() const;
+  u32 getResultAddressAt(int index) const;
+  size_t getResultCount() const;
   QModelIndexList getSelectedResults() const;
 
   void onScanFilterChanged();
