@@ -100,11 +100,49 @@ DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
     }
   });
 
+  QGroupBox* grbMemorySizeSettings = new QGroupBox("Memory Size settings");
+
+  m_lblMEM1Size = new QLabel();
+  m_lblMEM2Size = new QLabel();
+  m_sldMEM1Size = new QSlider(Qt::Horizontal);
+  m_sldMEM2Size = new QSlider(Qt::Horizontal);
+  connect(m_sldMEM1Size, &QSlider::valueChanged, [this](int slider_value) {
+    m_lblMEM1Size->setText(tr("%1 MB (MEM1)").arg(QString::number(slider_value)));
+  });
+  connect(m_sldMEM2Size, &QSlider::valueChanged, [this](int slider_value) {
+    m_lblMEM2Size->setText(tr("%1 MB (MEM2)").arg(QString::number(slider_value)));
+  });
+  m_sldMEM1Size->setRange(24, 64);
+  m_sldMEM2Size->setRange(64, 128);
+
+  m_chkAutoDetectMemory = new QCheckBox("Automatically detect MEM1 and MEM2 size");
+  connect(m_chkAutoDetectMemory, &QCheckBox::toggled, [this](bool checked) {
+    m_sldMEM1Size->setEnabled(!checked);
+    m_sldMEM2Size->setEnabled(!checked);
+    m_lblMEM1Size->setEnabled(!checked);
+    m_lblMEM2Size->setEnabled(!checked);
+  });
+
+  QHBoxLayout* MEM1Layout = new QHBoxLayout();
+  QHBoxLayout* MEM2Layout = new QHBoxLayout();
+  MEM1Layout->addWidget(m_sldMEM1Size);
+  MEM1Layout->addWidget(m_lblMEM1Size);
+  MEM2Layout->addWidget(m_sldMEM2Size);
+  MEM2Layout->addWidget(m_lblMEM2Size);
+
+  QVBoxLayout* memorySettingsInputLayout = new QVBoxLayout();
+  memorySettingsInputLayout->addWidget(m_chkAutoDetectMemory);
+  memorySettingsInputLayout->addLayout(MEM1Layout);
+  memorySettingsInputLayout->addLayout(MEM2Layout);
+
+  grbMemorySizeSettings->setLayout(memorySettingsInputLayout);
+
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(grbCoreSettings);
   mainLayout->addWidget(grbTimerSettings);
   mainLayout->addWidget(grbScannerSettings);
   mainLayout->addWidget(grbViewerSettings);
+  mainLayout->addWidget(grbMemorySizeSettings);
   mainLayout->addWidget(m_buttonsDlg);
   setLayout(mainLayout);
 
@@ -128,6 +166,15 @@ void DlgSettings::loadSettings()
   m_cmbViewerBytesSeparator->setCurrentIndex(
       m_cmbViewerBytesSeparator->findData(SConfig::getInstance().getViewerNbrBytesSeparator()));
   m_cmbTheme->setCurrentIndex(m_cmbTheme->findData(SConfig::getInstance().getTheme()));
+  // This erases fractional mebibyte sizes, but nobody should be using those anyway.
+  m_sldMEM1Size->setValue(static_cast<int>(SConfig::getInstance().getMEM1Size()) / 1024 / 1024);
+  m_sldMEM2Size->setValue(static_cast<int>(SConfig::getInstance().getMEM2Size()) / 1024 / 1024);
+  bool autoDetect = SConfig::getInstance().getAutoDetectMemorySize();
+  m_chkAutoDetectMemory->setChecked(autoDetect);
+  m_sldMEM1Size->setEnabled(!autoDetect);
+  m_sldMEM2Size->setEnabled(!autoDetect);
+  m_lblMEM1Size->setEnabled(!autoDetect);
+  m_lblMEM2Size->setEnabled(!autoDetect);
 }
 
 void DlgSettings::saveSettings() const
@@ -140,4 +187,7 @@ void DlgSettings::saveSettings() const
   SConfig::getInstance().setViewerNbrBytesSeparator(
       m_cmbViewerBytesSeparator->currentData().toInt());
   SConfig::getInstance().setTheme(m_cmbTheme->currentData().toInt());
+  SConfig::getInstance().setMEM1Size(m_sldMEM1Size->value() * 1024 * 1024);
+  SConfig::getInstance().setMEM2Size(m_sldMEM2Size->value() * 1024 * 1024);
+  SConfig::getInstance().setAutoDetectMemorySize(m_chkAutoDetectMemory->isChecked());
 }
