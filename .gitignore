@@ -24,3 +24,4 @@ Source/.idea/*
 .DS_Store
 .vs/
 .vscode/
+build/
