@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDialog>
 #include <QLabel>
@@ -31,4 +32,9 @@ private:
   QSpinBox* m_spnScannerShowThreshold;
   QComboBox* m_cmbViewerBytesSeparator;
   QDialogButtonBox* m_buttonsDlg;
+  QSlider* m_sldMEM1Size;
+  QSlider* m_sldMEM2Size;
+  QLabel* m_lblMEM1Size;
+  QLabel* m_lblMEM2Size;
+  QCheckBox* m_chkAutoDetectMemory;
 };

@@ -3,6 +3,7 @@
 #include "MacDolphinProcess.h"
 #include "../../Common/CommonUtils.h"
 #include "../../Common/MemoryCommon.h"
+#include "../GUI/Settings/SConfig.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -124,7 +125,20 @@ bool MacDolphinProcess::obtainEmuRAMInformations()
     if (systemInfo.isDiscMagicWordGCKnown() && systemInfo.isBootCodeKnown())
     {
       m_emuRAMAddressStart = regionAddr;
-      m_MEM1Size = dolphinOSGlobals.getSimulatedMemorySize();
+      // SConfig::getMEM1Size and SConfig::getMEM2Size are not entirely safe but
+      // there is no way to figure out the actual memory size at runtime, as bi2.bin
+      // can lie (delibrately modified while BAT#U/BAT#L can be something else) and
+      // dolphin only writes settings to its INIs when closing. The automatic detection
+      // using bi2.bin is a safe fallback but edge cases of customized bi2.bin and modified
+      // BAT registers leads to improper sizes (missing valid memory in the memory view).
+      if (!SConfig::getInstance().getAutoDetectMemorySize())
+      {
+        m_MEM1Size = SConfig::getInstance().getMEM1Size();
+      }
+      else
+      {
+        m_MEM1Size = dolphinOSGlobals.getSimulatedMemorySize();
+      }
       m_ARAMSize = dolphinOSGlobals.getARAMSize();
       break;
     }
@@ -133,8 +147,16 @@ bool MacDolphinProcess::obtainEmuRAMInformations()
     if (systemInfo.isDiscMagicWordWiiKnown() && systemInfo.isBootCodeKnown())
     {
       m_emuRAMAddressStart = regionAddr;
-      m_MEM1Size = wiiSpecificInfo.getSimulatedMEM1Size();
-      m_MEM2Size = wiiSpecificInfo.getSimulatedMEM2Size();
+      if (!SConfig::getInstance().getAutoDetectMemorySize())
+      {
+        m_MEM1Size = SConfig::getInstance().getMEM1Size();
+        m_MEM2Size = SConfig::getInstance().getMEM2Size();
+      }
+      else
+      {
+        m_MEM1Size = wiiSpecificInfo.getSimulatedMEM1Size();
+        m_MEM2Size = wiiSpecificInfo.getSimulatedMEM2Size();
+      }
       break;
     }
 
@@ -149,8 +171,16 @@ bool MacDolphinProcess::obtainEmuRAMInformations()
         dolphinOSGlobals.getSimulatedMemorySize() == wiiSpecificInfo.getSimulatedMEM1Size())
     {
       m_emuRAMAddressStart = regionAddr;
-      m_MEM1Size = wiiSpecificInfo.getSimulatedMEM1Size();
-      m_MEM2Size = wiiSpecificInfo.getSimulatedMEM2Size();
+      if (!SConfig::getInstance().getAutoDetectMemorySize())
+      {
+        m_MEM1Size = SConfig::getInstance().getMEM1Size();
+        m_MEM2Size = SConfig::getInstance().getMEM2Size();
+      }
+      else
+      {
+        m_MEM1Size = wiiSpecificInfo.getSimulatedMEM1Size();
+        m_MEM2Size = wiiSpecificInfo.getSimulatedMEM2Size();
+      }
       break;
     }
   }
