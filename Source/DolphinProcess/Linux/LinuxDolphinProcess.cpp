@@ -63,8 +63,11 @@ bool LinuxDolphinProcess::obtainEmuRAMInformations()
     std::string line;
     while (getline(mapsFile, line))
     {
-      if (line.find("/dev/shm/dolphin-emu") == std::string::npos &&
-          line.find("/dev/shm/dolphinmem") == std::string::npos)
+      if (  // Shared mappings
+          (line.find("/dev/shm/dolphin-emu") == std::string::npos &&
+           line.find("/dev/shm/dolphinmem") == std::string::npos) &&
+          // Anonymous mappings
+          (line.find("rw-p") == std::string::npos && line.find("00:00 0") == std::string::npos))
         continue;
 
       const std::vector<std::string> lineParts{Common::splitBySpace(line)};
@@ -140,24 +143,49 @@ bool LinuxDolphinProcess::obtainEmuRAMInformations()
   {
     const u64 size{secondAddress - firstAddress};
 
-    if (m_ARAMSize && size == Common::NextPowerOf2(m_MEM1Size) &&
-        (offset & 0x00040000) == 0x00040000)
+    if (systemInfo.isDiscMagicWordGCKnown() && systemInfo.isBootCodeKnown() &&
+        size == dolphinOSGlobals.getARAMSize())
     {
-      m_emuARAMAdressStart = firstAddress;
-      m_ARAMAccessible = true;
-      break;
+      // Gamecube uses an anonymous private mmap.
+      // https://github.com/dolphin-emu/dolphin/blob/1bc93fd16d5a452bedcc5437923abd0d9fcb8c52/Source/Core/Core/HW/DSP.cpp#L138
+      // https://github.com/dolphin-emu/dolphin/blob/1bc93fd16d5a452bedcc5437923abd0d9fcb8c52/Source/Core/Common/MemoryUtil.cpp#L128
+      // ARAM dumps start with a common pattern of 02 9F 00 10 but only if the game
+      // initializes ARAM (it's all zeroes otherwise). Unsure if this is reliable
+      // to look for. Without this, the very first 16MiB sized mapping may not be
+      // ARAM, leading to a false postivie.
+      // TODO: There may be edge cases where this may fail. Most likely solution is other heuristics
+      // to look for?
+      u32 probe = 0;
+      ::readFromRAM(m_PID, firstAddress, 0, reinterpret_cast<char*>(&probe), sizeof(probe));
+      if (probe == 0x10009F02 || probe == 0x00000000)
+      {
+        m_emuARAMAdressStart = firstAddress;
+        m_ARAMAccessible = true;
+        break;
+      }
     }
-
-    if (m_MEM2Size && size == Common::NextPowerOf2(m_MEM2Size) &&
-        (offset & 0x00040000) == 0x00040000)
+    else
     {
-      m_MEM2AddressStart = firstAddress;
-      m_MEM2Present = true;
-      break;
-    }
+      // Wii uses a shared map for MEM2 and ARAM (ExRAM)
+      // TODO: Better heuristics for wii? Validating the memory for common patterns?
+      if (m_ARAMSize && size == Common::NextPowerOf2(m_MEM1Size) &&
+          (offset & 0x00040000) == 0x00040000)
+      {
+        m_emuARAMAdressStart = firstAddress;
+        m_ARAMAccessible = true;
+        break;
+      }
 
-    // TODO(CA): Ideally, we'd inspect the memory to try to determine whether it's pointing to the
-    // expected data, as opposed to relying on these fragile size and offset checks.
+      if (m_MEM2Size && size == Common::NextPowerOf2(m_MEM2Size) &&
+          (offset & 0x00040000) == 0x00040000)
+      {
+        m_MEM2AddressStart = firstAddress;
+        m_MEM2Present = true;
+        break;
+      }
+      // TODO(CA): Ideally, we'd inspect the memory to try to determine whether it's pointing to the
+      // expected data, as opposed to relying on these fragile size and offset checks.
+    }
   }
 
   return m_emuRAMAddressStart != 0;
