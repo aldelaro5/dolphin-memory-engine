@@ -124,28 +124,25 @@ jobs:
           path: dolphin-memory-engine.AppImage
 
   build-macos:
-    runs-on: macos-15
+    runs-on: macos-26
     name: 🍎 macOS
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      # Current Runner has cmake we want by default; Omitting for now but restore if they stop bundling it
-      # - name: Install Dependencies
-      #   run: |
-      #     brew install --formula cmake
-      #   shell: bash
-
-      - name: Initialize submodules
-        run: git submodule update --init
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.11.1'
+          archives: 'qtbase qtsvg'
 
       - name: Build
         run: |
           mkdir Source/build
           cd Source/build
           cmake .. \
-            -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)" \
+            -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" \
             -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           make
           echo -e "\n" | ../../Tools/MacDeploy.sh
