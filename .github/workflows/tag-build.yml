@@ -143,15 +143,18 @@ jobs:
             dolphin-memory-engine-${{ github.ref_name }}-linux-x86_64-binary.tar.gz
 
   build-macos:
-    runs-on: macos-15
+    runs-on: macos-26
     name: 🍎 macOS (TAG)
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Initialize submodules
-        run: git submodule update --init
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.11.1'
+          archives: 'qtbase qtsvg'
         
       - name: Set APP_VERSION for tags
         run: echo "APP_VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
@@ -161,7 +164,7 @@ jobs:
           mkdir -p Source/build
           cd Source/build
           cmake .. \
-            -DCMAKE_PREFIX_PATH="$(realpath ../../Externals/Qt-macOS)" \
+            -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" \
             -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           make
           echo -e "\n" | ../../Tools/MacDeploy.sh
